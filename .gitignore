@@ -6,7 +6,7 @@
 ._*
 
 # Custom folder icons
-Icon
+Icon
 
 # Volume root files
 .DocumentRevisions-V100
@@ -61,3 +61,7 @@ out/
 .yarn/unplugged
 .yarn/install-state.gz
 .pnp.*
+
+### Large binaries (exceed GitHub's 100MB limit) — kept locally, not committed
+*.exe
+Extract/ExiledGuildManager.exe
