@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3 uid="uid://7478k7hodnc6"]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "morale_gain"
+display_name = "Morale Gain"
+description = "A bonus (or penalty, if negative) to any source of Morale Gain."
+stat_type = 1
+min_value = -100.0
+max_value = 1000.0
+show_as_percentage = true
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

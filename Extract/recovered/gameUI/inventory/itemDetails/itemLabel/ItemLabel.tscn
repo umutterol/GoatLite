@@ -1,0 +1,161 @@
+[gd_scene format=3 uid="uid://de8ahkno68e6"]
+
+[ext_resource type="Script" uid="uid://bmixwwjkrknpj" path="res://gameUI/inventory/itemDetails/itemLabel/ItemLabel.gd" id="1"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4jqg1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5841c"]
+bg_color = Color(0.08, 0.07, 0.05, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.57, 0.41, 0.04, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4jqg1"]
+bg_color = Color(0.050708726, 0.050708726, 0.050708726, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8628016, 0.7010953, 0.5819601, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+expand_margin_left = 4.0
+expand_margin_top = 4.0
+expand_margin_right = 4.0
+expand_margin_bottom = 4.0
+
+[node name="ItemLabel" type="PanelContainer" unique_id=51999236]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxEmpty_4jqg1")
+script = ExtResource("1")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=764346157]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_5841c")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=1387165582]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=1498291361]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 10
+
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1030822000]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_4jqg1")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer" unique_id=1933911028]
+layout_mode = 2
+size_flags_vertical = 4
+alignment = 1
+
+[node name="ItemName" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer/VBoxContainer" unique_id=1678221857]
+clip_contents = false
+layout_mode = 2
+size_flags_vertical = 4
+bbcode_enabled = true
+text = "Example Item Name"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ItemBase" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer/VBoxContainer" unique_id=209814582]
+clip_contents = false
+layout_mode = 2
+size_flags_vertical = 4
+bbcode_enabled = true
+text = "Item Base"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CategoryLevel" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1566004349]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 12
+bbcode_enabled = true
+text = "Belt: Item Level 10"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MonsterInfrequent" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=2014011001]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 12
+bbcode_enabled = true
+text = "[center][color=#B020D8]Monster Infrequent — Crabs[/color][/center]"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Corrupted" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1900113001]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 12
+bbcode_enabled = true
+text = "[center][color=#c43838]Corrupted[/color][/center]"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1813008449]
+layout_mode = 2
+
+[node name="BaseStats" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=945470304]
+layout_mode = 2
+bbcode_enabled = true
+text = "This is where base stats go if there are any."
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+
+[node name="BaseStatsDivider" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1016377432]
+layout_mode = 2
+
+[node name="Implicits" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=329576906]
+layout_mode = 2
+bbcode_enabled = true
+text = "This is where implicits go
+If there are any"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+
+[node name="ImplicitDivider" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1633025626]
+layout_mode = 2
+
+[node name="Modifiers" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=150690122]
+layout_mode = 2
+size_flags_vertical = 4
+bbcode_enabled = true
+text = "7% Increased Item Modifier
++23 Item Modifier to Stat
+14% Increased Modifier
+"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1

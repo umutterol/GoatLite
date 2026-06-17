@@ -1,0 +1,271 @@
+[gd_scene format=3 uid="uid://bl4rtu7xwe5h1"]
+
+[ext_resource type="Script" uid="uid://bumgk854not8b" path="res://debug/testScenes/combatTests/CombatSandbox.gd" id="1"]
+
+[node name="CombatSandbox" type="Control" unique_id=660849668]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="HSplit" type="HSplitContainer" parent="." unique_id=1283197722]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offsets = PackedInt32Array(320)
+split_offset = 320
+
+[node name="LeftPanel" type="PanelContainer" parent="HSplit" unique_id=80560558]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="HSplit/LeftPanel" unique_id=309614935]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="HSplit/LeftPanel/Scroll" unique_id=1910836331]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="HSplit/LeftPanel/Scroll/Margin" unique_id=1397371233]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1458717839]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Combat Sandbox"
+
+[node name="Hint" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=696452956]
+modulate = Color(1, 1, 1, 0.6)
+layout_mode = 2
+text = "Pick a monster + counts, click Fight. Playback embeds on the right."
+autowrap_mode = 2
+
+[node name="Sep1" type="HSeparator" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=231203860]
+layout_mode = 2
+
+[node name="MonsterHeader" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1232116413]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Monster"
+
+[node name="MonsterOption" type="OptionButton" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1153754516]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Scanned from systems/monsters/normal/ and systems/monsters/unique/."
+
+[node name="MonsterCountLabel" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=310252883]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Monster count: 1"
+
+[node name="MonsterCountSlider" type="HSlider" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=229419418]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 5.0
+value = 1.0
+
+[node name="ReloadMonstersButton" type="Button" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=399071911]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Re-scan monster .tres files (pick up newly authored monsters without restarting)."
+text = "Reload monsters"
+
+[node name="Sep2" type="HSeparator" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=217291119]
+layout_mode = 2
+
+[node name="ExilesHeader" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1313505081]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Exiles"
+
+[node name="ExilesHint" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=832708621]
+modulate = Color(1, 1, 1, 0.55)
+layout_mode = 2
+text = "Generated via real ExileGenerator + ItemGenerator. Melee = 1H sword + shield, Ranged = bow."
+autowrap_mode = 2
+
+[node name="MeleeCountLabel" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1967324034]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Melee exiles: 1"
+
+[node name="MeleeCountSlider" type="HSlider" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=2006367467]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 5.0
+value = 1.0
+
+[node name="RangedCountLabel" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=933837644]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Ranged exiles: 0"
+
+[node name="RangedCountSlider" type="HSlider" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1401472557]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 5.0
+
+[node name="ExileLevelLabel" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=772135252]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Exile level: 1"
+
+[node name="ExileLevelSlider" type="HSlider" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=58505083]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Generator runs queue_level_up + resolve_pending_growth for level > 1, so stats grow naturally."
+min_value = 1.0
+max_value = 10.0
+value = 1.0
+
+[node name="Sep3" type="HSeparator" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1702685357]
+layout_mode = 2
+
+[node name="AilmentHeader" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=-1584967295]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Ailment Test Setup"
+
+[node name="AilmentHint" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=-1584967294]
+modulate = Color(1, 1, 1, 0.55)
+layout_mode = 2
+text = "Presets override exile current_stats AFTER recalculate_stats. Pair with low monster life to reliably see ailments fire."
+autowrap_mode = 2
+
+[node name="AilmentPresetOption" type="OptionButton" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=-1584967293]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Vanilla = no overrides. Force X = boost the relevant damage type + ailment stats so X fires reliably. Mixed = modest of everything. Crit Build = 60% crit + 200% mult + ailment-effect boosts."
+
+[node name="ForceCritsCheck" type="CheckBox" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=-1584967292]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Bumps critical_chance to 100% on top of the preset. Guarantees ignite (crit short-circuits the chance roll) and amplifies shock/chill magnitudes via post-crit damage."
+text = "Force crits (100% crit chance)"
+
+[node name="MonsterFragilityLabel" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=-1584967291]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Monster life: ×1.00"
+
+[node name="MonsterFragilitySlider" type="HSlider" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=-1584967290]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Multiplier on monster max life. Lower = ailment magnitudes (which scale by damage / max life) hit the threshold easier and ailments register every hit. Higher = tankier; useful for testing DoT uptime."
+min_value = 0.1
+max_value = 3.0
+step = 0.05
+value = 1.0
+
+[node name="Sep3b" type="HSeparator" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=-1584967289]
+layout_mode = 2
+
+[node name="ArenaHeader" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1466597399]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Arena"
+
+[node name="ArenaWidthLabel" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=668984743]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Arena width: 30 units"
+
+[node name="ArenaWidthSlider" type="HSlider" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1750116889]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 10.0
+max_value = 60.0
+value = 30.0
+
+[node name="ArenaHeightLabel" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=998807894]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Arena height: 20 units"
+
+[node name="ArenaHeightSlider" type="HSlider" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1835456326]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 10.0
+max_value = 40.0
+value = 20.0
+
+[node name="Sep4" type="HSeparator" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=237540363]
+layout_mode = 2
+
+[node name="SeedHeader" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1442937661]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Seed"
+
+[node name="SeedEdit" type="LineEdit" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=2044156368]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Empty = 0 (sim randomizes). Type a number to repro a specific fight. Random check overrides."
+placeholder_text = "(auto)"
+
+[node name="RandomSeedCheck" type="CheckBox" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1849381429]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+text = "Random seed each fight"
+
+[node name="Sep5" type="HSeparator" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1280002006]
+layout_mode = 2
+
+[node name="FightButton" type="Button" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1843991411]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Fight"
+
+[node name="StatusLabel" type="Label" parent="HSplit/LeftPanel/Scroll/Margin/VBox" unique_id=1628421115]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.75)
+layout_mode = 2
+text = "Loading..."
+autowrap_mode = 2
+
+[node name="RightPanel" type="PanelContainer" parent="HSplit" unique_id=926371772]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PlaybackHost" type="Control" parent="HSplit/RightPanel" unique_id=467038331]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PlaceholderLabel" type="Label" parent="HSplit/RightPanel/PlaybackHost" unique_id=889065743]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.45)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -10.0
+offset_right = 160.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Click Fight to begin"
+horizontal_alignment = 1
+vertical_alignment = 1

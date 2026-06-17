@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://c3rxcbsb10anf"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_0ffbd"]
+script = ExtResource("2")
+stat_id = "victory_morale_bonus"
+base_value = 1.0
+value_per_stack = 1.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_lfici"]
+script = ExtResource("2")
+stat_id = "attack_speed"
+scaling_type = 1
+base_value = 4.0
+value_per_stack = 4.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "revel"
+name = "Revel"
+description = "In such grim circumstance you must celebrate every victory."
+rarity = 1
+icon = null
+max_stacks = 3
+stat_tags = ["morale", "attack_speed"]
+theme_tags = ["warrior"]
+category_tags = ["offence"]
+primary_tag = "morale"
+stat_bonuses = [SubResource("Resource_0ffbd"), SubResource("Resource_lfici")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

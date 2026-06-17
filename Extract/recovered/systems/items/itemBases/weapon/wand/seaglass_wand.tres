@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://crjj8u5sdkwrb"]
+
+[ext_resource type="Resource" uid="uid://dl4q258kjbcac" path="res://systems/combat/vfx/presets/water_spuirt.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://crj1ma2drg66" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/seaglass_wand.webp" id="2"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="3"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="4"]
+
+[sub_resource type="Resource" id="Resource_115rq"]
+script = ExtResource("3")
+affix_id = "chill_effect"
+display_name = "Chill Effect"
+is_implicit = true
+stat_type = "chill_effect_more_pct"
+modifier_type = 3
+min_value = 10.0
+max_value = 20.0
+value_suffix = "%"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("4")
+item_id = "seaglass_wand"
+display_name = "Seaglass Wand"
+icon = ExtResource("2")
+weapon_type = 6
+min_item_level = 3
+required_level = 3
+grid_height = 2
+base_cold_damage_min = 4
+base_cold_damage_max = 6
+base_attack_speed = 1.1
+base_critical_chance = 8.0
+base_attack_range = 6.0
+implicit_affixes = [SubResource("Resource_115rq")]
+ranged = true
+attack_vfx = ExtResource("1")
+metadata/_custom_type_script = "uid://cetys5ykyhird"

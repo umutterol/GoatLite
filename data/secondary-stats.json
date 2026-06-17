@@ -1,0 +1,22 @@
+[
+  {
+    "id": "of-precision", "name": "of Precision", "statId": "crit", "weight": 100, "phase": 2,
+    "valueByKey": { "2": [1, 3], "6": [3, 6], "11": [6, 10], "16": [10, 15] },
+    "validSlots": ["weapon", "helm", "chest", "legs", "boots", "trinket"]
+  },
+  {
+    "id": "of-alacrity", "name": "of Alacrity", "statId": "haste", "weight": 100, "phase": 2,
+    "valueByKey": { "2": [1, 3], "6": [3, 6], "11": [6, 10], "16": [10, 15] },
+    "validSlots": ["weapon", "helm", "chest", "legs", "boots", "trinket"]
+  },
+  {
+    "id": "of-mastery", "name": "of Mastery", "statId": "mastery", "weight": 100, "phase": 2,
+    "valueByKey": { "2": [1, 4], "6": [4, 7], "11": [7, 11], "16": [11, 17] },
+    "validSlots": ["weapon", "helm", "chest", "legs", "boots", "trinket"]
+  },
+  {
+    "id": "of-adaptation", "name": "of Adaptation", "statId": "versatility", "weight": 100, "phase": 2,
+    "valueByKey": { "2": [1, 3], "6": [3, 5], "11": [5, 9], "16": [9, 13] },
+    "validSlots": ["weapon", "helm", "chest", "legs", "boots", "trinket"]
+  }
+]

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="StatusEffect" format=3 uid="uid://d46kqm457d8x"]
+
+[ext_resource type="Script" uid="uid://c7u4b1n711gll" path="res://systems/combat/statusEffects/StatusEffect.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://d46kdcmqcfex" path="res://systems/combat/vfx/persistentPresets/IgniteFireVFX.tscn" id="2"]
+[ext_resource type="Script" uid="uid://thfpduvqcsyc" path="res://systems/combat/vfx/PersistentVFX.gd" id="3"]
+
+[sub_resource type="Resource" id="VFXIgnite"]
+script = ExtResource("3")
+application_burst_scene = null
+overlay_scene = ExtResource("2")
+removal_burst_scene = null
+portrait_tint = Color(1, 0.85, 0.7, 1)
+icon = null
+ambient_impact_fx = null
+ambient_impact_interval_seconds = 0.25
+
+[resource]
+script = ExtResource("1")
+effect_id = &"ignite"
+display_name = "Ignite"
+description = "Burning. Deals fire damage per second for several seconds. Damage applies to energy shield first, then life. Cannot be inflicted again by a weaker ignite while a stronger one is active.
+
+Scales with the attacker's Ignite Effect %, Ignite Duration %, and the generic Damage over Time % stat. Duration scales independently of damage — a longer ignite is a longer-lasting burn at the same DPS, dealing more total damage."
+duration_seconds = 4.0
+refresh_mode = 3
+is_damage_over_time = true
+per_tick_effects = {
+"fire_damage_per_sec": 100.0
+}
+vfx = SubResource("VFXIgnite")

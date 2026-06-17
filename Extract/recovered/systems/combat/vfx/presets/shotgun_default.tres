@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ShotgunVFX" format=3 uid="uid://dmp7okrqnrub2"]
+
+[ext_resource type="Resource" path="res://systems/combat/vfx/impactPresets/blood_default.tres" id="1"]
+[ext_resource type="Script" uid="uid://xh5i1r11hpwr" path="res://systems/combat/vfx/ShotgunVFX.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+pellet_count = 32
+impact_fx = ExtResource("1")

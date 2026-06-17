@@ -1,0 +1,4 @@
+[
+  { "id": "ashveil-pack-a", "name": "Ossuary Wardens", "tags": ["ashveil", "undead"], "mobs": [ { "enemyId": "bone-acolyte", "count": 2 }, { "enemyId": "crypt-horror", "count": 3 } ] },
+  { "id": "ashveil-pack-b", "name": "Barrow Procession", "tags": ["ashveil", "undead"], "mobs": [ { "enemyId": "crypt-horror", "count": 4 }, { "enemyId": "bone-acolyte", "count": 1 } ] }
+]

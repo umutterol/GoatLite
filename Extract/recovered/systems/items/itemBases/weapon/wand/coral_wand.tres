@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://b556qtrgyxnb3"]
+
+[ext_resource type="Resource" uid="uid://c42ljfkgw4qxg" path="res://systems/combat/vfx/presets/lightning_default.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://bctn3t0ay5w3v" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Goat's_Horn_inventory_icon.png" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[resource]
+script = ExtResource("3")
+item_id = "coral_wand"
+display_name = "Coral Wand"
+description = "A length of polished pink coral, the tip humming faintly. Storm-fishermen claim it remembers lightning."
+icon = ExtResource("2")
+weapon_type = 6
+min_item_level = 2
+required_level = 2
+grid_height = 2
+base_lightning_damage_min = 1
+base_lightning_damage_max = 8
+base_critical_chance = 8.0
+base_attack_range = 5.0
+ranged = true
+attack_vfx = ExtResource("1")
+metadata/_custom_type_script = "uid://cetys5ykyhird"

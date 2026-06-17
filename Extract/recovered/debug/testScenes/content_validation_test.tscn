@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://4b5rnbc3yaea"]
+
+[ext_resource type="Script" uid="uid://mxjrgro0p1j3" path="res://debug/testScenes/content_validation_test.gd" id="1"]
+
+[node name="ContentValidationTest" type="Node2D" unique_id=1160876698]
+script = ExtResource("1")

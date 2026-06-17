@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="HomingVFX" format=3 uid="uid://cdgfkg77gahd8"]
+
+[ext_resource type="Resource" path="res://systems/combat/vfx/impactPresets/chaos_tendrils.tres" id="1"]
+[ext_resource type="Script" uid="uid://dfqcnbaoshx3f" path="res://systems/combat/vfx/HomingVFX.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+projectile_count = 3
+sequence_stagger = 0.2
+arrival_fraction = 0.15000000000000002
+post_arrival_fade_exponent = 5.0
+twist_amplitude = 9.5
+twist_frequency = 1.5
+trajectory_segments = 24
+pellet_radius = 1.25
+pellet_length = 30.0
+pellet_glow_radius_mult = 2.6
+core_brightness = 0.8
+trail_length = 0.25
+trail_width = 1.25
+color_override = Color(0.56078434, 0.003921569, 0.84705883, 0.90588236)
+lifetime_seconds = 2.6
+homes_on_target = true
+impact_fx = ExtResource("1")
+impact_landing_progress = 0.0

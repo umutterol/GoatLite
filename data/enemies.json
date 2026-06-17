@@ -1,0 +1,10 @@
+[
+  { "id": "sexton-caldew", "name": "Sexton Caldew", "kind": "boss", "stage": 2, "dungeonId": "ashveil-crypts", "abilityId": "grave-detail",     "testsTactic": "killorder",   "baseHp": 60, "baseDamage": 8,  "icon": "tac-killorder",   "flavor": "The crypt's undying caretaker, still working." },
+  { "id": "embalmer-vesk", "name": "Embalmer Vesk", "kind": "boss", "stage": 4, "dungeonId": "ashveil-crypts", "abilityId": "preserving-fume",  "testsTactic": "interrupts",  "baseHp": 64, "baseDamage": 9,  "icon": "tac-interrupts",  "flavor": "Alchemist of the dead." },
+  { "id": "the-unmourned", "name": "The Unmourned", "kind": "boss", "stage": 6, "dungeonId": "ashveil-crypts", "abilityId": "pooling-sorrow",   "testsTactic": "positioning", "baseHp": 68, "baseDamage": 10, "icon": "tac-positioning", "flavor": "The city's unclaimed dead, fused into one shape." },
+  { "id": "othrend",       "name": "Othrend, Last of the Interred Kings", "kind": "boss", "stage": 8, "dungeonId": "ashveil-crypts", "abilityId": "final-coronation", "testsTactic": "cooldowns", "baseHp": 78, "baseDamage": 12, "icon": "tac-cooldowns", "flavor": "Rises from the catafalque." },
+
+  { "id": "bone-acolyte",  "name": "Bone Acolyte",  "kind": "trash", "role": "caster", "baseHp": 10, "baseDamage": 4, "tags": ["ashveil", "undead", "caster"] },
+  { "id": "crypt-horror",  "name": "Crypt Horror",  "kind": "trash", "role": "melee",  "baseHp": 16, "baseDamage": 6, "tags": ["ashveil", "undead", "melee"] },
+  { "id": "grave-digger",  "name": "Grave Digger",  "kind": "trash", "role": "add",    "baseHp": 8,  "baseDamage": 3, "tags": ["ashveil", "undead", "add"] }
+]

@@ -1,0 +1,171 @@
+[gd_scene format=3 uid="uid://t5nfrkauubua"]
+
+[ext_resource type="Script" uid="uid://w8f5fan3ncu2" path="res://gameUI/inventory/equipment/EquipmentScreen.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bf65nhtsly1i8" path="res://assets/sprites/uiSprites/CloseXIcon.tres" id="2"]
+[ext_resource type="FontFile" uid="uid://ckdfy3nugcff5" path="res://assets/fonts/Fontin-SmallCaps.otf" id="3"]
+[ext_resource type="PackedScene" uid="uid://cgpjgiltsi0vk" path="res://gameUI/inventory/equipment/EquipmentSlotsLayout.tscn" id="4"]
+[ext_resource type="Script" uid="uid://oeu6xqwbm1sd" path="res://gameUI/inventory/inventoryGrid/SalvageGrid.gd" id="5"]
+[ext_resource type="PackedScene" uid="uid://c201htd523wec" path="res://gameUI/inventory/inventoryGrid/inventoryGrid.tscn" id="6"]
+[ext_resource type="Texture2D" uid="uid://ch7bva8pko3nh" path="res://assets/sprites/uiSprites/sortIcon.tres" id="7"]
+
+[node name="EquipmentScreen" type="Panel" unique_id=180923332]
+custom_minimum_size = Vector2(620, 0)
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -620.0
+script = ExtResource("1")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1157901952]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=2100676403]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=538507173]
+layout_mode = 2
+
+[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer/Header" unique_id=2102512844]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+icon = ExtResource("2")
+flat = true
+icon_alignment = 1
+
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer/Header" unique_id=988812935]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 24
+text = "EQUIPMENT"
+vertical_alignment = 1
+
+[node name="TopArea" type="Control" parent="MarginContainer/VBoxContainer" unique_id=-1293947295]
+custom_minimum_size = Vector2(0, 450)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SlotsContainer" parent="MarginContainer/VBoxContainer/TopArea" unique_id=801312925 instance=ExtResource("4")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -145.0
+offset_top = -195.0
+offset_right = 145.0
+offset_bottom = 195.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+
+[node name="SalvagePanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopArea" unique_id=1967981641]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="SalvageGridCenter" type="CenterContainer" parent="MarginContainer/VBoxContainer/TopArea/SalvagePanel" unique_id=814709810]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SalvageGrid" type="Control" parent="MarginContainer/VBoxContainer/TopArea/SalvagePanel/SalvageGridCenter" unique_id=148732603]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 2
+script = ExtResource("5")
+
+[node name="SalvageButtonsCenter" type="CenterContainer" parent="MarginContainer/VBoxContainer/TopArea/SalvagePanel" unique_id=1870546579]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SalvageButtonsRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TopArea/SalvagePanel/SalvageButtonsCenter" unique_id=1948087429]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SalvageConfirmButton" type="Button" parent="MarginContainer/VBoxContainer/TopArea/SalvagePanel/SalvageButtonsCenter/SalvageButtonsRow" unique_id=1933435798]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Scrap Items"
+
+[node name="CloseSalvageButton" type="Button" parent="MarginContainer/VBoxContainer/TopArea/SalvagePanel/SalvageButtonsCenter/SalvageButtonsRow" unique_id=1216411882]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Close"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer" unique_id=1690915214]
+layout_mode = 2
+
+[node name="StashHeaderRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=792632236]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="StashLabel" type="Label" parent="MarginContainer/VBoxContainer/StashHeaderRow" unique_id=1809318389]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 24
+text = "Guild Stash"
+vertical_alignment = 1
+
+[node name="Craftbtn" type="Button" parent="MarginContainer/VBoxContainer/StashHeaderRow" unique_id=1464917618]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Craft"
+
+[node name="Scrapbtn" type="Button" parent="MarginContainer/VBoxContainer/StashHeaderRow" unique_id=889277432]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Scrap"
+
+[node name="InventoryGrid" parent="MarginContainer/VBoxContainer" unique_id=1584925198 instance=ExtResource("6")]
+layout_mode = 2
+
+[node name="SortButton" type="TextureButton" parent="." unique_id=-1293947294]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -32.0
+offset_top = -32.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+tooltip_text = "Sort this tab"
+texture_normal = ExtResource("7")
+texture_pressed = ExtResource("7")
+texture_hover = ExtResource("7")
+ignore_texture_size = true
+stretch_mode = 5

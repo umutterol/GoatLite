@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ClassDefinition" format=3 uid="uid://cngixfk1t4p23"]
+
+[ext_resource type="Texture2D" uid="uid://dwk5bfe85lmis" path="res://systems/exile/exileClasses/2_uncommon/warrioricon.webp" id="1"]
+[ext_resource type="Script" uid="uid://diftkoyemu6om" path="res://systems/exile/exileClasses/ClassDefinition.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+class_id = "warrior"
+name = "Warrior"
+description = "Whether by training, experience or nature: this exile is ready to fight. That's a huge advantage over the rest of the dregs that tend to wash up."
+rarity = 1
+icon = ExtResource("1")
+override_life = 110.0
+override_vitality = 110.0
+override_physical_damage = Vector2(1, 4)
+life_per_level = 10.0
+vitality_per_level = 10.0
+percent_stat_ids = ["physical_damage", "armour"]
+percent_stat_values = [10.0, 5.0]
+potential_tags = ["warrior", "physical_damage", "armour"]
+potential_values = [2.5, 1.5, 1.0]
+metadata/_custom_type_script = "uid://diftkoyemu6om"

@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://tyh2f3yca4qm"]
+
+[ext_resource type="Texture2D" uid="uid://bjqll1kfbb752" path="res://assets/sprites/itemSprites/gearSprites/jewellerySprites/Bone_Ring_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_ironarm"]
+script = ExtResource("2")
+affix_id = "bone_ring_chaos"
+display_name = "Chaos Damage"
+is_implicit = true
+stat_type = "chaos_damage"
+modifier_type = 1
+min_value = 10.0
+max_value = 20.0
+value_suffix = "%"
+min_item_level = 3
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "bone_ring"
+display_name = "Bone Ring"
+description = "A carefully carved bone ring. It feels uncomfortable to wear in more ways than one."
+icon = ExtResource("1")
+category = 1
+min_item_level = 3
+required_level = 3
+implicit_affixes = [SubResource("Resource_ironarm")]
+attack_vfx = null
+exclusive_tags = ["bone", "cannibal"]
+is_monster_infrequent = true
+monster_infrequent_set = "Bone"
+metadata/_custom_type_script = "uid://cetys5ykyhird"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3 uid="uid://crndq5whh0kib"]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "well_fed_rest_morale_bonus"
+display_name = "Well Fed Bonus Morale"
+description = "A flat bonus to Morale gained from resting with adequate food rations."
+min_value = 0.0
+max_value = 25.0
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

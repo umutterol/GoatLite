@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://be1qujh1lbmm2"]
+
+[ext_resource type="Script" uid="uid://dn8chjjrdw06v" path="res://systems/monsters/MonsterStats.gd" id="1"]
+[ext_resource type="Resource" uid="uid://40hod28rjacd" path="res://systems/combat/vfx/presets/melee_pop_VFX.tres" id="2"]
+[ext_resource type="Script" uid="uid://bn4tocniaeat3" path="res://systems/combat/CombatBehavior.gd" id="3"]
+[ext_resource type="Script" uid="uid://djr2nsux711tk" path="res://systems/combat/profiles/TacticalProfile.gd" id="4"]
+[ext_resource type="Resource" uid="uid://c2ooo7qqerv3h" path="res://systems/items/itemBases/weapon/wand/bone_wand.tres" id="5"]
+[ext_resource type="Script" uid="uid://bu3sdlngwyt7h" path="res://systems/monsters/MonsterDropEntry.gd" id="6"]
+[ext_resource type="Script" uid="uid://b50iqhtungdym" path="res://systems/monsters/MonsterDropTable.gd" id="7"]
+[ext_resource type="Script" uid="uid://xo0774xbjf5m" path="res://systems/monsters/MonsterData.gd" id="8"]
+
+[sub_resource type="Resource" id="Resource_26356"]
+script = ExtResource("1")
+life = 40.0
+vitality = 5.0
+evasion = 5.0
+endurance = 0.0
+cold_resistance = -20.0
+fire_resistance = 20.0
+life_leech = 10.0
+physical_damage = Vector2(4, 8)
+fire_damage = Vector2(4, 8)
+attack_speed = 1.1
+movement = 10.0
+
+[sub_resource type="Resource" id="Resource_df0pq"]
+script = ExtResource("4")
+melee_threat_memory_duration = 0.5
+metadata/_custom_type_script = "uid://djr2nsux711tk"
+
+[sub_resource type="Resource" id="Resource_1dkm4"]
+script = ExtResource("3")
+aggro_type = 2
+stance = 0
+tactical_profile = SubResource("Resource_df0pq")
+basic_attack_vfx_override = ExtResource("2")
+metadata/_custom_type_script = "uid://bn4tocniaeat3"
+
+[sub_resource type="Resource" id="Resource_fcxdr"]
+script = ExtResource("6")
+item_base = ExtResource("5")
+chance = 0.01
+metadata/_custom_type_script = "uid://bu3sdlngwyt7h"
+
+[sub_resource type="Resource" id="Resource_x2ud3"]
+script = ExtResource("7")
+entries = [SubResource("Resource_fcxdr")]
+metadata/_custom_type_script = "uid://b50iqhtungdym"
+
+[resource]
+script = ExtResource("8")
+monster_id = "cannibal"
+display_name = "Cannibal Meattaker"
+icon = null
+base_level = 3
+base_stats = SubResource("Resource_26356")
+combat_behavior = SubResource("Resource_1dkm4")
+drop_tags = ["cannibal"]
+drop_table = SubResource("Resource_x2ud3")
+experience_value = 24
+scrap_drops = 0.2
+metadata/_custom_type_script = "uid://xo0774xbjf5m"

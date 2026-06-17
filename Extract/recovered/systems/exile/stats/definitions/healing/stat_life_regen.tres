@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3 uid="uid://dojpo7rlg5c56"]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "life_regen"
+display_name = "Life Regeneration"
+description = "The amount of Life recovered per round of combat."
+category = 2
+min_value = 0.0
+decimal_places = 1
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

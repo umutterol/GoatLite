@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3 uid="uid://c1belt2ndwind"]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckf2e0ljtmtxg" path="res://systems/items/affixes/AffixValueTier.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_t1_belt_second_wind_chance"]
+script = ExtResource("2")
+min_value = 10.0
+max_value = 18.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t2_belt_second_wind_chance"]
+script = ExtResource("2")
+item_level = 3
+min_value = 16.0
+max_value = 25.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t3_belt_second_wind_chance"]
+script = ExtResource("2")
+item_level = 5
+min_value = 22.0
+max_value = 32.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t4_belt_second_wind_chance"]
+script = ExtResource("2")
+item_level = 8
+min_value = 30.0
+max_value = 45.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[resource]
+script = ExtResource("1")
+affix_id = "belt_second_wind_chance"
+display_name = "Second Wind Chance"
+is_prefix = true
+valid_on_belt = true
+stat_type = "second_wind_chance"
+modifier_type = 1
+value_suffix = "%"
+use_tier_helper = true
+value_tiers = [SubResource("Resource_t1_belt_second_wind_chance"), SubResource("Resource_t2_belt_second_wind_chance"), SubResource("Resource_t3_belt_second_wind_chance"), SubResource("Resource_t4_belt_second_wind_chance")]
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

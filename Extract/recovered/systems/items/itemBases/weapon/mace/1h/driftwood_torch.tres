@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://doesf0dn332w6"]
+
+[ext_resource type="Texture2D" uid="uid://5l8amspb4lh3" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Driftwood_Club_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+item_id = "driftwood_torch"
+display_name = "Driftwood Torch"
+description = "A burning piece of driftwood."
+icon = ExtResource("1")
+weapon_type = 2
+grid_height = 3
+base_physical_damage_min = 1
+base_physical_damage_max = 2
+base_fire_damage_min = 1
+base_fire_damage_max = 4
+base_critical_chance = 1.0
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "poison_chance"
+display_name = "Poison Chance"
+description = "% chance for a physical or chaos hit to inflict a Poison stack. Stacks additively on top of the 0% base. Crits do NOT auto-poison. Chance above 100% applies multiple stacks per hit (150% = 1 guaranteed + 50% chance of a 2nd)."
+category = 3
+stat_type = 1
+min_value = 0.0
+show_as_percentage = true
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

@@ -1,0 +1,84 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://dvq4q8ys13bod"]
+
+[ext_resource type="Resource" uid="uid://d2qm2f3n2bjrw" path="res://systems/combat/encounters/coast/cannibal_hunting_party.tres" id="1"]
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="2"]
+[ext_resource type="Resource" uid="uid://dwqs4n3khbj" path="res://systems/monsters/normal/cannibal_firebreather.tres" id="3"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="4"]
+[ext_resource type="Resource" uid="uid://be1qujh1lbmm2" path="res://systems/monsters/normal/cannibal.tres" id="5"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="6"]
+[ext_resource type="Script" uid="uid://1jao5grkeqsb" path="res://systems/mission/MissionReward.gd" id="7"]
+[ext_resource type="Script" uid="uid://bl1n406v551lg" path="res://systems/mission/ProgressionRequirement.gd" id="8"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="9"]
+
+[sub_resource type="Resource" id="Resource_6ogfc"]
+script = ExtResource("2")
+slot_type = 0
+encounter = ExtResource("1")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_52yw6"]
+script = ExtResource("4")
+monster = ExtResource("3")
+count = 5
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_8kbcs"]
+script = ExtResource("4")
+monster = ExtResource("5")
+count = 7
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_348th"]
+script = ExtResource("6")
+encounter_id = "cannibal_camp"
+display_name = "Cannibal Camp"
+description = "You've become the uber eats."
+monster_spawns = [SubResource("Resource_52yw6"), SubResource("Resource_8kbcs")]
+recommended_level = 3
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="Resource_5ig2r"]
+script = ExtResource("2")
+slot_type = 0
+encounter = SubResource("Resource_348th")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_1xats"]
+script = ExtResource("7")
+scrap_amount = 3
+bonus_item_rolls = 2
+metadata/_custom_type_script = "uid://1jao5grkeqsb"
+
+[sub_resource type="Resource" id="Resource_mmt8k"]
+script = ExtResource("8")
+type = 2
+required_value = 5.0
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[sub_resource type="Resource" id="Resource_rwsoe"]
+script = ExtResource("8")
+mission_id = "deep_explore_coast"
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[resource]
+script = ExtResource("9")
+mission_id = "cannibal_camp"
+display_name = "Cannibal Camp"
+description = "Hitting back at the Cannibals is a very high-risk, high-reward venture. Their desperate hunger drives them into a frenzy and they're known to use fire to cook their targets alive... But with some luck we could recover one of their captives to join our ranks."
+icon = null
+level = 5
+mission_tags = [2, 3]
+availability_type = 3
+prerequisites = [SubResource("Resource_mmt8k"), SubResource("Resource_rwsoe")]
+recruit_quality_bonus = 0.30000000000000004
+recruit_level_margin = 0.5
+opportunity_chance = 0.4
+opportunity_cooldown_days = 2
+mission_length = 2
+encounter_slots = [SubResource("Resource_6ogfc"), SubResource("Resource_5ig2r")]
+scouting_reward = 4.0
+rarity_bonus = 0.2
+quantity_bonus = 0.1
+mission_rewards = SubResource("Resource_1xats")
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

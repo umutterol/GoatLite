@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3 uid="uid://5arfnwsinqbk"]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "victory_morale_bonus"
+display_name = "Victory Morale Bonus"
+description = "A flat bonus (or penalty, if negative) to any Morale gained from missions completions."
+min_value = -90.0
+max_value = 90.0
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

@@ -1,0 +1,284 @@
+[gd_scene format=3 uid="uid://iipch0nql0vt"]
+
+[ext_resource type="Script" uid="uid://dfcmvswf4h1x3" path="res://gameUI/missions/MissionReportScreen.gd" id="1"]
+[ext_resource type="Script" uid="uid://j6hfajtypepq" path="res://gameUI/tooltips/TooltipHover.gd" id="2"]
+[ext_resource type="PackedScene" path="res://gameUI/smallComponents/CurrencyDropPip.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://byv02n6xs3l1p" path="res://assets/sprites/itemSprites/currencySprites/food_icon.tres" id="4"]
+[ext_resource type="Texture2D" uid="uid://c2e6sjoriwn7a" path="res://assets/sprites/itemSprites/currencySprites/ChaosShardPhysical.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://7kt8cuu1ykma" path="res://assets/sprites/itemSprites/currencySprites/ScrapPhysical.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://c8hq4sdpxl8bp" path="res://assets/sprites/itemSprites/currencySprites/ExaltShardPhysical.png" id="7"]
+[ext_resource type="Script" uid="uid://bonv7jw0xwc3k" path="res://gameUI/inventory/inventoryGrid/LootGrid.gd" id="8"]
+[ext_resource type="Script" uid="uid://druvovxn5dgn6" path="res://gameUI/smallComponents/GlowifyNode.gd" id="9"]
+[ext_resource type="PackedScene" uid="uid://b8x4nq7wrdis2" path="res://gameUI/missions/IntermissionDiscardZone.tscn" id="10"]
+
+[node name="MissionReportScreen" type="Control" unique_id=503927211]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="." unique_id=180719091]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.045, 0.04, 0.04, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1430629319]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer" unique_id=326029770]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="OutcomeBanner" type="Label" parent="MarginContainer/VBox" unique_id=845435056]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 44
+text = "VICTORY"
+horizontal_alignment = 1
+
+[node name="MissionSubtitle" type="Label" parent="MarginContainer/VBox" unique_id=2002870371]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Mission Name"
+horizontal_alignment = 1
+
+[node name="RescueBanner" type="RichTextLabel" parent="MarginContainer/VBox" unique_id=-963742795]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "[center][color=#f55]Rescue Mission Available[/color][/center]"
+fit_content = true
+scroll_active = false
+
+[node name="SummaryRow" type="HBoxContainer" parent="MarginContainer/VBox" unique_id=973555758]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="SummaryLabel" type="Label" parent="MarginContainer/VBox/SummaryRow" unique_id=186680982]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.74, 0.66, 1)
+text = "Summary stats appear here."
+horizontal_alignment = 1
+
+[node name="ScoutingChip" type="Label" parent="MarginContainer/VBox/SummaryRow" unique_id=1155012780]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.58, 0.88, 0.62, 1)
+text = "Scouting: +0"
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/VBox/SummaryRow/ScoutingChip" unique_id=428221151]
+script = ExtResource("2")
+keyword = "scouting"
+
+[node name="HSplit" type="HBoxContainer" parent="MarginContainer/VBox" unique_id=1295380519]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="LeftColumn" type="VBoxContainer" parent="MarginContainer/VBox/HSplit" unique_id=599731828]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="PartyHeader" type="Label" parent="MarginContainer/VBox/HSplit/LeftColumn" unique_id=1574942206]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Party"
+
+[node name="PartyScroll" type="ScrollContainer" parent="MarginContainer/VBox/HSplit/LeftColumn" unique_id=1773658725]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PartyList" type="VBoxContainer" parent="MarginContainer/VBox/HSplit/LeftColumn/PartyScroll" unique_id=474063747]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="RightColumn" type="VBoxContainer" parent="MarginContainer/VBox/HSplit" unique_id=284251186]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="FoundHeader" type="Label" parent="MarginContainer/VBox/HSplit/RightColumn" unique_id=1494593287]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Loot Found"
+
+[node name="CurrencyRow" type="HBoxContainer" parent="MarginContainer/VBox/HSplit/RightColumn" unique_id=1788246865]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 28
+
+[node name="FoodPip" parent="MarginContainer/VBox/HSplit/RightColumn/CurrencyRow" unique_id=1497475269 instance=ExtResource("3")]
+unique_name_in_owner = true
+layout_mode = 2
+icon_texture = ExtResource("4")
+tooltip_keyword = "food"
+
+[node name="ChaosPip" parent="MarginContainer/VBox/HSplit/RightColumn/CurrencyRow" unique_id=2088315431 instance=ExtResource("3")]
+unique_name_in_owner = true
+layout_mode = 2
+icon_texture = ExtResource("5")
+tooltip_keyword = "chaos"
+
+[node name="ScrapPip" parent="MarginContainer/VBox/HSplit/RightColumn/CurrencyRow" unique_id=1884495386 instance=ExtResource("3")]
+unique_name_in_owner = true
+layout_mode = 2
+icon_texture = ExtResource("6")
+
+[node name="ExaltPip" parent="MarginContainer/VBox/HSplit/RightColumn/CurrencyRow" unique_id=1767756060 instance=ExtResource("3")]
+unique_name_in_owner = true
+layout_mode = 2
+icon_texture = ExtResource("7")
+tooltip_keyword = "exalt"
+
+[node name="FoundGridWrapper" type="CenterContainer" parent="MarginContainer/VBox/HSplit/RightColumn" unique_id=1590621976]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FoundGrid" type="Control" parent="MarginContainer/VBox/HSplit/RightColumn/FoundGridWrapper" unique_id=2004045160]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 200)
+layout_mode = 2
+script = ExtResource("8")
+columns = 16
+rows = 5
+
+[node name="LootButtonRow" type="HBoxContainer" parent="MarginContainer/VBox/HSplit/RightColumn" unique_id=385825004]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ScrapButton" type="Button" parent="MarginContainer/VBox/HSplit/RightColumn/LootButtonRow" unique_id=1337161687]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.2
+text = "Scrap All"
+
+[node name="TakeAllButton" type="Button" parent="MarginContainer/VBox/HSplit/RightColumn/LootButtonRow" unique_id=534569225]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Take All"
+
+[node name="GlowifyNode" type="Node" parent="MarginContainer/VBox/HSplit/RightColumn/LootButtonRow/TakeAllButton" unique_id=607619435]
+script = ExtResource("9")
+auto_start = true
+disable_on_click = true
+only_when_enabled = true
+
+[node name="KeptHeader" type="Label" parent="MarginContainer/VBox/HSplit/RightColumn" unique_id=284409547]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 16
+text = "Loot Kept"
+
+[node name="KeptGridWrapper" type="CenterContainer" parent="MarginContainer/VBox/HSplit/RightColumn" unique_id=1811137716]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="KeptGrid" type="Control" parent="MarginContainer/VBox/HSplit/RightColumn/KeptGridWrapper" unique_id=862418476]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 200)
+layout_mode = 2
+script = ExtResource("8")
+columns = 16
+rows = 5
+
+[node name="ReturnButton" type="Button" parent="MarginContainer/VBox/HSplit/RightColumn" unique_id=28382477]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Return to Guild"
+
+[node name="DecisionRow" type="HBoxContainer" parent="MarginContainer/VBox/HSplit/RightColumn" unique_id=1199384472]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="RetreatColumn" type="VBoxContainer" parent="MarginContainer/VBox/HSplit/RightColumn/DecisionRow" unique_id=1199384473]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="RetreatButton" type="Button" parent="MarginContainer/VBox/HSplit/RightColumn/DecisionRow/RetreatColumn" unique_id=1722994158]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Retreat"
+
+[node name="RetreatNote" type="Label" parent="MarginContainer/VBox/HSplit/RightColumn/DecisionRow/RetreatColumn" unique_id=1199384474]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.55, 0.48, 1)
+theme_override_font_sizes/font_size = 13
+text = "Keep the loot but suffer a hit to Morale."
+horizontal_alignment = 1
+
+[node name="ContinueMissionButton" type="Button" parent="MarginContainer/VBox/HSplit/RightColumn/DecisionRow" unique_id=1820493753]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+text = "Continue →"
+
+[node name="ScrapNote" type="Label" parent="MarginContainer/VBox/HSplit/RightColumn" unique_id=1932109437]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.55, 0.48, 1)
+theme_override_font_sizes/font_size = 13
+text = "Items not kept are automatically scrapped."
+horizontal_alignment = 1
+
+[node name="DiscardZone" parent="." unique_id=1499797953 instance=ExtResource("10")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -180.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 116.0
+grow_horizontal = 0

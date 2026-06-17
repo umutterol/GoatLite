@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://g4fad6gc3l3g"]
+
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_cold"]
+script = ExtResource("2")
+stat_id = "cold_resistance"
+base_value = 8.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_chillred"]
+script = ExtResource("2")
+stat_id = "chill_effect_reduction_pct"
+base_value = 20.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_shockred"]
+script = ExtResource("2")
+stat_id = "shock_effect_reduction_pct"
+base_value = 20.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+trait_id = "weathered"
+name = "Weathered"
+description = "A lifetime of exposure to the elements has hardened them."
+rarity = 1
+icon = null
+stat_bonuses = [SubResource("Resource_cold"), SubResource("Resource_chillred"), SubResource("Resource_shockred")]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

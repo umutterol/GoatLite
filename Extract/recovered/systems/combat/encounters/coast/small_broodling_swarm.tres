@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3 uid="uid://280qes0phdke"]
+
+[ext_resource type="Resource" uid="uid://b7ioq8md2j48w" path="res://systems/monsters/normal/sparking_broodling.tres" id="1"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="2"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_f2egg"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 6
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[resource]
+script = ExtResource("3")
+encounter_id = "small_broodling_swarm"
+display_name = "Small Sparking Broodling Swarm"
+monster_spawns = [SubResource("Resource_f2egg")]
+recommended_level = 3
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"

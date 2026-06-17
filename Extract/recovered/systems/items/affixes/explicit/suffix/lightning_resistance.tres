@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3 uid="uid://bade0ro5hgnxe"]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckf2e0ljtmtxg" path="res://systems/items/affixes/AffixValueTier.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_t1_lightning_resistance"]
+script = ExtResource("2")
+min_value = 8.0
+max_value = 14.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t2_lightning_resistance"]
+script = ExtResource("2")
+item_level = 3
+min_value = 12.0
+max_value = 18.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t3_lightning_resistance"]
+script = ExtResource("2")
+item_level = 5
+min_value = 16.0
+max_value = 22.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t4_lightning_resistance"]
+script = ExtResource("2")
+item_level = 8
+min_value = 22.0
+max_value = 30.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[resource]
+script = ExtResource("1")
+affix_id = "lightning_resistance"
+display_name = "Lightning Resistance"
+is_suffix = true
+valid_on_helmet = true
+valid_on_gloves = true
+valid_on_boots = true
+valid_on_chest = true
+valid_on_ring = true
+valid_on_amulet = true
+valid_on_belt = true
+valid_on_rucksack = true
+stat_type = "lightning_resistance"
+value_suffix = "%"
+use_tier_helper = true
+value_tiers = [SubResource("Resource_t1_lightning_resistance"), SubResource("Resource_t2_lightning_resistance"), SubResource("Resource_t3_lightning_resistance"), SubResource("Resource_t4_lightning_resistance")]
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

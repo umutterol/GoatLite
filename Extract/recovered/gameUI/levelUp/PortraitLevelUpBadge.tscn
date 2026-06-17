@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://dhel2d3t375eq"]
+
+[ext_resource type="Script" uid="uid://bvpcktuifxjk" path="res://gameUI/levelUp/PortraitLevelUpBadge.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://b1xycjpboh60" path="res://assets/ui/LevelUpIcon.tres" id="2"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vgcpg"]
+
+[node name="PortraitLevelUpBadge" type="Control" unique_id=89526668]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -22.0
+offset_bottom = 22.0
+grow_horizontal = 0
+mouse_default_cursor_shape = 2
+script = ExtResource("1")
+
+[node name="Background" type="Panel" parent="." unique_id=131315277]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_vgcpg")
+
+[node name="IconLabel" type="Label" parent="Background" unique_id=139404424]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.15, 0.1, 0.05, 1)
+theme_override_font_sizes/font_size = 14
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="Background" unique_id=1406185225]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2")

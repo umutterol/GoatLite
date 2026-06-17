@@ -1,0 +1,27 @@
+[
+  { "id": "node-1", "node": 1, "name": "Survival vs. Throughput", "options": [
+    { "id": "iron-will",          "name": "Iron Will",    "effect": "+15% max HP",                                "tags": ["survival"] },
+    { "id": "executioner-talent", "name": "Executioner",  "effect": "+12% damage to targets below 30% HP",        "tags": ["burst"] },
+    { "id": "adaptive",           "name": "Adaptive",     "effect": "+8% HP and +6% damage (balanced)",           "tags": ["survival", "burst"] }
+  ] },
+  { "id": "node-2", "node": 2, "name": "Single Target vs. AoE", "options": [
+    { "id": "focused-strike",     "name": "Focused Strike","effect": "+20% single-target damage",                 "tags": ["burst"] },
+    { "id": "cleaving-blow",      "name": "Cleaving Blow", "effect": "Attacks hit 2 additional targets for 40% damage", "tags": ["aoe", "cleave"] },
+    { "id": "opportunist-talent", "name": "Opportunist",   "effect": "+15% damage when 3+ enemies are nearby",     "tags": ["aoe"] }
+  ] },
+  { "id": "node-3", "node": 3, "name": "Tempo vs. Spike", "options": [
+    { "id": "steady-hand", "name": "Steady Hand", "effect": "+8% sustained output, unaffected by morale-band swings", "tags": ["sustain"] },
+    { "id": "overload",    "name": "Overload",    "effect": "+25% output for the first 30s of each pull, then -5%",   "tags": ["burst"] },
+    { "id": "metronome",   "name": "Metronome",   "effect": "+5% output; the first failed interrupt each boss is ignored", "tags": ["interrupt", "sustain"] }
+  ] },
+  { "id": "node-4", "node": 4, "name": "Defensive Tech", "options": [
+    { "id": "bulwark",       "name": "Bulwark",       "effect": "+10% damage reduction while below 50% HP", "tags": ["survival", "tank"] },
+    { "id": "fleetfoot",     "name": "Fleetfoot",     "effect": "+8% positioning reliability",              "tags": ["positioning"] },
+    { "id": "second-breath", "name": "Second Breath", "effect": "Once per run, survive a lethal hit at 1 HP","tags": ["survival"] }
+  ] },
+  { "id": "node-5", "node": 5, "name": "Affix Specialist", "options": [
+    { "id": "focus-fire",     "name": "Focus Fire",     "effect": "+10% Kill Order effectiveness for this character",   "tags": ["cleave"] },
+    { "id": "quick-reflexes", "name": "Quick Reflexes", "effect": "+10% Interrupt reliability for this character",      "tags": ["interrupt"] },
+    { "id": "spatial-sense",  "name": "Spatial Sense",  "effect": "+10% Positioning reliability for this character",    "tags": ["positioning"] }
+  ] }
+]

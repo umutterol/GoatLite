@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3 uid="uid://jshvu3ykrytm"]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "life_gain_on_hit"
+display_name = "Life Gain on Hit"
+description = "A flat amount of Life recovered when dealing hit damage."
+category = 2
+min_value = 0.0
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

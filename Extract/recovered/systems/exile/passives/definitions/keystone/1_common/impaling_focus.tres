@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://cimpalekey001"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_max_imp"]
+script = ExtResource("2")
+stat_id = "max_impales_bonus"
+base_value = 2.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_imp_eff"]
+script = ExtResource("2")
+stat_id = "impale_effect_pct"
+base_value = 50.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_no_elem"]
+script = ExtResource("2")
+stat_id = "elemental_damage"
+scaling_type = 3
+base_value = 100.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "impaling_focus"
+name = "Impaling Focus"
+description = "A single blade, driven deep, returns no fire and no frost — only the wound."
+passive_type = 2
+icon = null
+stat_tags = ["impale", "physical_damage"]
+theme_tags = ["duelist", "warrior"]
+category_tags = ["offence"]
+primary_tag = "impale"
+stat_bonuses = [SubResource("Resource_max_imp"), SubResource("Resource_imp_eff"), SubResource("Resource_no_elem")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

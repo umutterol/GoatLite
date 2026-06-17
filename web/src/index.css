@@ -1,0 +1,193 @@
+@import "tailwindcss";
+
+/* ----------------------------------------------------------------------------
+   GOAT Lite — aged-scroll Warcraft theme.  Warm parchment, gold, bronze,
+   oiled leather and deep teal.  No purple in the chrome (epic-rarity purple is
+   reserved strictly for item-quality text, per WoW convention).
+---------------------------------------------------------------------------- */
+@theme {
+  --color-parchment: #e8d6ac;
+  --color-parchment-2: #dcc592;
+  --color-parchment-3: #cdb074;
+  --color-ink: #2a1c0e;
+  --color-ink-2: #4a341c;
+  --color-ink-soft: #5b4428;
+  --color-leather: #2c2014;
+  --color-leather-2: #20160c;
+  --color-leather-3: #150d06;
+  --color-wood: #3c2a18;
+  --color-gold: #c79a3f;
+  --color-gold-2: #e6c163;
+  --color-gold-3: #8c6a26;
+  --color-bronze: #9c7434;
+  --color-blood: #842b1d;
+  --color-blood-2: #5e1d13;
+  --color-teal: #2f6360;
+  --color-teal-2: #1f4543;
+  --color-emerald: #3f7d3a;
+
+  --font-display: "Cinzel Decorative", "Cinzel", serif;
+  --font-heading: "Cinzel", serif;
+  --font-body: "IM Fell English", "EB Garamond", serif;
+}
+
+/* frame-border widths the warcraftcn components rely on (not in Tailwind's default set) */
+@utility border-5 { border-width: 5px; }
+@utility border-6 { border-width: 6px; }
+@utility border-12 { border-width: 12px; }
+@utility border-16 { border-width: 16px; }
+@utility border-24 { border-width: 24px; }
+
+:root {
+  /* WoW item-quality colours */
+  --q-poor: #9d9d9d;
+  --q-common: #f4ecd6;
+  --q-uncommon: #4caf3f;
+  --q-rare: #2f7fd6;
+  --q-epic: #a335ee;
+  --q-legendary: #e08a1e;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: #0a0704;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- 16:9 stage: design at 1280x720, scaled to fit, letterboxed on leather ---- */
+.stage-viewport {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(ellipse at 50% 40%, #1a1109 0%, #0a0704 70%, #060402 100%);
+}
+.stage-viewport::before {
+  /* faint vignette grain over the letterbox */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+.stage {
+  width: 1280px;
+  height: 720px;
+  transform-origin: center center;
+  position: relative;
+  overflow: hidden;
+  color: var(--color-ink);
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(60,42,22,0) 55%, rgba(20,12,5,0.55) 100%),
+    linear-gradient(180deg, #2a1d10, #1c1309);
+}
+
+/* ---- parchment surface ---- */
+.parchment {
+  position: relative;
+  background-color: #e3cf9f;
+  background-image:
+    radial-gradient(120% 120% at 18% 12%, rgba(255,247,222,0.85), rgba(255,247,222,0) 45%),
+    radial-gradient(120% 120% at 88% 92%, rgba(150,112,60,0.30), rgba(150,112,60,0) 40%),
+    radial-gradient(140% 140% at 50% 50%, rgba(0,0,0,0) 52%, rgba(70,46,18,0.32) 100%),
+    linear-gradient(180deg, #ecdcb3 0%, #ddc78f 55%, #cdae72 100%);
+  color: var(--color-ink);
+}
+.parchment::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.018' numOctaves='4' seed='7'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.30 0 0 0 0 0.20 0 0 0 0 0.08 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+
+/* ---- oiled leather / wood panel (dark surfaces) ---- */
+.leather {
+  background:
+    radial-gradient(120% 140% at 50% 0%, rgba(80,56,28,0.55), rgba(0,0,0,0) 60%),
+    linear-gradient(180deg, #34251400, #1d130a),
+    linear-gradient(180deg, #3a2917, #221608);
+  color: #e6d4a8;
+}
+
+/* ---- gilt framing helpers ---- */
+.gilt-frame {
+  border: 2px solid #6f5320;
+  box-shadow:
+    inset 0 0 0 1px rgba(231,193,99,0.55),
+    inset 0 0 18px rgba(0,0,0,0.45),
+    0 2px 10px rgba(0,0,0,0.45);
+}
+.gilt-rule {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #b98f3c 18%, #e6c163 50%, #b98f3c 82%, transparent);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.3);
+}
+.text-gilt {
+  color: #e6c163;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.6), 0 0 8px rgba(201,154,63,0.25);
+}
+.text-engraved {
+  color: #2a1c0e;
+  text-shadow: 0 1px 0 rgba(255,247,222,0.5);
+}
+.heading { font-family: var(--font-heading); letter-spacing: 0.5px; }
+.display { font-family: var(--font-display); letter-spacing: 1px; }
+
+/* ---- WoW item-quality colour utilities ---- */
+.q-poor { color: var(--q-poor); }
+.q-common { color: var(--q-common); }
+.q-uncommon { color: var(--q-uncommon); }
+.q-rare { color: var(--q-rare); }
+.q-epic { color: var(--q-epic); }
+.q-legendary { color: var(--q-legendary); }
+.brd-poor { border-color: var(--q-poor); }
+.brd-uncommon { border-color: var(--q-uncommon); }
+.brd-rare { border-color: var(--q-rare); }
+.brd-epic { border-color: var(--q-epic); }
+.brd-legendary { border-color: var(--q-legendary); }
+
+/* ---- thin styled scrollbar ---- */
+.scroll-thin { scrollbar-width: thin; scrollbar-color: #8c6a26 transparent; }
+.scroll-thin::-webkit-scrollbar { width: 8px; }
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: linear-gradient(#a07c33, #6f5320);
+  border-radius: 8px;
+  border: 1px solid #4a341c;
+}
+.scroll-thin::-webkit-scrollbar-track { background: rgba(0,0,0,0.15); }
+
+/* ---- gem / pip for tactics points ---- */
+.pip {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1px solid #4a341c;
+  background: radial-gradient(circle at 35% 30%, #5b4428, #2a1c0e);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.5);
+}
+.pip-on {
+  border-color: #e6c163;
+  background: radial-gradient(circle at 35% 30%, #ffe9a6, #c79a3f 60%, #8c6a26);
+  box-shadow: 0 0 7px rgba(230,193,99,0.7), inset 0 1px 2px rgba(255,255,255,0.4);
+}
+
+/* parchment-coloured icon mask helper handled inline via <Icon/> */
+@keyframes ember {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; filter: brightness(1.25); }
+}
+.ember { animation: ember 2.6s ease-in-out infinite; }

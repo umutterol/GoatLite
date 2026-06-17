@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="StatusEffect" format=3 uid="uid://b2uilqs14x40a"]
+
+[ext_resource type="Script" uid="uid://c7u4b1n711gll" path="res://systems/combat/statusEffects/StatusEffect.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://chil1vprvfx00" path="res://systems/combat/vfx/persistentPresets/ChillVaporsVFX.tscn" id="2"]
+[ext_resource type="Script" uid="uid://thfpduvqcsyc" path="res://systems/combat/vfx/PersistentVFX.gd" id="3"]
+
+[sub_resource type="Resource" id="VFXChill"]
+script = ExtResource("3")
+application_burst_scene = null
+overlay_scene = ExtResource("2")
+removal_burst_scene = null
+portrait_tint = Color(0.78, 0.9, 1, 1)
+icon = null
+ambient_impact_fx = null
+
+[resource]
+script = ExtResource("1")
+effect_id = &"chill"
+display_name = "Chill"
+description = "The target's limbs slow under the cold. Reduces both attack speed and movement speed for a few seconds.
+
+Applies on every cold hit — no chance roll. (The chance-based aspect of cold is Freeze, a separate ailment.)
+
+Magnitude scales with the size of the triggering cold hit relative to the target's max life — a hit dealing 10%+ of max life chills for the full 20% (unscaled). Smaller hits chill for less, and chills computing below 5% reduced action speed are discarded entirely.
+
+Scales with the attacker's Chill Effect % and Chill Duration % stats. Only a stronger re-chill can override the current one; weaker re-applications are ignored (existing magnitude and duration keep ticking)."
+duration_seconds = 4.0
+refresh_mode = 3
+stat_modifiers = {
+"action_speed_more_pct": -20.0
+}
+vfx = SubResource("VFXChill")

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bdbw118r6kue0"]
+
+[ext_resource type="Script" uid="uid://d16rsmanw1usq" path="res://debug/testScenes/combatTests/combat_math_test.gd" id="1"]
+
+[node name="CombatMathTest" type="Node2D" unique_id=508822796]
+script = ExtResource("1")

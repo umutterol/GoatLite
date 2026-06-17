@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://cujxcv7f0ftus"]
+
+[ext_resource type="Texture2D" uid="uid://c1y237elb51bl" path="res://assets/sprites/itemSprites/gearSprites/jewellerySprites/Paua_Amulet_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_coralregen"]
+script = ExtResource("2")
+affix_id = "paua_amulet_implicit"
+display_name = "Second Wind Chance"
+is_implicit = true
+stat_type = "second_wind_chance"
+modifier_type = 1
+min_value = 20.0
+max_value = 40.0
+value_suffix = "%"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "paua_amulet"
+display_name = "Paua Amulet"
+description = "A well-polished paua shell worn for good luck."
+icon = ExtResource("1")
+category = 1
+jewellery_type = 1
+implicit_affixes = [SubResource("Resource_coralregen")]
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

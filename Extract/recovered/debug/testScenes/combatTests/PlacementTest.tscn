@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dxji1m25orsbu"]
+
+[ext_resource type="Script" uid="uid://bqn6o6c76knkx" path="res://debug/testScenes/combatTests/placement_test.gd" id="1"]
+
+[node name="PlacementTest" type="Node2D" unique_id=1483998019]
+script = ExtResource("1")

@@ -1,0 +1,111 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://brkxxill43eav"]
+
+[ext_resource type="Resource" uid="uid://18mfeaqt5s8g" path="res://systems/monsters/normal/tentacled_bivalve.tres" id="1"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="2"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="3"]
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="4"]
+[ext_resource type="Resource" uid="uid://bvjodi1hp32m3" path="res://systems/monsters/normal/hardshell_crab.tres" id="5"]
+[ext_resource type="Script" uid="uid://1jao5grkeqsb" path="res://systems/mission/MissionReward.gd" id="6"]
+[ext_resource type="Script" uid="uid://bl1n406v551lg" path="res://systems/mission/ProgressionRequirement.gd" id="7"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="8"]
+
+[sub_resource type="Resource" id="Resource_shd5l"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 2
+position_hint = 3
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_7wvkb"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 2
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_22pm7"]
+script = ExtResource("3")
+encounter_id = "shallow_pools"
+display_name = "Shallow Rockpools"
+monster_spawns = [SubResource("Resource_shd5l"), SubResource("Resource_7wvkb")]
+recommended_level = 2
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="Resource_l25vh"]
+script = ExtResource("4")
+slot_type = 0
+encounter = SubResource("Resource_22pm7")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_75dcl"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 3
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_f5ql3"]
+script = ExtResource("2")
+monster = ExtResource("5")
+count = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_3ey6p"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 2
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_wvg6y"]
+script = ExtResource("3")
+encounter_id = "deep_rockpools"
+display_name = "Deep Rockpools"
+monster_spawns = [SubResource("Resource_75dcl"), SubResource("Resource_f5ql3"), SubResource("Resource_3ey6p")]
+recommended_level = 2
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="Resource_rlpyj"]
+script = ExtResource("4")
+slot_type = 0
+encounter = SubResource("Resource_wvg6y")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_a8otf"]
+script = ExtResource("6")
+food_amount = 2
+scrap_amount = 3
+bonus_item_rolls = 1
+metadata/_custom_type_script = "uid://1jao5grkeqsb"
+
+[sub_resource type="Resource" id="Resource_233fy"]
+script = ExtResource("7")
+mission_id = "crabbing_coast"
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[sub_resource type="Resource" id="Resource_5yovn"]
+script = ExtResource("7")
+type = 3
+required_value = 10.0
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[resource]
+script = ExtResource("8")
+mission_id = "rockpool_scavenge"
+display_name = "Rockpool Scavenging"
+description = "With the constant shipwrecks along the coast there's a good chance some supplies or materials gets caught in the rockpools. The giant tentacle clams and ice-cold water make this a treacherous task."
+icon = null
+level = 3
+mission_tags = [2]
+availability_type = 2
+prerequisites = [SubResource("Resource_233fy"), SubResource("Resource_5yovn")]
+scouting_threshold_percent = 15.0
+discovery_base_chance = 1.0
+discovery_description = "Rockpool Scavenging discovered."
+mission_length = 2
+encounter_slots = [SubResource("Resource_l25vh"), SubResource("Resource_rlpyj")]
+scouting_reward = 1.0
+rarity_bonus = 0.05
+quantity_bonus = 0.2
+mission_rewards = SubResource("Resource_a8otf")
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

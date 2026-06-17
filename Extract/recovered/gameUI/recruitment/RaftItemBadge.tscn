@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://dvtkcti4w3aro"]
+
+[ext_resource type="Script" uid="uid://b7i1v0yrmj3t0" path="res://gameUI/recruitment/RaftItemBadge.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.12, 0.12, 0.14, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.35, 0.4, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="RaftItemBadge" type="PanelContainer" unique_id=2106804152]
+custom_minimum_size = Vector2(230, 96)
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_badge")
+script = ExtResource("1")
+
+[node name="Layout" type="HBoxContainer" parent="." unique_id=1232698477]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="IconRect" type="TextureRect" parent="Layout" unique_id=327949375]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Layout" unique_id=1438719460]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 17
+text = "Item Name"
+autowrap_mode = 2

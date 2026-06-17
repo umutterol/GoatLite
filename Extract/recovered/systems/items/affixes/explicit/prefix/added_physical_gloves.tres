@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3 uid="uid://dphysgloves01"]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckf2e0ljtmtxg" path="res://systems/items/affixes/AffixValueTier.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_t1_added_physical_gloves"]
+script = ExtResource("2")
+is_range_value = true
+min_value_low = 1.0
+min_value_high = 1.0
+max_value_low = 2.0
+max_value_high = 2.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t2_added_physical_gloves"]
+script = ExtResource("2")
+item_level = 3
+is_range_value = true
+min_value_low = 1.0
+min_value_high = 2.0
+max_value_low = 2.0
+max_value_high = 3.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t3_added_physical_gloves"]
+script = ExtResource("2")
+item_level = 5
+is_range_value = true
+min_value_low = 2.0
+min_value_high = 2.0
+max_value_low = 3.0
+max_value_high = 4.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t4_added_physical_gloves"]
+script = ExtResource("2")
+item_level = 8
+is_range_value = true
+min_value_low = 2.0
+min_value_high = 3.0
+max_value_low = 4.0
+max_value_high = 6.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[resource]
+script = ExtResource("1")
+affix_id = "added_physical_gloves"
+display_name = "Physical Damage"
+is_prefix = true
+valid_on_gloves = true
+valid_on_ring = true
+stat_type = "physical_damage"
+use_tier_helper = true
+value_tiers = [SubResource("Resource_t1_added_physical_gloves"), SubResource("Resource_t2_added_physical_gloves"), SubResource("Resource_t3_added_physical_gloves"), SubResource("Resource_t4_added_physical_gloves")]
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

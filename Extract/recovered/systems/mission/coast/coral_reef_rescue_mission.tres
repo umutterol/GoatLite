@@ -1,0 +1,99 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://7hc730p2e7be"]
+
+[ext_resource type="Resource" uid="uid://b7ioq8md2j48w" path="res://systems/monsters/normal/sparking_broodling.tres" id="1"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="2"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="3"]
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="4"]
+[ext_resource type="Resource" uid="uid://bvjodi1hp32m3" path="res://systems/monsters/normal/hardshell_crab.tres" id="5"]
+[ext_resource type="Script" uid="uid://1jao5grkeqsb" path="res://systems/mission/MissionReward.gd" id="6"]
+[ext_resource type="Script" uid="uid://bl1n406v551lg" path="res://systems/mission/ProgressionRequirement.gd" id="7"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="8"]
+
+[sub_resource type="Resource" id="Resource_aspr2"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 4
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_705s5"]
+script = ExtResource("3")
+encounter_id = "coral1"
+display_name = "Small Sparking Broodling Swarm"
+monster_spawns = [SubResource("Resource_aspr2")]
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="Resource_tqtuf"]
+script = ExtResource("4")
+slot_type = 0
+encounter = SubResource("Resource_705s5")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_opbb2"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 2
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_vpuqy"]
+script = ExtResource("2")
+monster = ExtResource("5")
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_fjg1k"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 2
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_vl1hl"]
+script = ExtResource("3")
+encounter_id = "reef2"
+display_name = "Lightning Reef Rescue"
+monster_spawns = [SubResource("Resource_opbb2"), SubResource("Resource_vpuqy"), SubResource("Resource_fjg1k")]
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="Resource_g8kjv"]
+script = ExtResource("4")
+slot_type = 0
+encounter = SubResource("Resource_vl1hl")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_a8otf"]
+script = ExtResource("6")
+food_amount = 2
+scrap_amount = 3
+bonus_item_rolls = 1
+metadata/_custom_type_script = "uid://1jao5grkeqsb"
+
+[sub_resource type="Resource" id="Resource_233fy"]
+script = ExtResource("7")
+type = 2
+required_value = 3.0
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[resource]
+script = ExtResource("8")
+mission_id = "coral_reef_rescue_mission"
+display_name = "Coral Reef Rescue Mission"
+description = "A panicked voice was heard shouting in the darkness. Could be a chance to pick up a new recruit. Lightning seems to be striking the area rather frequently though..."
+icon = null
+level = 2
+mission_tags = [3]
+availability_type = 3
+prerequisites = [SubResource("Resource_233fy")]
+recruit_min_class_rarity = 1
+scouting_threshold_percent = 15.0
+discovery_base_chance = 1.0
+discovery_description = "Rockpool Scavenging discovered."
+opportunity_chance = 1.0
+one_time_only = true
+mission_length = 2
+encounter_slots = [SubResource("Resource_tqtuf"), SubResource("Resource_g8kjv")]
+scouting_reward = 1.0
+rarity_bonus = 0.05
+quantity_bonus = 0.2
+mission_rewards = SubResource("Resource_a8otf")
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bcflypip0001"]
+
+[ext_resource type="Script" uid="uid://uy7mxnua82vv" path="res://gameUI/smallComponents/CurrencyFlyPip.gd" id="1"]
+
+[node name="CurrencyFlyPip" type="Control" unique_id=293289735]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1218493065]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5

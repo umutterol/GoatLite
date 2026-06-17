@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://b8inslcld002"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_insu_res"]
+script = ExtResource("2")
+stat_id = "cold_resistance"
+base_value = 8.0
+value_per_stack = 8.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_insu_life"]
+script = ExtResource("2")
+stat_id = "vitality"
+base_value = 4.0
+value_per_stack = 4.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "insulated"
+name = "Insulated"
+description = "Bundled tight against the chill."
+icon = null
+max_stacks = 5
+stat_tags = ["cold_resistance", "vitality"]
+category_tags = ["defence", "resistance"]
+primary_tag = "resistances"
+stat_bonuses = [SubResource("Resource_insu_res"), SubResource("Resource_insu_life")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

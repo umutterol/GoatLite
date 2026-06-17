@@ -1,0 +1,153 @@
+[gd_scene format=3 uid="uid://dr6pap7ij5eom"]
+
+[ext_resource type="Script" uid="uid://k0r17jiphdlp" path="res://gameUI/missions/MissionBoardExileCard.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://der180whhwy45" path="res://gameUI/smallComponents/ExilePortraitSlot.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://bwpnicon00001" path="res://gameUI/smallComponents/WeaponTypeIcon.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://bxlbar0001egm" path="res://gameUI/smallComponents/ExileBars.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://brec0vry0001" path="res://gameUI/smallComponents/RecoveryIcon.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://bstrvic0n0001" path="res://gameUI/smallComponents/StarvingIcon.tscn" id="6"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_idle"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+bg_color = Color(0.08, 0.075, 0.07, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.28, 0.25, 0.22, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_idle_hover"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+bg_color = Color(0.11, 0.1, 0.09, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.45, 0.4, 0.35, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_party"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+bg_color = Color(0.13, 0.11, 0.07, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.75, 0.6, 0.3, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_party_hover"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+bg_color = Color(0.16, 0.13, 0.08, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.7, 0.35, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="MissionBoardExileCard" type="PanelContainer" unique_id=1675262788]
+mouse_default_cursor_shape = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_idle")
+script = ExtResource("1")
+style_idle = SubResource("StyleBoxFlat_idle")
+style_idle_hover = SubResource("StyleBoxFlat_idle_hover")
+style_party = SubResource("StyleBoxFlat_party")
+style_party_hover = SubResource("StyleBoxFlat_party_hover")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1320327467]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 10
+
+[node name="Row" type="HBoxContainer" parent="MarginContainer" unique_id=2003448618]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Row" unique_id=276826917]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Portrait" parent="MarginContainer/Row/VBoxContainer" unique_id=328250888 instance=ExtResource("2")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="WeaponIcon" parent="MarginContainer/Row/VBoxContainer" unique_id=1663644867 instance=ExtResource("3")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(35, 35)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Info" type="VBoxContainer" parent="MarginContainer/Row" unique_id=390173293]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderRow" type="HBoxContainer" parent="MarginContainer/Row/Info" unique_id=1380485182]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="HeaderRich" type="RichTextLabel" parent="MarginContainer/Row/Info/HeaderRow" unique_id=1174831531]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+bbcode_enabled = true
+text = "[b]Exile Name[/b]  -  Class (L1)"
+fit_content = true
+scroll_active = false
+
+[node name="Bars" parent="MarginContainer/Row/Info" unique_id=480606029 instance=ExtResource("4")]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="RecoveryIcon" parent="MarginContainer/Row" unique_id=2107268057 instance=ExtResource("5")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="StarvingIcon" parent="MarginContainer/Row" unique_id=1104940915 instance=ExtResource("6")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0

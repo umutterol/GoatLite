@@ -1,0 +1,214 @@
+[gd_scene format=3 uid="uid://fafloig7435p"]
+
+[ext_resource type="Script" uid="uid://bqsl0q3u7shhb" path="res://gameUI/smallComponents/resource_bar.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cbda7ld1wcbvs" path="res://assets/ui/Border9.tres" id="2"]
+[ext_resource type="Texture2D" uid="uid://byv02n6xs3l1p" path="res://assets/sprites/itemSprites/currencySprites/food_icon.tres" id="3"]
+[ext_resource type="Script" uid="uid://j6hfajtypepq" path="res://gameUI/tooltips/TooltipHover.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://7kt8cuu1ykma" path="res://assets/sprites/itemSprites/currencySprites/ScrapPhysical.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://c8hq4sdpxl8bp" path="res://assets/sprites/itemSprites/currencySprites/ExaltShardPhysical.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://c2e6sjoriwn7a" path="res://assets/sprites/itemSprites/currencySprites/ChaosShardPhysical.png" id="7"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_mp5n4"]
+texture = ExtResource("2")
+texture_margin_left = 15.0
+texture_margin_top = 15.0
+texture_margin_right = 15.0
+texture_margin_bottom = 15.0
+
+[node name="ResourceBar" type="HBoxContainer" unique_id=939314047]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_stretch_ratio = 1.86
+theme_override_constants/separation = 5
+script = ExtResource("1")
+
+[node name="FoodPanel" type="Panel" parent="." unique_id=1856335158]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxTexture_mp5n4")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="FoodPanel" unique_id=1268938068]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -17.5
+offset_bottom = 17.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TextureRect" type="TextureRect" parent="FoodPanel/HBoxContainer" unique_id=452409679]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+size_flags_horizontal = 10
+texture = ExtResource("3")
+stretch_mode = 5
+
+[node name="CurrentFood" type="RichTextLabel" parent="FoodPanel/HBoxContainer" unique_id=1780939000]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 25
+bbcode_enabled = true
+text = "0"
+fit_content = true
+vertical_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="FoodPanel" unique_id=1971123755]
+script = ExtResource("4")
+keyword = "food"
+
+[node name="ScrapPanel" type="Panel" parent="." unique_id=524209761]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxTexture_mp5n4")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrapPanel" unique_id=1210266414]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -17.5
+offset_bottom = 17.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TextureRect" type="TextureRect" parent="ScrapPanel/HBoxContainer" unique_id=985272958]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+texture = ExtResource("5")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CurrentScrap" type="RichTextLabel" parent="ScrapPanel/HBoxContainer" unique_id=1257368841]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 25
+bbcode_enabled = true
+text = "0"
+fit_content = true
+vertical_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="ScrapPanel" unique_id=1674535474]
+script = ExtResource("4")
+keyword = "scrap"
+
+[node name="ExaltPanel" type="Panel" parent="." unique_id=1700000001]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxTexture_mp5n4")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ExaltPanel" unique_id=1700000002]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -17.5
+offset_bottom = 17.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TextureRect" type="TextureRect" parent="ExaltPanel/HBoxContainer" unique_id=1700000003]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+texture = ExtResource("6")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CurrentExalt" type="RichTextLabel" parent="ExaltPanel/HBoxContainer" unique_id=1700000004]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 25
+bbcode_enabled = true
+text = "0"
+fit_content = true
+vertical_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="ExaltPanel" unique_id=1646300976]
+script = ExtResource("4")
+keyword = "exalt"
+
+[node name="ChaosPanel" type="Panel" parent="." unique_id=1848066822]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxTexture_mp5n4")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ChaosPanel" unique_id=546993906]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -17.5
+offset_bottom = 17.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TextureRect" type="TextureRect" parent="ChaosPanel/HBoxContainer" unique_id=1097432928]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+texture = ExtResource("7")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CurrentChaos" type="RichTextLabel" parent="ChaosPanel/HBoxContainer" unique_id=531171115]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 25
+bbcode_enabled = true
+text = "0"
+fit_content = true
+vertical_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="ChaosPanel" unique_id=862835116]
+script = ExtResource("4")
+keyword = "chaos"
+
+[node name="Day" type="Panel" parent="." unique_id=630224313]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxTexture_mp5n4")
+
+[node name="Day" type="RichTextLabel" parent="Day" unique_id=1189259215]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Day 1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="Day" unique_id=2133581525]
+script = ExtResource("4")
+keyword = "day"

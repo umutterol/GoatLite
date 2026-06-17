@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3 uid="uid://clh3iipqkx38x"]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+affix_id = "vitality_amulet_implicit"
+display_name = "Vitality"
+is_implicit = true
+valid_on_amulet = true
+stat_type = "vitality"
+min_value = 8.0
+max_value = 20.0
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

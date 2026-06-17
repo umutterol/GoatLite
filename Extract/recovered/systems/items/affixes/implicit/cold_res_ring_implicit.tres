@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3 uid="uid://c0i1idm2gk3ln"]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+affix_id = "cold_res_ring_implicit"
+display_name = "Cold Resistance"
+is_implicit = true
+valid_on_ring = true
+stat_type = "cold_resistance"
+min_value = 10.0
+max_value = 20.0
+value_suffix = "%"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

@@ -1,0 +1,12 @@
+[
+  { "id": "guardian",   "name": "Guardian",   "classId": "warrior", "role": "Tank",   "position": "Front", "icon": "spec-guardian",   "defaultProfile": "tunnel-vision", "blurb": "Taunt, stun, thorns" },
+  { "id": "berserker",  "name": "Berserker",  "classId": "warrior", "role": "DPS",    "position": "Front", "icon": "spec-berserker",  "defaultProfile": "executioner",   "blurb": "Rampage stacks, cleave, bleed" },
+  { "id": "crusader",   "name": "Crusader",   "classId": "paladin", "role": "Tank",   "position": "Front", "icon": "spec-crusader",   "defaultProfile": "tunnel-vision", "blurb": "Party shields, guard, mark cleanse" },
+  { "id": "cleric",     "name": "Cleric",     "classId": "paladin", "role": "Healer", "position": "Back",  "icon": "spec-cleric",     "defaultProfile": "peel",          "blurb": "Disc-style burst heals + absorbs" },
+  { "id": "assassin",   "name": "Assassin",   "classId": "rogue",   "role": "DPS",    "position": "Front", "icon": "spec-assassin",   "defaultProfile": "executioner",   "blurb": "Camouflage, execute, crit chains" },
+  { "id": "bard",       "name": "Bard",       "classId": "rogue",   "role": "DPS",    "position": "Back",  "icon": "spec-bard",       "defaultProfile": "opportunist",   "blurb": "Overdrive windows, mark/crit setup" },
+  { "id": "pyromancer", "name": "Pyromancer", "classId": "mage",    "role": "DPS",    "position": "Back",  "icon": "spec-pyromancer", "defaultProfile": "opportunist",   "blurb": "Burn stacks then detonate" },
+  { "id": "arcanist",   "name": "Arcanist",   "classId": "mage",    "role": "DPS",    "position": "Back",  "icon": "spec-arcanist",   "defaultProfile": "opportunist",   "blurb": "Silence, slows, party barrier" },
+  { "id": "lifebinder", "name": "Lifebinder", "classId": "sage",    "role": "Healer", "position": "Back",  "icon": "spec-lifebinder", "defaultProfile": "peel",          "blurb": "HoTs, DoT-to-heal, nature shields" },
+  { "id": "mystic",     "name": "Mystic",     "classId": "sage",    "role": "Tank",   "position": "Front", "icon": "spec-mystic",     "defaultProfile": "peel",          "blurb": "Parries, stuns, self-sustain" }
+]

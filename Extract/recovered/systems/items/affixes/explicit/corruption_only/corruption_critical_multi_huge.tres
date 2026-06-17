@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckf2e0ljtmtxg" path="res://systems/items/affixes/AffixValueTier.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_corr_crit"]
+script = ExtResource("2")
+min_value = 40.0
+max_value = 60.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[resource]
+script = ExtResource("1")
+affix_id = "corruption_critical_multi_huge"
+display_name = "Critical Multiplier"
+is_suffix = true
+valid_on_gloves = true
+valid_on_1h_weapon = true
+valid_on_2h_weapon = true
+valid_on_ring = true
+valid_on_amulet = true
+valid_on_sword = true
+valid_on_mace = true
+valid_on_axe = true
+valid_on_bow = true
+valid_on_staff = true
+valid_on_wand = true
+valid_on_focus = true
+valid_on_sceptre = true
+valid_on_spear = true
+valid_on_dagger = true
+custom_tags = ["corruption_only"]
+spawn_weight = 0
+stat_type = "critical_multiplier"
+value_suffix = "%"
+use_tier_helper = true
+value_tiers = [SubResource("Resource_corr_crit")]
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

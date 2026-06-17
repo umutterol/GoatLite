@@ -1,0 +1,32 @@
+[
+  {
+    "id": "set-warrior", "name": "Warplate of the Interred", "classId": "warrior",
+    "bonus2pc": "+5% output while above 50% HP",
+    "bonus4pc": "Guardian: +8% threat and mitigation. Berserker: cleave hits 1 extra target for 30%.",
+    "pieces": [], "note": "First-pass bonuses. Piece-to-item assignment ships with raid tiers (Phase 2+)."
+  },
+  {
+    "id": "set-paladin", "name": "Reliquary Vestments", "classId": "paladin",
+    "bonus2pc": "+5% effective healing and absorbs",
+    "bonus4pc": "Crusader: party shields are 15% stronger. Cleric: burst heals cost 10% less mana.",
+    "pieces": [], "note": "First-pass; pieces TBD with raid tiers."
+  },
+  {
+    "id": "set-rogue", "name": "Shroud of the Quiet Blade", "classId": "rogue",
+    "bonus2pc": "+4% crit",
+    "bonus4pc": "Crit chains: +15% critical damage (crits land harder in the Hit Quality roll).",
+    "pieces": [], "note": "First-pass; pieces TBD with raid tiers."
+  },
+  {
+    "id": "set-mage", "name": "Regalia of the Ashen Flame", "classId": "mage",
+    "bonus2pc": "+5% AoE output",
+    "bonus4pc": "Pyromancer: detonations deal +20%. Arcanist: party barrier is 15% stronger.",
+    "pieces": [], "note": "First-pass; pieces TBD with raid tiers."
+  },
+  {
+    "id": "set-sage", "name": "Garb of the Evergreen", "classId": "sage",
+    "bonus2pc": "+5% sustained output and healing",
+    "bonus4pc": "Lifebinder: HoTs tick 10% faster. Mystic: parry one extra hit per pull.",
+    "pieces": [], "note": "First-pass; pieces TBD with raid tiers."
+  }
+]

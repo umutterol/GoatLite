@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="MonsterAbility" format=3 uid="uid://dosey66fl365"]
+
+[ext_resource type="Script" uid="uid://dmetojbdk5sls" path="res://systems/combat/abilities/MonsterAbility.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_id = "rhoa_charge"
+display_name = "Rhoa Charge"
+icon = null
+shape = 1
+ability_target = 1
+ability_range = 10.0
+cooldown_seconds = 10.0
+damage_scaling = 3.0
+execute_vfx = null
+impact_vfx = null
+telegraph_vfx = null
+metadata/_custom_type_script = "uid://dmetojbdk5sls"

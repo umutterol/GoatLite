@@ -1,0 +1,7 @@
+[
+  { "id": "flasks-cauldron",  "name": "Flasks & Cauldron", "icon": "spec-arcanist",  "effect": "Party gets consumable stat buffs" },
+  { "id": "war-room",         "name": "War Room",          "icon": "tac-cooldowns",  "effect": "Replay shows additional combat data" },
+  { "id": "coaching-corner",  "name": "Coaching Corner",   "icon": "ico-morale",     "effect": "Reduces low-morale negative-trait amplification (×1.5 -> ×1.25)" },
+  { "id": "recruitment-board","name": "Recruitment Board", "icon": "ico-trait",      "effect": "Access higher-potential recruits" },
+  { "id": "morale-officer",   "name": "Morale Officer",    "icon": "ico-morale",     "effect": "Passive morale recovery between runs (+5 / run)" }
+]

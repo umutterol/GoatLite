@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://c6p2goe4ioaal"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_lgp3f"]
+script = ExtResource("2")
+stat_id = "evasion"
+base_value = 4.0
+value_per_stack = 4.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_3j0ri"]
+script = ExtResource("2")
+stat_id = "movement"
+base_value = 4.0
+value_per_stack = 4.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "lithe"
+name = "Lithe"
+description = "Move smoothly and without delay."
+rarity = 1
+icon = null
+max_stacks = 5
+stat_tags = ["evasion", "movement"]
+theme_tags = ["assassin"]
+category_tags = ["defence", "utility"]
+primary_tag = "evasion"
+stat_bonuses = [SubResource("Resource_lgp3f"), SubResource("Resource_3j0ri")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

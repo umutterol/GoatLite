@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3 uid="uid://bh8igwpj3tw4f"]
+
+[ext_resource type="Resource" uid="uid://cyor2ko1xxwb3" path="res://systems/monsters/normal/sand_spitter.tres" id="1"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="2"]
+[ext_resource type="Resource" uid="uid://bvjodi1hp32m3" path="res://systems/monsters/normal/hardshell_crab.tres" id="3"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="4"]
+
+[sub_resource type="Resource" id="Resource_i4kdf"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 4
+position_hint = 3
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_r7gfu"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 4
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_txe3o"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 2
+position_hint = 5
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_bepop"]
+script = ExtResource("2")
+monster = ExtResource("3")
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[resource]
+script = ExtResource("4")
+encounter_id = "crab_ambush"
+display_name = "Sandspitter Ambush"
+description = "The crafty lil bastards buried themselves in the sand..."
+area_tags = [0]
+tags = [0]
+selection_weight = 5.0
+monster_spawns = [SubResource("Resource_i4kdf"), SubResource("Resource_r7gfu"), SubResource("Resource_txe3o"), SubResource("Resource_bepop")]
+recommended_level = 2
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"

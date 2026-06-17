@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://dijacfkexqg2g"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_ufv1a"]
+script = ExtResource("2")
+stat_id = "life"
+base_value = 30.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_7ffbt"]
+script = ExtResource("2")
+stat_id = "vitality"
+base_value = 30.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "beef"
+name = "Beef"
+description = "Beef within, Beef without."
+rarity = 3
+icon = null
+stat_tags = ["life", "vitality"]
+theme_tags = ["tank"]
+category_tags = ["core"]
+primary_tag = "life"
+stat_bonuses = [SubResource("Resource_ufv1a"), SubResource("Resource_7ffbt")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

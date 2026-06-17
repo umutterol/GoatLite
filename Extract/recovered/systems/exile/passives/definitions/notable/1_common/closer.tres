@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3]
+
+[ext_resource type="Script" uid="uid://btjm4jmsenevr" path="res://systems/exile/stats/ConditionalStatBonus.gd" id="1"]
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_crit"]
+script = ExtResource("1")
+condition_type = 3
+condition_threshold = 35.0
+stat_id = "critical_chance"
+base_value = 50.0
+metadata/_custom_type_script = "uid://btjm4jmsenevr"
+
+[sub_resource type="Resource" id="Resource_multi"]
+script = ExtResource("1")
+condition_type = 3
+condition_threshold = 35.0
+stat_id = "critical_multiplier"
+base_value = 25.0
+metadata/_custom_type_script = "uid://btjm4jmsenevr"
+
+[resource]
+script = ExtResource("2")
+passive_id = "closer"
+name = "Closer"
+description = "Finish the fight when it's nearly over — desperation sharpens the killing blow."
+passive_type = 1
+icon = null
+stat_tags = ["critical"]
+theme_tags = ["assassin", "low_life"]
+category_tags = ["offence"]
+primary_tag = "assassin"
+conditional_bonuses = [SubResource("Resource_crit"), SubResource("Resource_multi")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

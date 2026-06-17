@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://bpotcard0001"]
+
+[ext_resource type="Script" uid="uid://cnq36j0v67aar" path="res://gameUI/guild/characterSheet/PotentialCardPanel.gd" id="1"]
+[ext_resource type="Script" uid="uid://j6hfajtypepq" path="res://gameUI/tooltips/TooltipHover.gd" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pot"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+bg_color = Color(0.1, 0.09, 0.07, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.3, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="PotentialCardPanel" type="PanelContainer" unique_id=1198797630]
+custom_minimum_size = Vector2(140, 44)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_pot")
+script = ExtResource("1")
+
+[node name="TooltipHover" type="Node" parent="." unique_id=1933237132]
+script = ExtResource("2")
+keyword = "potential_system"
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2132123795]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Layout" type="HBoxContainer" parent="MarginContainer" unique_id=261255597]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout" unique_id=1452900200]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TagLabel" type="Label" parent="MarginContainer/Layout" unique_id=658616109]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Tag"
+horizontal_alignment = 1
+vertical_alignment = 1

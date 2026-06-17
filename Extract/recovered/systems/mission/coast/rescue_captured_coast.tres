@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://crscucapcst01"]
+
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="1"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_slot1"]
+script = ExtResource("1")
+encounter = null
+area_filter = [0]
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_slot2"]
+script = ExtResource("1")
+encounter = null
+area_filter = [0]
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[resource]
+script = ExtResource("2")
+mission_id = "rescue_captured_coast"
+display_name = "Search & Rescue"
+description = "One of ours is out there. Push through the coastal scrub before the tide takes whatever's left."
+icon = null
+level = 2
+mission_tags = [0]
+availability_type = 3
+timeout_days = 4
+mission_length = 2
+encounter_slots = [SubResource("Resource_slot1"), SubResource("Resource_slot2")]
+scouting_reward = 2.0
+rarity_bonus = 0.1
+quantity_bonus = 0.1
+mission_rewards = null
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://bns3ybpwkes2n"]
+
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_s2ucw"]
+script = ExtResource("2")
+stat_id = "vitality"
+scaling_type = 3
+base_value = 5.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_r54wx"]
+script = ExtResource("2")
+stat_id = "life"
+scaling_type = 3
+base_value = 5.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+trait_id = "sickly"
+name = "Sickly"
+description = "They're never not unwell."
+icon = null
+stat_bonuses = [SubResource("Resource_s2ucw"), SubResource("Resource_r54wx")]
+potential_tags = ["life", "vitality"]
+potential_values = [-0.2, -0.2]
+incompatible_traits = ["healthy"]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

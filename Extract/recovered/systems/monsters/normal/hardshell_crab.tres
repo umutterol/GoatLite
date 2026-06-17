@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bvjodi1hp32m3"]
+
+[ext_resource type="Resource" uid="uid://brb3tyqus6whr" path="res://systems/combat/abilities/resources/hardshell_slam.tres" id="1"]
+[ext_resource type="Script" uid="uid://cetal6p7kbjls" path="res://systems/combat/abilities/ActionSlotConfig.gd" id="2"]
+[ext_resource type="Script" uid="uid://dn8chjjrdw06v" path="res://systems/monsters/MonsterStats.gd" id="3"]
+[ext_resource type="Script" uid="uid://bn4tocniaeat3" path="res://systems/combat/CombatBehavior.gd" id="4"]
+[ext_resource type="Resource" uid="uid://cqjv21e6i1lel" path="res://systems/combat/profiles/tactical_dumb_aggro.tres" id="5"]
+[ext_resource type="Texture2D" uid="uid://cwrhbtfk2si4o" path="res://assets/sprites/monsterSprites/ShellCrab.png" id="6"]
+[ext_resource type="Script" uid="uid://xo0774xbjf5m" path="res://systems/monsters/MonsterData.gd" id="7"]
+
+[sub_resource type="Resource" id="Resource_slamSlot"]
+script = ExtResource("2")
+abilities = [ExtResource("1")]
+metadata/_custom_type_script = "uid://cetal6p7kbjls"
+
+[sub_resource type="Resource" id="Resource_qrl6s"]
+script = ExtResource("3")
+life = 35.0
+armour = 24.0
+cold_resistance = 20.0
+lightning_resistance = -20.0
+fire_resistance = 20.0
+physical_damage = Vector2(4, 8)
+movement = -20.0
+
+[sub_resource type="Resource" id="Resource_esu41"]
+script = ExtResource("4")
+attack_range = 2.0
+stance = 0
+tactical_profile = ExtResource("5")
+basic_attack_vfx_override = null
+metadata/_custom_type_script = "uid://bn4tocniaeat3"
+
+[resource]
+script = ExtResource("7")
+monster_id = "hardshell_crab"
+display_name = "Hardshell"
+icon = ExtResource("6")
+description = "A well-armored crab that gorges itself on the dead. It's not adverse to creating new food sources for itself."
+base_stats = SubResource("Resource_qrl6s")
+combat_behavior = SubResource("Resource_esu41")
+action_slot_configs = [SubResource("Resource_slamSlot")]
+drop_tags = ["crab"]
+drop_table = null
+experience_value = 22
+base_drop_chance = 0.3
+food_drops = 0.5
+exalt_drops = 0.1
+metadata/_custom_type_script = "uid://xo0774xbjf5m"

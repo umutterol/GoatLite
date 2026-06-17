@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://clo6nhgjppouk"]
+
+[ext_resource type="Texture2D" uid="uid://c7pjdsqgr20d0" path="res://assets/sprites/itemSprites/gearSprites/armorSprites/shackles.png" id="1"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+item_id = "shackled_boots"
+display_name = "Shackle Boots"
+description = "Iron shackles, repurposed into terribly uncomfortable and heavy \"boots\". Fabric is tied to the manacles and wrapped under the foot with a piece of rope betwen the toes to help keep it in place."
+icon = ExtResource("1")
+category = 0
+armour_type = 0
+grid_width = 2
+grid_height = 2
+movement = -10
+base_armour_min = 10
+base_armour_max = 14
+base_evasion_min = -2
+base_evasion_max = -2
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

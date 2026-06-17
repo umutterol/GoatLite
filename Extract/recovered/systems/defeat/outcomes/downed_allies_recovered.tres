@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DefeatOutcome" format=3 uid="uid://bec2sbttv4itd"]
+
+[ext_resource type="Script" uid="uid://l2mo5qh0p5js" path="res://systems/defeat/DefeatOutcome.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+outcome_id = "downed_allies_recovered"
+display_name = "Recovered by Allies"
+description = "Knocked unconscious but carried home by surviving allies."
+weight = 50.0
+requires_allies_survived = true
+vitality_cost_percent = 15.0
+morale_cost = 10.0
+recovery_days = 1
+metadata/_custom_type_script = "uid://l2mo5qh0p5js"

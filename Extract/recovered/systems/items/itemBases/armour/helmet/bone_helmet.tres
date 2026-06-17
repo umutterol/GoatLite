@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://bgq3jj02t8dqe"]
+
+[ext_resource type="Texture2D" uid="uid://nni5xup4b5i1" path="res://assets/sprites/itemSprites/gearSprites/armorSprites/Bone_Helmet_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_hjp70"]
+script = ExtResource("2")
+affix_id = "bone_helmet_implicit"
+display_name = "chaos_resistance"
+is_implicit = true
+stat_type = "scouting"
+min_value = -4.0
+max_value = -8.0
+value_prefix = ""
+value_suffix = "%"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "bone_helmet"
+display_name = "Bone Helmet"
+description = "A wicked and impressively artistic helmet made of bone."
+icon = ExtResource("1")
+category = 0
+armour_type = 2
+min_item_level = 5
+required_level = 5
+grid_width = 2
+grid_height = 2
+base_armour_min = 20
+base_armour_max = 40
+implicit_affixes = [SubResource("Resource_hjp70")]
+attack_vfx = null
+exclusive_tags = ["bone"]
+is_monster_infrequent = true
+monster_infrequent_set = "Bone"
+metadata/_custom_type_script = "uid://cetys5ykyhird"

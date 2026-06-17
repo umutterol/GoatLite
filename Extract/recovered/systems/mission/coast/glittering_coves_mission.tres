@@ -1,0 +1,219 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://b8cv3qaq4mke7"]
+
+[ext_resource type="Resource" uid="uid://cyor2ko1xxwb3" path="res://systems/monsters/normal/sand_spitter.tres" id="1"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="2"]
+[ext_resource type="Resource" uid="uid://b7ioq8md2j48w" path="res://systems/monsters/normal/sparking_broodling.tres" id="3"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="4"]
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="5"]
+[ext_resource type="Resource" uid="uid://bvjodi1hp32m3" path="res://systems/monsters/normal/hardshell_crab.tres" id="6"]
+[ext_resource type="Resource" uid="uid://18mfeaqt5s8g" path="res://systems/monsters/normal/tentacled_bivalve.tres" id="7"]
+[ext_resource type="Resource" uid="uid://bhn7tpioc7qfi" path="res://systems/monsters/normal/barrel.tres" id="8"]
+[ext_resource type="Resource" uid="uid://cexnblx0c6bi8" path="res://systems/items/itemBases/jewellery/amulet/coral_amulet.tres" id="9"]
+[ext_resource type="Script" uid="uid://1jao5grkeqsb" path="res://systems/mission/MissionReward.gd" id="10"]
+[ext_resource type="Script" uid="uid://bl1n406v551lg" path="res://systems/mission/ProgressionRequirement.gd" id="11"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="12"]
+
+[sub_resource type="Resource" id="spawn_e1_a"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 3
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="spawn_e1_b"]
+script = ExtResource("2")
+monster = ExtResource("3")
+count = 2
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="enc1"]
+script = ExtResource("4")
+encounter_id = "coves1"
+display_name = "Approach to the Coves"
+monster_spawns = [SubResource("spawn_e1_a"), SubResource("spawn_e1_b")]
+recommended_level = 4
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="slot1"]
+script = ExtResource("5")
+slot_type = 0
+encounter = SubResource("enc1")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="spawn_e2_a"]
+script = ExtResource("2")
+monster = ExtResource("6")
+count = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="spawn_e2_b"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 2
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="spawn_e2_c"]
+script = ExtResource("2")
+monster = ExtResource("7")
+count = 2
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="enc2"]
+script = ExtResource("4")
+encounter_id = "coves2"
+display_name = "Cove Entrance"
+monster_spawns = [SubResource("spawn_e2_a"), SubResource("spawn_e2_b"), SubResource("spawn_e2_c")]
+recommended_level = 4
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="slot2"]
+script = ExtResource("5")
+slot_type = 0
+encounter = SubResource("enc2")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="spawn_e3_a"]
+script = ExtResource("2")
+monster = ExtResource("3")
+count = 3
+position_hint = 3
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="spawn_e3_b"]
+script = ExtResource("2")
+monster = ExtResource("7")
+count = 2
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="enc3"]
+script = ExtResource("4")
+encounter_id = "coves3"
+display_name = "Glittering Tidepools"
+monster_spawns = [SubResource("spawn_e3_a"), SubResource("spawn_e3_b")]
+recommended_level = 4
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="slot3"]
+script = ExtResource("5")
+slot_type = 0
+encounter = SubResource("enc3")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="spawn_e4_a"]
+script = ExtResource("2")
+monster = ExtResource("3")
+count = 4
+position_hint = 3
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="spawn_e4_b"]
+script = ExtResource("2")
+monster = ExtResource("6")
+count = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="spawn_e4_c"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 2
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="enc4"]
+script = ExtResource("4")
+encounter_id = "coves4"
+display_name = "The Inner Shoals"
+monster_spawns = [SubResource("spawn_e4_a"), SubResource("spawn_e4_b"), SubResource("spawn_e4_c")]
+recommended_level = 4
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="slot4"]
+script = ExtResource("5")
+slot_type = 0
+encounter = SubResource("enc4")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="spawn_e5_a"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 3
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="spawn_e5_b"]
+script = ExtResource("2")
+monster = ExtResource("3")
+count = 3
+position_hint = 3
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="spawn_e5_c"]
+script = ExtResource("2")
+monster = ExtResource("7")
+count = 2
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="spawn_e5_d"]
+script = ExtResource("2")
+monster = ExtResource("6")
+count = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="spawn_e5_e"]
+script = ExtResource("2")
+monster = ExtResource("8")
+count = 4
+position_hint = 3
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="enc5"]
+script = ExtResource("4")
+encounter_id = "coves5"
+display_name = "The Glittering Hollow"
+encounter_type = 1
+monster_spawns = [SubResource("spawn_e5_a"), SubResource("spawn_e5_b"), SubResource("spawn_e5_c"), SubResource("spawn_e5_d"), SubResource("spawn_e5_e")]
+recommended_level = 4
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="slot5"]
+script = ExtResource("5")
+slot_type = 0
+encounter = SubResource("enc5")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="reward"]
+script = ExtResource("10")
+chaos_amount = 1
+exalt_amount = 2
+guaranteed_item_bases = [ExtResource("9")]
+metadata/_custom_type_script = "uid://1jao5grkeqsb"
+
+[sub_resource type="Resource" id="prereq"]
+script = ExtResource("11")
+mission_id = "coral_reef_rescue_mission"
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[resource]
+script = ExtResource("12")
+mission_id = "glittering_coves_mission"
+display_name = "Glittering Coves"
+description = "One of the scouts said they saw a twinkling light coming from the coves. The others couldn't confirm it but could work checking out."
+icon = null
+level = 4
+mission_tags = [1]
+availability_type = 2
+prerequisites = [SubResource("prereq")]
+scouting_threshold_percent = 40.0
+discovery_base_chance = 1.0
+discovery_description = "Glittering Coves discovered."
+mission_length = 5
+encounter_slots = [SubResource("slot1"), SubResource("slot2"), SubResource("slot3"), SubResource("slot4"), SubResource("slot5")]
+scouting_reward = 5.0
+rarity_bonus = 0.1
+quantity_bonus = 0.15
+mission_rewards = SubResource("reward")
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

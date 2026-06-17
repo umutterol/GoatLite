@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DefeatOutcome" format=3 uid="uid://b3wf38a27chld"]
+
+[ext_resource type="Script" uid="uid://l2mo5qh0p5js" path="res://systems/defeat/DefeatOutcome.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+outcome_id = "scarred_generic"
+display_name = "Scarred"
+description = "The wounds left a lasting mark."
+weight = 20.0
+vitality_cost_percent = 25.0
+morale_cost = 20.0
+recovery_days = 2
+assigns_scar = true
+metadata/_custom_type_script = "uid://l2mo5qh0p5js"

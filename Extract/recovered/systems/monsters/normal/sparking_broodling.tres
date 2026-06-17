@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://b7ioq8md2j48w"]
+
+[ext_resource type="Script" uid="uid://dn8chjjrdw06v" path="res://systems/monsters/MonsterStats.gd" id="1"]
+[ext_resource type="Resource" uid="uid://c42ljfkgw4qxg" path="res://systems/combat/vfx/presets/lightning_default.tres" id="2"]
+[ext_resource type="Script" uid="uid://bn4tocniaeat3" path="res://systems/combat/CombatBehavior.gd" id="3"]
+[ext_resource type="Resource" uid="uid://cg4og4vyghiqv" path="res://systems/combat/profiles/tactical_skittish.tres" id="4"]
+[ext_resource type="Script" uid="uid://xo0774xbjf5m" path="res://systems/monsters/MonsterData.gd" id="5"]
+
+[sub_resource type="Resource" id="Resource_t01kj"]
+script = ExtResource("1")
+life = 25.0
+vitality = 5.0
+armour = 5.0
+cold_resistance = -20.0
+lightning_resistance = 40.0
+chaos_resistance = -20.0
+life_gain_on_hit = 1.0
+lightning_damage = Vector2(1, 9)
+critical_chance = 20.0
+attack_speed = 1.1
+shock_chance = 10.0
+metadata/_custom_type_script = "uid://dn8chjjrdw06v"
+
+[sub_resource type="Resource" id="Resource_h4evs"]
+script = ExtResource("3")
+attack_range = 6.0
+preferred_distance = 4.0
+kite_mode = 2
+tactical_profile = ExtResource("4")
+basic_attack_vfx_override = ExtResource("2")
+metadata/_custom_type_script = "uid://bn4tocniaeat3"
+
+[resource]
+script = ExtResource("5")
+monster_id = "sparking_broodling"
+display_name = "Sparking Broodling"
+icon = null
+description = "Their tentacles crackle with static."
+base_level = 2
+base_stats = SubResource("Resource_t01kj")
+combat_behavior = SubResource("Resource_h4evs")
+drop_table = null
+experience_value = 22
+food_drops = 0.2
+chaos_drops = 0.02
+exalt_drops = 0.05
+vaal_drops = 0.01
+metadata/_custom_type_script = "uid://xo0774xbjf5m"

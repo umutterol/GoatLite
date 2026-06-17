@@ -1,0 +1,99 @@
+[gd_scene format=3 uid="uid://oplrmijlie1a"]
+
+[ext_resource type="Script" uid="uid://cqg62erb62fke" path="res://gameUI/levelUp/PassiveTreeNodeWidget.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_passive"]
+bg_color = Color(0.13, 0.13, 0.16, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_notable"]
+bg_color = Color(0.13, 0.13, 0.16, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+shadow_color = Color(1, 1, 1, 0.18)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_keystone"]
+bg_color = Color(0.11, 0.1, 0.14, 1)
+border_width_left = 7
+border_width_top = 7
+border_width_right = 7
+border_width_bottom = 7
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+expand_margin_left = 4.0
+expand_margin_top = 4.0
+expand_margin_right = 4.0
+expand_margin_bottom = 4.0
+shadow_color = Color(1, 1, 1, 0.28)
+shadow_size = 14
+anti_aliasing_size = 1.5
+
+[node name="PassiveTreeNodeWidget" type="Control" unique_id=1181739011]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 1
+script = ExtResource("1")
+metadata/_passive_style = SubResource("StyleBoxFlat_passive")
+metadata/_notable_style = SubResource("StyleBoxFlat_notable")
+metadata/_keystone_style = SubResource("StyleBoxFlat_keystone")
+
+[node name="Background" type="Panel" parent="." unique_id=2094800763]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_passive")
+
+[node name="IconRect" type="TextureRect" parent="Background" unique_id=1095738306]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="FallbackLabel" type="Label" parent="Background" unique_id=9071914]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 28
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

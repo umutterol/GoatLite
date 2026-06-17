@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://cgalvanic001"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_sh_chance"]
+script = ExtResource("2")
+stat_id = "shock_chance"
+base_value = 100.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_light_dmg"]
+script = ExtResource("2")
+stat_id = "lightning_damage"
+scaling_type = 1
+base_value = 10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "galvanic_temperament"
+name = "Galvanic Temperament"
+description = "Every nick of lightning fastens itself into the flesh."
+passive_type = 1
+rarity = 1
+icon = null
+stat_tags = ["shock", "lightning_damage"]
+theme_tags = ["elementalist"]
+category_tags = ["offence", "elemental_damage"]
+primary_tag = "shock"
+stat_bonuses = [SubResource("Resource_sh_chance"), SubResource("Resource_light_dmg")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

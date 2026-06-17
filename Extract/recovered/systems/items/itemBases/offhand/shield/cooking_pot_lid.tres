@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://cifbo2soflwj3"]
+
+[ext_resource type="Texture2D" uid="uid://rw1smnciabf6" path="res://assets/sprites/itemSprites/gearSprites/armorSprites/156px-Leather_Buckler_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+item_id = "cooking_pot_lid"
+display_name = "Cookpot Lid"
+description = "A beaten and dented cookpot lid, repurposed into a shoddy iron buckler."
+icon = ExtResource("1")
+category = 2
+grid_width = 2
+grid_height = 2
+base_block_chance_min = 10
+base_block_chance_max = 14
+base_block_amount_min = 3
+base_block_amount_max = 6
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

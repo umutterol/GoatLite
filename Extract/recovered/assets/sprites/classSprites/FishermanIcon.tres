@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" format=3 uid="uid://bnuhtg18xaacb"]
+
+[ext_resource type="Texture2D" uid="uid://dn4g7owb810xd" path="res://assets/sprites/itemSprites/SODA's Realistic 32x32 IconSet/IconSet.png" id="1"]
+
+[resource]
+atlas = ExtResource("1")
+region = Rect2(96, 512, 32, 32)

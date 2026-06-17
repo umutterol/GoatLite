@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://wn20sc7d0lnl"]
+
+[ext_resource type="Texture2D" uid="uid://8m2scbxhmj0q" path="res://assets/sprites/itemSprites/currencySprites/VaalIcon.png" id="1"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+item_id = "vaal_orb"
+display_name = "Vaal Orb"
+description = "A dim red orb humming with corrupted power. Applied to an item, it transforms the item in one of four unpredictable ways and locks it forever from further crafting."
+icon = ExtResource("1")
+category = 5
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

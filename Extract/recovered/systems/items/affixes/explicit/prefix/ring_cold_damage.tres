@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3 uid="uid://ypafcsjghrpf"]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckf2e0ljtmtxg" path="res://systems/items/affixes/AffixValueTier.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_t1_ring_cold_damage"]
+script = ExtResource("2")
+is_range_value = true
+min_value_low = 1.0
+min_value_high = 2.0
+max_value_low = 2.0
+max_value_high = 3.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t2_ring_cold_damage"]
+script = ExtResource("2")
+item_level = 3
+is_range_value = true
+min_value_low = 2.0
+min_value_high = 2.0
+max_value_low = 3.0
+max_value_high = 4.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t3_ring_cold_damage"]
+script = ExtResource("2")
+item_level = 5
+is_range_value = true
+min_value_low = 2.0
+min_value_high = 3.0
+max_value_low = 3.0
+max_value_high = 4.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t4_ring_cold_damage"]
+script = ExtResource("2")
+item_level = 8
+is_range_value = true
+min_value_low = 3.0
+min_value_high = 4.0
+max_value_low = 4.0
+max_value_high = 6.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[resource]
+script = ExtResource("1")
+affix_id = "ring_cold_damage"
+display_name = "Cold Damage"
+is_prefix = true
+valid_on_ring = true
+stat_type = "cold_damage"
+global_damage_flag = true
+use_tier_helper = true
+value_tiers = [SubResource("Resource_t1_ring_cold_damage"), SubResource("Resource_t2_ring_cold_damage"), SubResource("Resource_t3_ring_cold_damage"), SubResource("Resource_t4_ring_cold_damage")]
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

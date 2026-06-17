@@ -1,0 +1,12 @@
+[
+  { "id": "crit",        "label": "Crit Scaling" },
+  { "id": "survival",    "label": "Survival" },
+  { "id": "interrupt",   "label": "Interrupt Affinity" },
+  { "id": "positioning", "label": "Spatial Sense" },
+  { "id": "aoe",         "label": "AoE Mastery" },
+  { "id": "cleave",      "label": "Cleave" },
+  { "id": "sustain",     "label": "Sustain" },
+  { "id": "burst",       "label": "Burst" },
+  { "id": "morale",      "label": "Morale Ceiling" },
+  { "id": "tank",        "label": "Threat" }
+]

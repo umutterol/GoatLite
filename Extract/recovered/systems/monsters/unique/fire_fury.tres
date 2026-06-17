@@ -1,0 +1,173 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://dhfq11s3x646j"]
+
+[ext_resource type="Script" uid="uid://1t3ktnqe5b5j" path="res://systems/combat/vfx/HitImpactFX.gd" id="1"]
+[ext_resource type="Script" uid="uid://xh5i1r11hpwr" path="res://systems/combat/vfx/ShotgunVFX.gd" id="2"]
+[ext_resource type="Resource" uid="uid://b1ps4xchfbalg" path="res://systems/combat/vfx/impactPresets/fire_cinders.tres" id="3"]
+[ext_resource type="Script" uid="uid://dmetojbdk5sls" path="res://systems/combat/abilities/MonsterAbility.gd" id="4"]
+[ext_resource type="Script" uid="uid://bd3yjptnlyeim" path="res://systems/combat/vfx/FireboltVFX.gd" id="5"]
+[ext_resource type="Script" uid="uid://cetal6p7kbjls" path="res://systems/combat/abilities/ActionSlotConfig.gd" id="6"]
+[ext_resource type="Script" uid="uid://dn8chjjrdw06v" path="res://systems/monsters/MonsterStats.gd" id="7"]
+[ext_resource type="Resource" uid="uid://40hod28rjacd" path="res://systems/combat/vfx/presets/melee_pop_VFX.tres" id="8"]
+[ext_resource type="Script" uid="uid://bn4tocniaeat3" path="res://systems/combat/CombatBehavior.gd" id="9"]
+[ext_resource type="Resource" uid="uid://cg4og4vyghiqv" path="res://systems/combat/profiles/tactical_skittish.tres" id="10"]
+[ext_resource type="Resource" uid="uid://c2ooo7qqerv3h" path="res://systems/items/itemBases/weapon/wand/bone_wand.tres" id="11"]
+[ext_resource type="Script" uid="uid://bu3sdlngwyt7h" path="res://systems/monsters/MonsterDropEntry.gd" id="12"]
+[ext_resource type="Script" uid="uid://b50iqhtungdym" path="res://systems/monsters/MonsterDropTable.gd" id="13"]
+[ext_resource type="Script" uid="uid://xo0774xbjf5m" path="res://systems/monsters/MonsterData.gd" id="14"]
+
+[sub_resource type="Resource" id="Resource_yeud4"]
+script = ExtResource("1")
+particle_style = 2
+color_inner = Color(0.54901963, 0.5137255, 0.4627451, 0.6901961)
+color_outer = Color(0.92941177, 0.89411765, 0.8784314, 0.54509807)
+particle_count = 9
+lifetime_seconds = 1.25
+speed_min = 0.5
+speed_max = 2.5
+angle_spread_radians = 1.65
+direction_bias_radians = 1.1584073464102098
+gravity = 0.0
+particle_radius_max = 1.6
+glow = true
+crit_multiplier = 2.0
+curl_frequency = 5.0
+
+[sub_resource type="Resource" id="Resource_q7lxk"]
+script = ExtResource("2")
+pellet_count = 32
+aim_jitter_deg = 9.0
+range_jitter = 0.5
+range_factor_base = 1.2000000000000002
+arrival_fraction = 0.6000000000000001
+post_arrival_fade_exponent = 4.5
+pellet_radius = 0.75
+pellet_length = 7.0
+pellet_glow_radius_mult = 4.1
+pellet_glow_alpha = 0.5
+core_brightness = 0.45
+trail_length = 2.0
+trail_width = 5.25
+trail_glow_alpha = 0.3
+trail_segments = 16
+color_override = Color(0.7882353, 0.43529412, 0.07058824, 0.7529412)
+lifetime_seconds = 1.5
+homes_on_target = true
+impact_fx = SubResource("Resource_yeud4")
+impact_landing_progress = 0.7
+metadata/_custom_type_script = "uid://xh5i1r11hpwr"
+
+[sub_resource type="Resource" id="Resource_ikwp3"]
+script = ExtResource("4")
+ability_id = "firebreath"
+display_name = "Breathe Fire"
+icon = null
+shape = 2
+ability_range = 7.0
+aoe_size = 10.0
+cooldown_seconds = 8.0
+wind_up_seconds = 0.1
+recovery_seconds = 1.0
+damage_scaling = 1.5
+convert_to_fire = 1.0
+execute_vfx = SubResource("Resource_q7lxk")
+impact_vfx = ExtResource("3")
+telegraph_vfx = null
+
+[sub_resource type="Resource" id="Resource_l7w42"]
+script = ExtResource("5")
+arrival_fraction = 0.05
+head_radius = 8.0
+head_glow_radius_mult = 5.0
+trail_length = 0.0
+trail_width = 0.0
+trail_glow_alpha = 0.0
+trail_segments = 4
+explosion_radius_max_in_def_radii = 21.8
+explosion_radius_start_in_def_radii = 4.05
+explosion_ring_width = 50.0
+color_override = Color(0.69803923, 0.23921569, 0.08235294, 0.8156863)
+impact_fx = ExtResource("3")
+metadata/_custom_type_script = "uid://bd3yjptnlyeim"
+
+[sub_resource type="Resource" id="Resource_25ynl"]
+script = ExtResource("4")
+ability_id = "firefury_explosion"
+display_name = "Explosive Fury"
+icon = null
+shape = 3
+ability_target = 4
+ability_range = 5.0
+aoe_size = 8.0
+cooldown_seconds = 20.0
+wind_up_seconds = 0.5
+recovery_seconds = 1.0
+damage_scaling = 1.5
+convert_to_physical = 0.2
+convert_to_fire = 0.8
+execute_vfx = SubResource("Resource_l7w42")
+impact_vfx = null
+telegraph_vfx = null
+metadata/_custom_type_script = "uid://dmetojbdk5sls"
+
+[sub_resource type="Resource" id="Resource_85lfq"]
+script = ExtResource("6")
+abilities = [SubResource("Resource_ikwp3"), SubResource("Resource_25ynl")]
+metadata/_custom_type_script = "uid://cetal6p7kbjls"
+
+[sub_resource type="Resource" id="Resource_26356"]
+script = ExtResource("7")
+life = 600.0
+vitality = 20.0
+cold_resistance = -40.0
+fire_resistance = 40.0
+chaos_resistance = -20.0
+life_gain_on_hit = 5.0
+physical_damage = Vector2(4, 12)
+fire_damage = Vector2(18, 40)
+action_speed = 1.1
+ignite_chance = 50.0
+ignite_duration_more_pct = 50.0
+movement = 10.0
+
+[sub_resource type="Resource" id="Resource_1dkm4"]
+script = ExtResource("9")
+attack_range = 5.0
+kite_mode = 2
+stance = 0
+tactical_profile = ExtResource("10")
+basic_attack_vfx_override = ExtResource("8")
+metadata/_custom_type_script = "uid://bn4tocniaeat3"
+
+[sub_resource type="Resource" id="Resource_xxv7y"]
+script = ExtResource("12")
+item_base = ExtResource("11")
+chance = 0.05
+metadata/_custom_type_script = "uid://bu3sdlngwyt7h"
+
+[sub_resource type="Resource" id="Resource_7e00b"]
+script = ExtResource("13")
+entries = [SubResource("Resource_xxv7y")]
+metadata/_custom_type_script = "uid://b50iqhtungdym"
+
+[resource]
+script = ExtResource("14")
+monster_id = "fire_fury"
+display_name = "The Fire Fury"
+icon = null
+description = "Head cook of the coastal Cannibal tribes."
+is_unique = true
+base_level = 6
+base_stats = SubResource("Resource_26356")
+combat_behavior = SubResource("Resource_1dkm4")
+action_slot_configs = [SubResource("Resource_85lfq")]
+drop_tags = ["cannibal"]
+drop_table = SubResource("Resource_7e00b")
+experience_value = 400
+item_rarity_bonus = 1.0
+item_quantity_bonus = 1.0
+base_drop_chance = 1.0
+scrap_drops = 2.5
+chaos_drops = 2.5
+exalt_drops = 2.5
+vaal_drops = 1.0
+metadata/_custom_type_script = "uid://xo0774xbjf5m"

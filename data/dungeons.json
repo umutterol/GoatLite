@@ -1,0 +1,25 @@
+[
+  {
+    "id": "ashveil-crypts",
+    "name": "Ashveil Crypts",
+    "theme": "Undead catacombs beneath a fallen city",
+    "timerSeconds": 1500,
+    "signature": "High undead density, Bursting-punishing",
+    "slots": [
+      { "stage": 1, "kind": "trash", "packTags": ["ashveil"] },
+      { "stage": 2, "kind": "boss",  "boss": "sexton-caldew" },
+      { "stage": 3, "kind": "trash", "packTags": ["ashveil"] },
+      { "stage": 4, "kind": "boss",  "boss": "embalmer-vesk" },
+      { "stage": 5, "kind": "trash", "packTags": ["ashveil"] },
+      { "stage": 6, "kind": "boss",  "boss": "the-unmourned" },
+      { "stage": 7, "kind": "trash", "packTags": ["ashveil"] },
+      { "stage": 8, "kind": "boss",  "boss": "othrend" }
+    ],
+    "lootTable": [
+      "bastion-of-the-barrow-march", "scepter-of-quiet-rest", "ashveil-cleaver",
+      "faceguard-of-interred-kings", "pale-mitre-of-ashveil", "cuirass-of-interred-kings",
+      "shroudweave-vestments", "legplates-of-the-barrow-march", "shroudweave-leggings",
+      "treads-of-quiet-rest", "vial-of-crypt-dust", "icon-of-pale-mercy"
+    ]
+  }
+]

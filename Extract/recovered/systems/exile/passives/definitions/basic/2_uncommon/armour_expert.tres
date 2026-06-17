@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://djfbi3s7hkevw"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_t04t6"]
+script = ExtResource("2")
+stat_id = "armour"
+scaling_type = 1
+base_value = 10.0
+value_per_stack = 10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_i65b3"]
+script = ExtResource("2")
+stat_id = "movement"
+base_value = 4.0
+value_per_stack = 4.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "armour_expert"
+name = "Armour Expert"
+description = "It's become like a second skin."
+rarity = 1
+icon = null
+max_stacks = 5
+stat_tags = ["armour", "movement"]
+theme_tags = ["warrior", "tank"]
+category_tags = ["defence"]
+primary_tag = "armour"
+stat_bonuses = [SubResource("Resource_t04t6"), SubResource("Resource_i65b3")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

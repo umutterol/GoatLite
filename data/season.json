@@ -1,0 +1,20 @@
+[
+  {
+    "id": "season-1-beta",
+    "name": "Beta Season I",
+    "seasonAffix": null,
+    "ratingTarget": 2500,
+    "dungeons": ["ashveil-crypts"],
+    "note": "Full-game content. ratingTarget and the affixCalendar assume the full 6-dungeon, 8-affix season; only Ashveil Crypts is authored so far, and the MVP restricts PLAY to Fortified + Bursting (GDD MVP scope). Affix rules locked per GDD v1.10: Tier 1 alternates Fortified/Tyrannical weekly; Tier 2 pairs never combine Bursting + Bolstering.",
+    "affixCalendar": [
+      { "week": 1, "tier1": "fortified",  "tier2": ["bursting", "spiteful"] },
+      { "week": 2, "tier1": "tyrannical", "tier2": ["volcanic", "raging"] },
+      { "week": 3, "tier1": "fortified",  "tier2": ["bolstering", "sanguine"] },
+      { "week": 4, "tier1": "tyrannical", "tier2": ["spiteful", "volcanic"] },
+      { "week": 5, "tier1": "fortified",  "tier2": ["bursting", "raging"] },
+      { "week": 6, "tier1": "tyrannical", "tier2": ["sanguine", "bolstering"] },
+      { "week": 7, "tier1": "fortified",  "tier2": ["bursting", "spiteful"] },
+      { "week": 8, "tier1": "tyrannical", "tier2": ["volcanic", "raging"] }
+    ]
+  }
+]

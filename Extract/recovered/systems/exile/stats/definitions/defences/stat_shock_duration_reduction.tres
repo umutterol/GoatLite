@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "shock_duration_reduction_pct"
+display_name = "Reduced Shock Duration"
+description = "% reduction to the duration of Shocks applied to this combatant. Stacks additively, clamped 0-100. At 100% shocks expire immediately."
+category = 1
+stat_type = 1
+min_value = 0.0
+max_value = 100.0
+show_as_percentage = true
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

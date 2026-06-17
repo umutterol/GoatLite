@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "impale_effect_pct"
+display_name = "Impale Effect"
+description = "Additional % of post-mitigation physical damage captured into Impale stacks. Stacks additively on top of the 10% base capture. The captured flat is added to the next elemental hit on the target."
+category = 3
+stat_type = 1
+min_value = -10.0
+show_as_percentage = true
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

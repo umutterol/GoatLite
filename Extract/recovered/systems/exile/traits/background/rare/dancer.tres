@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://dqsm58dm57473"]
+
+[ext_resource type="Script" uid="uid://btjm4jmsenevr" path="res://systems/exile/stats/ConditionalStatBonus.gd" id="1"]
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="2"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_3ilk0"]
+script = ExtResource("1")
+condition_type = 5
+condition_threshold = 90.0
+stat_id = "evasion"
+scaling_type = 1
+base_value = 25.0
+metadata/_custom_type_script = "uid://btjm4jmsenevr"
+
+[sub_resource type="Resource" id="Resource_ism0v"]
+script = ExtResource("1")
+condition_type = 6
+condition_threshold = 25.0
+stat_id = "evasion"
+scaling_type = 3
+base_value = 25.0
+metadata/_custom_type_script = "uid://btjm4jmsenevr"
+
+[sub_resource type="Resource" id="Resource_fw742"]
+script = ExtResource("3")
+stat_id = "evasion"
+base_value = 3.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("2")
+trait_id = "dancer"
+name = "Dancer"
+description = "Light on their feet and confident in their movement. In high spirits they cannot be touched, but they suffer when things are most grim."
+rarity = 2
+icon = null
+stat_bonuses = [SubResource("Resource_fw742")]
+conditional_bonuses = [SubResource("Resource_3ilk0"), SubResource("Resource_ism0v")]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

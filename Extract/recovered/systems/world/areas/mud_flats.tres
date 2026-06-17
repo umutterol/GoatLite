@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="AreaData" format=3 uid="uid://d01x4jr57k0dg"]
+
+[ext_resource type="Script" uid="uid://bl1n406v551lg" path="res://systems/mission/ProgressionRequirement.gd" id="1"]
+[ext_resource type="Script" uid="uid://cuit5e3jj2yuk" path="res://systems/world/AreaConnection.gd" id="2"]
+[ext_resource type="Script" uid="uid://drkvveldog20i" path="res://systems/world/AreaData.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_1k8uj"]
+script = ExtResource("1")
+mission_id = "fire_fury_boss_mission"
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[sub_resource type="Resource" id="Resource_sp8h4"]
+script = ExtResource("2")
+requirements = [SubResource("Resource_1k8uj")]
+metadata/_custom_type_script = "uid://cuit5e3jj2yuk"
+
+[resource]
+script = ExtResource("3")
+area_id = 1
+display_name = "The Mud Flats"
+description = "TODO UNFINISHED"
+connections = [SubResource("Resource_sp8h4")]
+metadata/_custom_type_script = "uid://drkvveldog20i"

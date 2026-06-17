@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="StatusEffect" format=3]
+
+[ext_resource type="Script" uid="uid://c7u4b1n711gll" path="res://systems/combat/statusEffects/StatusEffect.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+effect_id = &"desperation"
+display_name = "Desperation"
+description = "Combat has dragged on. Every 5 seconds, all combatants gain another stack. Per stack:
+  +5% damage dealt (additive)
+  -0.5 vitality per second (spills into life when vitality is empty)
+Designed to force long fights to a quick, dramatic resolution."
+max_stacks = 100
+stat_modifiers = {
+"damage_dealt_more_pct": 5.0
+}
+per_tick_effects = {
+"vitality_drain_per_sec": 0.5
+}
+vfx = null

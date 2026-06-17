@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ashveil-crypts-loot",
+    "dungeonId": "ashveil-crypts",
+    "entries": [
+      { "itemId": "bastion-of-the-barrow-march", "weight": 10, "minKey": 2 },
+      { "itemId": "scepter-of-quiet-rest",        "weight": 10, "minKey": 2 },
+      { "itemId": "ashveil-cleaver",              "weight": 10, "minKey": 2 },
+      { "itemId": "faceguard-of-interred-kings",  "weight": 12, "minKey": 2 },
+      { "itemId": "pale-mitre-of-ashveil",        "weight": 10, "minKey": 2 },
+      { "itemId": "cuirass-of-interred-kings",    "weight": 12, "minKey": 2 },
+      { "itemId": "shroudweave-vestments",        "weight": 10, "minKey": 2 },
+      { "itemId": "legplates-of-the-barrow-march","weight": 12, "minKey": 2 },
+      { "itemId": "shroudweave-leggings",         "weight": 10, "minKey": 2 },
+      { "itemId": "treads-of-quiet-rest",         "weight": 14, "minKey": 2 },
+      { "itemId": "vial-of-crypt-dust",           "weight": 8,  "minKey": 4 },
+      { "itemId": "icon-of-pale-mercy",           "weight": 8,  "minKey": 4 }
+    ]
+  }
+]

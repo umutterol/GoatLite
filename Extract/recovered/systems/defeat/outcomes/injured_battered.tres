@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DefeatOutcome" format=3 uid="uid://c0vdpwg2pbprg"]
+
+[ext_resource type="Script" uid="uid://l2mo5qh0p5js" path="res://systems/defeat/DefeatOutcome.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+outcome_id = "injured_battered"
+display_name = "Battered"
+description = "Took a serious beating. Needs time to recover."
+weight = 40.0
+vitality_cost_percent = 40.0
+morale_cost = 20.0
+recovery_days = 3
+metadata/_custom_type_script = "uid://l2mo5qh0p5js"

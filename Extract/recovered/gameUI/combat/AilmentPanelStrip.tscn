@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://berw30o2ka3om"]
+
+[ext_resource type="Script" uid="uid://5llhpd1wer7t" path="res://gameUI/combat/AilmentPanelStrip.gd" id="1"]
+
+[node name="AilmentPanelStrip" type="HBoxContainer" unique_id=245046253]
+custom_minimum_size = Vector2(0, 22)
+mouse_filter = 2
+script = ExtResource("1")

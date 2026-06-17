@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://der180whhwy45"]
+
+[ext_resource type="Script" uid="uid://dfoxrhimvocv6" path="res://gameUI/smallComponents/ExilePortraitSlot.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://dhel2d3t375eq" path="res://gameUI/levelUp/PortraitLevelUpBadge.tscn" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_portrait"]
+content_margin_left = 1.0
+content_margin_top = 1.0
+content_margin_right = 1.0
+content_margin_bottom = 1.0
+bg_color = Color(0.08, 0.07, 0.06, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.34, 0.24, 0.9)
+border_blend = true
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="ExilePortraitSlot" type="PanelContainer" unique_id=111385836]
+clip_contents = true
+custom_minimum_size = Vector2(48, 48)
+theme_override_styles/panel = SubResource("StyleBoxFlat_portrait")
+script = ExtResource("1")
+
+[node name="Inner" type="Control" parent="." unique_id=1656797690]
+clip_contents = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ClassIcon" type="TextureRect" parent="Inner" unique_id=2100713812]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Placeholder" type="Label" parent="Inner" unique_id=1601534378]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.35, 0.32, 0.28, 1)
+theme_override_font_sizes/font_size = 22
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LevelUpBadge" parent="Inner" unique_id=600157774 instance=ExtResource("2")]
+layout_mode = 1

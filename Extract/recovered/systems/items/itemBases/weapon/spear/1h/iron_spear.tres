@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://bmt45kntud7ty"]
+
+[ext_resource type="Resource" uid="uid://d0qjrkgj5ny0l" path="res://systems/combat/vfx/presets/spear_stabVFX.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://d150voqlmdu2x" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/1HSpear02.webp" id="2"]
+[ext_resource type="Resource" path="res://systems/items/affixes/implicit/impale_chance_spear.tres" id="3"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="4"]
+
+[resource]
+script = ExtResource("4")
+item_id = "iron_spear"
+display_name = "Iron Spear"
+description = "A sturdy shortspear with a rough Iron head."
+icon = ExtResource("2")
+weapon_type = 3
+min_item_level = 2
+required_level = 2
+grid_height = 4
+base_physical_damage_min = 4
+base_physical_damage_max = 8
+base_attack_speed = 1.15
+base_critical_chance = 6.0
+base_attack_range = 2.5
+implicit_affixes = [ExtResource("3")]
+attack_vfx = ExtResource("1")
+metadata/_custom_type_script = "uid://cetys5ykyhird"

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://crmpexgrmwwj4"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_eskpv"]
+script = ExtResource("2")
+stat_id = "cold_damage"
+base_value = 6.0
+damage_target = 1
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_qhau1"]
+script = ExtResource("2")
+stat_id = "cold_damage"
+base_value = 10.0
+damage_target = 2
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_et7df"]
+script = ExtResource("2")
+stat_id = "life"
+base_value = -5.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "cryogenic_reaction"
+name = "Cryogenic Reaction"
+description = "...something will have to be done about the digital frostbite effects, of course, but the results are promising."
+rarity = 2
+icon = null
+stat_tags = ["cold_damage"]
+theme_tags = ["elementalist"]
+category_tags = ["elemental_damage", "offence"]
+primary_tag = "elementalist"
+stat_bonuses = [SubResource("Resource_eskpv"), SubResource("Resource_qhau1"), SubResource("Resource_et7df")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

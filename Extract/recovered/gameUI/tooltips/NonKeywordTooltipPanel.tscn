@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://bnonkwtt0001"]
+
+[ext_resource type="StyleBox" uid="uid://d1ant8po3qwme" path="res://gameUI/tooltips/TooltipStyle.tres" id="1"]
+[ext_resource type="Script" uid="uid://6t0b6862reil" path="res://gameUI/tooltips/NonKeywordTooltipPanel.gd" id="2"]
+
+[node name="NonKeywordTooltipPanel" type="PanelContainer" unique_id=1952647721]
+visible = false
+z_index = 100
+custom_minimum_size = Vector2(220, 0)
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("1")
+script = ExtResource("2")
+
+[node name="Margins" type="MarginContainer" parent="." unique_id=1139144524]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 22
+
+[node name="Body" type="RichTextLabel" parent="Margins" unique_id=585213517]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false

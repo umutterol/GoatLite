@@ -1,0 +1,61 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://ds7mdopq3b1h"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_ipx06"]
+script = ExtResource("2")
+stat_id = "attack_speed"
+scaling_type = 1
+value_range_max = 10.0
+use_random_range = true
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_j4mea"]
+script = ExtResource("2")
+stat_id = "chaos_resistance"
+value_range_max = 10.0
+use_random_range = true
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_by1yj"]
+script = ExtResource("2")
+stat_id = "critical_chance"
+scaling_type = 1
+value_range_max = 20.0
+use_random_range = true
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_7hek2"]
+script = ExtResource("2")
+stat_id = "second_wind_chance"
+value_range_max = 5.0
+use_random_range = true
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_7e8oc"]
+script = ExtResource("2")
+stat_id = "evasion"
+value_range_max = 5.0
+use_random_range = true
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_3tvob"]
+script = ExtResource("2")
+stat_id = "scavenging"
+value_range_max = 20.0
+use_random_range = true
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "luck_of_the_draw"
+name = "Luck of the Draw"
+description = "It's different every time you see it but you can only take one, will you see one better than this?"
+passive_type = 1
+rarity = 2
+icon = null
+theme_tags = ["gamble"]
+primary_tag = "gamble"
+stat_bonuses = [SubResource("Resource_ipx06"), SubResource("Resource_j4mea"), SubResource("Resource_by1yj"), SubResource("Resource_7hek2"), SubResource("Resource_7e8oc"), SubResource("Resource_3tvob")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

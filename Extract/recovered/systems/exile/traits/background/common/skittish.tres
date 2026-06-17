@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://bm6hu8e151qh4"]
+
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_k7fdj"]
+script = ExtResource("2")
+stat_id = "evasion"
+base_value = 4.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_46p2a"]
+script = ExtResource("2")
+stat_id = "scouting"
+base_value = 10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+trait_id = "skittish"
+name = "Skittish"
+description = "They're jumpy and always on the lookout. "
+icon = null
+stat_bonuses = [SubResource("Resource_k7fdj"), SubResource("Resource_46p2a")]
+potential_tags = ["evasion"]
+potential_values = [0.5]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

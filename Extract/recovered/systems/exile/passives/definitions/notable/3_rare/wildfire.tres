@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://cwildfire001"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_ig_chance"]
+script = ExtResource("2")
+stat_id = "ignite_chance"
+base_value = 500.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_ig_dur"]
+script = ExtResource("2")
+stat_id = "ignite_duration_more_pct"
+base_value = 50.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_fire_res"]
+script = ExtResource("2")
+stat_id = "fire_resistance"
+base_value = 20.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_less_life"]
+script = ExtResource("2")
+stat_id = "life"
+scaling_type = 3
+base_value = 10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "wildfire"
+name = "Wildfire"
+description = "You burn brighter and the world burns with you. Stand too close to your own work and the flesh remembers."
+passive_type = 1
+rarity = 2
+icon = null
+stat_tags = ["ignite", "fire_damage", "fire_resistance", "life"]
+theme_tags = ["elementalist", "gamble"]
+category_tags = ["offence", "resistance"]
+primary_tag = "ignite"
+stat_bonuses = [SubResource("Resource_ig_chance"), SubResource("Resource_ig_dur"), SubResource("Resource_fire_res"), SubResource("Resource_less_life")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

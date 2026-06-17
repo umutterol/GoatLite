@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShotgunVFX" format=3 uid="uid://dl4q258kjbcac"]
+
+[ext_resource type="Resource" path="res://systems/combat/vfx/impactPresets/blood_default.tres" id="1"]
+[ext_resource type="Script" uid="uid://xh5i1r11hpwr" path="res://systems/combat/vfx/ShotgunVFX.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+pellet_count = 24
+spread_angle_deg = 2.0
+aim_jitter_deg = 2.0
+range_jitter = 0.3
+range_factor_base = 1.2000000000000002
+arrival_fraction = 0.2
+pellet_radius = 1.0
+pellet_length = 18.0
+pellet_glow_radius_mult = 1.5
+core_brightness = 0.35
+color_override = Color(0.08802645, 0.1299053, 0.21979158, 0.79607844)
+impact_fx = ExtResource("1")

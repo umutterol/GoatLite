@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3 uid="uid://dm2k2qr8go7ry"]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "lightning_damage"
+display_name = "Lightning Damage"
+description = "Lightning type Elemental Damage."
+category = 3
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

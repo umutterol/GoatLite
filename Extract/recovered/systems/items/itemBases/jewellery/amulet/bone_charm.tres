@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://cqfsi8omdbo76"]
+
+[ext_resource type="Texture2D" uid="uid://1uypgc5xpxsn" path="res://assets/sprites/itemSprites/gearSprites/jewellerySprites/bone_charm_icon.png" id="1"]
+[ext_resource type="Resource" uid="uid://clh3iipqkx38x" path="res://systems/items/affixes/implicit/vitality_amulet_implicit.tres" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[resource]
+script = ExtResource("3")
+item_id = "bone_charm"
+display_name = "Bone Charm"
+description = "A necklace of woven hair laced with rune-carved bones that clatter together. They are hopefully the bones of small animals but just as likely human finger bones."
+icon = ExtResource("1")
+category = 1
+jewellery_type = 1
+min_item_level = 3
+required_level = 3
+implicit_affixes = [ExtResource("2")]
+attack_vfx = null
+exclusive_tags = ["bone", "cannibal"]
+is_monster_infrequent = true
+monster_infrequent_set = "Bone"
+metadata/_custom_type_script = "uid://cetys5ykyhird"

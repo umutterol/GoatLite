@@ -1,0 +1,8 @@
+[
+  { "id": "weapon",  "name": "Weapon" },
+  { "id": "helm",    "name": "Helm" },
+  { "id": "chest",   "name": "Chest" },
+  { "id": "legs",    "name": "Legs" },
+  { "id": "boots",   "name": "Boots" },
+  { "id": "trinket", "name": "Trinket" }
+]

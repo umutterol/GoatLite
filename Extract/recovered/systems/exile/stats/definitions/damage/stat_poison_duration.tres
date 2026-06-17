@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "poison_duration_more_pct"
+display_name = "Poison Duration"
+description = "% bonus to the duration of Poison stacks you apply (base 2.0s per stack). Does NOT dilute DPS — a longer poison ticks at the same per-second rate, dealing more total damage over its lifetime. Stacks are independent: each carries its own expiry."
+category = 3
+stat_type = 1
+min_value = -100.0
+show_as_percentage = true
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

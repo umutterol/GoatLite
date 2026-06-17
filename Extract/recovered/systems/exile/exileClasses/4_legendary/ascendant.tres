@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="ClassDefinition" format=3 uid="uid://cy8hpkuf2docr"]
+
+[ext_resource type="Script" uid="uid://btjm4jmsenevr" path="res://systems/exile/stats/ConditionalStatBonus.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dr5so8uo1ethh" path="res://systems/exile/exileClasses/4_legendary/ascendanticon.webp" id="2"]
+[ext_resource type="Script" uid="uid://diftkoyemu6om" path="res://systems/exile/exileClasses/ClassDefinition.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_pibc3"]
+script = ExtResource("1")
+condition_type = 5
+condition_threshold = 90.0
+stat_id = "second_wind_chance"
+scaling_type = 2
+base_value = 100.0
+metadata/_custom_type_script = "uid://btjm4jmsenevr"
+
+[resource]
+script = ExtResource("3")
+class_id = "ascendant"
+name = "Ascendant"
+description = "Trained from birth and destined for greatness. But destiny can be a bit cheeky sometimes, that destined greatness may not be what they imagined."
+rarity = 3
+icon = ExtResource("2")
+override_life = 120.0
+override_vitality = 140.0
+override_physical_damage = Vector2(2, 4)
+override_critical_chance = 8.0
+override_critical_multiplier = 175.0
+override_evasion = 15.0
+override_chaos_resistance = 20.0
+override_scouting = 20.0
+override_movement = 20.0
+life_per_level = 10.0
+vitality_per_level = 10.0
+potential_tags = ["morale", "offense", "defence", "critical"]
+potential_values = [2.0, 1.5, 1.5, 1.0]
+incompatible_trait_ids = ["just_awful"]
+conditional_bonuses = [SubResource("Resource_pibc3")]
+metadata/_custom_type_script = "uid://diftkoyemu6om"

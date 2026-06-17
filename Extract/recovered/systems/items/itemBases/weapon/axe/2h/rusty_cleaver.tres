@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://kg0ct86a35eh"]
+
+[ext_resource type="Texture2D" uid="uid://gd5v2rqv1q5n" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Cleaver_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+item_id = "rusty_cleaver"
+display_name = "Rusty Cleaver"
+description = "Barely sharp but heavy enough to cut anyway."
+icon = ExtResource("1")
+weapon_type = 0
+hand_type = 1
+grid_width = 2
+grid_height = 3
+base_physical_damage_min = 3
+base_physical_damage_max = 10
+base_critical_chance = 1.0
+base_attack_range = 2.5
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

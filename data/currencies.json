@@ -1,0 +1,5 @@
+[
+  { "id": "gold",   "name": "Gold",                "icon": "cur-gold",   "tint": "#e6c163", "desc": "Per-mob soft currency. Sinks pending (Open Questions)." },
+  { "id": "emblem", "name": "Emblems of Heroism",  "icon": "cur-emblem", "tint": "#cf9a52", "desc": "Run-completion reward: 5 timed / 2 depleted. Vendor BiS at 30-50." },
+  { "id": "shard",  "name": "Shards",              "icon": "cur-shard",  "tint": "#7fc7d6", "desc": "Scrapped gear -> reroll / add secondaries at the bench (Phase 2)." }
+]

@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://ccoldproof001"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_chill_red"]
+script = ExtResource("2")
+stat_id = "chill_effect_reduction_pct"
+base_value = 25.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_cold_res"]
+script = ExtResource("2")
+stat_id = "cold_resistance"
+base_value = 5.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "coldproofing"
+name = "Coldproofing"
+description = "Layered furs and seal grease shrug off the slowing grip of frost."
+passive_type = 1
+icon = null
+max_stacks = 4
+stat_tags = ["chill", "cold_resistance", "ailment_defence"]
+theme_tags = ["tank", "survivalist"]
+category_tags = ["defence", "resistance"]
+primary_tag = "ailment_defence"
+stat_bonuses = [SubResource("Resource_chill_red"), SubResource("Resource_cold_res")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ClassDefinition" format=3 uid="uid://bn4tsrxxt13at"]
+
+[ext_resource type="Script" uid="uid://btjm4jmsenevr" path="res://systems/exile/stats/ConditionalStatBonus.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bnuhtg18xaacb" path="res://assets/sprites/classSprites/FishermanIcon.tres" id="2"]
+[ext_resource type="Script" uid="uid://diftkoyemu6om" path="res://systems/exile/exileClasses/ClassDefinition.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_chill"]
+script = ExtResource("1")
+stat_id = "chill_effect_reduction_pct"
+base_value = 50.0
+metadata/_custom_type_script = "uid://btjm4jmsenevr"
+
+[resource]
+script = ExtResource("3")
+class_id = "fisherman"
+name = "Fisherman"
+description = "More likely exiled by a ill-weather than anything else. Hardy folk with some survival skills, they'll will need a lot of luck to survive out here."
+icon = ExtResource("2")
+override_life = 90.0
+override_vitality = 90.0
+override_physical_damage = Vector2(1, 4)
+override_cold_resistance = 10.0
+override_survival = 10.0
+life_per_level = 6.0
+vitality_per_level = 6.0
+potential_tags = ["survival"]
+potential_values = [1.0]
+conditional_bonuses = [SubResource("Resource_chill")]
+metadata/_custom_type_script = "uid://diftkoyemu6om"

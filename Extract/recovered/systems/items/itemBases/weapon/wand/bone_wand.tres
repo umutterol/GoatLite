@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://c2ooo7qqerv3h"]
+
+[ext_resource type="Resource" uid="uid://cdgfkg77gahd8" path="res://systems/combat/vfx/presets/homing_default.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://d00qplulnfwij" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Bone_Wand_inventory_icon.png" id="2"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="3"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="4"]
+
+[sub_resource type="Resource" id="Resource_xb044"]
+script = ExtResource("3")
+affix_id = "bone_wand_life_leech"
+display_name = "Life Leech"
+is_implicit = true
+stat_type = "life_leech"
+min_value = 8.0
+max_value = 12.0
+value_suffix = "%"
+min_item_level = 3
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("4")
+item_id = "bone_wand"
+display_name = "Bone Wand"
+description = "Best not to think about this one..."
+icon = ExtResource("2")
+weapon_type = 6
+min_item_level = 3
+required_level = 3
+grid_height = 2
+base_chaos_damage_min = 6
+base_chaos_damage_max = 12
+base_attack_speed = 0.9
+base_critical_chance = 6.0
+base_attack_range = 7.0
+implicit_affixes = [SubResource("Resource_xb044")]
+ranged = true
+attack_vfx = ExtResource("1")
+exclusive_tags = ["cannibal", "bone"]
+is_monster_infrequent = true
+monster_infrequent_set = "Bone"
+metadata/_custom_type_script = "uid://cetys5ykyhird"

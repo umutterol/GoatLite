@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://rhw5k1lbpoph"]
+
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+trait_id = "iron_willed"
+name = "Iron Willed"
+description = "It's clear their body will quit before their mind does."
+rarity = 3
+icon = null
+special_effects = ["unbreakable"]
+incompatible_traits = ["coward"]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

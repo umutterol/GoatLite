@@ -1,0 +1,54 @@
+[
+  { "id": "log-flavor", "kind": "flavor", "lines": [
+    "{actor} typed \"mb\" in party chat.",
+    "{actor} is now \"questioning their life choices.\"",
+    "Half the party is suddenly somewhere they should not be.",
+    "Someone pinged the boss. Helpful.",
+    "{actor} inspects {target}'s gear mid-pull. Bold."
+  ] },
+  { "id": "log-good", "kind": "good", "lines": [
+    "{actor} pulls the pack clean. Textbook.",
+    "Kill Order holds. The deaths stay apart.",
+    "{actor} stabilizes the pull. Crisis averted.",
+    "The cooldowns line up. Boss melts."
+  ] },
+  { "id": "log-crit", "kind": "crit", "lines": [
+    "{actor} — CRITICAL — {n} to {target}. It does not get up.",
+    "{actor} crits for {n}. The parse twitches upward.",
+    "CRITICAL. {target} folds."
+  ] },
+  { "id": "log-dodge", "kind": "dodge", "lines": [
+    "{actor} glances the blow. Half damage. Healer exhales.",
+    "{target} dodges clean. Nothing lands.",
+    "A glancing hit. {actor} barely feels it."
+  ] },
+  { "id": "log-heal", "kind": "heal", "lines": [
+    "{actor} blows a cooldown. The wipe is averted — barely.",
+    "Two absorbs land just in time.",
+    "{actor} is out of mana.",
+    "{actor} tops the party off and immediately regrets the mana spend."
+  ] },
+  { "id": "log-death", "kind": "death", "lines": [
+    "{actor} ignored the assignment. The cast goes through.",
+    "{actor} is dragged into the dark. Morale -20.",
+    "{actor} stood in it. Again.",
+    "{actor} has left the dungeon."
+  ] },
+  { "id": "log-mechanic", "kind": "mechanic", "lines": [
+    "{boss} begins {ability} — interrupt assigned to {actor}…",
+    "The mechanic resolves. Mostly.",
+    "A telegraph blooms under {target}."
+  ] },
+  { "id": "log-bursting", "kind": "mechanic", "affixId": "bursting", "lines": [
+    "Bursting stacks at {n}. {actor} is holding the deaths apart.",
+    "…which spikes Bursting to {n}. That was greedy."
+  ] },
+  { "id": "log-spiteful", "kind": "mechanic", "affixId": "spiteful", "lines": [
+    "Spiteful ghost spawns. It picks the lowest parse: {target}.",
+    "A ghost peels off toward {target}. Of course it does."
+  ] },
+  { "id": "log-sanguine", "kind": "mechanic", "affixId": "sanguine", "lines": [
+    "The pack sits in its own Sanguine pool, healing. {actor} sighs.",
+    "Move out of the red, {actor}. Please."
+  ] }
+]

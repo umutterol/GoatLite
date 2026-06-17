@@ -1,0 +1,109 @@
+[gd_scene format=3 uid="uid://cm4nwskf4a0nt"]
+
+[ext_resource type="Script" uid="uid://5osxeq62gytl" path="res://gameUI/recruitment/RecruitCard.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://der180whhwy45" path="res://gameUI/smallComponents/ExilePortraitSlot.tscn" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.0784314, 0.0784314, 0.0784314, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.549549, 0.408286, 0.320186, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="RecruitCard" type="PanelContainer" unique_id=998635313]
+custom_minimum_size = Vector2(320, 420)
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+script = ExtResource("1")
+
+[node name="Layout" type="VBoxContainer" parent="." unique_id=1622210848]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderRow" type="HBoxContainer" parent="Layout" unique_id=279267235]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PortraitPanel" parent="Layout/HeaderRow" unique_id=1132991194 instance=ExtResource("2")]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 1
+show_level_up_badge = false
+
+[node name="NameClassVBox" type="VBoxContainer" parent="Layout/HeaderRow" unique_id=1445547552]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 2
+
+[node name="NameLabel" type="Label" parent="Layout/HeaderRow/NameClassVBox" unique_id=1981121082]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.78, 1)
+theme_override_font_sizes/font_size = 22
+text = "ExileName"
+autowrap_mode = 2
+
+[node name="ClassLevelRow" type="HBoxContainer" parent="Layout/HeaderRow/NameClassVBox" unique_id=873580720]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="ClassNameLabel" type="Label" parent="Layout/HeaderRow/NameClassVBox/ClassLevelRow" unique_id=147415280]
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 1
+theme_override_font_sizes/font_size = 22
+text = "Class"
+
+[node name="LevelLabel" type="Label" parent="Layout/HeaderRow/NameClassVBox/ClassLevelRow" unique_id=26712647]
+modulate = Color(0.8, 0.8, 0.8, 1)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 14
+text = "Lv 1"
+
+[node name="TraitsSection" type="VBoxContainer" parent="Layout" unique_id=1315407735]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TraitsHeader" type="Label" parent="Layout/TraitsSection" unique_id=1550849809]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.78, 0.6, 1)
+theme_override_font_sizes/font_size = 13
+text = "Traits"
+
+[node name="TraitsList" type="GridContainer" parent="Layout/TraitsSection" unique_id=511034799]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 6
+columns = 3
+
+[node name="PotentialsSection" type="VBoxContainer" parent="Layout" unique_id=1622840256]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="PotentialsHeader" type="Label" parent="Layout/PotentialsSection" unique_id=1395031982]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.78, 0.6, 1)
+theme_override_font_sizes/font_size = 13
+text = "Known Potentials"
+
+[node name="PotentialsGrid" type="GridContainer" parent="Layout/PotentialsSection" unique_id=1928106264]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 4

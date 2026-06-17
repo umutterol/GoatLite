@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://b5joof8v7fvus"]
+
+[ext_resource type="Script" uid="uid://dn8chjjrdw06v" path="res://systems/monsters/MonsterStats.gd" id="1"]
+[ext_resource type="Script" uid="uid://bn4tocniaeat3" path="res://systems/combat/CombatBehavior.gd" id="2"]
+[ext_resource type="Script" uid="uid://djr2nsux711tk" path="res://systems/combat/profiles/TacticalProfile.gd" id="3"]
+[ext_resource type="Texture2D" uid="uid://debpcdjtddy8o" path="res://assets/sprites/monsterSprites/zombie.png" id="4"]
+[ext_resource type="Script" uid="uid://xo0774xbjf5m" path="res://systems/monsters/MonsterData.gd" id="5"]
+
+[sub_resource type="Resource" id="Resource_26356"]
+script = ExtResource("1")
+life = 35.0
+vitality = 10.0
+armour = 5.0
+evasion = 0.0
+endurance = 0.0
+fire_resistance = -20.0
+physical_damage = Vector2(4, 10)
+attack_speed = 0.6
+movement = -45.0
+
+[sub_resource type="Resource" id="Resource_df0pq"]
+script = ExtResource("3")
+sticky_target_duration = 1.0
+metadata/_custom_type_script = "uid://djr2nsux711tk"
+
+[sub_resource type="Resource" id="Resource_1dkm4"]
+script = ExtResource("2")
+tactical_profile = SubResource("Resource_df0pq")
+basic_attack_vfx_override = null
+metadata/_custom_type_script = "uid://bn4tocniaeat3"
+
+[resource]
+script = ExtResource("5")
+monster_id = "zombie"
+display_name = "Zombie"
+icon = ExtResource("4")
+description = "Shambler, biter, walker, whatever... call it what it is: a Zombie."
+base_stats = SubResource("Resource_26356")
+combat_behavior = SubResource("Resource_1dkm4")
+drop_table = null
+experience_value = 12
+base_drop_chance = 0.1
+scrap_drops = 0.05
+chaos_drops = 0.01
+exalt_drops = 0.02
+vaal_drops = 0.01
+metadata/_custom_type_script = "uid://xo0774xbjf5m"

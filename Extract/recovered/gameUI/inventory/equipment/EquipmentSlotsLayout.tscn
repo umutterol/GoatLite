@@ -1,0 +1,118 @@
+[gd_scene format=3 uid="uid://cgpjgiltsi0vk"]
+
+[ext_resource type="Script" uid="uid://bvhemd6sflbi1" path="res://gameUI/inventory/equipment/EquipmentSlot.gd" id="1"]
+
+[node name="EquipmentSlotsLayout" type="Control" unique_id=1744581704]
+custom_minimum_size = Vector2(290, 390)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 290.0
+offset_bottom = 390.0
+mouse_filter = 1
+
+[node name="Helmet" type="Control" parent="." unique_id=1355006172]
+custom_minimum_size = Vector2(90, 90)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 100.0
+offset_right = 190.0
+offset_bottom = 90.0
+script = ExtResource("1")
+slot_type = 0
+
+[node name="Amulet" type="Control" parent="." unique_id=1987018819]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 200.0
+offset_top = 45.0
+offset_right = 245.0
+offset_bottom = 90.0
+script = ExtResource("1")
+slot_type = 7
+
+[node name="MainHand" type="Control" parent="." unique_id=1168286008]
+custom_minimum_size = Vector2(90, 145)
+layout_mode = 1
+anchors_preset = 0
+offset_top = 100.0
+offset_right = 90.0
+offset_bottom = 190.0
+script = ExtResource("1")
+
+[node name="Chest" type="Control" parent="." unique_id=1379875494]
+custom_minimum_size = Vector2(90, 145)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 100.0
+offset_top = 100.0
+offset_right = 190.0
+offset_bottom = 190.0
+script = ExtResource("1")
+slot_type = 1
+
+[node name="OffHand" type="Control" parent="." unique_id=2033699652]
+custom_minimum_size = Vector2(90, 145)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 200.0
+offset_top = 100.0
+offset_right = 290.0
+offset_bottom = 190.0
+script = ExtResource("1")
+slot_type = 5
+
+[node name="RingLeft" type="Control" parent="." unique_id=579351764]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 46.0
+offset_top = 251.0
+offset_right = 91.0
+offset_bottom = 296.0
+script = ExtResource("1")
+slot_type = 8
+
+[node name="Belt" type="Control" parent="." unique_id=631419565]
+custom_minimum_size = Vector2(90, 45)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 100.0
+offset_top = 251.0
+offset_right = 190.0
+offset_bottom = 296.0
+script = ExtResource("1")
+slot_type = 10
+
+[node name="RingRight" type="Control" parent="." unique_id=1665104246]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 200.0
+offset_top = 251.0
+offset_right = 245.0
+offset_bottom = 296.0
+script = ExtResource("1")
+slot_type = 9
+
+[node name="Gloves" type="Control" parent="." unique_id=441040642]
+custom_minimum_size = Vector2(90, 90)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 51.0
+offset_top = 306.0
+offset_right = 141.0
+offset_bottom = 396.0
+script = ExtResource("1")
+slot_type = 3
+
+[node name="Boots" type="Control" parent="." unique_id=1260275276]
+custom_minimum_size = Vector2(90, 90)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 153.0
+offset_top = 306.0
+offset_right = 243.0
+offset_bottom = 396.0
+script = ExtResource("1")
+slot_type = 2

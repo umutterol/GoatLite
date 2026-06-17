@@ -1,0 +1,61 @@
+Spell Name,Class,Specialization,Category,Formula,Description,CD,Target Type,Damage Type,Base Values,Dev Status
+Shield Bash,Warrior,Guardian,Damage,40 + 60% STR,Basic attack with 15% chance to Daze target for 1 turn,0,Single,Physical,"Base: 40, Scaling: 60% STR, Daze: 15% chance",OK
+Challenge,Warrior,Guardian,Utility,0,Hard taunt forcing single enemy to attack Guardian for 2 turns + 20% DEF,3,Single,None,"Taunt: 2 turns, DEF: +20%",OK
+War Cry,Warrior,Guardian,Buff,0,Soft taunt (increased likelihood) on all enemies + 10% DEF to all allies for 2 turns,5,All Enemies + All Allies,None,"Soft Taunt: 2 turns, Party DEF: +10%",OK
+Shield Wall,Warrior,Guardian,Utility,0,Block next 2 attacks completely and reflect 50% damage back,6,Self,None,"Blocks: 2 attacks, Reflect: 50%",OK
+Revenge,Warrior,Guardian,Damage,60 + 100% STR,If hit last turn: 2x damage + apply Bleed (5% STR/turn for 3 turns),4,Single,Physical,"Base: 60, Scaling: 100% STR, Bleed: 5% STR/turn",OK
+Thorns Aura,Warrior,Guardian,Passive,15 + 30% STR,Reflect damage to melee attackers,0,Aura,Physical,"Base: 15, Scaling: 30% STR",OK
+Cleaving Strike,Warrior,Berserker,Damage,40 + 60% STR,AoE basic attack hitting 1 adjacent enemy + gain 1 Rampage stack,0,Adjacent 1,Physical,"Base: 40, Scaling: 60% STR, Rampage: +1",OK
+Blood Frenzy,Warrior,Berserker,Buff,0,Sacrifice 15% HP for +25% damage +15% crit +2 Rampage stacks for 2 turns,2,Self,None,"HP Cost: 15%, Damage: +25%, Crit: +15%",OK
+Bladestorm,Warrior,Berserker,Damage,70 + 100% STR,AoE damage with +20% per Rampage stack. At 5 stacks: apply Bleed to all damaged enemies,6,All Enemies,Physical,"Base: 70, Scaling: 100% STR, Rampage Bonus: +20%/stack",OK
+Whirlwind,Warrior,Berserker,Damage,50 + 70% STR,AoE damage that extends existing Bleed effects by 1 turn,4,Adjacent 2,Physical,"Base: 50, Scaling: 70% STR, Bleed Extend: +1 turn",OK
+Massacre,Warrior,Berserker,Damage,60 + 90% STR,Execute that deals +100% damage to enemies below 20% HP. Kill resets Blood Frenzy,7,Single,Physical,"Base: 60, Scaling: 90% STR, Execute: +100% below 20%",OK
+Bloodlust,Warrior,Berserker,Passive,0,+4% damage per Rampage stack. Crits heal 3% HP. Low HP grants bonus scaling,0,Self,None,"Rampage Bonus: +4%/stack, Crit Heal: 3% HP",OK
+Smite,Paladin,Cleric,Damage,35 + 50% INT,Basic attack with Atonement: heal lowest ally for 50% of damage dealt,0,Single,Magic,"Base: 35, Scaling: 50% INT, Atonement: 50%",Needs Review
+Flash Heal,Paladin,Cleric,Healing,60 + 120% INT,Instant heal. Overheal converts to shield (50% of overheal),2,Single Ally,None,"Base: 60, Scaling: 120% INT, Overheal Shield: 50%",Needs Review
+Greater Heal,Paladin,Cleric,Healing,100 + 180% INT,Large heal with +50% bonus if target below 30% HP,4,Single Ally,None,"Base: 100, Scaling: 180% INT, Low HP Bonus: +50%",Needs Review
+Holy Fire,Paladin,Cleric,Damage,50 + 80% INT,Damage + DoT (10% INT/turn for 3 turns). DoT triggers Atonement healing,4,Single,Magic,"Base: 50, Scaling: 80% INT, DoT: 10% INT/turn",Needs Review
+Mass Dispel,Paladin,Cleric,Utility,0,Cleanse 2 debuffs from all allies + cleansed allies deal +10% damage for 2 turns,5,All Allies,None,"Cleanse: 2 debuffs, Damage Buff: +10%",Needs Review
+Divine Insight,Paladin,Cleric,Passive,0,Allies below 30% HP receive +20% damage and +25% Atonement healing,0,Self (Aura),None,"Low HP Bonus: +20% damage, +25% Atonement",Needs Review
+Holy Strike,Paladin,Crusader,Damage,30 + 40% STR,Basic attack that grants nearest ally +5% DEF for 1 turn,0,Single,Physical,"Base: 30, Scaling: 40% STR, Ally DEF: +5%",Needs Review
+Divine Shield,Paladin,Crusader,Buff,80 + 100% VIT,Grant ally a shield that absorbs damage,3,Single Ally,None,"Base: 80, Scaling: 100% VIT",Needs Review
+Guardian's Oath,Paladin,Crusader,Utility,0,Redirect 100% of target ally's damage to self (reduced by 20%) for 2 turns,4,Single Ally,None,"Redirect: 100%, Reduction: 20%",Needs Review
+Blessing of Protection,Paladin,Crusader,Buff,0,Target ally immune to next 2 attacks but cannot attack during immunity,5,Single Ally,None,"Immunity: 2 attacks, Trade-off: Cannot attack",Needs Review
+Rally Cry,Paladin,Crusader,Buff,0,Party-wide +15% damage and +10% DEF for 2 turns,6,All Allies,None,"Damage: +15%, DEF: +10%",Needs Review
+Stalwart Defender,Paladin,Crusader,Passive,0,+15% DEF permanently. Shields are +20% stronger (+40% if target below 30% HP),0,Self,None,"DEF: +15%, Shield Bonus: +20%/+40%",Needs Review
+Poisoned Blade,Rogue,Assassin,Damage,40 + 70% AGI,Basic attack applying +1 Poison stack. +30% damage vs backline targets,0,Single,Physical,"Base: 40, Scaling: 70% AGI, Poison: +1 stack",Needs Review
+Camouflage,Rogue,Assassin,Utility,0,Enter stealth: untargetable. Next attack +50% damage and guaranteed crit,4,Self,None,"Stealth: 1 turn, Damage: +50%, Crit: Guaranteed",Needs Review
+Ambush,Rogue,Assassin,Damage,70 + 110% AGI,High damage attack. +30% from stealth +30% vs backline,3,Single,Physical,"Base: 70, Scaling: 110% AGI, Bonuses: +30% each",Needs Review
+Eviscerate,Rogue,Assassin,Damage,90 + 140% AGI,Finisher: +20% per Poison stack. If target HP is below %20  +100% damage,5,Single,Physical,"Base: 90, Scaling: 140% AGI, Poison: +20%/stack",Needs Review
+Shadow Step,Rogue,Assassin,Damage,50 + 80% AGI,Teleport strike applying +1 Poison. Crit resets Camouflage cooldown,4,Single,Physical,"Base: 50, Scaling: 80% AGI, Poison: +1",Needs Review
+Cold Blood,Rogue,Assassin,Passive,0,+15% crit chance after crit (2x stacks). +25% crit damage. +10% dodge after crit,0,Self,None,"Crit Chain: +15%/stack, Crit Damage: +25%",Needs Review
+Dissonant Strike,Rogue,Bard,Damage,30 + 50% AGI,Basic attack applying Mark: target takes +15% damage for 2 turns,0,Single,Physical,"Base: 30, Scaling: 50% AGI, Mark: +15% dmg taken",Needs Review
+Anthem of Haste,Rogue,Bard,Buff,0,All allies +20% AGI for 2 turns. Next turn: allies act before all enemies,5,All Allies,None,"AGI: +20%, Turn Override: 1 turn",Needs Review
+Rhythm Reset,Rogue,Bard,Utility,0,Reduce target ally's cooldowns by 2 turns + +15% damage for 1 turn,6,Single Ally,None,"CD Reduction: 2 turns, Damage: +15%",Needs Review
+Soothing Ballad,Rogue,Bard,Healing,25 + 40% INT,Remove 1 debuff from each ally. If removed: heal. If no debuff: +10% DEF,4,All Allies,None,"Cleanse: 1 debuff, Heal or DEF: +10%",Needs Review
+Crescendo,Rogue,Bard,Buff,0,Target ally enters Overdrive: +30% damage +20% crit + immediate action,7,Single Ally,None,"Damage: +30%, Crit: +20%, Immediate Action",Needs Review
+Inspiring Presence,Rogue,Bard,Passive,0,Allies gain +5% crit and +5% damage. Songs heal all allies 10 + 20% INT,0,All Allies (Aura),None,"Crit: +5%, Damage: +5%, Song Heal: 10 + 20% INT",Needs Review
+Arcane Bolt,Mage,Arcanist,Damage,40 + 65% INT,Basic attack applying 1 Chill stack (-25% AGI). +30% vs CC'd targets,0,Single,Magic,"Base: 40, Scaling: 65% INT, Chill: -25% AGI",Needs Review
+Silence,Mage,Arcanist,CC,30 + 50% INT,Target cannot use Active skills for 2 turns (3 with Arcane Mastery),4,Single,Magic,"Base: 30, Scaling: 50% INT, Silence: 2-3 turns",Needs Review
+Frost Nova,Mage,Arcanist,Damage,40 + 60% INT,AoE damage + 1 Chill to all. 30% Freeze chance at 2+ Chill stacks,5,All Enemies,Magic,"Base: 40, Scaling: 60% INT, Freeze: 30% chance",Needs Review
+Arcane Barrier,Mage,Arcanist,Utility,100 + 150% INT,Team barrier absorbing damage. While active: CC immunity. Break deals AoE,6,All Allies,None,"Shield: 100 + 150% INT, CC Immune, Break: 50 + 80% INT",Needs Review
+Counterspell,Mage,Arcanist,Utility,25 + 40% INT,Interrupt + add 2 turns to target's next skill cooldown,3,Single,Magic,"Base: 25, Scaling: 40% INT, CD Increase: +2",Needs Review
+Arcane Mastery,Mage,Arcanist,Passive,0,First CC application gains +1 turn duration. Barrier break deals 50 + 80% INT,0,Self,None,"CC Extension: +1 turn, Break Damage: 50 + 80% INT",Needs Review
+Scorch,Mage,Pyromancer,Damage,35 + 60% INT,Basic attack applying 1 Burn stack (10% INT/turn for 3 turns max 5),0,Single,Magic,"Base: 35, Scaling: 60% INT, Burn: 10% INT/turn",Needs Review
+Fireball,Mage,Pyromancer,Damage,60 + 100% INT,Primary target damage + 50% splash to adjacent + 1 Burn to all hit,3,Adjacent 1,Magic,"Base: 60, Scaling: 100% INT, Splash: 50%",Needs Review
+Conflagration,Mage,Pyromancer,Utility,30 + 40% INT,Spread all Burn stacks from target to adjacent enemies + instant damage,5,Adjacent 2,Magic,"Base: 30, Scaling: 40% INT, Spreads Burns",Needs Review
+Ignite,Mage,Pyromancer,Damage,20 + 30% INT per stack,Detonate all Burn stacks for burst damage. 50% splash to adjacent,6,Adjacent 2,Magic,"Per Stack: 20 + 30% INT, Splash: 50%",Needs Review
+Meteor,Mage,Pyromancer,Damage,120 + 180% INT,Ultimate AoE: 80% splash + 3 Burn stacks. Stun if target had Burn,8,All Enemies,Magic,"Base: 120, Scaling: 180% INT, Stun if Burned",Needs Review
+Combustion,Mage,Pyromancer,Passive,0,Burn DoT +20%. Detonating 4+ stacks grants +25% INT for 2 turns,0,Self,None,"Burn Amp: +20%, Detonate Buff: +25% INT",Needs Review
+Palm Strike,Sage,Mystic,Damage,35 + 60% AGI,Basic attack with 20% lifesteal (heal self based on damage dealt),0,Single,Physical,"Base: 35, Scaling: 60% AGI, Lifesteal: 20%",Needs Review
+Earthen Stance,Sage,Mystic,Utility,0,40% parry chance + counter-attack + 15% DEF + 50% soft taunt for 2 turns,4,Self,None,"Parry: 40%, Counter: 30 + 50% AGI, DEF: +15%",Needs Review
+Leg Sweep,Sage,Mystic,CC,40 + 50% AGI,AoE frontline damage + guaranteed 1-turn stun on all hit,3,Adjacent 2,Physical,"Base: 40, Scaling: 50% AGI, Stun: 1 turn",Needs Review
+Spirit Link,Sage,Mystic,Utility,15 + 25% INT,Redirect 30% of ally's damage to self (-20%). HoT + 30% soft taunt,5,Single Ally,None,"Redirect: 30%, HoT: 15 + 25% INT/turn, 3 turns",Needs Review
+Zen Strike,Sage,Mystic,Damage,60 + 100% AGI,High damage + interrupt + heal self and lowest ally 40 + 60% INT,5,Single,Physical,"Base: 60, Scaling: 100% AGI, Heal: 40 + 60% INT",Needs Review
+Inner Peace,Sage,Mystic,Passive,0,Parry heals 10 + 20% AGI. Stun heals allies 15 + 20% INT. 5% HP regen above 50%,0,Self,None,"Parry Heal, Stun Heal, Regen: 5% HP/turn",Needs Review
+Verdant Touch,Sage,Lifebinder,Healing,20 + 30% INT,Apply Regrowth HoT (stacks 2x) healing per turn for 3 turns,0,Single Ally,None,"HoT: 20 + 30% INT/turn, Max Stacks: 2",Needs Review
+Blossom Ward,Sage,Lifebinder,Healing,10 + 13% INT tick / 40 + 60% INT bloom,Apply Blossom (max 3 stacks). Ticks heal. Bloom heals on trigger/expire,3,Single Ally,None,"Tick: 10 + 13% INT, Bloom: 40 + 60% INT/stack",Needs Review
+Grove's Embrace,Sage,Lifebinder,Healing,25 + 34% INT,AoE HoT: Nature's Breath healing per turn for 3 turns to all allies,5,All Allies,None,"HoT: 25 + 34% INT/turn, Duration: 3 turns",Needs Review
+Vital Surge,Sage,Lifebinder,Healing,Remaining HoT x1.5,Consume all HoTs for instant burst heal (+50%). 3+ stacks: +20% DEF,4,Single Ally,None,"Burst: HoT value x1.5, DEF Buff: +20%",Needs Review
+Flourish,Sage,Lifebinder,Healing,40 + 60% INT per stack,Trigger all Blossom stacks instantly. No Blossom: apply 2 Regrowth instead,3,Single Ally,None,"Bloom: 40 + 60% INT/stack, Fallback: 2 Regrowth",Needs Review
+Nature's Grace,Sage,Lifebinder,Passive,50 + 80% INT,HoTs +15% per stack (max +45%). Below 25% HP with HoT: instant heal once,0,All Allies (Aura),None,"HoT Amp: +15%/stack, Emergency: 50 + 80% INT",Needs Review

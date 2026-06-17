@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SwooshVFX" format=3 uid="uid://biecl5v68xtxt"]
+
+[ext_resource type="Resource" path="res://systems/combat/vfx/impactPresets/blood_default.tres" id="1"]
+[ext_resource type="Script" uid="uid://dfv0kkti66ktq" path="res://systems/combat/vfx/SwooshVFX.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+radius_max_dist_frac = 0.9
+min_radius_in_def_radii = 5.0
+max_spread = 1.25
+tip_taper = 0.05
+bands = 14
+arc_segments = 24
+trail_fade_exponent = 4.6
+color_override = Color(0.83391726, 0.68099886, 0.55723333, 0.7411765)
+lifetime_seconds = 0.5
+impact_fx = ExtResource("1")
+impact_landing_progress = 0.5

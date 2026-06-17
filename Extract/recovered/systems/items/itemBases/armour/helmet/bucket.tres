@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://bmn5l3g8q3t1s"]
+
+[ext_resource type="Texture2D" uid="uid://3rjnlpn3ska4" path="res://assets/sprites/itemSprites/gearSprites/armorSprites/BucketHelmetSprite.png" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_hjp70"]
+script = ExtResource("2")
+affix_id = "bucket_vision"
+display_name = "Scouting"
+is_implicit = true
+stat_type = "scouting"
+min_value = -4.0
+max_value = -8.0
+value_prefix = ""
+value_suffix = "%"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "bucket"
+display_name = "Bucket"
+description = "A heavy, wooden bucket. Inverted, emptied and placed upon the head. A small amount of vision is afforded by the fact that this was a rather shoddy bucket."
+icon = ExtResource("1")
+category = 0
+armour_type = 2
+grid_width = 2
+grid_height = 2
+base_armour_min = 22
+base_armour_max = 28
+base_evasion_min = -5
+base_evasion_max = -5
+implicit_affixes = [SubResource("Resource_hjp70")]
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

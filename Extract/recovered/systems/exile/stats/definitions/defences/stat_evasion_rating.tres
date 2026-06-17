@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3 uid="uid://bdskh6ujvxbcb"]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "evasion"
+display_name = "Evasion"
+description = "A chance to Evade a hit or mitigate hit damage with a Glancing Blow."
+category = 1
+stat_type = 1
+default_value = 5.0
+min_value = 0.0
+max_value = 75.0
+show_as_percentage = true
+decimal_places = 1
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

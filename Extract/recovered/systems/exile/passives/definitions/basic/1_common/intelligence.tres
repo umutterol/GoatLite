@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://cpruaek41lwiw"]
+
+[ext_resource type="Texture2D" uid="uid://l7psdn4v86ah" path="res://systems/exile/passives/definitions/basic/1_common/inticon.webp" id="1"]
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="2"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_1vtu5"]
+script = ExtResource("3")
+stat_id = "fire_resistance"
+base_value = 2.0
+value_per_stack = 2.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_6qns0"]
+script = ExtResource("3")
+stat_id = "cold_resistance"
+base_value = 2.0
+value_per_stack = 2.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_aa0od"]
+script = ExtResource("3")
+stat_id = "lightning_resistance"
+base_value = 2.0
+value_per_stack = 2.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_3e50y"]
+script = ExtResource("3")
+stat_id = "elemental_damage"
+scaling_type = 1
+base_value = 10.0
+value_per_stack = 10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("2")
+passive_id = "intelligence"
+name = "Intelligence"
+description = "A fit mind is an alive one."
+icon = ExtResource("1")
+max_stacks = 5
+stat_tags = ["cold_resistance", "fire_resistance", "lightning_resistance"]
+theme_tags = ["elementalist"]
+category_tags = ["defence", "resistance"]
+primary_tag = "resistances"
+stat_bonuses = [SubResource("Resource_1vtu5"), SubResource("Resource_6qns0"), SubResource("Resource_aa0od"), SubResource("Resource_3e50y")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

@@ -1,0 +1,113 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://cfgyvb7n5afbx"]
+
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="1"]
+[ext_resource type="Resource" uid="uid://b1n4rrn2cwn0s" path="res://systems/combat/encounters/coast/huge_zombie_horde.tres" id="2"]
+[ext_resource type="Resource" uid="uid://c5tiv3sx5wk51" path="res://systems/monsters/normal/zombie_merchant.tres" id="3"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="4"]
+[ext_resource type="Resource" uid="uid://b5joof8v7fvus" path="res://systems/monsters/normal/zombie.tres" id="5"]
+[ext_resource type="Resource" uid="uid://bhn7tpioc7qfi" path="res://systems/monsters/normal/barrel.tres" id="6"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="7"]
+[ext_resource type="Script" uid="uid://1jao5grkeqsb" path="res://systems/mission/MissionReward.gd" id="8"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="9"]
+
+[sub_resource type="Resource" id="Resource_cf5it"]
+script = ExtResource("1")
+encounter = null
+area_filter = [0]
+excluded_tags = [1]
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_a8u56"]
+script = ExtResource("1")
+encounter = null
+area_filter = [0]
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_kou7w"]
+script = ExtResource("1")
+slot_type = 0
+encounter = ExtResource("2")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_ggij7"]
+script = ExtResource("4")
+monster = ExtResource("3")
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_e75yt"]
+script = ExtResource("4")
+monster = ExtResource("5")
+count = 8
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_2lhc8"]
+script = ExtResource("4")
+monster = ExtResource("5")
+count = 4
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_1sdpw"]
+script = ExtResource("4")
+monster = ExtResource("5")
+count = 2
+position_hint = 4
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_ast05"]
+script = ExtResource("4")
+monster = ExtResource("5")
+position_hint = 5
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_kehx5"]
+script = ExtResource("4")
+monster = ExtResource("6")
+count = 3
+position_hint = 5
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_nl8wd"]
+script = ExtResource("7")
+encounter_id = "shipwreck"
+display_name = "The Ship's Hold"
+encounter_type = 2
+area_tags = [0]
+monster_spawns = [SubResource("Resource_ggij7"), SubResource("Resource_e75yt"), SubResource("Resource_2lhc8"), SubResource("Resource_1sdpw"), SubResource("Resource_ast05"), SubResource("Resource_kehx5")]
+recommended_level = 4
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="Resource_6fvle"]
+script = ExtResource("1")
+slot_type = 0
+encounter = SubResource("Resource_nl8wd")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_ooijg"]
+script = ExtResource("8")
+chaos_amount = 1
+food_amount = 2
+scrap_amount = 4
+exalt_amount = 1
+bonus_item_rolls = 1
+metadata/_custom_type_script = "uid://1jao5grkeqsb"
+
+[resource]
+script = ExtResource("9")
+mission_id = "zombieshipwreck_coast"
+display_name = "Zombie Shipwreck"
+description = "We've found a ship just recently smashed ashore. It's a golden opportunity to turn up some useful supplies and material. The areas seems to be swarming with an absurd number of the restless dead - best bring fire, and lots of it. Supremely dangerous if they get overwhelmed."
+icon = null
+level = 5
+mission_tags = [2]
+availability_type = 3
+opportunity_chance = 0.05
+timeout_days = 3
+opportunity_cooldown_days = 2
+mission_length = 4
+encounter_slots = [SubResource("Resource_cf5it"), SubResource("Resource_a8u56"), SubResource("Resource_kou7w"), SubResource("Resource_6fvle")]
+scouting_reward = 2.0
+rarity_bonus = 0.2
+mission_rewards = SubResource("Resource_ooijg")
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

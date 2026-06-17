@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3 uid="uid://b7lllring"]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckf2e0ljtmtxg" path="res://systems/items/affixes/AffixValueTier.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_t1_life_leech_ring"]
+script = ExtResource("2")
+min_value = 0.1
+max_value = 0.15
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t2_life_leech_ring"]
+script = ExtResource("2")
+item_level = 3
+min_value = 0.13
+max_value = 0.2
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t3_life_leech_ring"]
+script = ExtResource("2")
+item_level = 5
+min_value = 0.17
+max_value = 0.25
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t4_life_leech_ring"]
+script = ExtResource("2")
+item_level = 8
+min_value = 0.2
+max_value = 0.3
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[resource]
+script = ExtResource("1")
+affix_id = "life_leech_ring"
+display_name = "Life Leech"
+is_suffix = true
+valid_on_ring = true
+stat_type = "life_leech"
+value_suffix = "%"
+use_tier_helper = true
+value_tiers = [SubResource("Resource_t1_life_leech_ring"), SubResource("Resource_t2_life_leech_ring"), SubResource("Resource_t3_life_leech_ring"), SubResource("Resource_t4_life_leech_ring")]
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

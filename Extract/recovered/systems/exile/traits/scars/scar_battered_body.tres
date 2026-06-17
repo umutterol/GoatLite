@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://rcmwtqd77q57"]
+
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_xwy8d"]
+script = ExtResource("2")
+stat_id = "attack_speed"
+scaling_type = 3
+base_value = 4.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_0otbr"]
+script = ExtResource("2")
+stat_id = "endurance"
+scaling_type = 1
+base_value = 10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+trait_id = "scar_battered_body"
+name = "Battered Body"
+description = "Repeated beatings have not improved morale and caused some lasting damage. Only upshot is their tolerance for beatins has improved."
+category = 2
+icon = null
+stat_bonuses = [SubResource("Resource_xwy8d"), SubResource("Resource_0otbr")]
+potential_tags = ["tank"]
+potential_values = [0.5]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

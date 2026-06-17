@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3 uid="uid://b7vf5cvlfgd4b"]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckf2e0ljtmtxg" path="res://systems/items/affixes/AffixValueTier.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_t1_increased_cold_damage_jewellery"]
+script = ExtResource("2")
+min_value = 6.0
+max_value = 12.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t2_increased_cold_damage_jewellery"]
+script = ExtResource("2")
+item_level = 3
+min_value = 9.0
+max_value = 17.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t3_increased_cold_damage_jewellery"]
+script = ExtResource("2")
+item_level = 5
+min_value = 13.0
+max_value = 22.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t4_increased_cold_damage_jewellery"]
+script = ExtResource("2")
+item_level = 8
+min_value = 18.0
+max_value = 30.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[resource]
+script = ExtResource("1")
+affix_id = "increased_cold_damage_jewellery"
+display_name = "Cold Damage"
+is_prefix = true
+valid_on_ring = true
+valid_on_amulet = true
+stat_type = "cold_damage"
+modifier_type = 1
+value_suffix = "%"
+global_damage_flag = true
+use_tier_helper = true
+value_tiers = [SubResource("Resource_t1_increased_cold_damage_jewellery"), SubResource("Resource_t2_increased_cold_damage_jewellery"), SubResource("Resource_t3_increased_cold_damage_jewellery"), SubResource("Resource_t4_increased_cold_damage_jewellery")]
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

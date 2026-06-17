@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://bmkn3x2l4qbfq"]
+
+[ext_resource type="Texture2D" uid="uid://due4qu06ehgw7" path="res://assets/sprites/itemSprites/gearSprites/jewellerySprites/Iron_Ring_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_ironarm"]
+script = ExtResource("2")
+affix_id = "iron_ring_armour"
+display_name = "Armour"
+is_implicit = true
+stat_type = "armour"
+min_value = 2.0
+max_value = 4.0
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "iron_ring"
+display_name = "Iron Ring"
+description = "A heavy band of pitted iron."
+icon = ExtResource("1")
+category = 1
+implicit_affixes = [SubResource("Resource_ironarm")]
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

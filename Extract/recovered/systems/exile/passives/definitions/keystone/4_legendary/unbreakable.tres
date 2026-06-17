@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_ldi2w"]
+script = ExtResource("2")
+stat_id = "endurance"
+scaling_type = 1
+base_value = 50.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_7wg8s"]
+script = ExtResource("2")
+stat_id = "endurance_threshold"
+base_value = 10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "unbreakable"
+name = "Unbreakable"
+description = "Will not quit, they fight until nothing is left."
+passive_type = 2
+rarity = 3
+icon = null
+stat_tags = ["morale", "endurance"]
+primary_tag = "morale"
+stat_bonuses = [SubResource("Resource_ldi2w"), SubResource("Resource_7wg8s")]
+special_effects = ["unbreakable"]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

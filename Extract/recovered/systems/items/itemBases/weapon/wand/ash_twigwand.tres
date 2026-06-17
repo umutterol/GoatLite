@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://br3jpie70yads"]
+
+[ext_resource type="Resource" uid="uid://bjybpk5kedfhl" path="res://systems/combat/vfx/presets/firebolt_default.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://s3fkogunasb6" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Driftwood_Wand_inventory_icon.png" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[resource]
+script = ExtResource("3")
+item_id = "ash_twigwand"
+display_name = "Ash Twigwand"
+description = "A wand made from partially blackened twigs from a campfire that was infused with a small amount of chaos. It conjures only a little more than hot wind and embers."
+icon = ExtResource("2")
+weapon_type = 6
+grid_height = 2
+base_fire_damage_min = 2
+base_fire_damage_max = 4
+base_attack_speed = 1.2
+base_attack_range = 6.0
+ranged = true
+attack_vfx = ExtResource("1")
+metadata/_custom_type_script = "uid://cetys5ykyhird"

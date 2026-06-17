@@ -1,0 +1,373 @@
+[gd_scene format=3 uid="uid://cnmm6sk7m8a01"]
+
+[ext_resource type="Script" uid="uid://dou5llj01tg0f" path="res://gameUI/main/MainMenu.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://ckdfy3nugcff5" path="res://assets/fonts/Fontin-SmallCaps.otf" id="2"]
+[ext_resource type="Texture2D" uid="uid://qn3c1scegux5" path="res://assets/ui/mainMenuIcons/twitchicon.tres" id="3"]
+[ext_resource type="Texture2D" uid="uid://w7wm2j2ewb2s" path="res://assets/ui/mainMenuIcons/yticon.tres" id="4"]
+[ext_resource type="Texture2D" uid="uid://ougomjtowic0" path="res://assets/ui/mainMenuIcons/itchioicon.tres" id="5"]
+
+[node name="MainMenu" type="Control" unique_id=1134461510]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+patch_notes_body = "[b]Patch 0.1.5b[/b]
+Roster expansion and a long-overdue Dismiss button.
+
+Dismissing Exiles:
+- New Dismiss button on the Character Sheet (red border, confirmation modal). Equipped gear is returned to the stash automatically.
+- Dismissed exiles are fully removed from the roster.
+
+Roster Layout:
+- Core party slots reduced from 6 to 5 (now matches the 5-exile party limit). Arranged as two pairs over a single centered seat.
+- Backbench expanded from 4 to 8 slots (2 added on each side).
+- Total roster cap is now 13 (was 10).
+- Existing saves auto-migrate: any 6th core exile is moved to the first open backbench slot on load; any lingering dismissed exiles are pruned.
+
+---
+
+[b]Patch 0.1.5[/b]
+This patch features a huge expansion to customizable Exile tactics. This is a large buff to party power when used correctly, as your Exiles can now act far more intelligently. It'll also allow development of much more nuanced strategies. I'm planning even more on this front when other systems (like Skills) are added, but I'm very excited about the state of this now!
+New Tactics Features:
+- Kiting Profiles to determine if and when exiles try to kite an enemy.
+	- Profiles: Careful Sniper, Balanced Aggressive, Reckless, Evasive Melee, No Kiting. 
+		- Consult the in-game tooltips to learn how each profile works!
+- A layered Target Priority rules system. 
+	- Top to bottom rules for what enemy to target and attack.
+	- \"In Range\" toggle for each rule.
+	-  A Fallback Targeting as a catchall for if your other rules aren't met.
+	- Have exiles spread ignites or shocks, protect allies, protect allies, cull weakened enemies and much more.
+		- Check out the list of Target Priority Rules in game. Share your clever party strategies with me, I'd love to see what you come up with!
+- Target Lock-on Control. 
+	-  Off: Have an exile always look for new targets matching your rules with no target-lock.
+	-  Short / Long Lock On: Chase targets or keep attacking the primary target for Xs before re-evaluating against their rules. 
+
+Rethinking Range on Wands:
+Wands are aimed at being a mid-ranged weapon with a range of applications including DPS skirmishers and ailment specialists. What they were in previous patches was the highest DPS despite having long range AND being allowed to use a Shield (which were also giving damage). I'm excited to see how Wands perform in this new pistol skirmisher role, alongside the new tactics system!
+- Wands now sit around 5 to 7 range. Comfortably in between Bows (10 to 12), and Spears (2.5 to 3.5). 
+- Retuned Crit Chance and Attack Speed on the Wands.
+- Added the Seaglass Wand (Level 3), which specializes in Cold damage and chill effect. 
+- Moved Coral Wand to Level 2.
+
+Gearing Changes:
+- Added Flat Chaos Damage and increased chaos damage affixes to weapons, rings and Amulets.
+- Added \"x% increased Damage\" to Amulets. 
+- Lowered the amount of Flat Elemental Damage on Rings and Gloves.
+- Lowered flat Regen on gear.
+- Increased Life Gain on Hit on melee weapons.
+- Increased the base damage of the Driftwood Maul and Stone Hatchet.
+
+Other Changes:
+- Added fullscreen support to the Windows build. Alt+Enter to toggle enabled.
+- Added exit game buttons to the Windows build.
+
+---
+
+[b]0.1.4[/b] Poison, Shadow, and Missing Persons
+Congrats to those who beat the hidden Uber boss in 0.1.3! I've been amazed to see people reaching level 10-20, 1000s of DPS, and even [i]100% evasion chance - shudder[/]. I'm honored that you'd drop such time into the game and your feedback and playtesting has been amazing!
+- Rescue System: when an exile is captured in defeat, a rescue mission appears on the board. Miss the window and they are gone... or are they? There is a small chance you will see them again in the future - depending on how skilled your scouts are! Scouting now rolls a small chance per mission to surface a long-lost lead - a 2-day re-rescue opportunity. New screens guide the welcome/dismiss choice when a found exile comes home.
+- New Ailment: Poison. Chaos damage-over-time with independent stacking - every stack ticks its own DPS for its own duration. Triggered by physical or chaos hits on a chance roll, scales with poison chance/effect/duration stats.
+- Combat now shows a strip of active ailments per combatant with live duration counters. 
+- Shadow class rework: now built around poison and criticals. Lower life and vitality, but gains baseline 50% poison chance and 25% poison duration, plus a big bonus to crit chance and crit multi while at high life.
+- New trait: Cocky. +3 morale on victory, -3 evasion. Mutually exclusive with Coward.
+- New rare notable: Grace. Evasion + movement, themed to Assassin/Ranger.
+- New dagger base: Tainted Stiletto. Fast, high-crit, with implicit poison chance.
+- New weapon affixes: poison chance (1H, 2H), poison duration (daggers and bows).
+- Reworked the massively overstacked Suffixes on weapons. A lot more work on Affix weighting is still to be done.
+- Evasion is now capped at 75% so a fully stacked evasion build can't refuse to be touched.
+- Monster XP, Life, Vitality, and Damage now scales +10% per level above the area's base.
+- Retreat morale penalties softened: Safe retreat -15 -> -5, Risky retreat -25 -> -15. 
+- Morale penalties for doing lower level missions softened. Exiles will now happily run Missions 2 levels lower than them with no Morale cost.
+- Passing-boat recruitment cadence stretched (6-12 days between offers, was 5-9) and offers fewer candidates (2-3, was 3-6). A small step on the road to making recruiting feel more meaningful.
+- Crafting UI further improved with glowy effects to guide the steps.
+- More stuff that I didn't document because I don't have a proper patch note workflow yet!
+
+---
+
+[b]0.1.3[/b]
+Huge Mission Running QoL, more content, and major tweaks to Morale and item affix progression.
+- Set Default Speed and Autoplayback start on the mission board.
+- Crafting remembers your last selected craft in the current crafting session.
+- Added Mission: Glittering Coves
+- Added Mission: Rhoa Hunting
+- Added Mission: ???????
+- Character Sheet now has a Morale tab - shows current effects, active modifiers, and recent morale changes so you can see exactly why an exile is grumpy.
+- Crafting modal now keeps your selected currency after a slam, so you can spam Chaos/Alts without re-clicking every time.
+- Crafting outcome log is taller and easier to read.
+- Morale: boredom penalty is now more forgiving - first level below an exile's expectation is free, only deeper gaps stack up.
+- Fixed: Vaal reroll-ranges were rounding fractional affixes (life regen, life leech) down to zero. They now preserve decimals correctly.
+- Fixed: Exalt/Chaos/Regal could roll non-integer values on integer-only stats. All integer stats now round properly.
+- Fixed: Mission report could crash trying to spawn pips after the screen closed.
+- Affix data pass: ranges, tiers and weights tweaked across most prefixes and suffixes (armour, life, resistances, elemental damage, ailment chance/effect/duration). Drops should feel a bit cleaner.
+
+---
+
+[b]0.1.2[/b]
+- Figured out why the game was so blurry, should be crisp on any resolution now!
+- Inventory Auto Sort
+- Compare items with equipped
+- Hold Alt to compare Right Ring.
+- Alt+Right Click to equip to right ring slot.
+- Improved visuals for inventory items and item labels.
+- Fixed a bug with the 5th exile card being hidden in battles.
+- Moved the continue button for combat to the victory/defeat popup. Enter hotkey still works to skip battle.
+- Cleaned up incompatible emojis and unicode.
+- Persistance for stash tab names and mission board area selection.
+- Made passiives, notables and keystones more distinct. This menu is terrible, haven't figured out how i want to do it yet but it's at least functional. 
+
+---
+
+[b]0.1.1[/b]
+- Fixed a new game / save bug that caused old save data to not be overridden on starting a new game (infinite exiles).
+- Added a new monster: Sparking Broodling
+- Added a rescue mission earlier on for a first recruit opportunity.
+- Made rations restore to full if they were auto swapped to none as a result of food shortage.
+- Added support for alternate keyboard layouts for hotkeys (I cannot test this, let me know if further issues).
+- Stopped the barrels from looking at you.
+
+[b]0.1.0 beta[/b]
+- Ininitial release of the Godot version of the game.
+
+[b]0.0.1 alpha[/b]
+- Abdandoned web prototype version.
+"
+roadmap_body = "[i]Please report bugs, feature suggestions, and feedback to me on my Discord, YouTube, Twitch, twitter or anywhere else you see me![/i]
+
+[b]Current Features & Content Scope[/b]
+- 1 full Area (The Coast) and a stubbed second area (The Mud Flats) with a placeholder boss for fun.
+- Recruiting Exiles via missions and passing ships. 
+- Full gear system with varied item bases, random modifiers, and unique monster infrequent bases.
+- Crafting: Add modifiers to gear, reroll specific modifiers, corrupt items for wild and powerful outcomes. Complete with contextual crafting bench that guides the process.
+- Level Ups: Passive allocation on a randomized tree.
+- Exploration and Discovery System: Scouting, mission completions and other actions can cause the discovery of new missions, areas and information such as monster details.
+- Combat replay system: multiple speed settings, scrubbing, play, pause and event log.
+- Exile Tactics Customization: Tune the targetting and kiting behaviour of your Exiles in combat.
+- Varied mission types and encounters that require different exile builds and party strategies.
+- A wide variety of monsters and bossses with their own unique abilities and rewards.
+
+[b]Other Planned Features & Content[/b]
+My biggest dream and hope is to be able to hire some great artists to make real and actual non-placholder sound, music and art! (Stretch Goal: actually animated combat, not dressed up dots).
+- Skill gems and Supports: Monster skills exist but fully customizable Exile skills are planned in the near future!
+- Fighting and Panicked Retreat mechanic in combat: Exiles retreat based on poor health and morale. 
+- Crafting: Meta crafting items that alter the functionality of the base crafting resources.
+- Passive Tree Respeccing: Go back to an earlier path and explore a new branch of an Exile's tree.
+- Fully programmable exile conditional tactics (if X happens, do Y).
+- Guild vs Guild battles, poaching rival exiles.
+- Defence missions.
+- Event systems: both for in guild events and on mission non-combat events.
+- Unique items (legendaries). 
+- Deeper Morale management and morale-related events.
+- Party member synergy mechanics, support builds and such to make exile choices in a party more meaningful beyond how individually powerful they are.
+- Upgradeable guild buildings and facilities. Train Exiles, improve their Traits etc.
+- Proper drop weighting for item bases. Proper weighting for modifiers (they are all even right now).
+- Delve, capture and train pets, map system, and all those crazy things that I can't stop imagining! Okay so these aren't exactly plans, more [i]dreams[/i].
+
+[b]Known Issues[/b]
+- No sound or music. Pretty much all art and UI is placeholder.
+- Attack speed and crit need to apply locally to weapons (and show that in tooltip). It's not currently having much impact but [i]it's not right.[/i]
+
+"
+
+[node name="Background" type="ColorRect" parent="." unique_id=148265301]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.058, 0.062, 0.082, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1926721897]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 22
+
+[node name="version" type="Label" parent="MarginContainer" unique_id=14688827]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_fonts/font = ExtResource("2")
+text = "beta version 0.1"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1575006954]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="author" type="Label" parent="MarginContainer/VBoxContainer" unique_id=409979592]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 24
+text = "Made by ZiggyD"
+
+[node name="TwitchLink" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1138776075]
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_constants/separation = 8
+
+[node name="Label" type="LinkButton" parent="MarginContainer/VBoxContainer/TwitchLink" unique_id=740624689]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "twitch.tv/ziggydlive"
+text = "Twitch/ZiggyDLive"
+underline = 1
+
+[node name="Twitch" type="TextureButton" parent="MarginContainer/VBoxContainer/TwitchLink" unique_id=1536479240]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+tooltip_text = "twitch.tv/ziggydlive"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("3")
+
+[node name="YouTubeLink" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1736427166]
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_constants/separation = 8
+
+[node name="Label2" type="LinkButton" parent="MarginContainer/VBoxContainer/YouTubeLink" unique_id=1623748163]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "youtube.com/@ziggydgaming"
+text = "YouTube/@ZiggyDGaming"
+underline = 1
+
+[node name="YT" type="TextureButton" parent="MarginContainer/VBoxContainer/YouTubeLink" unique_id=325109919]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+tooltip_text = "youtube.com/@ziggydgaming"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("4")
+
+[node name="ItchioLink" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=30025344]
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_constants/separation = 8
+
+[node name="Label3" type="LinkButton" parent="MarginContainer/VBoxContainer/ItchioLink" unique_id=1205801963]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "ziggyd.itch.io"
+text = "ZiggyD.itch.io"
+underline = 1
+
+[node name="ITCHIO" type="TextureButton" parent="MarginContainer/VBoxContainer/ItchioLink" unique_id=670294415]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+tooltip_text = "ziggyd.itch.io"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("5")
+
+[node name="PatchNotes" type="Button" parent="MarginContainer" unique_id=1447760614]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+mouse_default_cursor_shape = 2
+text = "Patch Notes"
+
+[node name="RoadMap" type="Button" parent="MarginContainer" unique_id=1479488699]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+mouse_default_cursor_shape = 2
+text = "Roadmap"
+
+[node name="CenterLayout" type="VBoxContainer" parent="." unique_id=1811499090]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -180.0
+offset_right = 220.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="CenterLayout" unique_id=435203489]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.8628016, 0.7010953, 0.5819601, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 58
+text = "Exiled Guild Manager"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="CenterLayout" unique_id=1609830843]
+modulate = Color(0.78, 0.78, 0.78, 1)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 20
+text = "A Path of Exile inspired guild management simulator"
+horizontal_alignment = 1
+
+[node name="ButtonSpacer" type="Control" parent="CenterLayout" unique_id=1904378205]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[node name="NewGameButton" type="Button" parent="CenterLayout" unique_id=769278011]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(550, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Start a fresh run. You'll pick from two starting rafts."
+text = "New Game"
+
+[node name="ButtonSpacer2" type="Control" parent="CenterLayout" unique_id=888911965]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+
+[node name="LoadGameButton" type="Button" parent="CenterLayout" unique_id=193079017]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(500, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Continue from your most recent save."
+text = "Load Game"
+
+[node name="ButtonSpacer3" type="Control" parent="CenterLayout" unique_id=888911966]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+
+[node name="QuitButton" type="Button" parent="CenterLayout" unique_id=769278012]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(500, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Exit the game."
+text = "Exit Game"
+
+[node name="FadeOverlay" type="ColorRect" parent="." unique_id=1796920127]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

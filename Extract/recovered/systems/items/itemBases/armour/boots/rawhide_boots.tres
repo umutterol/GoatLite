@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://d1ybo6j7typp4"]
+
+[ext_resource type="Texture2D" uid="uid://cqhfuyydx1jnq" path="res://assets/sprites/itemSprites/gearSprites/armorSprites/Rawhide_Boots_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_rawms"]
+script = ExtResource("2")
+affix_id = "rawhide_boots_ms"
+display_name = "Movement Speed"
+is_implicit = true
+stat_type = "movement"
+min_value = 4.0
+max_value = 8.0
+value_suffix = "%"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "rawhide_boots"
+display_name = "Rawhide Boots"
+description = "Untreated hide bound to the foot with strips of the same. A big improvement over bare feet for moving quickly."
+icon = ExtResource("1")
+category = 0
+armour_type = 0
+grid_width = 2
+grid_height = 2
+base_evasion_min = 2
+base_evasion_max = 4
+implicit_affixes = [SubResource("Resource_rawms")]
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

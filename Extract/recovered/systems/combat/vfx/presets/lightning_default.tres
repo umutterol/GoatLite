@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="LightningVFX" format=3 uid="uid://c42ljfkgw4qxg"]
+
+[ext_resource type="Resource" uid="uid://b7bv7mu74s6x1" path="res://systems/combat/vfx/impactPresets/lightning_spark.tres" id="1"]
+[ext_resource type="Script" uid="uid://bkx7dirg1515u" path="res://systems/combat/vfx/LightningVFX.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+trail_length = 0.4
+width_base = 0.5
+width_pulse = 1.0
+segments = 32
+jitter_magnitude = 11.0
+taper_power = 2.0
+color_override = Color(0.5824939, 0.7172549, 0.98616666, 0.85882354)
+impact_fx = ExtResource("1")
+impact_landing_progress = 0.0

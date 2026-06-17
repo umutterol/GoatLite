@@ -1,0 +1,7 @@
+[
+  { "id": "warrior", "name": "Warrior", "blurb": "Front-line plate; rampage and guard." },
+  { "id": "paladin", "name": "Paladin", "blurb": "Shields, guard, and burst light." },
+  { "id": "rogue",   "name": "Rogue",   "blurb": "Daggers, camouflage, and song." },
+  { "id": "mage",    "name": "Mage",    "blurb": "Fire, frost, and arcane control." },
+  { "id": "sage",    "name": "Sage",    "blurb": "Nature's mending and quiet parries." }
+]

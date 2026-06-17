@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://h50oy2qk6465"]
+
+[ext_resource type="Script" uid="uid://j6hfajtypepq" path="res://gameUI/tooltips/TooltipHover.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_batt"]
+bg_color = Color(0.13, 0.1, 0.04, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9, 0.75, 0.3, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="BatteredIcon" type="PanelContainer" unique_id=1729374698]
+custom_minimum_size = Vector2(25, 25)
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_batt")
+
+[node name="Glyph" type="Label" parent="." unique_id=75302232]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.95, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="." unique_id=785608323]
+script = ExtResource("1")
+keyword = "battered"

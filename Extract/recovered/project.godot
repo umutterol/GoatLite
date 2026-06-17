@@ -1,0 +1,102 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
+[application]
+
+config/name="Exiled Guild Manager"
+config/version="0.1.5b"
+run/main_scene="uid://bxnk4p7m2qjwd"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+run/max_fps=240
+boot_splash/bg_color=Color(0.05882353, 0.0627451, 0.08235294, 1)
+boot_splash/show_image=false
+config/icon="uid://c8jewtjmy6d7"
+
+[autoload]
+
+TooltipDefinitions="*res://gameUI/tooltips/TooltipDefinitions.gd"
+TooltipController="*res://gameUI/tooltips/TooltipController.gd"
+StatDefinitionManager="*res://gameCore/autoLoad/StatDefinitionManager.gd"
+PassiveLibrary="*res://gameCore/autoLoad/PassiveLibrary.gd"
+TraitLibrary="*res://gameCore/autoLoad/TraitLibrary.gd"
+GameState="*res://gameCore/autoLoad/GameState.gd"
+MoraleManager="*res://gameCore/autoLoad/MoraleManager.gd"
+QuartermasterManager="*res://systems/quartermaster/QuartermasterManager.gd"
+ClassLibrary="*res://gameCore/autoLoad/ClassLibrary.gd"
+GlobalColorPalette="*uid://bj2beyngdpuoi"
+EquipmentManager="*uid://ufgwoqwyyaig"
+ItemTooltip="*uid://udhcygdv30tn"
+DebugConsole="*uid://bi3b3efn3gdw1"
+AreaManager="*uid://cpyhol56u1wo8"
+MissionManager="*uid://do3euc1qqcwdi"
+ToastManager="*res://gameCore/autoLoad/ToastManager.gd"
+SceneRouter="*res://gameCore/autoLoad/SceneRouter.gd"
+EventRecruitController="*res://gameCore/autoLoad/EventRecruitController.gd"
+SaveManager="*res://systems/save/SaveManager.gd"
+FocusPolicy="*res://gameCore/autoLoad/FocusPolicy.gd"
+WebPlatform="*res://gameCore/autoLoad/WebPlatform.gd"
+KeyAliases="*res://gameCore/autoLoad/KeyAliases.gd"
+UserPreferences="*res://gameCore/autoLoad/UserPreferences.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
+
+[editor]
+
+version_control/plugin_name="GitPlugin"
+version_control/autoload_on_startup=true
+
+[editor_overrides]
+
+text_editor/behavior/indent/type=1
+
+[file_customization]
+
+folder_colors={
+"res://systems/combat/encounters/": "orange",
+"res://systems/combat/encounters/coast/": "orange",
+"res://systems/combat/vfx/": "purple",
+"res://systems/exile/exileClasses/": "pink",
+"res://systems/exile/passives/": "pink",
+"res://systems/exile/stats/": "pink",
+"res://systems/exile/traits/": "pink",
+"res://systems/items/affixes/": "green",
+"res://systems/items/itemBases/": "green",
+"res://systems/mission/": "orange",
+"res://systems/monsters/": "red",
+"res://systems/world/areas/": "orange"
+}
+
+[gui]
+
+theme/default_font_multichannel_signed_distance_field=true
+theme/custom="uid://b3kq74llqlv3x"
+
+[input]
+
+lock_tooltip={
+"deadzone": 0.2,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":3,"canceled":false,"pressed":false,"double_click":false,"script":null)
+]
+}
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0, 0, 0, 1)

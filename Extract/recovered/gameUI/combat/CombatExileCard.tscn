@@ -1,0 +1,197 @@
+[gd_scene format=3 uid="uid://ceqwa2twnb4l3"]
+
+[ext_resource type="Script" uid="uid://dy4tpr4td4lif" path="res://gameUI/combat/CombatExileCard.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://der180whhwy45" path="res://gameUI/smallComponents/ExilePortraitSlot.tscn" id="2"]
+[ext_resource type="FontFile" uid="uid://ckdfy3nugcff5" path="res://assets/fonts/Fontin-SmallCaps.otf" id="3"]
+[ext_resource type="PackedScene" uid="uid://bxlbar0001egm" path="res://gameUI/smallComponents/ExileBars.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://b678edplkkpx2" path="res://gameUI/smallComponents/HighMoraleIcon.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://d0hhl42s2urfk" path="res://gameUI/smallComponents/LowMoraleIcon.tscn" id="6"]
+[ext_resource type="PackedScene" uid="uid://berw30o2ka3om" path="res://gameUI/combat/AilmentPanelStrip.tscn" id="7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_combatcard"]
+bg_color = Color(0.078431375, 0.078431375, 0.078431375, 0.78431374)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.54901963, 0.40784314, 0.32156864, 0.78431374)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xpfill_combat"]
+bg_color = Color(0.57254905, 0.40784314, 0.043137256, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="CombatExileCard" type="Control" unique_id=155080238]
+custom_minimum_size = Vector2(280, 120)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 280.0
+offset_bottom = 120.0
+script = ExtResource("1")
+popup_side_mode = 1
+popup_font_size_base = 60
+popup_drift_px = 131.0
+popup_arc_bow_px = 33.0
+popup_arc_upward_bias = 0.12
+popup_arc_flip_horizontal = true
+popup_exit_angle_base_deg = 27.5
+popup_punch_scale = 2.05
+popup_punch_scale_crit = 2.55
+
+[node name="CardBackground" type="Panel" parent="." unique_id=1617349828]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_combatcard")
+
+[node name="Margin" type="MarginContainer" parent="CardBackground" unique_id=1808815932]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="VBox" type="VBoxContainer" parent="CardBackground/Margin" unique_id=1000677377]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="HeaderRow" type="HBoxContainer" parent="CardBackground/Margin/VBox" unique_id=602080881]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="CardPortrait" parent="CardBackground/Margin/VBox/HeaderRow" unique_id=971656335 instance=ExtResource("2")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+mouse_filter = 2
+show_level_up_badge = false
+
+[node name="InfoCol" type="VBoxContainer" parent="CardBackground/Margin/VBox/HeaderRow" unique_id=1674381493]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = -2
+
+[node name="CardExileName" type="Label" parent="CardBackground/Margin/VBox/HeaderRow/InfoCol" unique_id=1219737323]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 17
+text = "Exilename"
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="ClassLevelCol" type="HBoxContainer" parent="CardBackground/Margin/VBox/HeaderRow/InfoCol" unique_id=1770060625]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="CardClassname" type="Label" parent="CardBackground/Margin/VBox/HeaderRow/InfoCol/ClassLevelCol" unique_id=881702091]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.54901963, 0.40784314, 0.32156864, 0.78431374)
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 14
+text = "Classname"
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="CardLvl" type="Label" parent="CardBackground/Margin/VBox/HeaderRow/InfoCol/ClassLevelCol" unique_id=1070378188]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_colors/font_color = Color(0.54901963, 0.40784314, 0.32156864, 0.78431374)
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 14
+text = "L1"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="CardXPBar" type="ProgressBar" parent="CardBackground/Margin/VBox" unique_id=1377990054]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_xpfill_combat")
+show_percentage = false
+
+[node name="CardXPValueLabel" type="Label" parent="CardBackground/Margin/VBox/CardXPBar" unique_id=1509391090]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 9
+text = "XP 0 / 100"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="CardExileBars" parent="CardBackground/Margin/VBox" unique_id=540514684 instance=ExtResource("4")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="CardStatusStrip" type="HBoxContainer" parent="CardBackground/Margin/VBox" unique_id=1762257431]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="CardHighMoraleIcon" parent="CardBackground/Margin/VBox/CardStatusStrip" unique_id=1334287351 instance=ExtResource("5")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="CardLowMoraleIcon" parent="CardBackground/Margin/VBox/CardStatusStrip" unique_id=1136984598 instance=ExtResource("6")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="StatusStripSpacer" type="Control" parent="CardBackground/Margin/VBox/CardStatusStrip" unique_id=2119127027]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="CardAilmentStrip" parent="CardBackground/Margin/VBox/CardStatusStrip" unique_id=1090210918 instance=ExtResource("7")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CardPopupLayer" type="Control" parent="." unique_id=1796368868]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

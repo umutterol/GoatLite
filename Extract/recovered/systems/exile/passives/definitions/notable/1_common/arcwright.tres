@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://carcwright001"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_sh_eff"]
+script = ExtResource("2")
+stat_id = "shock_effect_more_pct"
+base_value = 20.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_light_dmg"]
+script = ExtResource("2")
+stat_id = "lightning_damage"
+scaling_type = 1
+base_value = 10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "arcwright"
+name = "Arcwright"
+description = "Tune the discharge until the body becomes the conductor."
+passive_type = 1
+icon = null
+stat_tags = ["shock", "lightning_damage"]
+theme_tags = ["elementalist"]
+category_tags = ["offence", "elemental_damage"]
+primary_tag = "shock"
+stat_bonuses = [SubResource("Resource_sh_eff"), SubResource("Resource_light_dmg")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

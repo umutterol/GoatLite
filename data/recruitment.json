@@ -1,0 +1,27 @@
+{
+  "initialDraft": {
+    "tabs": ["Tank", "Healer", "DPS"],
+    "candidatesPerTab": 10,
+    "pick": 5,
+    "pityFloor": "Each role tab guarantees at least 2 candidates with an Uncommon-or-better trait, so a first roster can't roll all-gray."
+  },
+  "traitDistribution": { "Common": 0.70, "Uncommon": 0.25, "Rare": 0.05 },
+  "rosterCap": 15,
+  "levelMargin": { "min": 0.6, "max": 1.0, "note": "Ongoing recruits arrive geared at 60-100% of your best character's item level." },
+  "sources": [
+    { "id": "recruitment-board", "cadence": "weekly",      "count": 1, "paid": true,  "currency": "gold", "note": "Quality scales with guild progression." },
+    { "id": "dungeon-rescue",    "cadence": "rare-in-run",            "paid": false,                     "note": "Highest variance — could be a Rare-trait jackpot." },
+    { "id": "trade",             "cadence": "on-demand",              "paid": true,  "currency": "gold", "note": "Poach a specific class/spec; hidden potentials stay hidden — a pure gear bet." }
+  ],
+  "namePool": [
+    "Grymdark", "Svenrik", "Kaelthri", "Mournhollow", "Bramblewen", "Dolgrun", "Quillane", "Threnody",
+    "Orgrith", "Sister Maelle", "Brunnhild", "Caedric", "Lyssara", "Thornwick", "Velmora", "Hadrumal",
+    "Pyx", "Ossric", "Wrenna", "Belgrave", "Mirelle", "Knucklebones", "Sage Ondric", "Halberd Hal"
+  ],
+  "portraitPool": [
+    "orc-hero-1", "orc-hero-2", "orc-hero-3",
+    "human-hero-1", "human-hero-2", "human-hero-3", "human-peasant",
+    "elf-hero-1", "elf-hero-2", "elf-hero-3",
+    "undead-hero-1", "undead-hero-2", "undead-hero-3"
+  ]
+}

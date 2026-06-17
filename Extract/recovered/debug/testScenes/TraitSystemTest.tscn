@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cmixfoyetk5gd"]
+
+[ext_resource type="Script" uid="uid://tiysiobu3i7x" path="res://debug/testScenes/TraitSystemTest.gd" id="1"]
+
+[node name="TraitSystemTest" type="Node" unique_id=716440409]
+script = ExtResource("1")

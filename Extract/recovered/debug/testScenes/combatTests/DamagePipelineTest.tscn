@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://hh0wfythhe1h"]
+
+[ext_resource type="Script" uid="uid://djux20drgi4yp" path="res://debug/testScenes/combatTests/damage_pipeline_test.gd" id="1"]
+
+[node name="DamagePipelineTest" type="Node" unique_id=1814452939]
+script = ExtResource("1")

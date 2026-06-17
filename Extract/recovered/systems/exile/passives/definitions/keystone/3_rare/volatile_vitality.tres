@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://d1vfd2vyvays7"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_yjv3p"]
+script = ExtResource("2")
+stat_id = "life"
+scaling_type = 4
+base_value = 50.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_c7tl7"]
+script = ExtResource("2")
+stat_id = "life_regen"
+scaling_type = 2
+base_value = 100.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_c0yw8"]
+script = ExtResource("2")
+stat_id = "life_leech"
+scaling_type = 2
+base_value = 100.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_ft2en"]
+script = ExtResource("2")
+stat_id = "life_gain_on_hit"
+scaling_type = 2
+base_value = 100.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "volatile_vitality"
+name = "Volatile Vitality"
+description = "A lifestyle not for the faint of heart."
+passive_type = 2
+rarity = 2
+icon = null
+stat_tags = ["life_leech", "life_gain_on_hit", "life_regen"]
+theme_tags = ["reckless"]
+category_tags = ["recovery"]
+primary_tag = "recovery"
+stat_bonuses = [SubResource("Resource_yjv3p"), SubResource("Resource_c7tl7"), SubResource("Resource_c0yw8"), SubResource("Resource_ft2en")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

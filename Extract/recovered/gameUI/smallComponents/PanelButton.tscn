@@ -1,0 +1,99 @@
+[gd_scene format=3 uid="uid://b0cudmoj2k441"]
+
+[ext_resource type="Script" uid="uid://8s21iap5wgdu" path="res://gameUI/smallComponents/PanelButton.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://ckdfy3nugcff5" path="res://assets/fonts/Fontin-SmallCaps.otf" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
+bg_color = Color(0.06, 0.06, 0.06, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.34, 0.24, 0.7)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
+bg_color = Color(0.12, 0.1, 0.05, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7, 0.55, 0.3, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pressed"]
+bg_color = Color(0.04, 0.04, 0.04, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.7, 0.3, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_disabled"]
+bg_color = Color(0.05, 0.05, 0.05, 0.5)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.22, 0.18, 0.5)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_active"]
+bg_color = Color(0.18, 0.12, 0.04, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.7, 0.3, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="PanelButton" type="Panel" unique_id=1945171444]
+custom_minimum_size = Vector2(80, 28)
+theme_override_styles/panel = SubResource("StyleBoxFlat_normal")
+script = ExtResource("1")
+style_normal = SubResource("StyleBoxFlat_normal")
+style_hover = SubResource("StyleBoxFlat_hover")
+style_pressed = SubResource("StyleBoxFlat_pressed")
+style_disabled = SubResource("StyleBoxFlat_disabled")
+style_active = SubResource("StyleBoxFlat_active")
+font = ExtResource("2")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=201542584]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 2
+
+[node name="Label" type="Label" parent="MarginContainer" unique_id=763285778]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0.675, 0.525, 0.43, 0.765)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
+text = "Button"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -1,0 +1,24 @@
+[
+  {
+    "id": "reforge", "op": "reroll", "name": "Reforge", "currency": "shard", "costFormula": "effectiveKey", "phase": 2,
+    "desc": "Replace one secondary stat. Cost = (ilvl - 100) / 5 Shards. Exact odds shown before you commit."
+  },
+  {
+    "id": "augment", "op": "add", "name": "Augment", "currency": "shard", "costFormula": "effectiveKey", "phase": 2,
+    "desc": "Add a secondary stat — which upgrades the item's quality tier (Blue + a 3rd secondary becomes Epic). Cost = (ilvl - 100) / 5 Shards."
+  },
+  {
+    "id": "scrap", "op": "salvage", "name": "Scrap", "currency": "shard", "costFormula": "yield", "phase": 1,
+    "desc": "Scrap gear into Shards = (number of secondaries) × (1 + key band). A junk Epic shards for far more than a Green."
+  },
+  {
+    "id": "corrupt", "op": "corrupt", "name": "Corrupt", "currency": "emblem", "costFormula": "flat", "phase": 2,
+    "desc": "A one-way Vaal gamble (Legendary / season-end sink). The item is permanently locked from further crafting.",
+    "outcomes": [
+      { "weight": 25, "effect": "Reroll all secondaries" },
+      { "weight": 25, "effect": "Reroll secondary values" },
+      { "weight": 25, "effect": "Shift each secondary ±1 tier (can exceed normal caps)" },
+      { "weight": 25, "effect": "Stamp a corruption-only mod from the overpowered pool" }
+    ]
+  }
+]

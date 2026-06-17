@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://cfireproof001"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_ignite_red"]
+script = ExtResource("2")
+stat_id = "ignite_duration_reduction_pct"
+base_value = 25.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_fire_res"]
+script = ExtResource("2")
+stat_id = "fire_resistance"
+base_value = 5.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "fireproofing"
+name = "Fireproofing"
+description = "Treated cloth and wet rags shorten the burn before it does its work."
+passive_type = 1
+icon = null
+max_stacks = 4
+stat_tags = ["ignite", "fire_resistance", "ailment_defence"]
+theme_tags = ["tank", "survivalist"]
+category_tags = ["defence", "resistance"]
+primary_tag = "ailment_defence"
+stat_bonuses = [SubResource("Resource_ignite_red"), SubResource("Resource_fire_res")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

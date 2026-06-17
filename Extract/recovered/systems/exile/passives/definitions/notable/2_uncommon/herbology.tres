@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://b2smay7w5cc10"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_cfd48"]
+script = ExtResource("2")
+stat_id = "life_regen"
+base_value = 6.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_4lbav"]
+script = ExtResource("2")
+stat_id = "survival"
+base_value = 40.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "herbology"
+name = "Herbology"
+description = "Learn what the land can give to help you survive."
+passive_type = 1
+rarity = 1
+icon = null
+stat_tags = ["life_regen", "survival"]
+theme_tags = ["survivalist"]
+category_tags = ["recovery", "utility"]
+primary_tag = "survivalist"
+stat_bonuses = [SubResource("Resource_cfd48"), SubResource("Resource_4lbav")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

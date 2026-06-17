@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://b8sxg5p0r7tk2"]
+
+[ext_resource type="Script" uid="uid://bmncffrjfglln" path="res://debug/testScenes/saveTest/SaveSystemTest.gd" id="1"]
+
+[node name="SaveSystemTest" type="Node" unique_id=330582369]
+script = ExtResource("1")

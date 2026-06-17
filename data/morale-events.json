@@ -1,0 +1,9 @@
+[
+  { "id": "timed-key",        "label": "Timed key",                                            "delta": 10 },
+  { "id": "thrilling-victory","label": "Timed a near-wipe (2+ deaths, or finished below 10%)",  "delta": 5 },
+  { "id": "depleted",         "label": "Depleted key (no wipe)",                               "delta": -5 },
+  { "id": "wipe",             "label": "Party wipe",                                           "delta": -20 },
+  { "id": "lost-loot",        "label": "Lost contested loot",                                  "delta": -5 },
+  { "id": "boredom",          "label": "Timed a key dropping gear 30+ ilvl below the wearer",  "delta": -3 },
+  { "id": "morale-officer",   "label": "Morale Officer building (per run)",                    "delta": 5 }
+]

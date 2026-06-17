@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://bucbpcb4wb124"]
+
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_vv712"]
+script = ExtResource("2")
+stat_id = "fire_damage"
+scaling_type = 1
+base_value = 15.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_got6t"]
+script = ExtResource("2")
+stat_id = "fire_resistance"
+base_value = -5.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+trait_id = "firebug"
+name = "Firebug"
+description = "They seem to have a bit of an obsession with fire."
+icon = null
+stat_bonuses = [SubResource("Resource_vv712"), SubResource("Resource_got6t")]
+potential_tags = ["fire"]
+potential_values = [1.5]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

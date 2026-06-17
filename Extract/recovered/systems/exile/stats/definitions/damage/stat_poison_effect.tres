@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "poison_effect_more_pct"
+display_name = "Poison Effect"
+description = "% bonus to the per-second DAMAGE of Poison stacks you apply. Does NOT change duration — extends time only via Poison Duration. Composes additively with Damage over Time. Final DPS per stack = base × (1 + effect%/100) × (1 + DoT%/100)."
+category = 3
+stat_type = 1
+min_value = -100.0
+show_as_percentage = true
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

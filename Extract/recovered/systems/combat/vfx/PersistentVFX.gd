@@ -1,0 +1,105 @@
+class_name PersistentVFX
+extends Resource
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@export var application_burst_scene: PackedScene
+
+
+
+
+
+
+@export var overlay_scene: PackedScene
+
+
+
+
+@export var removal_burst_scene: PackedScene
+
+
+
+
+
+
+@export var portrait_tint: Color = Color.WHITE
+
+
+
+
+
+
+
+@export var icon: Texture2D
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@export var ambient_impact_fx: HitImpactFX
+
+
+
+
+
+
+
+
+
+@export_range(0.05, 5.0, 0.05) var ambient_impact_interval_seconds: float = 0.4

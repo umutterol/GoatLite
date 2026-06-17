@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://be3fjhl8ougai"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_h7jim"]
+script = ExtResource("2")
+stat_id = "cold_damage"
+scaling_type = 1
+base_value = 16.0
+value_per_stack = 16.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "cold_damage"
+name = "Cold"
+description = "As cold as ice, willing to sacrifice."
+icon = null
+max_stacks = 5
+stat_tags = ["cold_damage"]
+theme_tags = ["elementalist", "witch"]
+category_tags = ["elemental_damage"]
+primary_tag = "cold_damage"
+stat_bonuses = [SubResource("Resource_h7jim")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

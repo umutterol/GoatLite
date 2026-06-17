@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="MonsterAbility" format=3 uid="uid://brb3tyqus6whr"]
+
+[ext_resource type="Script" uid="uid://bd3yjptnlyeim" path="res://systems/combat/vfx/FireboltVFX.gd" id="1"]
+[ext_resource type="Script" uid="uid://dmetojbdk5sls" path="res://systems/combat/abilities/MonsterAbility.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_5st2j"]
+script = ExtResource("1")
+arrival_fraction = 0.05
+head_radius = 20.0
+head_glow_radius_mult = 5.0
+head_glow_alpha = 0.0
+core_brightness = 0.0
+core_radius_frac = 0.0
+trail_length = 1.05
+trail_width = 8.0
+trail_glow_alpha = 1.0
+explosion_radius_max_in_def_radii = 9.0
+explosion_radius_start_in_def_radii = 4.5
+explosion_ring_width = 10.0
+explosion_fade_exponent = 1.9
+explosion_flash_alpha = 0.25
+color_override = Color(0.4627451, 0.38039216, 0.31764707, 0.8862745)
+impact_fx = null
+impact_landing_progress = 0.0
+metadata/_custom_type_script = "uid://bd3yjptnlyeim"
+
+[resource]
+script = ExtResource("2")
+ability_id = "hardshell_slam"
+display_name = "Hardshell Slam"
+icon = null
+shape = 3
+ability_range = 3.5
+aoe_centred_on_target = true
+aoe_size = 3.0
+cooldown_seconds = 4.0
+wind_up_seconds = 0.2
+recovery_seconds = 0.5
+damage_scaling = 1.2
+execute_vfx = SubResource("Resource_5st2j")
+impact_vfx = null
+telegraph_vfx = null

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="FireboltVFX" format=3 uid="uid://40hod28rjacd"]
+
+[ext_resource type="Resource" uid="uid://b1ps4xchfbalg" path="res://systems/combat/vfx/impactPresets/fire_cinders.tres" id="1"]
+[ext_resource type="Script" uid="uid://bd3yjptnlyeim" path="res://systems/combat/vfx/FireboltVFX.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+arrival_fraction = 0.15000000000000002
+head_radius = 4.0
+head_glow_radius_mult = 1.0
+head_glow_alpha = 0.6
+core_brightness = 0.9
+core_radius_frac = 0.95
+trail_length = 2.0
+trail_width = 8.0
+trail_glow_alpha = 0.3
+trail_segments = 24
+explosion_radius_max_in_def_radii = 1.5
+explosion_radius_start_in_def_radii = 0.7
+explosion_ring_width = 4.5
+explosion_flash_alpha = 0.45
+color_override = Color(0.95686275, 0.4392157, 0.08235294, 1)
+lifetime_seconds = 0.5
+impact_fx = ExtResource("1")
+impact_landing_progress = 0.0

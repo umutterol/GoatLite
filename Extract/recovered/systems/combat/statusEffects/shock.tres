@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="StatusEffect" format=3 uid="uid://huos3y7cy1fk"]
+
+[ext_resource type="Script" uid="uid://c7u4b1n711gll" path="res://systems/combat/statusEffects/StatusEffect.gd" id="1"]
+[ext_resource type="Resource" uid="uid://ba2ccdph5gsro" path="res://systems/combat/vfx/impactPresets/shock_persistent.tres" id="2"]
+[ext_resource type="Script" uid="uid://thfpduvqcsyc" path="res://systems/combat/vfx/PersistentVFX.gd" id="3"]
+
+[sub_resource type="Resource" id="VFXShock"]
+script = ExtResource("3")
+application_burst_scene = null
+overlay_scene = null
+removal_burst_scene = null
+icon = null
+ambient_impact_fx = ExtResource("2")
+ambient_impact_interval_seconds = 0.35
+
+[resource]
+script = ExtResource("1")
+effect_id = &"shock"
+display_name = "Shock"
+description = "The target takes more damage from all sources for a few seconds.
+
+Magnitude scales with the size of the triggering lightning hit relative to the target's max life — a hit dealing 10%+ of max life shocks for the full 20% (unscaled). Smaller hits shock for less, and shocks computing below 5% damage taken are discarded entirely.
+
+Scales with the attacker's Shock Effect % and Shock Duration % stats. Only a stronger re-shock can override the current one; weaker re-applications are ignored (existing magnitude and duration keep ticking)."
+duration_seconds = 4.0
+refresh_mode = 3
+stat_modifiers = {
+"damage_taken_more_pct": 20.0
+}
+vfx = SubResource("VFXShock")

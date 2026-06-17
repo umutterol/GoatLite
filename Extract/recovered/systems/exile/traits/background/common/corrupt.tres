@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://bocwdit36rghq"]
+
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_vtbdg"]
+script = ExtResource("2")
+stat_id = "chaos_resistance"
+base_value = -10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+trait_id = "corrupt"
+name = "Corrupt"
+description = "Exiled for their wicked ways, some of the corruption follows them still."
+icon = null
+stat_bonuses = [SubResource("Resource_vtbdg")]
+potential_tags = ["chaos"]
+potential_values = [1.5]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

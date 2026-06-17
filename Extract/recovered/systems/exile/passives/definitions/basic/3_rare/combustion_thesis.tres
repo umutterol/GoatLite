@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://csgaeqpqteanj"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_8ly5o"]
+script = ExtResource("2")
+stat_id = "fire_damage"
+base_value = 4.0
+damage_target = 1
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_vrags"]
+script = ExtResource("2")
+stat_id = "fire_damage"
+base_value = 12.0
+damage_target = 2
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_dlu02"]
+script = ExtResource("2")
+stat_id = "life"
+base_value = -8.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "combustion_thesis"
+name = "Combustion Thesis"
+description = "The correct application of these principles should result in spontaneous combu..."
+rarity = 2
+icon = null
+stat_tags = ["fire_damage"]
+theme_tags = ["elementalist"]
+category_tags = ["elemental_damage", "offence"]
+primary_tag = "elementalist"
+stat_bonuses = [SubResource("Resource_8ly5o"), SubResource("Resource_vrags"), SubResource("Resource_dlu02")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

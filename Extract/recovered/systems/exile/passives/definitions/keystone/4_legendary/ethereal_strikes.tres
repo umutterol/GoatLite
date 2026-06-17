@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://dtuhh1xvbaldy"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_my1o5"]
+script = ExtResource("2")
+stat_id = "physical_damage"
+scaling_type = 4
+base_value = 100.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_e0i0s"]
+script = ExtResource("2")
+stat_id = "elemental_damage"
+scaling_type = 2
+base_value = 30.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_c4q1i"]
+script = ExtResource("2")
+stat_id = "attack_speed"
+scaling_type = 2
+base_value = 20.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "ethereal_strikes"
+name = "Ethereal Strikes"
+description = "Through some unknown twist of thaumaturgy all kinetic energy in attacks has been lost. This curse allows, however, for more efficient transfer of other forms of energy."
+passive_type = 2
+rarity = 3
+icon = null
+requires_previous = ["elemental_mastery"]
+theme_tags = ["elementalist"]
+category_tags = ["elemental_damage", "offence"]
+primary_tag = "elementalist"
+stat_bonuses = [SubResource("Resource_my1o5"), SubResource("Resource_e0i0s"), SubResource("Resource_c4q1i")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

@@ -1,0 +1,6 @@
+[
+  { "id": "tunnel-vision", "name": "Tunnel Vision", "behavior": "Always hits highest HP target, ignores adds" },
+  { "id": "executioner",   "name": "Executioner",   "behavior": "Switches to lowest HP target to secure kills" },
+  { "id": "peel",          "name": "Peel",          "behavior": "Prioritizes targets attacking allies" },
+  { "id": "opportunist",   "name": "Opportunist",   "behavior": "Mirrors the tank's current target" }
+]

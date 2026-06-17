@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://brec0vry0001"]
+
+[ext_resource type="Script" uid="uid://j6hfajtypepq" path="res://gameUI/tooltips/TooltipHover.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_recov"]
+bg_color = Color(0.13, 0.09, 0.04, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.7, 0.3, 0.85)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="RecoveryIcon" type="PanelContainer" unique_id=131841798]
+custom_minimum_size = Vector2(25, 25)
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_recov")
+
+[node name="Glyph" type="Label" parent="." unique_id=190320628]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.95, 0.7, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+text = "Z"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="." unique_id=1443501324]
+script = ExtResource("1")
+keyword = "recovering"

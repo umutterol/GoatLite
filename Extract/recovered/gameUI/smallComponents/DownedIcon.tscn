@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://cv8toy2qk6465"]
+
+[ext_resource type="Script" uid="uid://j6hfajtypepq" path="res://gameUI/tooltips/TooltipHover.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_down"]
+bg_color = Color(0.13, 0.04, 0.04, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.85, 0.3, 0.3, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="DownedIcon" type="PanelContainer" unique_id=1738033801]
+custom_minimum_size = Vector2(25, 25)
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_down")
+
+[node name="Glyph" type="Label" parent="." unique_id=1636064726]
+modulate = Color(0.95, 0.4, 0.4, 1)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "D"
+
+[node name="TooltipHover" type="Node" parent="." unique_id=40632707]
+script = ExtResource("1")
+keyword = "downed"

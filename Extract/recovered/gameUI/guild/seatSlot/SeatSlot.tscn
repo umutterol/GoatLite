@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://c0an8w3bmr0vs"]
+
+[ext_resource type="Script" uid="uid://8edsb0bxtr38" path="res://gameUI/guild/seatSlot/SeatSlot.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_empty"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.08, 0.07, 0.06, 0.55)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.32, 0.18, 0.7)
+border_blend = true
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_occupied"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_drophover"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.18, 0.14, 0.08, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.78, 0.35, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hidden"]
+
+[node name="SeatSlot" type="PanelContainer" unique_id=1401362078]
+custom_minimum_size = Vector2(220, 200)
+script = ExtResource("1")
+style_empty = SubResource("StyleBoxFlat_empty")
+style_occupied = SubResource("StyleBoxFlat_occupied")
+style_drop_hover = SubResource("StyleBoxFlat_drophover")
+style_hidden = SubResource("StyleBoxEmpty_hidden")
+
+[node name="PlaceholderLabel" type="Label" parent="." unique_id=1273364130]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.48, 0.32, 0.85)
+theme_override_font_sizes/font_size = 14
+text = "(empty)"
+horizontal_alignment = 1
+vertical_alignment = 1

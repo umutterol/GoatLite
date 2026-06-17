@@ -1,0 +1,80 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://2g0lr8plgqr4"]
+
+[ext_resource type="Resource" uid="uid://b7p06kx6opmy5" path="res://systems/monsters/unique/uber_endof_contentus.tres" id="1"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="2"]
+[ext_resource type="Resource" uid="uid://c5tiv3sx5wk51" path="res://systems/monsters/normal/zombie_merchant.tres" id="3"]
+[ext_resource type="Resource" uid="uid://b5kc5a0a0c3d1" path="res://systems/monsters/unique/grandaddy_crab.tres" id="4"]
+[ext_resource type="Resource" uid="uid://dhfq11s3x646j" path="res://systems/monsters/unique/fire_fury.tres" id="5"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="6"]
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="7"]
+[ext_resource type="Script" uid="uid://bl1n406v551lg" path="res://systems/mission/ProgressionRequirement.gd" id="8"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="9"]
+
+[sub_resource type="Resource" id="Resource_xrcs1"]
+script = ExtResource("2")
+monster = ExtResource("1")
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_2jld4"]
+script = ExtResource("2")
+monster = ExtResource("3")
+count = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_8am7i"]
+script = ExtResource("2")
+monster = ExtResource("4")
+count = 4
+position_hint = 5
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_im2m5"]
+script = ExtResource("2")
+monster = ExtResource("5")
+count = 2
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_mxm7p"]
+script = ExtResource("6")
+encounter_id = "endofcontentus"
+display_name = "Uber Endof Contentus"
+encounter_type = 2
+monster_spawns = [SubResource("Resource_xrcs1"), SubResource("Resource_2jld4"), SubResource("Resource_8am7i"), SubResource("Resource_im2m5")]
+recommended_level = 10
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="Resource_slot1"]
+script = ExtResource("7")
+slot_type = 0
+encounter = SubResource("Resource_mxm7p")
+area_filter = [1]
+excluded_tags = [1]
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_5kax6"]
+script = ExtResource("8")
+area = 1
+mission_id = "endof_contentus"
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[resource]
+script = ExtResource("9")
+mission_id = "uber_endof_contentus"
+display_name = "Uber Endof Contentus"
+description = "The harbinger of the end... for real this time!"
+icon = null
+area_requirement = 1
+level = 10
+mission_tags = [5]
+availability_type = 2
+prerequisites = [SubResource("Resource_5kax6")]
+scouting_threshold_percent = 5.0
+discovery_base_chance = 1.0
+discovery_description = "THE END IS HERE, FOR REAL THIS TIME"
+encounter_slots = [SubResource("Resource_slot1")]
+rarity_bonus = 5.0
+quantity_bonus = 1.0
+mission_rewards = null
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bhn7tpioc7qfi"]
+
+[ext_resource type="Script" uid="uid://dn8chjjrdw06v" path="res://systems/monsters/MonsterStats.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cb5aonsgnuji" path="res://assets/sprites/monsterSprites/Barrel Sprite.png" id="2"]
+[ext_resource type="Script" uid="uid://xo0774xbjf5m" path="res://systems/monsters/MonsterData.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_awtwt"]
+script = ExtResource("1")
+life = 5.0
+armour = 10.0
+cold_resistance = 50.0
+lightning_resistance = 50.0
+fire_resistance = -50.0
+chaos_resistance = 50.0
+attack_speed = 0.0
+action_speed = 0.0
+movement = -100.0
+metadata/_custom_type_script = "uid://dn8chjjrdw06v"
+
+[resource]
+script = ExtResource("3")
+monster_id = "barrel"
+display_name = "Barrel"
+icon = ExtResource("2")
+description = "Not a monster, hopefully."
+base_stats = SubResource("Resource_awtwt")
+faces_target = false
+combat_behavior = null
+drop_table = null
+experience_value = 0
+base_drop_chance = 1.0
+food_drops = 1.5
+scrap_drops = 1.5
+chaos_drops = 0.01
+exalt_drops = 0.01
+metadata/_custom_type_script = "uid://xo0774xbjf5m"

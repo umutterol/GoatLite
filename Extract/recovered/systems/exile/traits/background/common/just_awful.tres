@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://dkkvac5f3644o"]
+
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_jtcai"]
+script = ExtResource("2")
+stat_id = "attack_speed"
+scaling_type = 3
+base_value = 8.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_ujdkj"]
+script = ExtResource("2")
+stat_id = "critical_chance"
+scaling_type = 3
+base_value = 20.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_173yu"]
+script = ExtResource("2")
+stat_id = "movement"
+base_value = -10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_fvkuf"]
+script = ExtResource("2")
+stat_id = "scouting"
+base_value = -10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_3yixb"]
+script = ExtResource("2")
+stat_id = "second_wind_chance"
+scaling_type = 1
+base_value = 100.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+trait_id = "just_awful"
+name = "Just Awful"
+description = "They're just... so bad. And somehow they still live..."
+icon = null
+stat_bonuses = [SubResource("Resource_jtcai"), SubResource("Resource_ujdkj"), SubResource("Resource_173yu"), SubResource("Resource_fvkuf"), SubResource("Resource_3yixb")]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

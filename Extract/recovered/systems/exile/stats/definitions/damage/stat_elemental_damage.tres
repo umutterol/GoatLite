@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3 uid="uid://celmdmgxy7ph2"]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "elemental_damage"
+display_name = "Elemental Damage"
+description = "Composite elemental stat. INCREASED/REDUCED/MORE/LESS values authored on 'elemental_damage' fan out in StatCalculator to fire_damage, cold_damage, and lightning_damage. Not a standalone property on ExileStats — exists for authoring + display. FLAT scaling silently no-ops here (no fan-out path); author per-element bonuses for flat additions."
+category = 3
+stat_type = 1
+show_as_percentage = true
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

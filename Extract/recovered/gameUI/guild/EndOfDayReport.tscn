@@ -1,0 +1,90 @@
+[gd_scene format=3 uid="uid://dvow27fiq6465"]
+
+[ext_resource type="Script" uid="uid://b3etv0vbupqge" path="res://gameUI/guild/EndOfDayReport.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://ckdfy3nugcff5" path="res://assets/fonts/Fontin-SmallCaps.otf" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
+content_margin_left = 24.0
+content_margin_top = 18.0
+content_margin_right = 24.0
+content_margin_bottom = 18.0
+bg_color = Color(0.08, 0.07, 0.05, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.42, 0.28, 0.95)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="EndOfDayReport" type="CanvasLayer" unique_id=559309328]
+layer = 50
+script = ExtResource("1")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=291213754]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="ModalCenter" type="CenterContainer" parent="." unique_id=913060165]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ModalPanel" type="PanelContainer" parent="ModalCenter" unique_id=602516838]
+custom_minimum_size = Vector2(1400, 700)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+
+[node name="VBox" type="VBoxContainer" parent="ModalCenter/ModalPanel" unique_id=665016172]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="Label" parent="ModalCenter/ModalPanel/VBox" unique_id=2019891520]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 30
+text = "Day X → Day Y"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ModalCenter/ModalPanel/VBox" unique_id=645529243]
+custom_minimum_size = Vector2(0, 420)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ExileGrid" type="GridContainer" parent="ModalCenter/ModalPanel/VBox/ScrollContainer" unique_id=44648473]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 3
+
+[node name="EmptyMessage" type="Label" parent="ModalCenter/ModalPanel/VBox" unique_id=801572004]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Nothing changed overnight."
+horizontal_alignment = 1
+
+[node name="ButtonRow" type="HBoxContainer" parent="ModalCenter/ModalPanel/VBox" unique_id=1563731718]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="CloseButton" type="Button" parent="ModalCenter/ModalPanel/VBox/ButtonRow" unique_id=1526379245]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+text = "Continue"

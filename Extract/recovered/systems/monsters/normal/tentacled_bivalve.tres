@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://18mfeaqt5s8g"]
+
+[ext_resource type="Resource" uid="uid://d0lln5qrdi3uq" path="res://systems/combat/abilities/resources/bivalve_ice_nova.tres" id="1"]
+[ext_resource type="Script" uid="uid://cetal6p7kbjls" path="res://systems/combat/abilities/ActionSlotConfig.gd" id="2"]
+[ext_resource type="Script" uid="uid://dn8chjjrdw06v" path="res://systems/monsters/MonsterStats.gd" id="3"]
+[ext_resource type="Resource" uid="uid://dl4q258kjbcac" path="res://systems/combat/vfx/presets/water_spuirt.tres" id="4"]
+[ext_resource type="Script" uid="uid://bn4tocniaeat3" path="res://systems/combat/CombatBehavior.gd" id="5"]
+[ext_resource type="Script" uid="uid://djr2nsux711tk" path="res://systems/combat/profiles/TacticalProfile.gd" id="6"]
+[ext_resource type="Script" uid="uid://xo0774xbjf5m" path="res://systems/monsters/MonsterData.gd" id="7"]
+
+[sub_resource type="Resource" id="Resource_novaSlot"]
+script = ExtResource("2")
+abilities = [ExtResource("1")]
+metadata/_custom_type_script = "uid://cetal6p7kbjls"
+
+[sub_resource type="Resource" id="Resource_dm7x5"]
+script = ExtResource("3")
+life = 20.0
+vitality = 20.0
+armour = 26.0
+cold_resistance = 40.0
+lightning_resistance = -40.0
+fire_resistance = 20.0
+cold_damage = Vector2(4, 12)
+movement = -60.0
+metadata/_custom_type_script = "uid://dn8chjjrdw06v"
+
+[sub_resource type="Resource" id="Resource_10asc"]
+script = ExtResource("6")
+sticky_target_duration = 1.0
+melee_threat_memory_duration = 2.0
+metadata/_custom_type_script = "uid://djr2nsux711tk"
+
+[sub_resource type="Resource" id="Resource_hacrr"]
+script = ExtResource("5")
+attack_range = 10.0
+stance = 2
+tactical_profile = SubResource("Resource_10asc")
+basic_attack_vfx_override = ExtResource("4")
+metadata/_custom_type_script = "uid://bn4tocniaeat3"
+
+[resource]
+script = ExtResource("7")
+monster_id = "tentacled_bivalve"
+display_name = "Tentacled Bivalve"
+icon = null
+description = "Giant clams that drag themselves around with tentacles. Watch out for the icy jets of water they spit."
+base_level = 2
+base_stats = SubResource("Resource_dm7x5")
+combat_behavior = SubResource("Resource_hacrr")
+action_slot_configs = [SubResource("Resource_novaSlot")]
+drop_table = null
+experience_value = 18
+food_drops = 0.35
+exalt_drops = 0.1
+metadata/_custom_type_script = "uid://xo0774xbjf5m"

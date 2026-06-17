@@ -1,0 +1,302 @@
+[gd_scene format=3 uid="uid://bw8af6f8vkidc"]
+
+[ext_resource type="Script" uid="uid://6ocettfjuyo5" path="res://gameUI/levelUp/LevelUpModal.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bmr230kn7gdfp" path="res://assets/sprites/uiSprites/closebuttonsprite.png" id="2"]
+[ext_resource type="PackedScene" uid="uid://bo0fpk05hvbmm" path="res://gameUI/levelUp/StatDeltaRow.tscn" id="3"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
+content_margin_left = 48.0
+content_margin_top = 24.0
+content_margin_right = 48.0
+content_margin_bottom = 24.0
+bg_color = Color(0.07, 0.07, 0.1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panelbtn_normal"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.16, 0.16, 0.2, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.38, 0.18, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_confirm_normal"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.16, 0.22, 0.16, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.78, 0.45, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panelbtn_hover"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.24, 0.22, 0.16, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.78, 0.62, 0.28, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="LevelUpModal" type="CanvasLayer" unique_id=180292177]
+layer = 51
+script = ExtResource("1")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=1101192742]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.85)
+
+[node name="MainPanel" type="PanelContainer" parent="." unique_id=1823318082]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+
+[node name="OuterScroll" type="ScrollContainer" parent="MainPanel" unique_id=2042658260]
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="VBox" type="VBoxContainer" parent="MainPanel/OuterScroll" unique_id=2130131030]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="HeaderRow" type="HBoxContainer" parent="MainPanel/OuterScroll/VBox" unique_id=535613236]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="PortraitPanel" type="Panel" parent="MainPanel/OuterScroll/VBox/HeaderRow" unique_id=2062725004]
+clip_contents = true
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="ClassIcon" type="TextureRect" parent="MainPanel/OuterScroll/VBox/HeaderRow/PortraitPanel" unique_id=1354696503]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ClassFallbackLabel" type="Label" parent="MainPanel/OuterScroll/VBox/HeaderRow/PortraitPanel" unique_id=1814802794]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 36
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderInfo" type="VBoxContainer" parent="MainPanel/OuterScroll/VBox/HeaderRow" unique_id=1787539381]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="MainPanel/OuterScroll/VBox/HeaderRow/HeaderInfo" unique_id=426094515]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Exile - Level X"
+
+[node name="SubtitleLabel" type="Label" parent="MainPanel/OuterScroll/VBox/HeaderRow/HeaderInfo" unique_id=1909880887]
+unique_name_in_owner = true
+modulate = Color(0.78, 0.78, 0.78, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Reached level X"
+
+[node name="CloseButton" type="Button" parent="MainPanel/OuterScroll/VBox/HeaderRow" unique_id=1010820559]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+icon = ExtResource("2")
+flat = true
+icon_alignment = 1
+
+[node name="HSep1" type="HSeparator" parent="MainPanel/OuterScroll/VBox" unique_id=1916452237]
+layout_mode = 2
+
+[node name="BodyRow" type="HBoxContainer" parent="MainPanel/OuterScroll/VBox" unique_id=485571491]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="StatsColumn" type="VBoxContainer" parent="MainPanel/OuterScroll/VBox/BodyRow" unique_id=2102669230]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.3
+theme_override_constants/separation = 8
+
+[node name="StatChangesHeader" type="Label" parent="MainPanel/OuterScroll/VBox/BodyRow/StatsColumn" unique_id=722386304]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Stat Changes"
+
+[node name="StatChangesScroll" type="ScrollContainer" parent="MainPanel/OuterScroll/VBox/BodyRow/StatsColumn" unique_id=1955312571]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="StatDeltasContainer" type="VBoxContainer" parent="MainPanel/OuterScroll/VBox/BodyRow/StatsColumn/StatChangesScroll" unique_id=373467377]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="PlaceholderRow1" parent="MainPanel/OuterScroll/VBox/BodyRow/StatsColumn/StatChangesScroll/StatDeltasContainer" unique_id=2142710127 instance=ExtResource("3")]
+layout_mode = 2
+
+[node name="PlaceholderRow2" parent="MainPanel/OuterScroll/VBox/BodyRow/StatsColumn/StatChangesScroll/StatDeltasContainer" unique_id=1957992747 instance=ExtResource("3")]
+layout_mode = 2
+
+[node name="NoChangesLabel" type="Label" parent="MainPanel/OuterScroll/VBox/BodyRow/StatsColumn" unique_id=1508427243]
+unique_name_in_owner = true
+visible = false
+modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "(no stat changes - growth was already applied)"
+autowrap_mode = 2
+
+[node name="PassivesColumn" type="VBoxContainer" parent="MainPanel/OuterScroll/VBox/BodyRow" unique_id=1375507569]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.7
+theme_override_constants/separation = 8
+
+[node name="PassiveChoicesHeaderRow" type="HBoxContainer" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn" unique_id=325949498]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderLabel" type="Label" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn/PassiveChoicesHeaderRow" unique_id=2061543494]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Passive Choices"
+
+[node name="PendingPill" type="Label" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn/PassiveChoicesHeaderRow" unique_id=602696021]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.32, 1)
+theme_override_font_sizes/font_size = 22
+text = "+1"
+
+[node name="LeftSpacer" type="Control" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn/PassiveChoicesHeaderRow" unique_id=2040736433]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CancelButton" type="Panel" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn/PassiveChoicesHeaderRow" unique_id=1401577041]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(110, 36)
+layout_mode = 2
+mouse_filter = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panelbtn_normal")
+
+[node name="CancelLabel" type="Label" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn/PassiveChoicesHeaderRow/CancelButton" unique_id=359953667]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "Cancel"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConfirmButton" type="Panel" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn/PassiveChoicesHeaderRow" unique_id=1117534976]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+mouse_filter = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_confirm_normal")
+
+[node name="ConfirmLabel" type="Label" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn/PassiveChoicesHeaderRow/ConfirmButton" unique_id=182547348]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "Confirm"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightSpacer" type="Control" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn/PassiveChoicesHeaderRow" unique_id=2056460590]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HintLabel" type="Label" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn/PassiveChoicesHeaderRow" unique_id=1399070958]
+modulate = Color(0.6, 0.6, 0.6, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Ctrl+Click to allocate immediately"
+
+[node name="PassiveChoicesArea" type="Control" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn" unique_id=1565006308]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PlaceholderLabel" type="Label" parent="MainPanel/OuterScroll/VBox/BodyRow/PassivesColumn/PassiveChoicesArea" unique_id=473167087]
+modulate = Color(0.6, 0.6, 0.6, 1)
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "[ passive tree view mounts here ]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PanelButtonStyleNormal" type="Node" parent="." unique_id=1717190385]
+metadata/_normal_style = SubResource("StyleBoxFlat_panelbtn_normal")
+metadata/_hover_style = SubResource("StyleBoxFlat_panelbtn_hover")
+metadata/_confirm_style = SubResource("StyleBoxFlat_confirm_normal")

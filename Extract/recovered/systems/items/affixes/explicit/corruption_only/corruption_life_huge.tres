@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckf2e0ljtmtxg" path="res://systems/items/affixes/AffixValueTier.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_corr_life"]
+script = ExtResource("2")
+min_value = 40.0
+max_value = 70.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[resource]
+script = ExtResource("1")
+affix_id = "corruption_life_huge"
+display_name = "Life"
+is_prefix = true
+valid_on_helmet = true
+valid_on_gloves = true
+valid_on_boots = true
+valid_on_chest = true
+valid_on_ring = true
+valid_on_amulet = true
+valid_on_belt = true
+custom_tags = ["corruption_only"]
+spawn_weight = 0
+stat_type = "life"
+use_tier_helper = true
+value_tiers = [SubResource("Resource_corr_life")]
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

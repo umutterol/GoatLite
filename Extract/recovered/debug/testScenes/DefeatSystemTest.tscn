@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dqtuqnytrfowg"]
+
+[ext_resource type="Script" uid="uid://piih1hrniop5" path="res://debug/testScenes/DefeatSystemTest.gd" id="1"]
+
+[node name="DefeatSystemTest" type="Node2D" unique_id=1051036190]
+script = ExtResource("1")

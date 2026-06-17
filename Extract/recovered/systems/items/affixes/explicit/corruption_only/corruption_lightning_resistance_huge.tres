@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckf2e0ljtmtxg" path="res://systems/items/affixes/AffixValueTier.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_corr_lit"]
+script = ExtResource("2")
+min_value = 30.0
+max_value = 50.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[resource]
+script = ExtResource("1")
+affix_id = "corruption_lightning_resistance_huge"
+display_name = "Lightning Resistance"
+is_suffix = true
+valid_on_helmet = true
+valid_on_gloves = true
+valid_on_boots = true
+valid_on_chest = true
+valid_on_ring = true
+valid_on_amulet = true
+valid_on_belt = true
+valid_on_rucksack = true
+valid_on_focus = true
+valid_on_shield = true
+custom_tags = ["corruption_only"]
+spawn_weight = 0
+stat_type = "lightning_resistance"
+value_suffix = "%"
+use_tier_helper = true
+value_tiers = [SubResource("Resource_corr_lit")]
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://04i1jo4aem53"]
+
+[ext_resource type="Script" uid="uid://fgjb7y8nc26e" path="res://gameUI/recruitment/RaftPanel.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_raft"]
+content_margin_left = 14.0
+content_margin_top = 14.0
+content_margin_right = 14.0
+content_margin_bottom = 14.0
+bg_color = Color(0.06, 0.06, 0.07, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.35, 0.25, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="RaftPanel" type="PanelContainer" unique_id=61152078]
+custom_minimum_size = Vector2(800, 700)
+theme_override_styles/panel = SubResource("StyleBoxFlat_raft")
+script = ExtResource("1")
+
+[node name="Layout" type="VBoxContainer" parent="." unique_id=1923752824]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="Layout" unique_id=703920701]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.78, 1)
+theme_override_font_sizes/font_size = 20
+text = "Raft"
+horizontal_alignment = 1
+
+[node name="RecruitsRow" type="HBoxContainer" parent="Layout" unique_id=681171917]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="JoinButton" type="Button" parent="Layout" unique_id=179382269]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_font_sizes/font_size = 24
+text = "Join This Raft"

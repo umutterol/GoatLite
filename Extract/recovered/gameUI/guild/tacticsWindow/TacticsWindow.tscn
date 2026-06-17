@@ -1,0 +1,195 @@
+[gd_scene format=3 uid="uid://b8uactcs7w001"]
+
+[ext_resource type="Script" uid="uid://cbtv5v4u6f4qf" path="res://gameUI/guild/tacticsWindow/TacticsWindow.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://dj5o1hcpdda23" path="res://assets/ui/close_button.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://bf65nhtsly1i8" path="res://assets/sprites/uiSprites/CloseXIcon.tres" id="3"]
+[ext_resource type="Script" uid="uid://j6hfajtypepq" path="res://gameUI/tooltips/TooltipHover.gd" id="4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tactics_modal"]
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 14.0
+bg_color = Color(0.11, 0.1, 0.08, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.42, 0.28, 0.95)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="TacticsWindow" type="CanvasLayer" unique_id=680474188]
+layer = 50
+script = ExtResource("1")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=1626034289]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="ModalCenter" type="CenterContainer" parent="." unique_id=2004078372]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ModalPanel" type="PanelContainer" parent="ModalCenter" unique_id=2041184055]
+custom_minimum_size = Vector2(720, 580)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tactics_modal")
+
+[node name="Layout" type="VBoxContainer" parent="ModalCenter/ModalPanel" unique_id=987550890]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="ModalCenter/ModalPanel/Layout" unique_id=112957609]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TacticsTitleLabel" type="RichTextLabel" parent="ModalCenter/ModalPanel/Layout/Header" unique_id=1084950773]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_font_sizes/mono_font_size = 30
+bbcode_enabled = true
+text = "[code]Tactics[/code]"
+fit_content = true
+scroll_active = false
+vertical_alignment = 1
+
+[node name="TacticsCloseButton" parent="ModalCenter/ModalPanel/Layout/Header" unique_id=950192421 instance=ExtResource("2")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_horizontal = 8
+icon = ExtResource("3")
+
+[node name="KiteProfileRow" type="HBoxContainer" parent="ModalCenter/ModalPanel/Layout" unique_id=461591419]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="KiteProfileLabel" type="Label" parent="ModalCenter/ModalPanel/Layout/KiteProfileRow" unique_id=1343623387]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "Kite Profile"
+
+[node name="KiteProfileOption" type="OptionButton" parent="ModalCenter/ModalPanel/Layout/KiteProfileRow" unique_id=181321280]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TooltipHover" type="Node" parent="ModalCenter/ModalPanel/Layout/KiteProfileRow/KiteProfileOption" unique_id=1628262864]
+script = ExtResource("4")
+keyword = "kite_profile"
+
+[node name="RulesSectionLabel" type="RichTextLabel" parent="ModalCenter/ModalPanel/Layout" unique_id=512975988]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+theme_override_font_sizes/mono_font_size = 18
+bbcode_enabled = true
+text = "[code]Target Priority Rules[/code]"
+fit_content = true
+scroll_active = false
+
+[node name="TooltipHover" type="Node" parent="ModalCenter/ModalPanel/Layout/RulesSectionLabel" unique_id=2086805726]
+script = ExtResource("4")
+keyword = "target_priority_rules"
+
+[node name="RulesScroll" type="ScrollContainer" parent="ModalCenter/ModalPanel/Layout" unique_id=1477341080]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="RulesVBox" type="VBoxContainer" parent="ModalCenter/ModalPanel/Layout/RulesScroll" unique_id=998558728]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="NoRulesPlaceholder" type="Label" parent="ModalCenter/ModalPanel/Layout/RulesScroll/RulesVBox" unique_id=1255469166]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.6, 0.45, 0.7)
+text = "No rules — fallback picker below decides every target. Add rules to layer priorities on top."
+
+[node name="AddRuleRow" type="HBoxContainer" parent="ModalCenter/ModalPanel/Layout" unique_id=1469460467]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AddRuleButton" type="Button" parent="ModalCenter/ModalPanel/Layout/AddRuleRow" unique_id=2048396104]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 30)
+layout_mode = 2
+text = "+ Add Rule"
+
+[node name="AddRuleSpacer" type="Control" parent="ModalCenter/ModalPanel/Layout/AddRuleRow" unique_id=1154854247]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FallbackRow" type="HBoxContainer" parent="ModalCenter/ModalPanel/Layout" unique_id=213200941]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FallbackLabel" type="Label" parent="ModalCenter/ModalPanel/Layout/FallbackRow" unique_id=375219463]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "Fallback (always last)"
+
+[node name="FallbackPickerOption" type="OptionButton" parent="ModalCenter/ModalPanel/Layout/FallbackRow" unique_id=717540570]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TooltipHover" type="Node" parent="ModalCenter/ModalPanel/Layout/FallbackRow/FallbackPickerOption" unique_id=1799707200]
+script = ExtResource("4")
+keyword = "fallback_picker"
+
+[node name="LockOnRow" type="HBoxContainer" parent="ModalCenter/ModalPanel/Layout" unique_id=1145089677]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LockOnLabel" type="Label" parent="ModalCenter/ModalPanel/Layout/LockOnRow" unique_id=2003869952]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+text = "Target Lock-On"
+
+[node name="TargetLockOption" type="OptionButton" parent="ModalCenter/ModalPanel/Layout/LockOnRow" unique_id=486091194]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TooltipHover" type="Node" parent="ModalCenter/ModalPanel/Layout/LockOnRow/TargetLockOption" unique_id=140145455]
+script = ExtResource("4")
+keyword = "target_lock"
+
+[node name="Spacer" type="Control" parent="ModalCenter/ModalPanel/Layout" unique_id=224883197]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Footer" type="HBoxContainer" parent="ModalCenter/ModalPanel/Layout" unique_id=2052676688]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+alignment = 2
+
+[node name="TacticsResetButton" type="Button" parent="ModalCenter/ModalPanel/Layout/Footer" unique_id=634659821]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 32)
+layout_mode = 2
+text = "Reset to gear default"

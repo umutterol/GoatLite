@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3 uid="uid://cactspdacakqr"]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "action_speed"
+display_name = "Action Speed"
+description = "Global multiplier applied AFTER other speed calcs to BOTH attack and movement speed. Used by CombatantData.get_attack_interval (effective_speed = attack_speed * action_speed) and the movement_speed formula. Default 1.0 = normal; 0.92 = 8% slower; 0.0 = frozen (cannot act)."
+category = 3
+default_value = 1.0
+min_value = 0.0
+max_value = 100.0
+decimal_places = 1
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

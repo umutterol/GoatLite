@@ -1,0 +1,199 @@
+[gd_scene format=3 uid="uid://bmcard000001"]
+
+[ext_resource type="Script" uid="uid://bggy2nihriqr3" path="res://gameUI/missions/MissionCard.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://ckdfy3nugcff5" path="res://assets/fonts/Fontin-SmallCaps.otf" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mcard_bg"]
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+bg_color = Color(0.09, 0.08, 0.06, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.32, 0.22, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mcard_bg_unique"]
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+bg_color = Color(0.1, 0.07, 0.05, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.82, 0.435, 0.11, 0.95)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mcard_bg_rare"]
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+bg_color = Color(0.1, 0.09, 0.06, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.851, 0.729, 0.071, 0.95)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iconbox"]
+bg_color = Color(0.05, 0.045, 0.04, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.24, 0.16, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mcol"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+bg_color = Color(0.06, 0.05, 0.04, 0.6)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.24, 0.16, 0.7)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="MissionCard" type="PanelContainer" unique_id=2060573381]
+custom_minimum_size = Vector2(0, 140)
+theme_override_styles/panel = SubResource("StyleBoxFlat_mcard_bg")
+script = ExtResource("1")
+default_style = SubResource("StyleBoxFlat_mcard_bg")
+unique_style = SubResource("StyleBoxFlat_mcard_bg_unique")
+rare_style = SubResource("StyleBoxFlat_mcard_bg_rare")
+
+[node name="Row" type="HBoxContainer" parent="." unique_id=377517895]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="IconBox" type="PanelContainer" parent="Row" unique_id=1249159755]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_iconbox")
+
+[node name="IconRect" type="TextureRect" parent="Row/IconBox" unique_id=1030621657]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Info" type="VBoxContainer" parent="Row" unique_id=377521107]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="TitleRow" type="HBoxContainer" parent="Row/Info" unique_id=991394878]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="RichTextLabel" parent="Row/Info/TitleRow" unique_id=750007897]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_font_sizes/mono_font_size = 24
+bbcode_enabled = true
+text = "[code]Mission Name[/code]"
+fit_content = true
+scroll_active = false
+
+[node name="RecommendedLevelLabel" type="Label" parent="Row/Info/TitleRow" unique_id=1196274586]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_colors/font_color = Color(0.78, 0.72, 0.6, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 18
+text = "Recommended Level: —"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="Row/Info" unique_id=1430539060]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.66, 0.55, 1)
+theme_override_font_sizes/font_size = 18
+text = "— encounters"
+
+[node name="TimeoutLabel" type="Label" parent="Row/Info" unique_id=1730660096]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.74, 0.32, 1)
+theme_override_font_sizes/font_size = 16
+text = "— days remaining"
+
+[node name="DescriptionLabel" type="RichTextLabel" parent="Row/Info" unique_id=151033546]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.86, 0.82, 0.74, 1)
+theme_override_font_sizes/normal_font_size = 18
+bbcode_enabled = true
+text = "Mission description goes here. Autowraps to fit available width."
+fit_content = true
+scroll_active = false
+
+[node name="MonstersColumn" type="PanelContainer" parent="Row" unique_id=1258023272]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_mcol")
+
+[node name="MonstersBox" type="VBoxContainer" parent="Row/MonstersColumn" unique_id=227115866]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 4
+
+[node name="MonstersHeader" type="Label" parent="Row/MonstersColumn/MonstersBox" unique_id=203372754]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.72, 0.6, 1)
+theme_override_font_sizes/font_size = 16
+text = "Known Monsters"
+
+[node name="MonstersList" type="VBoxContainer" parent="Row/MonstersColumn/MonstersBox" unique_id=1332210383]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="EmbarkButton" type="Button" parent="Row" unique_id=1771892509]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+disabled = true
+text = "Embark"

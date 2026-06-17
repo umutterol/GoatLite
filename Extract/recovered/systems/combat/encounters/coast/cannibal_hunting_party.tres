@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3 uid="uid://d2qm2f3n2bjrw"]
+
+[ext_resource type="Resource" uid="uid://be1qujh1lbmm2" path="res://systems/monsters/normal/cannibal.tres" id="1"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="2"]
+[ext_resource type="Resource" uid="uid://dwqs4n3khbj" path="res://systems/monsters/normal/cannibal_firebreather.tres" id="3"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="4"]
+
+[sub_resource type="Resource" id="Resource_mnw3n"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 4
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_dcrfm"]
+script = ExtResource("2")
+monster = ExtResource("3")
+count = 2
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_a1pas"]
+script = ExtResource("2")
+monster = ExtResource("3")
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_iqw23"]
+script = ExtResource("2")
+monster = ExtResource("1")
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[resource]
+script = ExtResource("4")
+encounter_id = "cannibal_hunting_party"
+display_name = "Cannibal Hunting Party"
+description = "THEY HUNGY"
+area_tags = [0]
+tags = [0]
+monster_spawns = [SubResource("Resource_mnw3n"), SubResource("Resource_dcrfm"), SubResource("Resource_a1pas"), SubResource("Resource_iqw23")]
+recommended_level = 3
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"

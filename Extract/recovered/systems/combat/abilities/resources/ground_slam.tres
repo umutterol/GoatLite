@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="MonsterAbility" format=3]
+
+[ext_resource type="Script" uid="uid://dmetojbdk5sls" path="res://systems/combat/abilities/MonsterAbility.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_id = "ground_slam"
+display_name = "Ground Slam"
+icon = null
+description = "Caster slams the ground at their feet, hitting all enemies within a 3m radius. Brief wind-up gives nearby targets a chance to step out."
+shape = 3
+aoe_size = 3.0
+cooldown_seconds = 4.0
+wind_up_seconds = 0.5
+recovery_seconds = 0.3
+damage_scaling = 1.5
+execute_vfx = null
+impact_vfx = null
+telegraph_vfx = null

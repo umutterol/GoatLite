@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://b2pkdwwqp22uy"]
+
+[ext_resource type="Texture2D" uid="uid://bncw1w2u75ny3" path="res://assets/sprites/itemSprites/gearSprites/armorSprites/Rotted_Round_Shield_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_cadb3"]
+script = ExtResource("2")
+affix_id = "shieldaspdpenalty"
+display_name = "Attack Speed"
+is_implicit = true
+stat_type = "attack_speed"
+modifier_type = 2
+min_value = 4.0
+max_value = 8.0
+value_prefix = ""
+value_suffix = "%"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "barrel_lid"
+display_name = "Barrel Lid"
+description = "The top of a barrel with rope looped through two sets of holes to form a rough hand hold and arm strap. "
+icon = ExtResource("1")
+category = 2
+grid_width = 2
+grid_height = 2
+movement = -5
+base_block_chance_min = 8
+base_block_chance_max = 12
+base_block_amount_min = 5
+base_block_amount_max = 11
+implicit_affixes = [SubResource("Resource_cadb3")]
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

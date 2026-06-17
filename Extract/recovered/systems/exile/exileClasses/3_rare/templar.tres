@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="ClassDefinition" format=3 uid="uid://dyhqln2o5fgp6"]
+
+[ext_resource type="Script" uid="uid://btjm4jmsenevr" path="res://systems/exile/stats/ConditionalStatBonus.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://csemtnlvgh1er" path="res://systems/exile/exileClasses/3_rare/templaricon.webp" id="2"]
+[ext_resource type="Script" uid="uid://diftkoyemu6om" path="res://systems/exile/exileClasses/ClassDefinition.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_fpiyp"]
+script = ExtResource("1")
+condition_type = 5
+condition_threshold = 90.0
+stat_id = "chaos_resistance"
+scaling_type = 2
+base_value = 50.0
+metadata/_custom_type_script = "uid://btjm4jmsenevr"
+
+[sub_resource type="Resource" id="Resource_2a03n"]
+script = ExtResource("1")
+condition_type = 6
+condition_threshold = 25.0
+stat_id = "chaos_resistance"
+scaling_type = 4
+base_value = 50.0
+metadata/_custom_type_script = "uid://btjm4jmsenevr"
+
+[resource]
+script = ExtResource("3")
+class_id = "templar"
+name = "Templar"
+description = "Sworn to root and out destroy corruption. Exiled because they took their oath more seriously than their brothers and sisters."
+rarity = 2
+icon = ExtResource("2")
+override_life = 100.0
+override_vitality = 100.0
+override_physical_damage = Vector2(2, 4)
+override_chaos_resistance = 25.0
+percent_stat_ids = ["fire_damage", "chaos_resistance_cap"]
+percent_stat_values = [20.0, 1.0]
+potential_tags = ["templar", "fire_damage", "chaos_resistance"]
+potential_values = [3.0, 1.5, 1.5]
+incompatible_trait_ids = ["corrupt", "coward"]
+conditional_bonuses = [SubResource("Resource_fpiyp"), SubResource("Resource_2a03n")]
+metadata/_custom_type_script = "uid://diftkoyemu6om"

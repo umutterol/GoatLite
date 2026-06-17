@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ClassDefinition" format=3 uid="uid://b2r4rjbhej1u0"]
+
+[ext_resource type="Texture2D" uid="uid://n746bmkw8i2x" path="res://systems/exile/exileClasses/2_uncommon/rangericon.webp" id="1"]
+[ext_resource type="Script" uid="uid://diftkoyemu6om" path="res://systems/exile/exileClasses/ClassDefinition.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+class_id = "ranger"
+name = "Ranger"
+description = "Exiled themselves long before it was made a formality."
+rarity = 1
+icon = ExtResource("1")
+override_life = 85.0
+override_vitality = 120.0
+override_physical_damage = Vector2(1, 4)
+override_critical_chance = 7.0
+override_evasion = 25.0
+override_scouting = 15.0
+override_movement = 15.0
+life_per_level = 7.0
+vitality_per_level = 10.0
+percent_stat_ids = ["evasion", "critical_chance"]
+percent_stat_values = [1.0, 1.0]
+potential_tags = ["ranger", "evasion", "critical", "scouting"]
+potential_values = [2.5, 1.5, 1.0, 1.0]
+incompatible_trait_ids = ["oaf"]
+metadata/_custom_type_script = "uid://diftkoyemu6om"

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BasicAttackAbility" format=3]
+
+[ext_resource type="Script" uid="uid://isvvyxteqqmf" path="res://systems/combat/abilities/builtins/BasicAttackAbility.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_id = "basic_attack"
+display_name = "Basic Attack"
+icon = null
+description = "The combatant's default auto-attack. Uses CombatBehavior.attack_range for reach and stats.attack_speed for cadence, dealing the monster's full base damage mix unchanged."
+cooldown_seconds = 0.0
+execute_vfx = null
+impact_vfx = null
+telegraph_vfx = null

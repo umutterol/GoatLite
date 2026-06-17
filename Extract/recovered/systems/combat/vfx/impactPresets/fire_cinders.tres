@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="HitImpactFX" format=3 uid="uid://b1ps4xchfbalg"]
+
+[ext_resource type="Script" uid="uid://1t3ktnqe5b5j" path="res://systems/combat/vfx/HitImpactFX.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+particle_style = 2
+decay_mode = 1
+color_inner = Color(1, 0.9, 0.5, 1)
+color_outer = Color(0.55, 0.18, 0.05, 0.9)
+particle_count = 9
+lifetime_seconds = 0.7
+speed_min = 1.0
+speed_max = 4.5
+angle_spread_radians = 1.65
+direction_bias_radians = -0.3415926535897902
+gravity = 0.0
+particle_radius_max = 1.6
+glow = true
+crit_multiplier = 2.0
+curl_frequency = 5.0

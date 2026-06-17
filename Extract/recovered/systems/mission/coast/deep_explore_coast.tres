@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://ykgv2khe5vph"]
+
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="1"]
+[ext_resource type="Script" uid="uid://bl1n406v551lg" path="res://systems/mission/ProgressionRequirement.gd" id="2"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_cf5it"]
+script = ExtResource("1")
+encounter = null
+area_filter = [0]
+excluded_tags = [0]
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_ro5mp"]
+script = ExtResource("1")
+encounter = null
+area_filter = [0]
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_i7s4v"]
+script = ExtResource("1")
+encounter = null
+area_filter = [0]
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_c6f2o"]
+script = ExtResource("2")
+mission_id = "explore_coast"
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[sub_resource type="Resource" id="Resource_3n0h4"]
+script = ExtResource("2")
+type = 2
+required_value = 2.0
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[resource]
+script = ExtResource("3")
+mission_id = "deep_explore_coast"
+display_name = "Scouting Expedition"
+description = "Longer, more dangerous scouting expeditions to find better opportunities. To rest is to stagnate. Scouting runs like this are fairly safe, provided the party retreats if they're getting too battered."
+icon = null
+level = 3
+mission_tags = [1]
+prerequisites = [SubResource("Resource_c6f2o"), SubResource("Resource_3n0h4")]
+mission_length = 3
+encounter_slots = [SubResource("Resource_cf5it"), SubResource("Resource_ro5mp"), SubResource("Resource_i7s4v")]
+scouting_reward = 12.0
+rarity_bonus = 0.05
+quantity_bonus = 0.1
+mission_rewards = null
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://ir0pgevu50jq"]
+
+[ext_resource type="Texture2D" uid="uid://wals10mqheu4" path="res://assets/sprites/itemSprites/gearSprites/armorSprites/cracked_leather_gloves.png" id="1"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+item_id = "cracked_leather_gloves"
+display_name = "Cracked Leather Gloves"
+description = "Old work gloves, the leather split at every knuckle. Better than bare hands. Barely."
+icon = ExtResource("1")
+category = 0
+armour_type = 3
+grid_width = 2
+grid_height = 2
+base_evasion_min = 1
+base_evasion_max = 3
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

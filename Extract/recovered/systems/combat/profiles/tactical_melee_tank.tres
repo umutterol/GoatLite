@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TacticalProfile" format=3 uid="uid://crybkt61dtakc"]
+
+[ext_resource type="Script" uid="uid://djr2nsux711tk" path="res://systems/combat/profiles/TacticalProfile.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+sticky_target_duration = 1.0
+engaged_target_distance_discount = 0.6
+melee_threat_memory_duration = 0.0
+kite_settle_duration = 0.0

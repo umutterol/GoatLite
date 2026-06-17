@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://choarfrost001"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_ch_eff"]
+script = ExtResource("2")
+stat_id = "chill_effect_more_pct"
+base_value = 20.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_cold_dmg"]
+script = ExtResource("2")
+stat_id = "cold_damage"
+scaling_type = 1
+base_value = 10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "hoarfrost_grasp"
+name = "Hoarfrost Grasp"
+description = "A cold that climbs through the limbs and locks them mid-step."
+passive_type = 1
+icon = null
+stat_tags = ["chill", "cold_damage"]
+theme_tags = ["elementalist"]
+category_tags = ["offence", "elemental_damage"]
+primary_tag = "chill"
+stat_bonuses = [SubResource("Resource_ch_eff"), SubResource("Resource_cold_dmg")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

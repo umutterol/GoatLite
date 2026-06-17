@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://do10gu82h5mey"]
+
+[ext_resource type="Resource" uid="uid://d0qjrkgj5ny0l" path="res://systems/combat/vfx/presets/spear_stabVFX.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://ek8yt5sywqwx" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Stiletto_inventory_icon.png" id="2"]
+[ext_resource type="Resource" uid="uid://dgf4esahcivmh" path="res://systems/items/affixes/implicit/poison_chance_dagger.tres" id="3"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="4"]
+
+[resource]
+script = ExtResource("4")
+item_id = "tainted_stiletto"
+display_name = "Tainted Stiletto"
+description = "A needle-thin blade that's never been cleaned, likely on purpose."
+icon = ExtResource("2")
+weapon_type = 7
+min_item_level = 3
+required_level = 3
+grid_height = 2
+base_physical_damage_min = 2
+base_physical_damage_max = 7
+base_attack_speed = 1.4
+base_critical_chance = 11.0
+implicit_affixes = [ExtResource("3")]
+attack_vfx = ExtResource("1")
+metadata/_custom_type_script = "uid://cetys5ykyhird"

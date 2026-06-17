@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="TacticalProfile" format=3 uid="uid://1xev7ng6fbxl"]
+
+[ext_resource type="Script" uid="uid://djr2nsux711tk" path="res://systems/combat/profiles/TacticalProfile.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+melee_threat_memory_duration = 2.0

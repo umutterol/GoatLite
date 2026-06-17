@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dl6bkkexq0en1"]
+
+[ext_resource type="Script" uid="uid://vsg1a37no7xy" path="res://debug/testScenes/itemTests/ItemGeneratorTest.gd" id="1"]
+
+[node name="ItemGeneratorTest" type="Node" unique_id=2097118571]
+script = ExtResource("1")

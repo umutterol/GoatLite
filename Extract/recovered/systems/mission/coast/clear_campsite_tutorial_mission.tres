@@ -1,0 +1,71 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://cicbje6hbtk6y"]
+
+[ext_resource type="Resource" uid="uid://cyor2ko1xxwb3" path="res://systems/monsters/normal/sand_spitter.tres" id="1"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="2"]
+[ext_resource type="Resource" uid="uid://b5joof8v7fvus" path="res://systems/monsters/normal/zombie.tres" id="3"]
+[ext_resource type="Resource" uid="uid://bhn7tpioc7qfi" path="res://systems/monsters/normal/barrel.tres" id="4"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="5"]
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="6"]
+[ext_resource type="Resource" uid="uid://cifbo2soflwj3" path="res://systems/items/itemBases/offhand/shield/cooking_pot_lid.tres" id="7"]
+[ext_resource type="Resource" uid="uid://bmn5l3g8q3t1s" path="res://systems/items/itemBases/armour/helmet/bucket.tres" id="8"]
+[ext_resource type="Resource" uid="uid://vds17u60ya20" path="res://systems/items/itemBases/armour/chest/tattered_rags.tres" id="9"]
+[ext_resource type="Script" uid="uid://1jao5grkeqsb" path="res://systems/mission/MissionReward.gd" id="10"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="11"]
+
+[sub_resource type="Resource" id="Resource_fhgr1"]
+script = ExtResource("2")
+monster = ExtResource("1")
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_r8r7p"]
+script = ExtResource("2")
+monster = ExtResource("3")
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_kpv77"]
+script = ExtResource("2")
+monster = ExtResource("1")
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_0wce2"]
+script = ExtResource("2")
+monster = ExtResource("4")
+count = 2
+position_hint = 3
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_7ju0a"]
+script = ExtResource("5")
+encounter_id = "campsiteclear"
+display_name = "Clearing the Campsite"
+monster_spawns = [SubResource("Resource_fhgr1"), SubResource("Resource_r8r7p"), SubResource("Resource_kpv77"), SubResource("Resource_0wce2")]
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"
+
+[sub_resource type="Resource" id="Resource_3aaty"]
+script = ExtResource("6")
+slot_type = 0
+encounter = SubResource("Resource_7ju0a")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_7wyxd"]
+script = ExtResource("10")
+chaos_amount = 1
+food_amount = 4
+scrap_amount = 2
+exalt_amount = 1
+guaranteed_item_bases = [ExtResource("7"), ExtResource("8"), ExtResource("9")]
+metadata/_custom_type_script = "uid://1jao5grkeqsb"
+
+[resource]
+script = ExtResource("11")
+mission_id = "clear_campsite_tutorial_mission"
+display_name = "Clear the Campsite"
+description = "This former campsite could be a relatively good place for our guild to set up shop. But there's a few nasties prowling around. We should also see what loot is in the area for us to use."
+icon = null
+mission_tags = [1]
+availability_type = 1
+encounter_slots = [SubResource("Resource_3aaty")]
+mission_rewards = SubResource("Resource_7wyxd")
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

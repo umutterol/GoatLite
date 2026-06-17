@@ -1,0 +1,17 @@
+{
+  "_note": "INSTANCE / save data — recruited characters, not content. References specs.json + traits.json by id.",
+  "keystone": { "dungeonId": "ashveil-crypts", "level": 12, "best": 14, "rating": 2184 },
+  "wallet": { "gold": 14820, "emblem": 96, "shard": 213 },
+  "week": { "number": 7, "affixes": ["fortified", "bursting", "spiteful"] },
+  "roster": [
+    { "id": "m1", "name": "Grymdark",   "title": "the Unkillable", "specId": "guardian",   "ilvl": 162, "morale": 84, "portrait": "orc-hero-1",    "traitIds": ["prog-andy", "battle-hardened"], "note": "Main tank. Refuses to die out of spite." },
+    { "id": "m2", "name": "Svenrik",    "title": "the Mender",     "specId": "cleric",     "ilvl": 159, "morale": 41, "portrait": "human-hero-2",  "traitIds": ["boomer", "survivors-guilt"], "note": "Stood in Sanguine. Again. Morale is fragile." },
+    { "id": "m3", "name": "Kaelthri",   "title": "Ninety-Nine",    "specId": "assassin",   "ilvl": 165, "morale": 73, "portrait": "elf-hero-1",    "traitIds": ["jenkins", "cracked"], "note": "Parses 99. Toxic in party chat. Worth it?" },
+    { "id": "m4", "name": "Mournhollow","title": "the Spiteful",   "specId": "pyromancer", "ilvl": 158, "morale": 67, "portrait": "undead-hero-2", "traitIds": ["loot-goblin", "mechanic-master"] },
+    { "id": "m5", "name": "Bramblewen", "title": "Evergreen",      "specId": "lifebinder", "ilvl": 156, "morale": 90, "portrait": "elf-hero-3",    "traitIds": ["duo-queue", "redemption-arc"], "note": "High morale carry. Keep her happy." },
+    { "id": "m6", "name": "Dolgrun",    "title": "Pickaxe",        "specId": "berserker",  "ilvl": 160, "morale": 58, "portrait": "orc-hero-3",    "traitIds": ["drama-queen", "second-wind"] },
+    { "id": "m7", "name": "Sister Vael","title": "the Measured",   "specId": "crusader",   "ilvl": 154, "morale": 77, "portrait": "human-hero-1",  "traitIds": ["casual-andy"], "note": "Off-tank insurance for Tyrannical weeks." },
+    { "id": "m8", "name": "Quillane",   "title": "Off-Beat",       "specId": "bard",       "ilvl": 151, "morale": 62, "portrait": "human-peasant", "traitIds": ["solo-player"], "note": "Bench. Tactics barely land on him." },
+    { "id": "m9", "name": "Threnody",   "title": "the Silencer",   "specId": "arcanist",   "ilvl": 149, "morale": 70, "portrait": "undead-hero-1", "traitIds": ["cocky"], "note": "Bench. New recruit, two hidden potentials." }
+  ]
+}

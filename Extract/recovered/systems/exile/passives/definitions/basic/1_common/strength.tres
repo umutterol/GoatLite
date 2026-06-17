@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://ts1uj1irbv3v"]
+
+[ext_resource type="Texture2D" uid="uid://j36lr2nw2281" path="res://systems/exile/passives/definitions/basic/1_common/stricon.webp" id="1"]
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="2"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_ledbv"]
+script = ExtResource("3")
+stat_id = "life"
+base_value = 10.0
+value_per_stack = 10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_68myo"]
+script = ExtResource("3")
+stat_id = "physical_damage"
+scaling_type = 1
+base_value = 10.0
+value_per_stack = 10.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("2")
+passive_id = "strength"
+name = "Strength"
+description = "Might makes right."
+icon = ExtResource("1")
+max_stacks = 5
+stat_tags = ["life", "physical_damage"]
+theme_tags = ["warrior"]
+category_tags = ["core", "offence"]
+primary_tag = "warrior"
+stat_bonuses = [SubResource("Resource_ledbv"), SubResource("Resource_68myo")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

@@ -1,0 +1,14 @@
+[
+  { "id": "bastion-of-the-barrow-march", "name": "Bastion of the Barrow March", "slot": "weapon",  "specs": ["guardian"],                          "note": "sword and shield" },
+  { "id": "scepter-of-quiet-rest",       "name": "Scepter of Quiet Rest",       "slot": "weapon",  "specs": ["cleric"] },
+  { "id": "ashveil-cleaver",             "name": "Ashveil Cleaver",             "slot": "weapon",  "specs": ["berserker"],                         "note": "two-handed axe" },
+  { "id": "faceguard-of-interred-kings", "name": "Faceguard of Interred Kings", "slot": "helm",    "specs": ["guardian", "berserker"] },
+  { "id": "pale-mitre-of-ashveil",       "name": "Pale Mitre of Ashveil",       "slot": "helm",    "specs": ["cleric"] },
+  { "id": "cuirass-of-interred-kings",   "name": "Cuirass of Interred Kings",   "slot": "chest",   "specs": ["guardian", "berserker"] },
+  { "id": "shroudweave-vestments",       "name": "Shroudweave Vestments",       "slot": "chest",   "specs": ["cleric"] },
+  { "id": "legplates-of-the-barrow-march","name": "Legplates of the Barrow March","slot": "legs",  "specs": ["guardian", "berserker"] },
+  { "id": "shroudweave-leggings",        "name": "Shroudweave Leggings",        "slot": "legs",    "specs": ["cleric"] },
+  { "id": "treads-of-quiet-rest",        "name": "Treads of Quiet Rest",        "slot": "boots",   "specs": ["guardian", "cleric", "berserker"] },
+  { "id": "vial-of-crypt-dust",          "name": "Vial of Crypt Dust",          "slot": "trinket", "specs": ["guardian", "cleric", "berserker"] },
+  { "id": "icon-of-pale-mercy",          "name": "Icon of Pale Mercy",          "slot": "trinket", "specs": ["guardian", "cleric", "berserker"] }
+]

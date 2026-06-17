@@ -1,0 +1,12 @@
+[
+  { "id": "ilvl",        "name": "Item Level",   "category": "primary",   "kind": "flat",    "desc": "Average of the 6 equipped items. Drives HP, output, and healing." },
+  { "id": "power",       "name": "Output",       "category": "core",      "kind": "flat",    "desc": "Per-tick damage (or healing) rate, scaled from item level by role." },
+  { "id": "hp",          "name": "Health",       "category": "core",      "kind": "flat",    "desc": "A character dies when this reaches 0. Scaled from item level by role." },
+  { "id": "mana",        "name": "Mana",         "category": "core",      "kind": "flat",    "cap": 100, "desc": "Healer resource. Long pulls genuinely OOM the healer." },
+  { "id": "morale",      "name": "Morale",       "category": "core",      "kind": "flat",    "cap": 100, "desc": "0-100 mental state. Feeds the output band and the departure roll." },
+  { "id": "armour",      "name": "Armour",       "category": "defensive", "kind": "flat",    "desc": "Tank-only ratio mitigation: reduction = (armour/hit)/(armour/hit+10), cap 0.9." },
+  { "id": "crit",        "name": "Crit",         "category": "secondary", "kind": "percent", "desc": "Raises crit chance in the Hit Quality system." },
+  { "id": "haste",       "name": "Haste",        "category": "secondary", "kind": "percent", "desc": "Phase 2 sim hook — Open Questions." },
+  { "id": "mastery",     "name": "Mastery",      "category": "secondary", "kind": "percent", "desc": "Phase 2 sim hook — Open Questions." },
+  { "id": "versatility", "name": "Versatility",  "category": "secondary", "kind": "percent", "desc": "Raises avoid chance and reduces damage taken." }
+]

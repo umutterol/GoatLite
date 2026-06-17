@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3 uid="uid://d0tr2fe4bhwtc"]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "life_leech"
+display_name = "Life Leech"
+description = "Life recovered when dealing hit damage based on a % of the damage dealt."
+category = 2
+stat_type = 1
+min_value = 0.0
+show_as_percentage = true
+decimal_places = 1
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

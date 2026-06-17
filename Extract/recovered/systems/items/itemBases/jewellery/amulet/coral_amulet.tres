@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://cexnblx0c6bi8"]
+
+[ext_resource type="Texture2D" uid="uid://ltcijnqsjaa8" path="res://assets/sprites/itemSprites/gearSprites/jewellerySprites/Coral_Amulet_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_coralregen"]
+script = ExtResource("2")
+affix_id = "coral_amulet_regen"
+display_name = "Life Regeneration"
+is_implicit = true
+stat_type = "life_regen"
+min_value = 0.4
+max_value = 2.0
+value_suffix = " /s"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "coral_amulet"
+display_name = "Coral Amulet"
+description = "A piece of sea-bleached coral threaded on dried sinew. Said to mend wounds the wearer didn't know they had."
+icon = ExtResource("1")
+category = 1
+jewellery_type = 1
+implicit_affixes = [SubResource("Resource_coralregen")]
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

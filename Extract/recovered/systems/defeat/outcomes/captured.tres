@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DefeatOutcome" format=3 uid="uid://oiu1nxlsgbaf"]
+
+[ext_resource type="Script" uid="uid://l2mo5qh0p5js" path="res://systems/defeat/DefeatOutcome.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+outcome_id = "captured"
+display_name = "Captured"
+description = "Defeated and left without rescue, someone (or something) has taken them..."
+requires_total_wipe = true
+capture_duration_days = 14
+metadata/_custom_type_script = "uid://l2mo5qh0p5js"

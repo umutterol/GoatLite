@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://b2yhcreqcem53"]
+
+[ext_resource type="Script" uid="uid://c6a6vccmdh1t3" path="res://gameUI/smallComponents/ScarredIcon.gd" id="1"]
+[ext_resource type="Script" uid="uid://j6hfajtypepq" path="res://gameUI/tooltips/TooltipHover.gd" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scar"]
+content_margin_left = 4.0
+content_margin_top = 1.0
+content_margin_right = 4.0
+content_margin_bottom = 1.0
+bg_color = Color(0.08, 0.06, 0.1, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7, 0.55, 0.85, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="ScarredIcon" type="PanelContainer" unique_id=62202455]
+custom_minimum_size = Vector2(25, 25)
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_scar")
+script = ExtResource("1")
+
+[node name="Row" type="HBoxContainer" parent="." unique_id=646641508]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Glyph" type="Label" parent="Row" unique_id=811952019]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.7, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+text = "S"
+vertical_alignment = 1
+
+[node name="CountLabel" type="Label" parent="Row" unique_id=612948269]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "1"
+vertical_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="." unique_id=463150497]
+script = ExtResource("2")
+keyword = "scarred"

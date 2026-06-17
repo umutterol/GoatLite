@@ -1,0 +1,485 @@
+[gd_scene format=3 uid="uid://rye65fpx55ak"]
+
+[ext_resource type="Script" uid="uid://biwbkloetuhwb" path="res://gameUI/combat/CombatPlaybackScreen.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://ckdfy3nugcff5" path="res://assets/fonts/Fontin-SmallCaps.otf" id="2"]
+[ext_resource type="PackedScene" uid="uid://ceqwa2twnb4l3" path="res://gameUI/combat/CombatExileCard.tscn" id="3"]
+[ext_resource type="Script" uid="uid://2yh4v7s2v3qk" path="res://gameUI/combat/ArenaDrawer.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://bpji7h4k6f7q1" path="res://assets/ui/combatUiIcons/RewindIcon.tres" id="5"]
+[ext_resource type="Texture2D" uid="uid://dpiu4wjvfh5hf" path="res://assets/ui/combatUiIcons/PlayIcon.tres" id="6"]
+[ext_resource type="Texture2D" uid="uid://cs4qqd6kmxuwf" path="res://assets/ui/combatUiIcons/BackStepIcon.tres" id="7"]
+[ext_resource type="Texture2D" uid="uid://dkt8a21idjlg6" path="res://assets/ui/combatUiIcons/ForwardStepIcon.tres" id="8"]
+[ext_resource type="FontFile" uid="uid://74jdwy1p27fx" path="res://assets/fonts/Fontin-Bold.otf" id="9"]
+[ext_resource type="PackedScene" uid="uid://bwpnicon00001" path="res://gameUI/smallComponents/WeaponTypeIcon.tscn" id="10"]
+[ext_resource type="PackedScene" uid="uid://bxlbar0001egm" path="res://gameUI/smallComponents/ExileBars.tscn" id="11"]
+[ext_resource type="PackedScene" uid="uid://berw30o2ka3om" path="res://gameUI/combat/AilmentPanelStrip.tscn" id="12"]
+[ext_resource type="PackedScene" uid="uid://bnonkwtt0001" path="res://gameUI/tooltips/NonKeywordTooltipPanel.tscn" id="13"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_81pus"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner_normal"]
+content_margin_left = 28.0
+content_margin_top = 10.0
+content_margin_right = 28.0
+content_margin_bottom = 10.0
+bg_color = Color(0, 0, 0, 0.5)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 0.6)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(1, 1, 1, 0.3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner_pressed"]
+content_margin_left = 28.0
+content_margin_top = 10.0
+content_margin_right = 28.0
+content_margin_bottom = 10.0
+bg_color = Color(0, 0, 0, 0.75)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 0.75)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(1, 1, 1, 0.3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner_hover"]
+content_margin_left = 28.0
+content_margin_top = 10.0
+content_margin_right = 28.0
+content_margin_bottom = 10.0
+bg_color = Color(0, 0, 0, 0.6)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(1, 1, 1, 0.3)
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_qidnk"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r6pfb"]
+bg_color = Color(0.078431375, 0.078431375, 0.078431375, 0.8392157)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.54901963, 0.40784314, 0.32156864, 0.8745098)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="CombatPlaybackScreen" type="Control" unique_id=643100086]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+dot_body_alpha = 0.5
+monster_icon_overflow = 2.2
+weapon_overflow_dagger = 1.15
+weapon_overflow_wand = 1.4
+weapon_overflow_staff = 2.5
+offhand_overflow_shield = 1.2
+popup_hold_seconds = 0.1
+popup_start_scale = 0.45
+popup_rise_px = 33.0
+popup_arc_bow_px = 88.0
+popup_arc_flip_horizontal = true
+popup_damage_font_radius_mult = 2.15
+popup_damage_font_min = 35.0
+popup_damage_crit_scale = 1.5
+
+[node name="Background" type="ColorRect" parent="." unique_id=945193348]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03521628, 0.008308405, 3.760215e-09, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1103973641]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer" unique_id=1689399426]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TopBar" type="HBoxContainer" parent="MarginContainer/VBox" unique_id=867816228]
+layout_mode = 2
+
+[node name="MainSplit" type="HBoxContainer" parent="MarginContainer/VBox" unique_id=1509484019]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="InfoandExileRows" type="VBoxContainer" parent="MarginContainer/VBox/MainSplit" unique_id=1795706326]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="EncounterInfo" type="Panel" parent="MarginContainer/VBox/MainSplit/InfoandExileRows" unique_id=1050606640]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBox/MainSplit/InfoandExileRows/EncounterInfo" unique_id=1784318712]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBox/MainSplit/InfoandExileRows/EncounterInfo/MarginContainer" unique_id=1715257979]
+layout_mode = 2
+
+[node name="EncounterName" type="Label" parent="MarginContainer/VBox/MainSplit/InfoandExileRows/EncounterInfo/MarginContainer/VBoxContainer" unique_id=366164804]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 1
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 18
+text = "Encounter Name"
+
+[node name="EncounterLabel" type="Label" parent="MarginContainer/VBox/MainSplit/InfoandExileRows/EncounterInfo/MarginContainer/VBoxContainer" unique_id=1614673637]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_colors/font_color = Color(0.548865, 0.5148047, 0.46176308, 0.8627451)
+theme_override_font_sizes/font_size = 18
+text = "Encounter 1 of 1"
+
+[node name="CombatCard1" parent="MarginContainer/VBox/MainSplit/InfoandExileRows" unique_id=1025833534 instance=ExtResource("3")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 150)
+layout_mode = 2
+
+[node name="CombatCard2" parent="MarginContainer/VBox/MainSplit/InfoandExileRows" unique_id=2077988266 instance=ExtResource("3")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 150)
+layout_mode = 2
+
+[node name="CombatCard3" parent="MarginContainer/VBox/MainSplit/InfoandExileRows" unique_id=1253272545 instance=ExtResource("3")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 150)
+layout_mode = 2
+
+[node name="CombatCard4" parent="MarginContainer/VBox/MainSplit/InfoandExileRows" unique_id=1366118949 instance=ExtResource("3")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 150)
+layout_mode = 2
+
+[node name="CombatCard5" parent="MarginContainer/VBox/MainSplit/InfoandExileRows" unique_id=1500001005 instance=ExtResource("3")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 150)
+layout_mode = 2
+
+[node name="LogBG" type="Panel" parent="MarginContainer/VBox/MainSplit/InfoandExileRows" unique_id=1390784176]
+custom_minimum_size = Vector2(200, 120)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBox/MainSplit/InfoandExileRows/LogBG" unique_id=1003410443]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="EventLog" type="RichTextLabel" parent="MarginContainer/VBox/MainSplit/InfoandExileRows/LogBG/MarginContainer" unique_id=915706726]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_following = true
+
+[node name="Toggles" type="VBoxContainer" parent="MarginContainer/VBox/MainSplit/InfoandExileRows" unique_id=1156962355]
+layout_mode = 2
+theme_override_constants/separation = 1
+
+[node name="MonsterDamageToggle" type="CheckBox" parent="MarginContainer/VBox/MainSplit/InfoandExileRows/Toggles" unique_id=1906381117]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+tooltip_text = "Toggle Monster Damage Output."
+button_pressed = true
+text = "Monster Dmg"
+
+[node name="ExileDamageToggle" type="CheckBox" parent="MarginContainer/VBox/MainSplit/InfoandExileRows/Toggles" unique_id=371766659]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+tooltip_text = "Toggle Exile Damage Output."
+button_pressed = true
+text = "Exile Dmg"
+
+[node name="NonCrits" type="CheckBox" parent="MarginContainer/VBox/MainSplit/InfoandExileRows/Toggles" unique_id=1092281978]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+tooltip_text = "Shows only Critical Strikes (based on Monster and Exile Toggles)."
+text = "Criticals Only"
+
+[node name="LeftColumn" type="VBoxContainer" parent="MarginContainer/VBox/MainSplit" unique_id=1795333010]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="ArenaPanel" type="PanelContainer" parent="MarginContainer/VBox/MainSplit/LeftColumn" unique_id=1310508224]
+custom_minimum_size = Vector2(0, 440)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxEmpty_81pus")
+
+[node name="ArenaDrawer" type="Control" parent="MarginContainer/VBox/MainSplit/LeftColumn/ArenaPanel" unique_id=238132191]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+script = ExtResource("4")
+
+[node name="CombatEndBanner" type="Button" parent="MarginContainer/VBox/MainSplit/LeftColumn/ArenaPanel/ArenaDrawer" unique_id=1878222018]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+tooltip_text = "Continue (Enter)"
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 64
+theme_override_styles/normal = SubResource("StyleBoxFlat_banner_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_banner_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_banner_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_81pus")
+text = "VICTORY"
+
+[node name="ControlsBar" type="HBoxContainer" parent="MarginContainer/VBox/MainSplit/LeftColumn" unique_id=1355186714]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ResetButton" type="Button" parent="MarginContainer/VBox/MainSplit/LeftColumn/ControlsBar" unique_id=1783491074]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+tooltip_text = "Reset (Backspace)"
+focus_mode = 0
+icon = ExtResource("5")
+expand_icon = true
+
+[node name="PlayButton" type="Button" parent="MarginContainer/VBox/MainSplit/LeftColumn/ControlsBar" unique_id=550988239]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+tooltip_text = "Play (Spacebar)"
+focus_mode = 0
+icon = ExtResource("6")
+icon_alignment = 1
+expand_icon = true
+
+[node name="BackButton" type="Button" parent="MarginContainer/VBox/MainSplit/LeftColumn/ControlsBar" unique_id=1010601350]
+visible = false
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+tooltip_text = "Scrub Back (Left Arrowkey)"
+focus_mode = 0
+icon = ExtResource("7")
+expand_icon = true
+
+[node name="ForwardButton" type="Button" parent="MarginContainer/VBox/MainSplit/LeftColumn/ControlsBar" unique_id=1321052848]
+visible = false
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+tooltip_text = "Scrub Forward (Right Arrow Key)"
+focus_mode = 0
+icon = ExtResource("8")
+expand_icon = true
+
+[node name="SpacerL" type="Control" parent="MarginContainer/VBox/MainSplit/LeftColumn/ControlsBar" unique_id=1632183732]
+custom_minimum_size = Vector2(12, 0)
+layout_mode = 2
+
+[node name="Scrubber" type="HSlider" parent="MarginContainer/VBox/MainSplit/LeftColumn/ControlsBar" unique_id=1555437306]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+focus_mode = 0
+tick_count = 2
+ticks_on_borders = true
+ticks_position = 2
+
+[node name="TickLabel" type="Label" parent="MarginContainer/VBox/MainSplit/LeftColumn/ControlsBar" unique_id=922357091]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "0.0s"
+horizontal_alignment = 2
+
+[node name="Speed05x" type="Button" parent="MarginContainer/VBox/MainSplit/LeftColumn/ControlsBar" unique_id=855915705]
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+tooltip_text = "0.5x Speed (Up and Down Arrowkeys to Adjust Speed - or \"1\" key.)"
+focus_mode = 0
+theme_override_colors/font_color = Color(0.83, 0.65, 0.45, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.82, 0.55, 1)
+theme_override_colors/font_hover_color = Color(1, 0.82, 0.55, 1)
+theme_override_fonts/font = ExtResource("9")
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_qidnk")
+text = "0.5x"
+
+[node name="Speed1x" type="Button" parent="MarginContainer/VBox/MainSplit/LeftColumn/ControlsBar" unique_id=121659189]
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+tooltip_text = "1x Speed (Up and Down Arrowkeys to Adjust Speed or \"2\" key.)"
+focus_mode = 0
+theme_override_colors/font_color = Color(0.83, 0.65, 0.45, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.82, 0.55, 1)
+theme_override_colors/font_hover_color = Color(1, 0.82, 0.55, 1)
+theme_override_fonts/font = ExtResource("9")
+toggle_mode = true
+button_group = SubResource("ButtonGroup_qidnk")
+text = "1x"
+
+[node name="Speed2x" type="Button" parent="MarginContainer/VBox/MainSplit/LeftColumn/ControlsBar" unique_id=719934665]
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+tooltip_text = "2x Speed (Up and Down Arrowkeys to Adjust Speed or \"3\" key.)"
+focus_mode = 0
+theme_override_colors/font_color = Color(0.83, 0.65, 0.45, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.82, 0.55, 1)
+theme_override_colors/font_hover_color = Color(1, 0.82, 0.55, 1)
+theme_override_fonts/font = ExtResource("9")
+toggle_mode = true
+button_group = SubResource("ButtonGroup_qidnk")
+text = "2x"
+
+[node name="Speed4x" type="Button" parent="MarginContainer/VBox/MainSplit/LeftColumn/ControlsBar" unique_id=1196127618]
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+tooltip_text = "4x Speed (Up and Down Arrowkeys to Adjust Speed or \"4\" key.)"
+focus_mode = 0
+theme_override_colors/font_color = Color(0.83, 0.65, 0.45, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.82, 0.55, 1)
+theme_override_colors/font_hover_color = Color(1, 0.82, 0.55, 1)
+theme_override_fonts/font = ExtResource("9")
+toggle_mode = true
+button_group = SubResource("ButtonGroup_qidnk")
+text = "4x"
+
+[node name="PlaybackTimer" type="Timer" parent="." unique_id=233912454]
+wait_time = 0.1
+
+[node name="HoverTooltip" type="PanelContainer" parent="." unique_id=1664604889]
+visible = false
+z_index = 10
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_r6pfb")
+
+[node name="MarginContainer" type="MarginContainer" parent="HoverTooltip" unique_id=2087905738]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 7
+
+[node name="HoverContent" type="VBoxContainer" parent="HoverTooltip/MarginContainer" unique_id=635761730]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HoverRow" type="HBoxContainer" parent="HoverTooltip/MarginContainer/HoverContent" unique_id=635761733]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HoverLabel" type="Label" parent="HoverTooltip/MarginContainer/HoverContent/HoverRow" unique_id=923276391]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+
+[node name="HoverWeaponIcon" parent="HoverTooltip/MarginContainer/HoverContent/HoverRow" unique_id=1359140272 instance=ExtResource("10")]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="HoverBars" parent="HoverTooltip/MarginContainer/HoverContent" unique_id=635761735 instance=ExtResource("11")]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+
+[node name="HoverDescription" type="Label" parent="HoverTooltip/MarginContainer/HoverContent" unique_id=635761736]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.82, 0.74, 1)
+theme_override_font_sizes/font_size = 17
+autowrap_mode = 3
+
+[node name="HoverAilmentStrip" parent="HoverTooltip/MarginContainer/HoverContent" unique_id=1408679658 instance=ExtResource("12")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="CardPopupOverlay" type="Control" parent="." unique_id=1709441222]
+unique_name_in_owner = true
+z_index = 5
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="NonKeywordTooltipPanel" parent="." unique_id=2033011301 instance=ExtResource("13")]
+unique_name_in_owner = true
+layout_mode = 0

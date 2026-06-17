@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://bp6wh4a8pou5a"]
+
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_q47ur"]
+script = ExtResource("2")
+stat_id = "endurance_threshold"
+base_value = 5.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_7iiyk"]
+script = ExtResource("2")
+stat_id = "endurance"
+base_value = 5.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+trait_id = "hardy"
+name = "Hardy"
+description = "No stranger to weathering hardship, even before exile."
+rarity = 1
+icon = null
+stat_bonuses = [SubResource("Resource_q47ur"), SubResource("Resource_7iiyk")]
+potential_tags = ["endurance", "defence"]
+potential_values = [0.5, 0.2]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

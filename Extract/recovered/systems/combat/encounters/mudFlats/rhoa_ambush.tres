@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3 uid="uid://b8x4k2qarmf3a"]
+
+[ext_resource type="Resource" uid="uid://vnxbkmcdci3" path="res://systems/monsters/normal/rhoa.tres" id="1"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="2"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_rear"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 3
+position_hint = 5
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_flank"]
+script = ExtResource("2")
+monster = ExtResource("1")
+count = 3
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[resource]
+script = ExtResource("3")
+encounter_id = "rhoa_ambush"
+display_name = "Rhoa Ambush"
+area_tags = [1]
+tags = [0, 2]
+selection_weight = 8.0
+monster_spawns = [SubResource("Resource_rear"), SubResource("Resource_flank")]
+recommended_level = 6
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"

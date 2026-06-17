@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://chdh06k5uxl0j"]
+
+[ext_resource type="Script" uid="uid://cfddrdpkl0w41" path="res://debug/testScenes/MoraleSystemTest.gd" id="1"]
+
+[node name="MoraleSystemTest" type="Node" unique_id=1170293479]
+script = ExtResource("1")

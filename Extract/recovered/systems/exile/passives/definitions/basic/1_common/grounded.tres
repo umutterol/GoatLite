@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://cj24m1gparprc"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_aa0od"]
+script = ExtResource("2")
+stat_id = "lightning_resistance"
+base_value = 8.0
+value_per_stack = 8.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_60m87"]
+script = ExtResource("2")
+stat_id = "life"
+base_value = 4.0
+value_per_stack = 4.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "grounded"
+name = "Grounded"
+description = "Feet planted firmly."
+icon = null
+max_stacks = 5
+stat_tags = ["lightning_resistance", "life"]
+category_tags = ["defence", "resistance"]
+primary_tag = "resistances"
+stat_bonuses = [SubResource("Resource_aa0od"), SubResource("Resource_60m87")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

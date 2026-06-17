@@ -1,0 +1,63 @@
+{
+  "sim": {
+    "tickSeconds": 1,
+    "keyScalingPerLevel": 1.05,
+    "affixMultiplier": 1.3,
+    "softEnrageAfterSeconds": 90,
+    "softEnragePerStep": 0.05,
+    "softEnrageStepSeconds": 5,
+    "hpUnit": 780,
+    "dmgUnit": 4
+  },
+  "roleModel": {
+    "tank":   { "powerPerIlvl": 0.5, "hpPerIlvl": 15, "armourPerIlvl": 8 },
+    "healer": { "powerPerIlvl": 0.3, "hpPerIlvl": 10, "hpsPerIlvl": 1.2, "mana": 100, "healCost": 4, "manaRegenPerSec": 1 },
+    "dps":    { "powerPerIlvl": 1.0, "hpPerIlvl": 10 }
+  },
+  "hitQuality": {
+    "baseCrit": 0.05,
+    "critMultiplier": [1.5, 2.0],
+    "baseAvoidPerRoll": 0.10,
+    "glancingMultiplier": 0.5,
+    "dialCrit": { "Safe": -0.03, "Balanced": 0, "Yolo": 0.05 }
+  },
+  "aggression": {
+    "Safe":     { "output": 0.9,  "avoidableIntake": 0.7 },
+    "Balanced": { "output": 1.0,  "avoidableIntake": 1.0 },
+    "Yolo":     { "output": 1.15, "avoidableIntake": 1.4 }
+  },
+  "morale": {
+    "start": 70,
+    "bands": [
+      { "min": 90, "outputMult": 1.05, "label": "Inspired" },
+      { "min": 50, "outputMult": 1.0,  "label": "Steady" },
+      { "min": 0,  "outputMult": 0.7,  "label": "Falling", "interpolatesTo": 1.0 }
+    ],
+    "lowMoraleThreshold": 30,
+    "lowMoraleTraitAmp": 1.5,
+    "departureEnabled": false,
+    "departureRampPerRun": 0.05,
+    "departureGraceRuns": 1,
+    "departureCap": 0.95
+  },
+  "loot": {
+    "dropIlvlBase": 100,
+    "dropIlvlPerKey": 5,
+    "starterIlvl": 105,
+    "itemsTimed": 2,
+    "itemsDepleted": 1,
+    "emblemsTimed": 5,
+    "emblemsDepleted": 2,
+    "shardCraftCostPerKey": 1,
+    "keyBands": [
+      { "band": 1, "keys": "2-5",  "tier": "Uncommon" },
+      { "band": 2, "keys": "6-10", "tier": "Rare" },
+      { "band": 3, "keys": "11-15","tier": "Rare/Epic" },
+      { "band": 4, "keys": "16+",  "tier": "Epic" }
+    ],
+    "scrapYield": "secondaries * (1 + keyBand)",
+    "craftCost": "(ilvl - 100) / 5"
+  },
+  "keystone": { "startLevel": 2, "floorLevel": 2 },
+  "tacticsPoints": { "total": 6, "maxPerCategory": 3 }
+}

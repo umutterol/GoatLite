@@ -1,0 +1,64 @@
+[gd_resource type="Resource" script_class="MonsterAbility" format=3 uid="uid://dq2toreti2h83"]
+
+[ext_resource type="Script" uid="uid://1t3ktnqe5b5j" path="res://systems/combat/vfx/HitImpactFX.gd" id="1"]
+[ext_resource type="Script" uid="uid://xh5i1r11hpwr" path="res://systems/combat/vfx/ShotgunVFX.gd" id="2"]
+[ext_resource type="Resource" uid="uid://b1ps4xchfbalg" path="res://systems/combat/vfx/impactPresets/fire_cinders.tres" id="3"]
+[ext_resource type="Script" uid="uid://dmetojbdk5sls" path="res://systems/combat/abilities/MonsterAbility.gd" id="4"]
+
+[sub_resource type="Resource" id="Resource_yeud4"]
+script = ExtResource("1")
+particle_style = 2
+color_inner = Color(0.54901963, 0.5137255, 0.4627451, 0.6901961)
+color_outer = Color(0.92941177, 0.89411765, 0.8784314, 0.54509807)
+particle_count = 9
+lifetime_seconds = 1.25
+speed_min = 0.5
+speed_max = 2.5
+angle_spread_radians = 1.65
+direction_bias_radians = 1.1584073464102098
+gravity = 0.0
+particle_radius_max = 1.6
+glow = true
+crit_multiplier = 2.0
+curl_frequency = 5.0
+
+[sub_resource type="Resource" id="Resource_q7lxk"]
+script = ExtResource("2")
+pellet_count = 32
+aim_jitter_deg = 9.0
+range_jitter = 0.5
+range_factor_base = 1.2000000000000002
+arrival_fraction = 0.6000000000000001
+post_arrival_fade_exponent = 4.5
+pellet_radius = 0.75
+pellet_length = 7.0
+pellet_glow_radius_mult = 4.1
+pellet_glow_alpha = 0.5
+core_brightness = 0.45
+trail_length = 2.0
+trail_width = 5.25
+trail_glow_alpha = 0.3
+trail_segments = 16
+color_override = Color(0.7882353, 0.43529412, 0.07058824, 0.7529412)
+lifetime_seconds = 1.5
+homes_on_target = true
+impact_fx = SubResource("Resource_yeud4")
+impact_landing_progress = 0.7
+metadata/_custom_type_script = "uid://xh5i1r11hpwr"
+
+[resource]
+script = ExtResource("4")
+ability_id = "firebreath"
+display_name = "Breathe Fire"
+icon = null
+shape = 2
+ability_range = 6.0
+aoe_size = 4.0
+cooldown_seconds = 20.0
+wind_up_seconds = 0.1
+recovery_seconds = 1.0
+damage_scaling = 2.0
+convert_to_fire = 1.0
+execute_vfx = SubResource("Resource_q7lxk")
+impact_vfx = ExtResource("3")
+telegraph_vfx = null

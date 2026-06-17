@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://pjydgm8euov8"]
+
+[ext_resource type="Script" uid="uid://bhirkteqeh5wr" path="res://debug/testScenes/combatTests/combatant_data_test.gd" id="1"]
+
+[node name="CombatantDataTest" type="Node" unique_id=1088605975]
+script = ExtResource("1")

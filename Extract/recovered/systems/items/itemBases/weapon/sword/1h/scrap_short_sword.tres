@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://xdsjnj36ppus"]
+
+[ext_resource type="Texture2D" uid="uid://ch5gpde7no1cf" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Rusted_Sword_inventory_icon.png" id="1"]
+[ext_resource type="Resource" path="res://systems/items/affixes/implicit/impale_chance_sword.tres" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[resource]
+script = ExtResource("3")
+item_id = "scrap_short_sword"
+display_name = "Scrap Short Sword"
+description = "A crudely sharpened scrap of iron with some cloth wrapped around one end as a handle. It's only a litte bit sharper than a club."
+icon = ExtResource("1")
+grid_height = 3
+base_physical_damage_min = 2
+base_physical_damage_max = 6
+base_attack_speed = 1.1
+implicit_affixes = [ExtResource("2")]
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

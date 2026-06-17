@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://b657rmq13pnea"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_imp_eff"]
+script = ExtResource("2")
+stat_id = "impale_chance"
+base_value = 50.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_phys_dmg"]
+script = ExtResource("2")
+stat_id = "physical_damage"
+scaling_type = 1
+base_value = 6.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "driven_blade"
+name = "Driven Blade"
+description = "Push the steel past where it should stop. Some hits will catch and stay."
+icon = null
+max_stacks = 5
+stat_tags = ["impale", "physical_damage"]
+theme_tags = ["duelist", "warrior"]
+category_tags = ["offence"]
+primary_tag = "impale"
+stat_bonuses = [SubResource("Resource_imp_eff"), SubResource("Resource_phys_dmg")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

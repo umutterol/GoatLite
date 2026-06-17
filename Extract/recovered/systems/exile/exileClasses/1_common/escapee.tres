@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ClassDefinition" format=3 uid="uid://cimhuxe2hsqsn"]
+
+[ext_resource type="Texture2D" uid="uid://qt0fjkw4fmbb" path="res://systems/exile/exileClasses/1_common/escapeeicon.png" id="1"]
+[ext_resource type="Script" uid="uid://diftkoyemu6om" path="res://systems/exile/exileClasses/ClassDefinition.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+class_id = "escapee"
+name = "Escapee"
+description = "Voluntarily took to exile to escape inprisonment or worse. "
+icon = ExtResource("1")
+override_life = 80.0
+override_vitality = 60.0
+override_physical_damage = Vector2(1, 4)
+override_evasion = 15.0
+override_movement = 20.0
+potential_tags = ["movement", "vitality", "reckless"]
+potential_values = [1.5, -0.2, 1.2]
+metadata/_custom_type_script = "uid://diftkoyemu6om"

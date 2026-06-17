@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://bgrrc2o6osj2x"]
+
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_4h3fh"]
+script = ExtResource("2")
+stat_id = "chaos_resistance"
+base_value = 15.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+trait_id = "radiant"
+name = "Radiant"
+description = "The corruption seems to almost... flinch at their presence."
+rarity = 2
+icon = null
+stat_bonuses = [SubResource("Resource_4h3fh")]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

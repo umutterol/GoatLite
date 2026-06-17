@@ -1,0 +1,377 @@
+[gd_scene format=3 uid="uid://dlg2i0haugpkt"]
+
+[ext_resource type="Script" uid="uid://dpivbcs7m6apy" path="res://gameUI/guild/GuildScene.gd" id="1"]
+[ext_resource type="Shader" uid="uid://lgkj2wn27q04" path="res://assets/shaders/PixelArtShader.gdshader" id="2"]
+[ext_resource type="VideoStream" uid="uid://bts3yiymoxwq3" path="res://assets/backgrounds/camploop.ogv" id="3"]
+[ext_resource type="Texture2D" uid="uid://bxyuvqy3cjt4q" path="res://assets/sprites/monsterSprites/SandSpitterBase.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://bxbbfdap5acn3" path="res://assets/sprites/environmentalSprites/campfire-Sheet.png" id="5"]
+[ext_resource type="PackedScene" uid="uid://c0an8w3bmr0vs" path="res://gameUI/guild/seatSlot/SeatSlot.tscn" id="6"]
+[ext_resource type="PackedScene" uid="uid://bfbiurlyy1vo8" path="res://gameUI/guild/CharacterSheet.tscn" id="7"]
+[ext_resource type="PackedScene" uid="uid://t5nfrkauubua" path="res://gameUI/inventory/equipment/EquipmentScreen.tscn" id="8"]
+[ext_resource type="PackedScene" uid="uid://fafloig7435p" path="res://gameUI/smallComponents/resource_bar.tscn" id="9"]
+[ext_resource type="PackedScene" uid="uid://el6ymqnoem53" path="res://gameUI/guild/quartermasterWindow/QuartermasterWindow.tscn" id="10"]
+[ext_resource type="PackedScene" uid="uid://b8uactcs7w001" path="res://gameUI/guild/tacticsWindow/TacticsWindow.tscn" id="11"]
+[ext_resource type="PackedScene" uid="uid://b7cknwtapj2x4" path="res://gameUI/smallComponents/AutosaveToast.tscn" id="12"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gv2n6"]
+shader = ExtResource("2")
+shader_parameter/pixel_size = 4.000000142499999
+shader_parameter/color_steps = 12.000000475
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_k3ymr"]
+atlas = ExtResource("5")
+region = Rect2(0, 0, 36, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x8s4d"]
+atlas = ExtResource("5")
+region = Rect2(36, 0, 36, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cxnco"]
+atlas = ExtResource("5")
+region = Rect2(72, 0, 36, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ktsik"]
+atlas = ExtResource("5")
+region = Rect2(108, 0, 36, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kxmy5"]
+atlas = ExtResource("5")
+region = Rect2(144, 0, 36, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gv2n6"]
+atlas = ExtResource("5")
+region = Rect2(180, 0, 36, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_8iyyv"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_k3ymr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x8s4d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cxnco")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ktsik")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kxmy5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gv2n6")
+}],
+"loop": true,
+"name": &"CampfireBurning",
+"speed": 6.0
+}]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cxnco"]
+
+[node name="GuildScene" type="Control" unique_id=1379380260]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="BackgroundAnimCrop" type="Control" parent="." unique_id=416514603]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BackgroundAnim" type="VideoStreamPlayer" parent="BackgroundAnimCrop" unique_id=449379654]
+material = SubResource("ShaderMaterial_gv2n6")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -35.0
+offset_top = -164.0
+offset_right = 261.88892
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 2
+stream = ExtResource("3")
+volume_db = -80.0
+speed_scale = 0.8
+autoplay = true
+expand = true
+loop = true
+
+[node name="Background" type="ColorRect" parent="." unique_id=124661513]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.015686275, 0.015686275, 0.015686275, 0.19607843)
+
+[node name="DismissLayer" type="ColorRect" parent="." unique_id=55766774]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06666667, 0.77254903, 0, 0)
+
+[node name="SandSpitterBase" type="Sprite2D" parent="." unique_id=520512714]
+visible = false
+position = Vector2(906.00006, 816)
+rotation = -2.6179938
+scale = Vector2(3.656251, 3.656251)
+texture = ExtResource("4")
+
+[node name="Campfire" type="AnimatedSprite2D" parent="." unique_id=1855850417]
+visible = false
+position = Vector2(953, 783)
+scale = Vector2(4.0833335, 4.0833335)
+sprite_frames = SubResource("SpriteFrames_8iyyv")
+animation = &"CampfireBurning"
+frame = 5
+frame_progress = 0.94982964
+
+[node name="ExileArea" type="Control" parent="." unique_id=1128586430]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_right = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopLeftButtons" type="HBoxContainer" parent="." unique_id=537053871]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 280.0
+offset_bottom = 56.0
+theme_override_constants/separation = 8
+
+[node name="SaveButton" type="Button" parent="TopLeftButtons" unique_id=149150823]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 40)
+layout_mode = 2
+tooltip_text = "Save game (manual slot)"
+text = "Save"
+
+[node name="LoadButton" type="Button" parent="TopLeftButtons" unique_id=150820844]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 40)
+layout_mode = 2
+tooltip_text = "Load most recent manual save"
+text = "Load"
+
+[node name="SettingsButton" type="Button" parent="TopLeftButtons" unique_id=1178530640]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 40)
+layout_mode = 2
+tooltip_text = "Settings (placeholder — not yet implemented)"
+text = "Settings"
+
+[node name="MenuButton" type="Button" parent="TopLeftButtons" unique_id=1178530641]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 40)
+layout_mode = 2
+tooltip_text = "Menu (ESC) — Save / Load / Settings / Return to Main Menu"
+text = "Menu"
+
+[node name="LeftBench" type="VBoxContainer" parent="." unique_id=812000001]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 12.0
+offset_top = -210.0
+offset_right = 232.0
+offset_bottom = 210.0
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Slot0" parent="LeftBench" unique_id=1052282329 instance=ExtResource("6")]
+layout_mode = 2
+zone = "backbench"
+
+[node name="Slot1" parent="LeftBench" unique_id=129176760 instance=ExtResource("6")]
+layout_mode = 2
+zone = "backbench"
+slot_index = 1
+
+[node name="Slot2" parent="LeftBench" unique_id=129176761 instance=ExtResource("6")]
+layout_mode = 2
+zone = "backbench"
+slot_index = 4
+
+[node name="Slot3" parent="LeftBench" unique_id=129176762 instance=ExtResource("6")]
+layout_mode = 2
+zone = "backbench"
+slot_index = 5
+
+[node name="RightBench" type="VBoxContainer" parent="." unique_id=812000002]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -232.0
+offset_top = -210.0
+offset_right = -12.0
+offset_bottom = 210.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Slot0" parent="RightBench" unique_id=873797398 instance=ExtResource("6")]
+layout_mode = 2
+zone = "backbench"
+slot_index = 2
+
+[node name="Slot1" parent="RightBench" unique_id=384338225 instance=ExtResource("6")]
+layout_mode = 2
+zone = "backbench"
+slot_index = 3
+
+[node name="Slot2" parent="RightBench" unique_id=384338226 instance=ExtResource("6")]
+layout_mode = 2
+zone = "backbench"
+slot_index = 6
+
+[node name="Slot3" parent="RightBench" unique_id=384338227 instance=ExtResource("6")]
+layout_mode = 2
+zone = "backbench"
+slot_index = 7
+
+[node name="CharacterSheet" parent="." unique_id=1213408198 instance=ExtResource("7")]
+visible = false
+layout_mode = 1
+
+[node name="EquipmentScreen" parent="." unique_id=180923332 instance=ExtResource("8")]
+visible = false
+layout_mode = 1
+offset_left = 0.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="TopButtonsV" type="VBoxContainer" parent="." unique_id=402747397]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -360.0
+offset_right = 360.0
+offset_bottom = 70.0
+grow_horizontal = 2
+theme_override_constants/separation = 8
+
+[node name="ResourceBar" parent="TopButtonsV" unique_id=2067422757 instance=ExtResource("9")]
+custom_minimum_size = Vector2(460, 50)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TopButtonsH" type="HBoxContainer" parent="TopButtonsV" unique_id=945999156]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="MissionsButton" type="Button" parent="TopButtonsV/TopButtonsH" unique_id=2047932176]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+text = "Missions"
+
+[node name="EndDayButton" type="Button" parent="TopButtonsV/TopButtonsH" unique_id=270697959]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+text = "End Day"
+
+[node name="Spacer" type="Panel" parent="TopButtonsV" unique_id=957093506]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_cxnco")
+
+[node name="CenterCore" type="VBoxContainer" parent="TopButtonsV" unique_id=1861499423]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="TopRow" type="HBoxContainer" parent="TopButtonsV/CenterCore" unique_id=1861499424]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Slot0" parent="TopButtonsV/CenterCore/TopRow" unique_id=875830616 instance=ExtResource("6")]
+layout_mode = 2
+
+[node name="Slot1" parent="TopButtonsV/CenterCore/TopRow" unique_id=2074173894 instance=ExtResource("6")]
+layout_mode = 2
+slot_index = 1
+
+[node name="MidRow" type="HBoxContainer" parent="TopButtonsV/CenterCore" unique_id=1861499425]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Slot2" parent="TopButtonsV/CenterCore/MidRow" unique_id=1369501109 instance=ExtResource("6")]
+layout_mode = 2
+slot_index = 2
+
+[node name="Slot3" parent="TopButtonsV/CenterCore/MidRow" unique_id=2074086543 instance=ExtResource("6")]
+layout_mode = 2
+slot_index = 3
+
+[node name="BottomRow" type="HBoxContainer" parent="TopButtonsV/CenterCore" unique_id=1861499426]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 10
+
+[node name="Slot4" parent="TopButtonsV/CenterCore/BottomRow" unique_id=252148852 instance=ExtResource("6")]
+layout_mode = 2
+slot_index = 4
+
+[node name="Spacer2" type="Panel" parent="TopButtonsV" unique_id=226562654]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_cxnco")
+
+[node name="QuartermasterWindow" parent="TopButtonsV" unique_id=273930446 instance=ExtResource("10")]
+layout_mode = 2
+
+[node name="TacticsWindow" parent="TopButtonsV" unique_id=273930447 instance=ExtResource("11")]
+
+[node name="AutosaveToast" parent="." unique_id=1706116154 instance=ExtResource("12")]
+unique_name_in_owner = true
+layout_mode = 0
+anchors_preset = 0
+anchor_left = 0.0
+anchor_right = 0.0
+offset_left = 0.0
+offset_right = 184.0
+offset_bottom = 40.0
+grow_horizontal = 1
+
+[node name="FadeInOverlay" type="ColorRect" parent="." unique_id=991188821]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

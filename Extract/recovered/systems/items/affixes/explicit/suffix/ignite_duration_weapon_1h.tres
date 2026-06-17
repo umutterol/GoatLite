@@ -1,0 +1,51 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3 uid="uid://bkmk1polkrpdw"]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckf2e0ljtmtxg" path="res://systems/items/affixes/AffixValueTier.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_t1_ignite_duration_weapon_1h"]
+script = ExtResource("2")
+min_value = 14.0
+max_value = 22.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t2_ignite_duration_weapon_1h"]
+script = ExtResource("2")
+item_level = 3
+min_value = 20.0
+max_value = 32.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t3_ignite_duration_weapon_1h"]
+script = ExtResource("2")
+item_level = 5
+min_value = 28.0
+max_value = 44.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t4_ignite_duration_weapon_1h"]
+script = ExtResource("2")
+item_level = 8
+min_value = 40.0
+max_value = 58.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[resource]
+script = ExtResource("1")
+affix_id = "ignite_duration_weapon_1h"
+display_name = "Ignite Duration"
+is_suffix = true
+valid_on_1h_weapon = true
+valid_on_sword = true
+valid_on_mace = true
+valid_on_axe = true
+valid_on_wand = true
+valid_on_spear = true
+valid_on_dagger = true
+spawn_weight = 80
+stat_type = "ignite_duration_more_pct"
+value_suffix = "%"
+min_item_level = 2
+use_tier_helper = true
+value_tiers = [SubResource("Resource_t1_ignite_duration_weapon_1h"), SubResource("Resource_t2_ignite_duration_weapon_1h"), SubResource("Resource_t3_ignite_duration_weapon_1h"), SubResource("Resource_t4_ignite_duration_weapon_1h")]
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

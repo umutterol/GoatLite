@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://pyxakrf75522"]
+
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="1"]
+[ext_resource type="Script" uid="uid://bl1n406v551lg" path="res://systems/mission/ProgressionRequirement.gd" id="2"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_cf5it"]
+script = ExtResource("1")
+encounter = null
+area_filter = [0]
+excluded_tags = [0]
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_d3is7"]
+script = ExtResource("2")
+mission_id = "clear_campsite_tutorial_mission"
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[resource]
+script = ExtResource("3")
+mission_id = "explore_coast"
+display_name = "Quick Scouting Trip"
+description = "Building up knowledge of the area is how we'll discover options for food, gear, and fresh recruits. A quick, local scouting run like this is the perfect way to blood new recruits too."
+icon = null
+mission_tags = [1]
+prerequisites = [SubResource("Resource_d3is7")]
+encounter_slots = [SubResource("Resource_cf5it")]
+scouting_reward = 4.0
+mission_rewards = null
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

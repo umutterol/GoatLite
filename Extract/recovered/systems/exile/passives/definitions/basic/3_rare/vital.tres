@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://h5w4dueago0i"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_ufv1a"]
+script = ExtResource("2")
+stat_id = "life"
+scaling_type = 1
+base_value = 6.0
+value_per_stack = 6.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_7ffbt"]
+script = ExtResource("2")
+stat_id = "vitality"
+scaling_type = 1
+base_value = 8.0
+value_per_stack = 8.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "vital"
+name = "Vital"
+description = "Impressively healthy."
+rarity = 2
+icon = null
+max_stacks = 5
+stat_tags = ["life", "vitality"]
+theme_tags = ["tank"]
+category_tags = ["core"]
+primary_tag = "core"
+stat_bonuses = [SubResource("Resource_ufv1a"), SubResource("Resource_7ffbt")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

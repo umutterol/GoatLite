@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://dy6q6jm3naeyq"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_lq0mb"]
+script = ExtResource("2")
+stat_id = "critical_chance"
+scaling_type = 1
+base_value = 25.0
+value_per_stack = 25.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_6khhd"]
+script = ExtResource("2")
+stat_id = "critical_multiplier"
+base_value = 5.0
+value_per_stack = 5.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "precision"
+name = "Precision"
+description = "Direct and to the point."
+rarity = 1
+icon = null
+max_stacks = 5
+stat_tags = ["critical"]
+theme_tags = ["assassin"]
+category_tags = ["offence"]
+primary_tag = "critical"
+stat_bonuses = [SubResource("Resource_lq0mb"), SubResource("Resource_6khhd")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

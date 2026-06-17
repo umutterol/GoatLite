@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3 uid="uid://bdmjm1uw25yyf"]
+
+[ext_resource type="Resource" uid="uid://b5kc5a0a0c3d1" path="res://systems/monsters/unique/grandaddy_crab.tres" id="1"]
+[ext_resource type="Script" uid="uid://bu6ym8cwlec0w" path="res://systems/combat/encounters/MonsterSpawn.gd" id="2"]
+[ext_resource type="Resource" uid="uid://cyor2ko1xxwb3" path="res://systems/monsters/normal/sand_spitter.tres" id="3"]
+[ext_resource type="Script" uid="uid://cqw7pxfm2442x" path="res://systems/combat/encounters/EncounterData.gd" id="4"]
+
+[sub_resource type="Resource" id="Resource_mdbgb"]
+script = ExtResource("2")
+monster = ExtResource("1")
+position_hint = 1
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_qpce0"]
+script = ExtResource("2")
+monster = ExtResource("3")
+count = 4
+position_hint = 2
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[sub_resource type="Resource" id="Resource_cob75"]
+script = ExtResource("2")
+monster = ExtResource("3")
+count = 4
+metadata/_custom_type_script = "uid://bu6ym8cwlec0w"
+
+[resource]
+script = ExtResource("4")
+encounter_id = "grandaddy_crab_bossfight"
+display_name = "The Grandaddy Crab"
+description = "Will you manage to kill a grandaddy crab?"
+encounter_type = 2
+area_tags = [0]
+monster_spawns = [SubResource("Resource_mdbgb"), SubResource("Resource_qpce0"), SubResource("Resource_cob75")]
+recommended_level = 4
+metadata/_custom_type_script = "uid://cqw7pxfm2442x"

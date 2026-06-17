@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ClassDefinition" format=3 uid="uid://6w0irqrj1ar4"]
+
+[ext_resource type="Texture2D" uid="uid://dws007b2rmhc" path="res://systems/exile/exileClasses/2_uncommon/witchicon.webp" id="1"]
+[ext_resource type="Script" uid="uid://diftkoyemu6om" path="res://systems/exile/exileClasses/ClassDefinition.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+class_id = "witch"
+name = "Witch"
+description = "Trafficks in things polite society would rather forget. Frail of body, but the cold and the rot answer when she calls."
+rarity = 1
+icon = ExtResource("1")
+override_life = 85.0
+override_vitality = 85.0
+override_physical_damage = Vector2(1, 2)
+override_cold_resistance = 10.0
+override_chaos_resistance = 15.0
+life_per_level = 6.0
+vitality_per_level = 6.0
+percent_stat_ids = ["chaos_damage", "cold_damage"]
+percent_stat_values = [10.0, 10.0]
+potential_tags = ["witch", "chaos_damage", "cold_damage"]
+potential_values = [2.5, 1.5, 1.5]
+incompatible_trait_ids = ["coward"]
+metadata/_custom_type_script = "uid://diftkoyemu6om"

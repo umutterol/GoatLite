@@ -1,0 +1,6 @@
+[
+  { "id": "interrupts",  "name": "Interrupts",  "icon": "tac-interrupts",  "perPoint": "Dangerous cast interrupted at 20% + 25% per point (max 95%)", "starved": "Dangerous casts go through" },
+  { "id": "positioning", "name": "Positioning", "icon": "tac-positioning", "perPoint": "Avoidable event hits its target at 60% - 18% per point",       "starved": "Deaths to avoidables" },
+  { "id": "cooldowns",   "name": "Cooldowns",   "icon": "tac-cooldowns",   "perPoint": "+4%/pt party damage in boss burn windows; -10%/pt spike damage taken", "starved": "Wrong phase, wasted CDs" },
+  { "id": "killorder",   "name": "Kill Order",  "icon": "tac-killorder",   "perPoint": "+6%/pt effective party DPS on trash; sets the kill plan",       "starved": "Adds live too long, healer OOM" }
+]

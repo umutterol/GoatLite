@@ -1,0 +1,138 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://bhvtsbslb0u41"]
+
+[ext_resource type="Resource" uid="uid://bcoemgjyedv77" path="res://systems/combat/abilities/resources/implosion.tres" id="1"]
+[ext_resource type="Resource" path="res://systems/combat/vfx/impactPresets/chaos_tendrils.tres" id="2"]
+[ext_resource type="Script" uid="uid://deilicheqhkbk" path="res://systems/combat/vfx/LinePulseVFX.gd" id="3"]
+[ext_resource type="Script" uid="uid://dmetojbdk5sls" path="res://systems/combat/abilities/MonsterAbility.gd" id="4"]
+[ext_resource type="Resource" uid="uid://brb3tyqus6whr" path="res://systems/combat/abilities/resources/hardshell_slam.tres" id="5"]
+[ext_resource type="Script" uid="uid://cetal6p7kbjls" path="res://systems/combat/abilities/ActionSlotConfig.gd" id="6"]
+[ext_resource type="Script" uid="uid://dn8chjjrdw06v" path="res://systems/monsters/MonsterStats.gd" id="7"]
+[ext_resource type="Script" uid="uid://1t3ktnqe5b5j" path="res://systems/combat/vfx/HitImpactFX.gd" id="8"]
+[ext_resource type="Script" uid="uid://bkx7dirg1515u" path="res://systems/combat/vfx/LightningVFX.gd" id="9"]
+[ext_resource type="Script" uid="uid://bn4tocniaeat3" path="res://systems/combat/CombatBehavior.gd" id="10"]
+[ext_resource type="Script" uid="uid://djr2nsux711tk" path="res://systems/combat/profiles/TacticalProfile.gd" id="11"]
+[ext_resource type="Texture2D" uid="uid://cmksxg8tpmkrw" path="res://assets/sprites/monsterSprites/necromancer.png" id="12"]
+[ext_resource type="Script" uid="uid://xo0774xbjf5m" path="res://systems/monsters/MonsterData.gd" id="13"]
+
+[sub_resource type="Resource" id="Resource_6raho"]
+script = ExtResource("3")
+arrival_fraction = 0.5
+trail_length = 2.0
+width_base = 6.0
+width_pulse = 8.0
+glow_width_mult = 5.0
+segments = 32
+overshoot_in_def_radii = 5.0
+color_override = Color(0.34901962, 0.101960786, 0.54901963, 0.6745098)
+lifetime_seconds = 0.7999999999999999
+impact_fx = ExtResource("2")
+metadata/_custom_type_script = "uid://deilicheqhkbk"
+
+[sub_resource type="Resource" id="Resource_f3e3f"]
+script = ExtResource("4")
+ability_id = "contentus_beam"
+display_name = "Contentus Beam"
+icon = null
+shape = 1
+ability_target = 1
+ability_range = 16.0
+aoe_size = 20.0
+cooldown_seconds = 8.0
+wind_up_seconds = 0.1
+recovery_seconds = 0.4
+convert_to_cold = 0.5
+convert_to_chaos = 0.5
+execute_vfx = SubResource("Resource_6raho")
+impact_vfx = null
+telegraph_vfx = null
+metadata/_custom_type_script = "uid://dmetojbdk5sls"
+
+[sub_resource type="Resource" id="Resource_jy11q"]
+script = ExtResource("6")
+abilities = [ExtResource("1"), SubResource("Resource_f3e3f"), ExtResource("5")]
+metadata/_custom_type_script = "uid://cetal6p7kbjls"
+
+[sub_resource type="Resource" id="Resource_tqibk"]
+script = ExtResource("7")
+life = 2000.0
+armour = 40.0
+evasion = 0.0
+endurance = 30.0
+cold_resistance = 20.0
+chaos_resistance = 40.0
+life_leech = 10.0
+physical_damage = Vector2(15, 30)
+cold_damage = Vector2(10, 20)
+chaos_damage = Vector2(10, 20)
+attack_speed = 0.8
+chill_effect_more_pct = 10.0
+movement = -20.0
+
+[sub_resource type="Resource" id="Resource_fl7f6"]
+script = ExtResource("8")
+particle_style = 3
+color_inner = Color(0.34901962, 0.101960786, 0.54901963, 0.8980392)
+color_outer = Color(0.5153857, 0.19296947, 0.7886011, 0.5019608)
+particle_count = 4
+glow = true
+crit_multiplier = 3.0
+arc_endpoint_distance_min = 0.1
+arc_endpoint_distance_max = 2.0
+arc_jitter = 0.18
+arc_segments = 12
+arc_flash_duration = 0.1
+arc_branch_count = 1
+
+[sub_resource type="Resource" id="Resource_hxg00"]
+script = ExtResource("9")
+arrival_fraction = 0.4
+width_base = 1.75
+glow_width_mult = 3.5
+jitter_magnitude = 30.0
+taper_power = 4.0
+color_override = Color(0.34901962, 0.101960786, 0.54901963, 0.827451)
+homes_on_target = true
+impact_fx = SubResource("Resource_fl7f6")
+metadata/_custom_type_script = "uid://bkx7dirg1515u"
+
+[sub_resource type="Resource" id="Resource_6igp1"]
+script = ExtResource("11")
+sticky_target_duration = 2.0
+melee_threat_memory_duration = 0.0
+kite_angle_jitter_degrees = 7.0
+kite_open_space_weight = 0.5
+kite_max_deviation_degrees = 45.0
+metadata/_custom_type_script = "uid://djr2nsux711tk"
+
+[sub_resource type="Resource" id="Resource_g8nul"]
+script = ExtResource("10")
+aggro_type = 3
+attack_range = 6.0
+preferred_distance = 5.0
+kite_mode = 2
+stance = 0
+tactical_profile = SubResource("Resource_6igp1")
+basic_attack_vfx_override = SubResource("Resource_hxg00")
+metadata/_custom_type_script = "uid://bn4tocniaeat3"
+
+[resource]
+script = ExtResource("13")
+monster_id = "endof_contentus"
+display_name = "Endof Contentus, Harbinger of the End"
+icon = ExtResource("12")
+description = "The harbinger of the end."
+is_unique = true
+base_level = 8
+base_stats = SubResource("Resource_tqibk")
+combat_behavior = SubResource("Resource_g8nul")
+action_slot_configs = [SubResource("Resource_jy11q")]
+drop_tags = ["chaos"]
+drop_table = null
+experience_value = 500
+item_rarity_bonus = 5.0
+item_quantity_bonus = 5.0
+base_drop_chance = 1.0
+chaos_drops = 5.0
+exalt_drops = 5.0
+vaal_drops = 5.0
+metadata/_custom_type_script = "uid://xo0774xbjf5m"

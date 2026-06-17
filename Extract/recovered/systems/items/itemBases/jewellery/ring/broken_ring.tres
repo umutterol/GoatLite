@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://d3vwo0x487w4h"]
+
+[ext_resource type="Texture2D" uid="uid://6hcpsowvj5np" path="res://assets/sprites/itemSprites/gearSprites/jewellerySprites/broken_ring.png" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_ap3mt"]
+script = ExtResource("2")
+affix_id = "woven_ring_implicit"
+display_name = "Evasion"
+is_implicit = true
+stat_type = "evasion"
+min_value = 2.0
+max_value = 4.0
+value_suffix = "%"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "broken_ring"
+display_name = "Broken Ring"
+description = "A damaged ring with a missing stone. It feels like wearing a metaphor."
+icon = ExtResource("1")
+category = 1
+implicit_affixes = [SubResource("Resource_ap3mt")]
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

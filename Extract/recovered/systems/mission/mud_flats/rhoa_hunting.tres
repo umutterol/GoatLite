@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://6b865vtgj2hu"]
+
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="1"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_slot1"]
+script = ExtResource("1")
+encounter = null
+area_filter = [1]
+required_tags = [2]
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[resource]
+script = ExtResource("2")
+mission_id = "rhoa_hunting"
+display_name = "Rhoa Hunting"
+icon = null
+area_requirement = 1
+level = 6
+mission_tags = [6]
+encounter_slots = [SubResource("Resource_slot1")]
+scouting_reward = 5.0
+mission_rewards = null
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

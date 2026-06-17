@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ClassDefinition" format=3 uid="uid://dnhud1kw0m6ru"]
+
+[ext_resource type="Texture2D" uid="uid://ctcb7js448crq" path="res://systems/exile/exileClasses/1_common/beggaricon.jpg" id="1"]
+[ext_resource type="Script" uid="uid://diftkoyemu6om" path="res://systems/exile/exileClasses/ClassDefinition.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+class_id = "beggar"
+name = "Beggar"
+description = "A hard life fighting for scraps until a noble decided to \"clean up the streets.\" "
+icon = ExtResource("1")
+override_life = 60.0
+override_vitality = 60.0
+override_physical_damage = Vector2(1, 4)
+override_evasion = 15.0
+override_scouting = 20.0
+override_scavenging = 35.0
+life_per_level = 4.0
+vitality_per_level = 4.0
+potential_tags = ["scavenging"]
+potential_values = [2.5]
+metadata/_custom_type_script = "uid://diftkoyemu6om"

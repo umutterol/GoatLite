@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://coshgu8wvn1ha"]
+
+[ext_resource type="Resource" uid="uid://d0qjrkgj5ny0l" path="res://systems/combat/vfx/presets/spear_stabVFX.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://dekplsa80w1pi" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Glass_Shank_inventory_icon.png" id="2"]
+[ext_resource type="Resource" path="res://systems/items/affixes/implicit/impale_chance_dagger.tres" id="3"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="4"]
+
+[resource]
+script = ExtResource("4")
+item_id = "glass_shank"
+display_name = "Glass Shank"
+description = "A jagged shard of bottle-glass wedged into a wrapped grip. Cuts both ways — the wielder included."
+icon = ExtResource("2")
+weapon_type = 7
+grid_height = 2
+base_physical_damage_min = 1
+base_physical_damage_max = 4
+base_attack_speed = 1.5
+base_critical_chance = 9.0
+implicit_affixes = [ExtResource("3")]
+attack_vfx = ExtResource("1")
+metadata/_custom_type_script = "uid://cetys5ykyhird"

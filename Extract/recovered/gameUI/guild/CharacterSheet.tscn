@@ -1,0 +1,1403 @@
+[gd_scene format=3 uid="uid://bfbiurlyy1vo8"]
+
+[ext_resource type="Script" uid="uid://lx03oguku4il" path="res://gameUI/guild/CharacterSheet.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://ckdfy3nugcff5" path="res://assets/fonts/Fontin-SmallCaps.otf" id="2"]
+[ext_resource type="Texture2D" uid="uid://c0dxspimr11u1" path="res://assets/ui/UI_Font_B.png" id="3"]
+[ext_resource type="PackedScene" uid="uid://b0cudmoj2k441" path="res://gameUI/smallComponents/PanelButton.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://brec0vry0001" path="res://gameUI/smallComponents/RecoveryIcon.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://bstrvic0n0001" path="res://gameUI/smallComponents/StarvingIcon.tscn" id="6"]
+[ext_resource type="PackedScene" uid="uid://b678edplkkpx2" path="res://gameUI/smallComponents/HighMoraleIcon.tscn" id="7"]
+[ext_resource type="PackedScene" uid="uid://d0hhl42s2urfk" path="res://gameUI/smallComponents/LowMoraleIcon.tscn" id="8"]
+[ext_resource type="PackedScene" uid="uid://dj5o1hcpdda23" path="res://assets/ui/close_button.tscn" id="9"]
+[ext_resource type="Script" uid="uid://j6hfajtypepq" path="res://gameUI/tooltips/TooltipHover.gd" id="10"]
+[ext_resource type="PackedScene" uid="uid://bq55n1jvofime" path="res://gameUI/guild/characterSheet/CharacterStatRow.tscn" id="11"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_portrait"]
+bg_color = Color(0.08, 0.07, 0.06, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.34, 0.24, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_upk88"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ckv7x"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hy6nx"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vj8hb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ws7bn"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ptr7w"]
+atlas = ExtResource("3")
+region = Rect2(9, 265, 14, 15)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2b5ap"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ptr7w"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_q1qiq"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cdotf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3piq1"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2b5ap"]
+atlas = ExtResource("3")
+region = Rect2(359, 167, 18, 18)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dismiss_normal"]
+bg_color = Color(0.08, 0.04, 0.04, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7, 0.2, 0.2, 0.85)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dismiss_hover"]
+bg_color = Color(0.14, 0.05, 0.05, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.4, 0.4, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dismiss_pressed"]
+bg_color = Color(0.05, 0.02, 0.02, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.2, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_upk88"]
+atlas = ExtResource("3")
+region = Rect2(327, 167, 18, 18)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp"]
+bg_color = Color(0.57254905, 0.40784314, 0.043137256, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_life"]
+bg_color = Color(0.78, 0.16, 0.16, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vit"]
+bg_color = Color(0.8392157, 0.45490196, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_morale"]
+bg_color = Color(0.20784314, 0.35686275, 0.827451, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tile"]
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+bg_color = Color(0.1, 0.09, 0.07, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.26, 0.18, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_resist"]
+bg_color = Color(0.1, 0.09, 0.07, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.22, 0.16, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tabpanel"]
+content_margin_left = 6.0
+content_margin_top = 6.0
+content_margin_right = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.08, 0.07, 0.05, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.3, 0.2, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_unsel"]
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+bg_color = Color(0.1, 0.09, 0.07, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_color = Color(0.25, 0.22, 0.16, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_sel"]
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+bg_color = Color(0.18, 0.14, 0.08, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_color = Color(0.55, 0.42, 0.18, 1)
+
+[node name="CharacterSheet" type="Panel" unique_id=1638784913]
+custom_minimum_size = Vector2(620, 0)
+anchor_bottom = 1.0
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1881648795]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Layout" type="VBoxContainer" parent="MarginContainer" unique_id=696289497]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="MarginContainer/Layout" unique_id=1851918525]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PortraitPanel" type="Panel" parent="MarginContainer/Layout/Header" unique_id=648242959]
+clip_contents = true
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_portrait")
+
+[node name="ClassIcon" type="TextureRect" parent="MarginContainer/Layout/Header/PortraitPanel" unique_id=2113499401]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = -1.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="FallbackLabel" type="Label" parent="MarginContainer/Layout/Header/PortraitPanel" unique_id=1701337982]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 36
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderInfo" type="VBoxContainer" parent="MarginContainer/Layout/Header" unique_id=832685653]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NameRow" type="HBoxContainer" parent="MarginContainer/Layout/Header/HeaderInfo" unique_id=1563249147]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="MarginContainer/Layout/Header/HeaderInfo/NameRow" unique_id=1563249148]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 26
+text = "ExileLongName"
+
+[node name="NameEdit" type="LineEdit" parent="MarginContainer/Layout/Header/HeaderInfo/NameRow" unique_id=1563249149]
+visible = false
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 22
+placeholder_text = "Name"
+max_length = 32
+
+[node name="EditNameButton" type="Button" parent="MarginContainer/Layout/Header/HeaderInfo/NameRow" unique_id=1563249150]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+tooltip_text = "Rename exile"
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxEmpty_upk88")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_ckv7x")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_hy6nx")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_vj8hb")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_ws7bn")
+icon = SubResource("AtlasTexture_ptr7w")
+
+[node name="ConfirmNameButton" type="Button" parent="MarginContainer/Layout/Header/HeaderInfo/NameRow" unique_id=1563249151]
+visible = false
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Confirm name"
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxEmpty_2b5ap")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_ptr7w")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_q1qiq")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_cdotf")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_3piq1")
+icon = SubResource("AtlasTexture_2b5ap")
+
+[node name="DismissButton" parent="MarginContainer/Layout/Header/HeaderInfo/NameRow" unique_id=1097911581 instance=ExtResource("4")]
+custom_minimum_size = Vector2(64, 22)
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_styles/panel = SubResource("StyleBoxFlat_dismiss_normal")
+text = "Dismiss"
+style_normal = SubResource("StyleBoxFlat_dismiss_normal")
+style_hover = SubResource("StyleBoxFlat_dismiss_hover")
+style_pressed = SubResource("StyleBoxFlat_dismiss_pressed")
+font_size = 12
+font_color = Color(0.95, 0.45, 0.4, 0.95)
+
+[node name="ClassLevelLabel" type="Label" parent="MarginContainer/Layout/Header/HeaderInfo" unique_id=1287734276]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 18
+text = "Class - Level 1"
+
+[node name="StatusIconsGrid" type="GridContainer" parent="MarginContainer/Layout/Header" unique_id=521820697]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 4
+
+[node name="RecoveryIcon" parent="MarginContainer/Layout/Header/StatusIconsGrid" unique_id=1982926896 instance=ExtResource("5")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="StarvingIcon" parent="MarginContainer/Layout/Header/StatusIconsGrid" unique_id=1281606890 instance=ExtResource("6")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HighMoraleIcon" parent="MarginContainer/Layout/Header/StatusIconsGrid" unique_id=902749562 instance=ExtResource("7")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LowMoraleIcon" parent="MarginContainer/Layout/Header/StatusIconsGrid" unique_id=760574789 instance=ExtResource("8")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CloseButton" parent="MarginContainer/Layout/Header" unique_id=2028362536 instance=ExtResource("9")]
+layout_mode = 2
+icon = SubResource("AtlasTexture_upk88")
+
+[node name="XPBar" type="ProgressBar" parent="MarginContainer/Layout" unique_id=441699513]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_xp")
+rounded = true
+show_percentage = false
+
+[node name="XPValueLabel" type="Label" parent="MarginContainer/Layout/XPBar" unique_id=1751000098]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "0 / 100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSep1" type="HSeparator" parent="MarginContainer/Layout" unique_id=1843827991]
+layout_mode = 2
+
+[node name="LifeBar" type="ProgressBar" parent="MarginContainer/Layout" unique_id=2077482948]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_life")
+rounded = true
+show_percentage = false
+
+[node name="LifeValueLabel" type="Label" parent="MarginContainer/Layout/LifeBar" unique_id=1864234776]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "0 / 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LifeTooltip" type="Node" parent="MarginContainer/Layout/LifeBar" unique_id=681256229]
+script = ExtResource("10")
+keyword = "life"
+
+[node name="BarsGrid" type="GridContainer" parent="MarginContainer/Layout" unique_id=255105321]
+layout_mode = 2
+theme_override_constants/h_separation = 12
+columns = 2
+
+[node name="VitalityBar" type="ProgressBar" parent="MarginContainer/Layout/BarsGrid" unique_id=305224039]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/fill = SubResource("StyleBoxFlat_vit")
+rounded = true
+show_percentage = false
+
+[node name="VitalityValueLabel" type="Label" parent="MarginContainer/Layout/BarsGrid/VitalityBar" unique_id=682653721]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "0 / 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VitTooltip" type="Node" parent="MarginContainer/Layout/BarsGrid/VitalityBar" unique_id=1657287438]
+script = ExtResource("10")
+keyword = "vitality"
+
+[node name="MoraleBar" type="ProgressBar" parent="MarginContainer/Layout/BarsGrid" unique_id=1723043738]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/fill = SubResource("StyleBoxFlat_morale")
+rounded = true
+show_percentage = false
+
+[node name="MoraleValueLabel" type="Label" parent="MarginContainer/Layout/BarsGrid/MoraleBar" unique_id=665794409]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "0 / 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MoraleTooltip" type="Node" parent="MarginContainer/Layout/BarsGrid/MoraleBar" unique_id=499900185]
+script = ExtResource("10")
+keyword = "morale"
+
+[node name="HSep2" type="HSeparator" parent="MarginContainer/Layout" unique_id=1742051274]
+layout_mode = 2
+
+[node name="DefenceTiles" type="HBoxContainer" parent="MarginContainer/Layout" unique_id=1525889001]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ArmourTile" type="PanelContainer" parent="MarginContainer/Layout/DefenceTiles" unique_id=1051367010]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/DefenceTiles/ArmourTile" unique_id=1991022495]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/DefenceTiles/ArmourTile/VBox" unique_id=1925814979]
+layout_mode = 2
+text = "Armour"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/DefenceTiles/ArmourTile/VBox" unique_id=1348067073]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "0"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/DefenceTiles/ArmourTile" unique_id=1799208919]
+script = ExtResource("10")
+keyword = "armour"
+
+[node name="EvasionTile" type="PanelContainer" parent="MarginContainer/Layout/DefenceTiles" unique_id=1387804059]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/DefenceTiles/EvasionTile" unique_id=1947378152]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/DefenceTiles/EvasionTile/VBox" unique_id=460931658]
+layout_mode = 2
+text = "Evasion"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/DefenceTiles/EvasionTile/VBox" unique_id=222230320]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "0"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/DefenceTiles/EvasionTile" unique_id=461134426]
+script = ExtResource("10")
+keyword = "evasion"
+
+[node name="EnergyShieldTile" type="PanelContainer" parent="MarginContainer/Layout/DefenceTiles" unique_id=95775462]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/DefenceTiles/EnergyShieldTile" unique_id=833548458]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/DefenceTiles/EnergyShieldTile/VBox" unique_id=354974937]
+layout_mode = 2
+text = "Energy Shield"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/DefenceTiles/EnergyShieldTile/VBox" unique_id=2104370228]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "0"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/DefenceTiles/EnergyShieldTile" unique_id=1956894131]
+script = ExtResource("10")
+keyword = "energy_shield"
+
+[node name="BlockTile" type="PanelContainer" parent="MarginContainer/Layout/DefenceTiles" unique_id=641434620]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/DefenceTiles/BlockTile" unique_id=984134475]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/DefenceTiles/BlockTile/VBox" unique_id=1763112207]
+layout_mode = 2
+text = "Block
+Chance / Amount"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/DefenceTiles/BlockTile/VBox" unique_id=1423104282]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0% / 0"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/DefenceTiles/BlockTile" unique_id=1938007503]
+script = ExtResource("10")
+keyword = "block"
+
+[node name="EnduranceTile" type="PanelContainer" parent="MarginContainer/Layout/DefenceTiles" unique_id=1668587827]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/DefenceTiles/EnduranceTile" unique_id=1961864662]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/DefenceTiles/EnduranceTile/VBox" unique_id=1910068337]
+layout_mode = 2
+text = "Endurance 
+Thr. / Amt."
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/DefenceTiles/EnduranceTile/VBox" unique_id=1666895341]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "25% / 10%"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/DefenceTiles/EnduranceTile" unique_id=956971422]
+script = ExtResource("10")
+keyword = "endurance"
+
+[node name="HSep3" type="HSeparator" parent="MarginContainer/Layout" unique_id=72718654]
+layout_mode = 2
+
+[node name="ResistGrid" type="GridContainer" parent="MarginContainer/Layout" unique_id=1548742521]
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 4
+
+[node name="FireRes" type="PanelContainer" parent="MarginContainer/Layout/ResistGrid" unique_id=688240042]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_resist")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/ResistGrid/FireRes" unique_id=487678984]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="MarginContainer/Layout/ResistGrid/FireRes/VBox" unique_id=1801786909]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.45, 0.2, 1)
+theme_override_font_sizes/font_size = 11
+text = "Fire"
+horizontal_alignment = 1
+
+[node name="FireResValue" type="Label" parent="MarginContainer/Layout/ResistGrid/FireRes/VBox" unique_id=409841259]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "0% / 75%"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/ResistGrid/FireRes" unique_id=1526328556]
+script = ExtResource("10")
+keyword = "fire_resistance"
+
+[node name="ColdRes" type="PanelContainer" parent="MarginContainer/Layout/ResistGrid" unique_id=542772823]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_resist")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/ResistGrid/ColdRes" unique_id=1361381548]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="MarginContainer/Layout/ResistGrid/ColdRes/VBox" unique_id=210965147]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "Cold"
+horizontal_alignment = 1
+
+[node name="ColdResValue" type="Label" parent="MarginContainer/Layout/ResistGrid/ColdRes/VBox" unique_id=429754464]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "0% / 75%"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/ResistGrid/ColdRes" unique_id=786774468]
+script = ExtResource("10")
+keyword = "cold_resistance"
+
+[node name="LightRes" type="PanelContainer" parent="MarginContainer/Layout/ResistGrid" unique_id=1573071515]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_resist")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/ResistGrid/LightRes" unique_id=1239759886]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="MarginContainer/Layout/ResistGrid/LightRes/VBox" unique_id=1053895126]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.55, 1)
+theme_override_font_sizes/font_size = 11
+text = "Lightning"
+horizontal_alignment = 1
+
+[node name="LightResValue" type="Label" parent="MarginContainer/Layout/ResistGrid/LightRes/VBox" unique_id=319395690]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "0% / 75%"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/ResistGrid/LightRes" unique_id=518578930]
+script = ExtResource("10")
+keyword = "lightning_resistance"
+
+[node name="ChaosRes" type="PanelContainer" parent="MarginContainer/Layout/ResistGrid" unique_id=821661627]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_resist")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/ResistGrid/ChaosRes" unique_id=846507736]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="MarginContainer/Layout/ResistGrid/ChaosRes/VBox" unique_id=2087687845]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.45, 0.95, 1)
+theme_override_font_sizes/font_size = 11
+text = "Chaos"
+horizontal_alignment = 1
+
+[node name="ChaosResValue" type="Label" parent="MarginContainer/Layout/ResistGrid/ChaosRes/VBox" unique_id=985561889]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "0% / 75%"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/ResistGrid/ChaosRes" unique_id=223974646]
+script = ExtResource("10")
+keyword = "chaos_resistance"
+
+[node name="HSep4" type="HSeparator" parent="MarginContainer/Layout" unique_id=349141206]
+layout_mode = 2
+
+[node name="OffenceSectionLabel" type="Label" parent="MarginContainer/Layout" unique_id=776954288]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Offence"
+
+[node name="OffenceTiles" type="HBoxContainer" parent="MarginContainer/Layout" unique_id=1086934919]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="DpsTile" type="PanelContainer" parent="MarginContainer/Layout/OffenceTiles" unique_id=582409296]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/OffenceTiles/DpsTile" unique_id=580066001]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/OffenceTiles/DpsTile/VBox" unique_id=85583341]
+layout_mode = 2
+text = "Total DPS"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/OffenceTiles/DpsTile/VBox" unique_id=569685745]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 1
+
+[node name="HitTile" type="PanelContainer" parent="MarginContainer/Layout/OffenceTiles" unique_id=927548065]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/OffenceTiles/HitTile" unique_id=684011304]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/OffenceTiles/HitTile/VBox" unique_id=143664837]
+layout_mode = 2
+text = "Damage"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/OffenceTiles/HitTile/VBox" unique_id=994919898]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 1
+
+[node name="AttackSpeedTile" type="PanelContainer" parent="MarginContainer/Layout/OffenceTiles" unique_id=1990757721]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/OffenceTiles/AttackSpeedTile" unique_id=1894235094]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/OffenceTiles/AttackSpeedTile/VBox" unique_id=161944526]
+layout_mode = 2
+text = "Attack Speed"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/OffenceTiles/AttackSpeedTile/VBox" unique_id=1651701004]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "1.00"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/OffenceTiles/AttackSpeedTile" unique_id=1729359227]
+script = ExtResource("10")
+keyword = "attack_speed"
+
+[node name="CritTile" type="PanelContainer" parent="MarginContainer/Layout/OffenceTiles" unique_id=513446078]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/OffenceTiles/CritTile" unique_id=1593174301]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/OffenceTiles/CritTile/VBox" unique_id=863727888]
+layout_mode = 2
+text = "Crit 
+Chance / Multi"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/OffenceTiles/CritTile/VBox" unique_id=666984437]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "5% / 150%"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/OffenceTiles/CritTile" unique_id=409718781]
+script = ExtResource("10")
+keyword = "critical_strike"
+
+[node name="HSep5" type="HSeparator" parent="MarginContainer/Layout" unique_id=852540382]
+layout_mode = 2
+
+[node name="RecoverySectionLabel" type="Label" parent="MarginContainer/Layout" unique_id=382070507]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Recovery"
+
+[node name="RecoveryTiles" type="HBoxContainer" parent="MarginContainer/Layout" unique_id=808459651]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LifeRegenTile" type="PanelContainer" parent="MarginContainer/Layout/RecoveryTiles" unique_id=653126377]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/RecoveryTiles/LifeRegenTile" unique_id=1649721476]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/RecoveryTiles/LifeRegenTile/VBox" unique_id=1521916469]
+layout_mode = 2
+text = "Life Regen"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/RecoveryTiles/LifeRegenTile/VBox" unique_id=1094259429]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "0/s"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/RecoveryTiles/LifeRegenTile" unique_id=2033241013]
+script = ExtResource("10")
+keyword = "life_regen"
+
+[node name="LifeGainTile" type="PanelContainer" parent="MarginContainer/Layout/RecoveryTiles" unique_id=1875676981]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/RecoveryTiles/LifeGainTile" unique_id=1992681790]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/RecoveryTiles/LifeGainTile/VBox" unique_id=1856321044]
+layout_mode = 2
+text = "Life on Hit"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/RecoveryTiles/LifeGainTile/VBox" unique_id=832373677]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "0"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/RecoveryTiles/LifeGainTile" unique_id=982122225]
+script = ExtResource("10")
+keyword = "life_gain_on_hit"
+
+[node name="LifeLeechTile" type="PanelContainer" parent="MarginContainer/Layout/RecoveryTiles" unique_id=234001520]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/RecoveryTiles/LifeLeechTile" unique_id=1014431796]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/RecoveryTiles/LifeLeechTile/VBox" unique_id=807720858]
+layout_mode = 2
+text = "Life Leech"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/RecoveryTiles/LifeLeechTile/VBox" unique_id=275241128]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "0%"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/RecoveryTiles/LifeLeechTile" unique_id=2144294634]
+script = ExtResource("10")
+keyword = "life_leech"
+
+[node name="SecondWindTile" type="PanelContainer" parent="MarginContainer/Layout/RecoveryTiles" unique_id=593581028]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tile")
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/Layout/RecoveryTiles/SecondWindTile" unique_id=282111318]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelTop" type="Label" parent="MarginContainer/Layout/RecoveryTiles/SecondWindTile/VBox" unique_id=823024826]
+layout_mode = 2
+text = "Second Wind"
+horizontal_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="MarginContainer/Layout/RecoveryTiles/SecondWindTile/VBox" unique_id=1680031053]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "5% / 50%"
+horizontal_alignment = 1
+
+[node name="TooltipHover" type="Node" parent="MarginContainer/Layout/RecoveryTiles/SecondWindTile" unique_id=1850493539]
+script = ExtResource("10")
+keyword = "second_wind"
+
+[node name="HSep6" type="HSeparator" parent="MarginContainer/Layout" unique_id=1066963972]
+layout_mode = 2
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/Layout" unique_id=803391728]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_tabpanel")
+theme_override_styles/tab_unselected = SubResource("StyleBoxFlat_tab_unsel")
+theme_override_styles/tab_selected = SubResource("StyleBoxFlat_tab_sel")
+current_tab = 0
+
+[node name="Traits" type="ScrollContainer" parent="MarginContainer/Layout/TabContainer" unique_id=2134070005]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 0
+
+[node name="TraitsBody" type="VBoxContainer" parent="MarginContainer/Layout/TabContainer/Traits" unique_id=227592620]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="TraitsEmptyLabel" type="Label" parent="MarginContainer/Layout/TabContainer/Traits/TraitsBody" unique_id=1337068849]
+visible = false
+modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+text = "No traits."
+horizontal_alignment = 1
+
+[node name="TraitsGridMargin" type="MarginContainer" parent="MarginContainer/Layout/TabContainer/Traits/TraitsBody" unique_id=1452944961]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="TraitsGrid" type="HFlowContainer" parent="MarginContainer/Layout/TabContainer/Traits/TraitsBody/TraitsGridMargin" unique_id=692673826]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+alignment = 1
+
+[node name="TraitsPotentialSeparator" type="HSeparator" parent="MarginContainer/Layout/TabContainer/Traits/TraitsBody" unique_id=1859883942]
+layout_mode = 2
+
+[node name="PotentialGrid" type="GridContainer" parent="MarginContainer/Layout/TabContainer/Traits/TraitsBody" unique_id=98650548]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 3
+
+[node name="Scaling" type="ScrollContainer" parent="MarginContainer/Layout/TabContainer" unique_id=522071343]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 1
+
+[node name="ScalingMargin" type="MarginContainer" parent="MarginContainer/Layout/TabContainer/Scaling" unique_id=899103841]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="ScalingBody" type="VBoxContainer" parent="MarginContainer/Layout/TabContainer/Scaling/ScalingMargin" unique_id=1505529326]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 3
+
+[node name="HeaderLabel" type="Label" parent="MarginContainer/Layout/TabContainer/Scaling/ScalingMargin/ScalingBody" unique_id=1192130661]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 16
+text = "Damage Scaling"
+
+[node name="HelpLabel" type="Label" parent="MarginContainer/Layout/TabContainer/Scaling/ScalingMargin/ScalingBody" unique_id=90859039]
+modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Net % increased from passives, traits, conditionals, and non-local gear. Excludes local weapon scaling."
+autowrap_mode = 2
+
+[node name="PhysicalRow" parent="MarginContainer/Layout/TabContainer/Scaling/ScalingMargin/ScalingBody" unique_id=521406071 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Physical Damage"
+name_color = Color(0.949, 0.949, 0.949, 1)
+tooltip_keyword = "damage_scaling"
+
+[node name="ElementalRow" parent="MarginContainer/Layout/TabContainer/Scaling/ScalingMargin/ScalingBody" unique_id=177453125 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Elemental Damage"
+name_color = Color(0.753, 0.753, 0.753, 1)
+tooltip_keyword = "damage_scaling"
+
+[node name="FireRow" parent="MarginContainer/Layout/TabContainer/Scaling/ScalingMargin/ScalingBody" unique_id=954792204 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Fire Damage"
+name_color = Color(0.949, 0.451, 0.2, 1)
+tooltip_keyword = "damage_scaling"
+
+[node name="ColdRow" parent="MarginContainer/Layout/TabContainer/Scaling/ScalingMargin/ScalingBody" unique_id=1950571689 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Cold Damage"
+name_color = Color(0.549, 0.8, 1, 1)
+tooltip_keyword = "damage_scaling"
+
+[node name="LightningRow" parent="MarginContainer/Layout/TabContainer/Scaling/ScalingMargin/ScalingBody" unique_id=577484877 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Lightning Damage"
+name_color = Color(0.949, 0.898, 0.549, 1)
+tooltip_keyword = "damage_scaling"
+
+[node name="ChaosRow" parent="MarginContainer/Layout/TabContainer/Scaling/ScalingMargin/ScalingBody" unique_id=1946811269 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Chaos Damage"
+name_color = Color(0.8, 0.451, 0.949, 1)
+tooltip_keyword = "damage_scaling"
+
+[node name="Ailment" type="ScrollContainer" parent="MarginContainer/Layout/TabContainer" unique_id=120276368]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 2
+
+[node name="AilmentMargin" type="MarginContainer" parent="MarginContainer/Layout/TabContainer/Ailment" unique_id=1184760066]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="AilmentBody" type="VBoxContainer" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin" unique_id=1112559221]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 3
+
+[node name="OffenceHeader" type="Label" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=383881938]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 16
+text = "Offence"
+
+[node name="ShockChanceRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1740246792 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Shock Chance"
+name_color = Color(0.949, 0.898, 0.549, 1)
+tooltip_keyword = "shock_chance"
+
+[node name="ShockEffectRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=995121157 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Shock Effect"
+name_color = Color(0.949, 0.898, 0.549, 1)
+tooltip_keyword = "shock_effect"
+
+[node name="ShockDurationRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1045718268 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Shock Duration"
+name_color = Color(0.949, 0.898, 0.549, 1)
+tooltip_keyword = "shock_duration"
+
+[node name="ChillEffectRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1718539799 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Chill Effect"
+name_color = Color(0.549, 0.8, 1, 1)
+tooltip_keyword = "chill_effect"
+
+[node name="ChillDurationRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=334436105 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Chill Duration"
+name_color = Color(0.549, 0.8, 1, 1)
+tooltip_keyword = "chill_duration"
+
+[node name="IgniteChanceRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=760210249 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Ignite Chance"
+name_color = Color(0.949, 0.451, 0.2, 1)
+tooltip_keyword = "ignite_chance"
+
+[node name="IgniteEffectRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1240783763 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Ignite Effect"
+name_color = Color(0.949, 0.451, 0.2, 1)
+tooltip_keyword = "ignite_effect"
+
+[node name="IgniteDurationRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=454076471 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Ignite Duration"
+name_color = Color(0.949, 0.451, 0.2, 1)
+tooltip_keyword = "ignite_duration"
+
+[node name="DamageOverTimeRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1886380655 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Damage over Time"
+name_color = Color(0.753, 0.753, 0.753, 1)
+tooltip_keyword = "damage_over_time"
+
+[node name="PoisonChanceRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=492923967 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Poison Chance"
+name_color = Color(0.4, 0.85, 0.2, 1)
+tooltip_keyword = "poison_chance"
+
+[node name="PoisonEffectRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=40521431 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Poison Effect"
+name_color = Color(0.4, 0.85, 0.2, 1)
+tooltip_keyword = "poison_effect"
+
+[node name="PoisonDurationRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=521812284 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Poison Duration"
+name_color = Color(0.4, 0.85, 0.2, 1)
+tooltip_keyword = "poison_duration"
+
+[node name="ImpaleChanceRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1713124549 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Impale Chance"
+name_color = Color(0.949, 0.949, 0.949, 1)
+tooltip_keyword = "impale_chance"
+
+[node name="ImpaleEffectRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=289135112 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Impale Effect"
+name_color = Color(0.949, 0.949, 0.949, 1)
+tooltip_keyword = "impale_effect"
+
+[node name="MaxImpalesRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1588168692 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Max Impales"
+name_color = Color(0.949, 0.949, 0.949, 1)
+tooltip_keyword = "max_impales"
+
+[node name="OffenceEmptyLabel" type="Label" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1828662470]
+visible = false
+modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "No offensive ailment scaling."
+
+[node name="OffenceDefenceSeparator" type="HSeparator" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1320499626]
+layout_mode = 2
+
+[node name="DefenceHeader" type="Label" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1445060331]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 16
+text = "Defence"
+
+[node name="ShockEffectReductionRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1269177083 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Reduced Shock Effect"
+name_color = Color(0.949, 0.898, 0.549, 1)
+tooltip_keyword = "reduced_shock_effect"
+
+[node name="ShockDurationReductionRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1737429294 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Reduced Shock Duration"
+name_color = Color(0.949, 0.898, 0.549, 1)
+tooltip_keyword = "reduced_shock_duration"
+
+[node name="ChillEffectReductionRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1023008447 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Reduced Chill Effect"
+name_color = Color(0.549, 0.8, 1, 1)
+tooltip_keyword = "reduced_chill_effect"
+
+[node name="ChillDurationReductionRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1290139645 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Reduced Chill Duration"
+name_color = Color(0.549, 0.8, 1, 1)
+tooltip_keyword = "reduced_chill_duration"
+
+[node name="IgniteDurationReductionRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1796702239 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Reduced Ignite Duration"
+name_color = Color(0.949, 0.451, 0.2, 1)
+tooltip_keyword = "reduced_ignite_duration"
+
+[node name="PoisonDurationReductionRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=1547460884 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Reduced Poison Duration"
+name_color = Color(0.4, 0.85, 0.2, 1)
+tooltip_keyword = "reduced_poison_duration"
+
+[node name="ImmunitiesRow" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=827088147 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Immune to"
+name_color = Color(0.753, 0.753, 0.753, 1)
+tooltip_keyword = "ailment_immunities"
+
+[node name="DefenceEmptyLabel" type="Label" parent="MarginContainer/Layout/TabContainer/Ailment/AilmentMargin/AilmentBody" unique_id=859321162]
+visible = false
+modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "No defensive ailment scaling."
+
+[node name="Other" type="ScrollContainer" parent="MarginContainer/Layout/TabContainer" unique_id=150834235]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="OtherMargin" type="MarginContainer" parent="MarginContainer/Layout/TabContainer/Other" unique_id=406226567]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="OtherBody" type="VBoxContainer" parent="MarginContainer/Layout/TabContainer/Other/OtherMargin" unique_id=2001994622]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 3
+
+[node name="LifetimeHeader" type="Label" parent="MarginContainer/Layout/TabContainer/Other/OtherMargin/OtherBody" unique_id=227904786]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 16
+text = "Lifetime Combat"
+
+[node name="LifetimePlaceholder" type="Label" parent="MarginContainer/Layout/TabContainer/Other/OtherMargin/OtherBody" unique_id=1259949967]
+modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Per-exile lifetime stats not yet tracked. Coming soon."
+
+[node name="UtilityHeader" type="Label" parent="MarginContainer/Layout/TabContainer/Other/OtherMargin/OtherBody" unique_id=1209498661]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 16
+text = "Utility"
+
+[node name="MovementSpeedRow" parent="MarginContainer/Layout/TabContainer/Other/OtherMargin/OtherBody" unique_id=263445220 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Movement Speed"
+tooltip_keyword = "movement_speed"
+
+[node name="ActionSpeedRow" parent="MarginContainer/Layout/TabContainer/Other/OtherMargin/OtherBody" unique_id=1541838832 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Action Speed"
+tooltip_keyword = "action_speed"
+
+[node name="ScoutingRow" parent="MarginContainer/Layout/TabContainer/Other/OtherMargin/OtherBody" unique_id=1588477216 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Scouting"
+tooltip_keyword = "scouting"
+
+[node name="SurvivalRow" parent="MarginContainer/Layout/TabContainer/Other/OtherMargin/OtherBody" unique_id=174542101 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Survival"
+tooltip_keyword = "survival"
+
+[node name="ScavengingRow" parent="MarginContainer/Layout/TabContainer/Other/OtherMargin/OtherBody" unique_id=156729356 instance=ExtResource("11")]
+layout_mode = 2
+stat_name = "Scavenging"
+tooltip_keyword = "scavenging"
+
+[node name="Morale" type="VBoxContainer" parent="MarginContainer/Layout/TabContainer" unique_id=640400871]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+metadata/_tab_index = 4
+
+[node name="TopSection" type="HBoxContainer" parent="MarginContainer/Layout/TabContainer/Morale" unique_id=1395357763]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="TopLeft" type="MarginContainer" parent="MarginContainer/Layout/TabContainer/Morale/TopSection" unique_id=500524350]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="LeftBody" type="VBoxContainer" parent="MarginContainer/Layout/TabContainer/Morale/TopSection/TopLeft" unique_id=1605266364]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 3
+
+[node name="EffectsHeader" type="Label" parent="MarginContainer/Layout/TabContainer/Morale/TopSection/TopLeft/LeftBody" unique_id=620550551]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 16
+text = "Current Effects"
+
+[node name="EffectsBody" type="VBoxContainer" parent="MarginContainer/Layout/TabContainer/Morale/TopSection/TopLeft/LeftBody" unique_id=902663810]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 2
+
+[node name="NoEffectsLabel" type="Label" parent="MarginContainer/Layout/TabContainer/Morale/TopSection/TopLeft/LeftBody/EffectsBody" unique_id=1189475318]
+visible = false
+modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+text = "No active morale effects."
+
+[node name="TopMidSeparator" type="VSeparator" parent="MarginContainer/Layout/TabContainer/Morale/TopSection" unique_id=292508659]
+layout_mode = 2
+
+[node name="TopRight" type="MarginContainer" parent="MarginContainer/Layout/TabContainer/Morale/TopSection" unique_id=1168745997]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="RightBody" type="VBoxContainer" parent="MarginContainer/Layout/TabContainer/Morale/TopSection/TopRight" unique_id=1183786090]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 3
+
+[node name="MoraleGainRow" parent="MarginContainer/Layout/TabContainer/Morale/TopSection/TopRight/RightBody" unique_id=1027058454 instance=ExtResource("11")]
+layout_mode = 2
+size_flags_vertical = 3
+stat_name = "Morale Gain Bonus"
+tooltip_keyword = "morale_modifiers"
+
+[node name="MoraleLossResistRow" parent="MarginContainer/Layout/TabContainer/Morale/TopSection/TopRight/RightBody" unique_id=2109399178 instance=ExtResource("11")]
+layout_mode = 2
+size_flags_vertical = 3
+stat_name = "Morale Loss Resistance"
+tooltip_keyword = "morale_modifiers"
+
+[node name="VictoryMoraleRow" parent="MarginContainer/Layout/TabContainer/Morale/TopSection/TopRight/RightBody" unique_id=853206548 instance=ExtResource("11")]
+layout_mode = 2
+size_flags_vertical = 3
+stat_name = "Victory Morale Bonus"
+tooltip_keyword = "morale_modifiers"
+
+[node name="WellFedRow" parent="MarginContainer/Layout/TabContainer/Morale/TopSection/TopRight/RightBody" unique_id=1645235939 instance=ExtResource("11")]
+layout_mode = 2
+size_flags_vertical = 3
+stat_name = "Well-Fed Rest Bonus"
+tooltip_keyword = "morale_modifiers"
+
+[node name="TopBottomSeparator" type="HSeparator" parent="MarginContainer/Layout/TabContainer/Morale" unique_id=616533331]
+layout_mode = 2
+
+[node name="BottomSection" type="MarginContainer" parent="MarginContainer/Layout/TabContainer/Morale" unique_id=1026899892]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="BottomBody" type="VBoxContainer" parent="MarginContainer/Layout/TabContainer/Morale/BottomSection" unique_id=325082099]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 3
+
+[node name="HistoryHeader" type="Label" parent="MarginContainer/Layout/TabContainer/Morale/BottomSection/BottomBody" unique_id=1129886635]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 16
+text = "Recent Changes"
+
+[node name="HistoryEmptyLabel" type="Label" parent="MarginContainer/Layout/TabContainer/Morale/BottomSection/BottomBody" unique_id=802845772]
+visible = false
+modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+text = "No recent morale changes."
+
+[node name="HistoryGrid" type="GridContainer" parent="MarginContainer/Layout/TabContainer/Morale/BottomSection/BottomBody" unique_id=1338744100]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 2
+columns = 2

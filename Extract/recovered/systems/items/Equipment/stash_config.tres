@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="StashConfig" format=3]
+
+[ext_resource type="Script" uid="uid://dkl0b8di3b7hs" path="res://systems/items/Equipment/StashConfig.gd" id="1"]
+
+[resource]
+script = ExtResource("1")

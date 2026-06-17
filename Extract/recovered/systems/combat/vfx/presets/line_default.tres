@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LinePulseVFX" format=3 uid="uid://b6urepknxs62l"]
+
+[ext_resource type="Resource" path="res://systems/combat/vfx/impactPresets/blood_default.tres" id="1"]
+[ext_resource type="Script" uid="uid://deilicheqhkbk" path="res://systems/combat/vfx/LinePulseVFX.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+trail_length = 0.35
+segments = 14
+color_override = Color(0.8346143, 0.8346143, 0.8346143, 0.9372549)
+impact_fx = ExtResource("1")

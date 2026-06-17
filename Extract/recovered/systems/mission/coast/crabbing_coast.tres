@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://krpp328c6drp"]
+
+[ext_resource type="Resource" uid="uid://wi27st6bmpm" path="res://systems/combat/encounters/coast/foraging_crabs.tres" id="1"]
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="2"]
+[ext_resource type="Resource" uid="uid://boneesr6gpkue" path="res://systems/combat/encounters/coast/crab_nest.tres" id="3"]
+[ext_resource type="Script" uid="uid://1jao5grkeqsb" path="res://systems/mission/MissionReward.gd" id="4"]
+[ext_resource type="Script" uid="uid://bl1n406v551lg" path="res://systems/mission/ProgressionRequirement.gd" id="5"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="6"]
+
+[sub_resource type="Resource" id="Resource_cf5it"]
+script = ExtResource("2")
+slot_type = 0
+encounter = ExtResource("1")
+area_filter = [0]
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_kou7w"]
+script = ExtResource("2")
+slot_type = 0
+encounter = ExtResource("3")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_8b7jr"]
+script = ExtResource("4")
+food_amount = 1
+scrap_amount = 1
+metadata/_custom_type_script = "uid://1jao5grkeqsb"
+
+[sub_resource type="Resource" id="Resource_cd4m6"]
+script = ExtResource("5")
+type = 3
+required_value = 4.0
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[resource]
+script = ExtResource("6")
+mission_id = "crabbing_coast"
+display_name = "Crab Hunting"
+description = "They're dangerous, they stink, and they taste foul but they may be our only option. Raiding Spitter nests is pretty safe as long as the front liners have some decent protection from the gravel spray. Doesn't hurt to have a lightning heavy hitter too."
+icon = null
+level = 2
+mission_tags = [2]
+availability_type = 2
+prerequisites = [SubResource("Resource_cd4m6")]
+scouting_threshold_percent = 4.0
+discovery_base_chance = 1.0
+discovery_description = "Sand Skitter nesting grounds discovered."
+mission_length = 2
+encounter_slots = [SubResource("Resource_cf5it"), SubResource("Resource_kou7w")]
+scouting_reward = 4.0
+mission_rewards = SubResource("Resource_8b7jr")
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

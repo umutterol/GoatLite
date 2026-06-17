@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://vds17u60ya20"]
+
+[ext_resource type="Texture2D" uid="uid://cx1lr0telft2o" path="res://assets/sprites/itemSprites/gearSprites/armorSprites/tattered_rags.webp" id="1"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+item_id = "tattered_rags"
+display_name = "Tattered Rags"
+description = "What's left of someone else's clothes. Loose enough to twist out of a grab, thin enough to be a courtesy."
+icon = ExtResource("1")
+category = 0
+grid_width = 2
+grid_height = 3
+base_evasion_min = 2
+base_evasion_max = 6
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

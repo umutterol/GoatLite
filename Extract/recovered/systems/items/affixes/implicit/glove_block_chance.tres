@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3 uid="uid://bvt04lxq8rjgk"]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+affix_id = "glove_block_chance"
+display_name = "Glove Block Chance"
+is_implicit = true
+valid_on_gloves = true
+stat_type = "block_chance"
+min_value = 4.0
+max_value = 6.0
+value_suffix = "%"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

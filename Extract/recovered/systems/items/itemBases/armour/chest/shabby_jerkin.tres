@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://cumqk713wm47g"]
+
+[ext_resource type="Texture2D" uid="uid://cnx5tus5dty3r" path="res://assets/sprites/itemSprites/gearSprites/armorSprites/Shabby_Jerkin_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+item_id = "shabby_jerkin"
+display_name = "Shabby Jerkin"
+description = "A shabby jerkin is better than no jerkin."
+icon = ExtResource("1")
+category = 0
+min_item_level = 3
+required_level = 3
+grid_width = 2
+grid_height = 3
+base_armour_min = 4
+base_armour_max = 12
+base_evasion_min = 3
+base_evasion_max = 8
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

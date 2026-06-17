@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatDefinition" format=3 uid="uid://ba8haje51nbps"]
+
+[ext_resource type="Script" uid="uid://3qdow8f31kyn" path="res://systems/exile/stats/StatDefinition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stat_id = "max_morale"
+display_name = "Max Morale"
+description = "Change to the default Morale Maximum of 100. More thresholds are % based, so less Max Morale means more volatility, while increased Max Morale means more stability (resilience to change)."
+default_value = 100.0
+min_value = 10.0
+max_value = 1000.0
+icon = null
+metadata/_custom_type_script = "uid://3qdow8f31kyn"

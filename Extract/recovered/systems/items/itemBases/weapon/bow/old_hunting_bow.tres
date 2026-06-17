@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://c5taqdvj07d3u"]
+
+[ext_resource type="Texture2D" uid="uid://uc1s78dspr8e" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Long_Bow_inventory_icon.png" id="1"]
+[ext_resource type="Resource" path="res://systems/items/affixes/implicit/impale_chance_bow.tres" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[resource]
+script = ExtResource("3")
+item_id = "old_hunting_bow"
+display_name = "Old Hunting Bow"
+description = "An old and damaged hunter's bow. In better times it'd be retired permanently as the wood has not been maintained, making it brittle and dangerous to use."
+icon = ExtResource("1")
+weapon_type = 1
+hand_type = 1
+min_item_level = 2
+required_level = 2
+grid_width = 2
+grid_height = 3
+base_physical_damage_min = 4
+base_physical_damage_max = 10
+base_attack_speed = 0.8
+base_critical_chance = 8.0
+base_attack_range = 12.0
+implicit_affixes = [ExtResource("2")]
+ranged = true
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

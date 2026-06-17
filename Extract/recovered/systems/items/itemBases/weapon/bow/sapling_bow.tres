@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://d0u3ngg61ahac"]
+
+[ext_resource type="Texture2D" uid="uid://en8lcw7ycaih" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Crude_Bow_inventory_icon.png" id="1"]
+[ext_resource type="Resource" path="res://systems/items/affixes/implicit/impale_chance_bow.tres" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[resource]
+script = ExtResource("3")
+item_id = "sapling_bow"
+display_name = "Sapling Shortbow"
+description = "A simple and primitive shortbow made from a tree sapling and rough cordage. Weak, inaccruate, and barely better than throwing the arrows."
+icon = ExtResource("1")
+weapon_type = 1
+hand_type = 1
+grid_width = 2
+grid_height = 3
+base_physical_damage_min = 2
+base_physical_damage_max = 4
+base_attack_speed = 0.95
+base_critical_chance = 2.0
+base_attack_range = 10.0
+implicit_affixes = [ExtResource("2")]
+ranged = true
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DefeatOutcome" format=3 uid="uid://b6d001qq01b4s"]
+
+[ext_resource type="Script" uid="uid://l2mo5qh0p5js" path="res://systems/defeat/DefeatOutcome.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+outcome_id = "gear_damaged"
+display_name = "Gear Damaged"
+description = "They got off lightly but something doesn't feel quite right with their equipment..."
+weight = 5.0
+vitality_cost_percent = 5.0
+morale_cost = 20.0
+recovery_days = 1
+items_damaged = 1
+item_damage_severity = 1
+metadata/_custom_type_script = "uid://l2mo5qh0p5js"

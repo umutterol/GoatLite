@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://cyor2ko1xxwb3"]
+
+[ext_resource type="Script" uid="uid://dn8chjjrdw06v" path="res://systems/monsters/MonsterStats.gd" id="1"]
+[ext_resource type="Resource" uid="uid://bveqdsno2m7yo" path="res://systems/combat/vfx/presets/gravel_spitVFX.tres" id="2"]
+[ext_resource type="Script" uid="uid://bn4tocniaeat3" path="res://systems/combat/CombatBehavior.gd" id="3"]
+[ext_resource type="Resource" uid="uid://cg4og4vyghiqv" path="res://systems/combat/profiles/tactical_skittish.tres" id="4"]
+[ext_resource type="Texture2D" uid="uid://bxyuvqy3cjt4q" path="res://assets/sprites/monsterSprites/SandSpitterBase.png" id="5"]
+[ext_resource type="Script" uid="uid://xo0774xbjf5m" path="res://systems/monsters/MonsterData.gd" id="6"]
+
+[sub_resource type="Resource" id="Resource_qrl6s"]
+script = ExtResource("1")
+life = 12.0
+vitality = 12.0
+armour = 6.0
+lightning_resistance = -20.0
+fire_resistance = 20.0
+physical_damage = Vector2(1, 5)
+attack_speed = 1.2
+
+[sub_resource type="Resource" id="Resource_esu41"]
+script = ExtResource("3")
+attack_range = 6.0
+preferred_distance = 4.0
+kite_mode = 2
+tactical_profile = ExtResource("4")
+basic_attack_vfx_override = ExtResource("2")
+metadata/_custom_type_script = "uid://bn4tocniaeat3"
+
+[resource]
+script = ExtResource("6")
+monster_id = "sand_spitter"
+display_name = "Sand Spitter"
+icon = ExtResource("5")
+description = "A vicious little shit that emits a blast of sand that is known to shred skin from bone."
+base_stats = SubResource("Resource_qrl6s")
+combat_behavior = SubResource("Resource_esu41")
+drop_tags = ["crab"]
+drop_table = null
+experience_value = 12
+food_drops = 0.2
+metadata/_custom_type_script = "uid://xo0774xbjf5m"

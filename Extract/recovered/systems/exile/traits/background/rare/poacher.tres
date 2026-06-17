@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="TraitDefinition" format=3 uid="uid://bt4ux2mplnyhg"]
+
+[ext_resource type="Script" uid="uid://cqdaucea0t1j0" path="res://systems/exile/traits/TraitDefinition.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_i6ldf"]
+script = ExtResource("2")
+stat_id = "survival"
+base_value = 20.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_g3hlo"]
+script = ExtResource("2")
+stat_id = "scouting"
+base_value = 20.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_vglye"]
+script = ExtResource("2")
+stat_id = "critical_chance"
+base_value = 2.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+trait_id = "poacher"
+name = "Poacher"
+description = "An expert at hunting. They must've taken the wrong game to end up exiled."
+rarity = 2
+icon = null
+stat_bonuses = [SubResource("Resource_i6ldf"), SubResource("Resource_g3hlo"), SubResource("Resource_vglye")]
+potential_tags = ["survival"]
+potential_values = [2.5]
+metadata/_custom_type_script = "uid://cqdaucea0t1j0"

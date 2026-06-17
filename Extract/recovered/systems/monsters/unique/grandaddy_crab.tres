@@ -1,0 +1,72 @@
+[gd_resource type="Resource" script_class="MonsterData" format=3 uid="uid://b5kc5a0a0c3d1"]
+
+[ext_resource type="Resource" uid="uid://brb3tyqus6whr" path="res://systems/combat/abilities/resources/hardshell_slam.tres" id="1"]
+[ext_resource type="Script" uid="uid://cetal6p7kbjls" path="res://systems/combat/abilities/ActionSlotConfig.gd" id="2"]
+[ext_resource type="Script" uid="uid://dn8chjjrdw06v" path="res://systems/monsters/MonsterStats.gd" id="3"]
+[ext_resource type="Resource" uid="uid://biecl5v68xtxt" path="res://systems/combat/vfx/presets/swing_default.tres" id="4"]
+[ext_resource type="Script" uid="uid://bn4tocniaeat3" path="res://systems/combat/CombatBehavior.gd" id="5"]
+[ext_resource type="Resource" uid="uid://crybkt61dtakc" path="res://systems/combat/profiles/tactical_melee_tank.tres" id="6"]
+[ext_resource type="Resource" uid="uid://dvep8gk0fviws" path="res://systems/items/itemBases/offhand/shield/crabshell_shield.tres" id="7"]
+[ext_resource type="Script" uid="uid://bu3sdlngwyt7h" path="res://systems/monsters/MonsterDropEntry.gd" id="8"]
+[ext_resource type="Script" uid="uid://b50iqhtungdym" path="res://systems/monsters/MonsterDropTable.gd" id="9"]
+[ext_resource type="Texture2D" uid="uid://cwrhbtfk2si4o" path="res://assets/sprites/monsterSprites/ShellCrab.png" id="10"]
+[ext_resource type="Script" uid="uid://xo0774xbjf5m" path="res://systems/monsters/MonsterData.gd" id="11"]
+
+[sub_resource type="Resource" id="Resource_jy11q"]
+script = ExtResource("2")
+abilities = [ExtResource("1")]
+metadata/_custom_type_script = "uid://cetal6p7kbjls"
+
+[sub_resource type="Resource" id="Resource_tqibk"]
+script = ExtResource("3")
+life = 220.0
+vitality = 20.0
+armour = 50.0
+evasion = 0.0
+cold_resistance = 20.0
+lightning_resistance = -20.0
+fire_resistance = 20.0
+life_leech = 5.0
+physical_damage = Vector2(15, 30)
+attack_speed = 0.8
+movement = -30.0
+
+[sub_resource type="Resource" id="Resource_g8nul"]
+script = ExtResource("5")
+aggro_type = 2
+attack_range = 2.5
+stance = 0
+tactical_profile = ExtResource("6")
+basic_attack_vfx_override = ExtResource("4")
+metadata/_custom_type_script = "uid://bn4tocniaeat3"
+
+[sub_resource type="Resource" id="Resource_pgd1l"]
+script = ExtResource("8")
+item_base = ExtResource("7")
+
+[sub_resource type="Resource" id="Resource_ifl5e"]
+script = ExtResource("9")
+entries = [SubResource("Resource_pgd1l")]
+
+[resource]
+script = ExtResource("11")
+monster_id = "grandaddy_crab"
+display_name = "Grandaddy Crab"
+icon = ExtResource("10")
+description = "The crustacean primarch."
+is_unique = true
+base_level = 4
+base_stats = SubResource("Resource_tqibk")
+combat_behavior = SubResource("Resource_g8nul")
+action_slot_configs = [SubResource("Resource_jy11q")]
+drop_tags = ["crab", "grandaddy"]
+drop_table = SubResource("Resource_ifl5e")
+experience_value = 120
+item_rarity_bonus = 1.0
+item_quantity_bonus = 1.0
+base_drop_chance = 1.0
+food_drops = 5.0
+scrap_drops = 1.5
+chaos_drops = 1.5
+exalt_drops = 2.5
+metadata/_custom_type_script = "uid://xo0774xbjf5m"

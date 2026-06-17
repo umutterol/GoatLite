@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://cidv1mmcqynge"]
+
+[ext_resource type="Texture2D" uid="uid://dij61j4383vw6" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Stone_Axe_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+item_id = "stone_hatchet"
+display_name = "Stone Hatchet"
+description = "A piece of knapped rock, wedged in a short piece of driftwood and strapped in place with rags. Short reach, heavy and awkward."
+icon = ExtResource("1")
+weapon_type = 0
+grid_width = 2
+grid_height = 3
+base_physical_damage_min = 2
+base_physical_damage_max = 8
+base_attack_speed = 0.9
+base_critical_chance = 1.0
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

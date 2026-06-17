@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://b7cknwtapj2x4"]
+
+[ext_resource type="FontFile" uid="uid://ckdfy3nugcff5" path="res://assets/fonts/Fontin-SmallCaps.otf" id="1"]
+[ext_resource type="Script" uid="uid://dqq8wbvq2pprm" path="res://gameUI/smallComponents/AutosaveToast.gd" id="2"]
+
+[node name="AutosaveToast" type="Label" unique_id=1922444652]
+custom_minimum_size = Vector2(200, 80)
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_bottom = 50.0
+grow_horizontal = 0
+size_flags_horizontal = 8
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 22
+text = "Game Saved"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("2")

@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="AffixBase" format=3 uid="uid://b1lgohmelee"]
+
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckf2e0ljtmtxg" path="res://systems/items/affixes/AffixValueTier.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_t1_life_gain_on_hit_melee"]
+script = ExtResource("2")
+min_value = 1.0
+max_value = 2.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t2_life_gain_on_hit_melee"]
+script = ExtResource("2")
+item_level = 3
+min_value = 3.0
+max_value = 4.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_t3_life_gain_on_hit_melee"]
+script = ExtResource("2")
+item_level = 5
+min_value = 5.0
+max_value = 6.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[sub_resource type="Resource" id="Resource_cjbyc"]
+script = ExtResource("2")
+item_level = 8
+min_value = 7.0
+max_value = 8.0
+metadata/_custom_type_script = "uid://ckf2e0ljtmtxg"
+
+[resource]
+script = ExtResource("1")
+affix_id = "life_gain_on_hit_melee"
+display_name = "Life Gained on Hit"
+is_suffix = true
+valid_on_1h_weapon = true
+valid_on_2h_weapon = true
+valid_on_sword = true
+valid_on_mace = true
+valid_on_axe = true
+valid_on_staff = true
+valid_on_spear = true
+valid_on_dagger = true
+stat_type = "life_gain_on_hit"
+use_tier_helper = true
+value_tiers = [SubResource("Resource_t1_life_gain_on_hit_melee"), SubResource("Resource_t2_life_gain_on_hit_melee"), SubResource("Resource_t3_life_gain_on_hit_melee"), SubResource("Resource_cjbyc")]
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"

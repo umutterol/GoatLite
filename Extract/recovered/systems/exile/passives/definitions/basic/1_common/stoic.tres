@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://lkpofaei4nig"]
+
+[ext_resource type="Texture2D" uid="uid://c2yax2uahklwq" path="res://systems/exile/passives/definitions/basic/1_common/stoic.webp" id="1"]
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="2"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_ngydk"]
+script = ExtResource("3")
+stat_id = "morale_loss_resistance"
+base_value = 40.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("2")
+passive_id = "stoic"
+name = "Stoic"
+description = "Manage without complaint."
+rarity = 1
+icon = ExtResource("1")
+stat_tags = ["morale"]
+primary_tag = "morale"
+stat_bonuses = [SubResource("Resource_ngydk")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

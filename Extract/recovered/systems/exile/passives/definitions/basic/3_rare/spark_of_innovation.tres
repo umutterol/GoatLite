@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="PassiveDefinition" format=3 uid="uid://djxumopn8ostl"]
+
+[ext_resource type="Script" uid="uid://ifdhklhe10f7" path="res://systems/exile/passives/PassiveDefinitions.gd" id="1"]
+[ext_resource type="Script" uid="uid://lmp85aeaqixj" path="res://systems/exile/passives/PassiveStatBonus.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_1fdlp"]
+script = ExtResource("2")
+stat_id = "lightning_damage"
+base_value = 1.0
+damage_target = 1
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_sm1v8"]
+script = ExtResource("2")
+stat_id = "lightning_damage"
+base_value = 20.0
+damage_target = 2
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[sub_resource type="Resource" id="Resource_uw51a"]
+script = ExtResource("2")
+stat_id = "life"
+base_value = -11.0
+metadata/_custom_type_script = "uid://lmp85aeaqixj"
+
+[resource]
+script = ExtResource("1")
+passive_id = "spark_of_innovation"
+name = "Spark of Innovation"
+description = "...the energy produced is highly potent and extremley unpredicatable. Non-conductive gloves alone will not be sufficient."
+rarity = 2
+icon = null
+stat_tags = ["lightning_damage"]
+theme_tags = ["elementalist"]
+category_tags = ["elemental_damage", "offence"]
+primary_tag = "elementalist"
+stat_bonuses = [SubResource("Resource_1fdlp"), SubResource("Resource_sm1v8"), SubResource("Resource_uw51a")]
+metadata/_custom_type_script = "uid://ifdhklhe10f7"

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://c81fk63in1sap"]
+
+[ext_resource type="Texture2D" uid="uid://onkyt2vfjkv5" path="res://assets/sprites/itemSprites/gearSprites/armorSprites/wood_gloves.png" id="1"]
+[ext_resource type="Resource" uid="uid://bvt04lxq8rjgk" path="res://systems/items/affixes/implicit/glove_block_chance.tres" id="2"]
+[ext_resource type="Resource" uid="uid://ckuj17u0xygih" path="res://systems/items/affixes/implicit/glove_block_amount.tres" id="3"]
+[ext_resource type="Resource" uid="uid://dfchqkefb6vi" path="res://systems/items/affixes/implicit/heavyglovesaspd.tres" id="4"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="5"]
+
+[resource]
+script = ExtResource("5")
+item_id = "woodplankgloves"
+display_name = "Wooden Armguards"
+description = "Salvaged wooden planks and floorboards have been tied together and then bundled with scrap fabric into a pair of crude mitten, held in place with rope across the palm and forearm. They are heavy and make holding a weapon difficult."
+icon = ExtResource("1")
+category = 0
+armour_type = 3
+grid_width = 2
+grid_height = 2
+base_armour_min = 18
+base_armour_max = 28
+base_evasion_min = -2
+base_evasion_max = -4
+implicit_affixes = [ExtResource("2"), ExtResource("3"), ExtResource("4")]
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

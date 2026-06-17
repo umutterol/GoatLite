@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://dvwdr4aefpf2c"]
+
+[ext_resource type="Resource" uid="uid://bdmjm1uw25yyf" path="res://systems/combat/encounters/coast/grandaddy_crab_bossfight.tres" id="1"]
+[ext_resource type="Script" uid="uid://pj2v5nxvg4ma" path="res://systems/mission/MissionConundrumSlot.gd" id="2"]
+[ext_resource type="Script" uid="uid://1jao5grkeqsb" path="res://systems/mission/MissionReward.gd" id="3"]
+[ext_resource type="Script" uid="uid://bl1n406v551lg" path="res://systems/mission/ProgressionRequirement.gd" id="4"]
+[ext_resource type="Script" uid="uid://c4o7wjc1qkjbp" path="res://systems/mission/MissionData.gd" id="5"]
+
+[sub_resource type="Resource" id="Resource_cf5it"]
+script = ExtResource("2")
+slot_type = 0
+encounter = ExtResource("1")
+metadata/_custom_type_script = "uid://pj2v5nxvg4ma"
+
+[sub_resource type="Resource" id="Resource_5k0ny"]
+script = ExtResource("3")
+food_amount = 5
+exalt_amount = 3
+bonus_item_rolls = 1
+metadata/_custom_type_script = "uid://1jao5grkeqsb"
+
+[sub_resource type="Resource" id="Resource_m7n35"]
+script = ExtResource("4")
+mission_id = "crabbing_coast"
+metadata/_custom_type_script = "uid://bl1n406v551lg"
+
+[resource]
+script = ExtResource("5")
+mission_id = "grandaddy_crab"
+display_name = "The Grandaddy Crab"
+description = "\"It dragged its shell across the sand, leaving a furrow in its wake. One of the little ones crossed its path and it just... snatched them up and swallowed them whole. The ones ridin' on its back spat at us as it approached... we choofed off right about then.\" -Scouting Party Report"
+icon = null
+level = 3
+mission_tags = [5]
+availability_type = 3
+prerequisites = [SubResource("Resource_m7n35")]
+opportunity_chance = 0.5
+opportunity_cooldown_days = 4
+encounter_slots = [SubResource("Resource_cf5it")]
+scouting_reward = 4.0
+rarity_bonus = 0.25
+quantity_bonus = 0.25
+mission_rewards = SubResource("Resource_5k0ny")
+metadata/_custom_type_script = "uid://c4o7wjc1qkjbp"

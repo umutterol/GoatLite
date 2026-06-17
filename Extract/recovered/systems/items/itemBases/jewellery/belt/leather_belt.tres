@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://do717srxaq8xb"]
+
+[ext_resource type="Texture2D" uid="uid://uay0g2l4ol64" path="res://assets/sprites/itemSprites/gearSprites/jewellerySprites/Leather_Belt_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_leatherlife"]
+script = ExtResource("2")
+affix_id = "leather_belt_life"
+display_name = "Life"
+is_implicit = true
+stat_type = "life"
+min_value = 5.0
+max_value = 10.0
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "leather_belt"
+display_name = "Leather Belt"
+description = "A wide strap of cured hide. Holds the body together where the body would rather not."
+icon = ExtResource("1")
+category = 1
+jewellery_type = 2
+grid_width = 2
+implicit_affixes = [SubResource("Resource_leatherlife")]
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

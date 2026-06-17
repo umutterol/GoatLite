@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://bjnnfj50kkvbr"]
+
+[ext_resource type="Texture2D" uid="uid://cgoo1r1h15uaf" path="res://assets/sprites/itemSprites/gearSprites/weaponSprites/Gnarled_Branch_inventory_icon.png" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_xmoa3"]
+script = ExtResource("2")
+affix_id = "driftwood_staff_block_chance"
+display_name = "Block Chance"
+is_implicit = true
+stat_type = "block_chance"
+min_value = 12.0
+max_value = 16.0
+value_suffix = "%"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[sub_resource type="Resource" id="Resource_emgq1"]
+script = ExtResource("2")
+affix_id = "driftwood_staff_block_amount"
+display_name = "Block Amount"
+is_implicit = true
+stat_type = "block_amount"
+min_value = 3.0
+max_value = 5.0
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "driftwood_staff"
+display_name = "Driftwood Staff"
+description = "A long and gnarled piece of driftwood, worn smooth by the tides."
+icon = ExtResource("1")
+weapon_type = 4
+hand_type = 1
+grid_height = 4
+base_physical_damage_min = 2
+base_physical_damage_max = 6
+base_attack_speed = 1.1
+base_critical_chance = 2.0
+base_attack_range = 2.0
+implicit_affixes = [SubResource("Resource_xmoa3"), SubResource("Resource_emgq1")]
+attack_vfx = null
+metadata/_custom_type_script = "uid://cetys5ykyhird"

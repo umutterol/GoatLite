@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="ItemBase" format=3 uid="uid://dvep8gk0fviws"]
+
+[ext_resource type="Texture2D" uid="uid://cir1lhd0it6j3" path="res://assets/sprites/itemSprites/gearSprites/armorSprites/KrakenShield.webp" id="1"]
+[ext_resource type="Script" uid="uid://bo5wqffnihwqs" path="res://systems/items/affixes/AffixBase.gd" id="2"]
+[ext_resource type="Script" uid="uid://cetys5ykyhird" path="res://systems/items/core/ItemBase.gd" id="3"]
+
+[sub_resource type="Resource" id="Resource_wwam5"]
+script = ExtResource("2")
+affix_id = "grandaddy_coldres"
+display_name = "Cold Resistance"
+is_implicit = true
+stat_type = "fire_resistance"
+min_value = 8.0
+max_value = 16.0
+value_suffix = "%"
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[sub_resource type="Resource" id="Resource_ch0qc"]
+script = ExtResource("2")
+affix_id = "grandaddy_armour"
+display_name = "Armour"
+is_implicit = true
+stat_type = "armour"
+min_value = 20.0
+max_value = 40.0
+metadata/_custom_type_script = "uid://bo5wqffnihwqs"
+
+[resource]
+script = ExtResource("3")
+item_id = "crabshell_shield"
+display_name = "Grandad's Claw"
+description = "One of the claws of the great Grandaddy Crab, recovered intact and strapped to the arm. It's awkward, but it's sturdy and solid in a pinch."
+icon = ExtResource("1")
+category = 2
+min_item_level = 4
+required_level = 4
+grid_width = 2
+grid_height = 2
+movement = -12
+base_block_chance_min = 8
+base_block_chance_max = 12
+base_block_amount_min = 15
+base_block_amount_max = 25
+implicit_affixes = [SubResource("Resource_wwam5"), SubResource("Resource_ch0qc")]
+attack_vfx = null
+exclusive_tags = ["grandaddy"]
+is_monster_infrequent = true
+monster_infrequent_set = "Crabs"
+metadata/_custom_type_script = "uid://cetys5ykyhird"
