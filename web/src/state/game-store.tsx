@@ -33,7 +33,9 @@ function rarityForKey(key: number): string {
   if (key <= 15) return key >= 14 ? "Epic" : "Rare"
   return "Epic"
 }
-const dropIlvl = (key: number) => 100 + 5 * key
+// Drops track the key: gear-appropriate ilvl for a key is ~108+4·key, so a drop lands a few above that —
+// a real upgrade that nudges you toward the next key's requirement (timing K gears you to attempt K+1).
+const dropIlvl = (key: number) => 112 + 4 * key
 function starterGear(specId: string, ilvl: number, memberId: string): Record<string, GearItem> {
   const g: Record<string, GearItem> = {}
   for (const s of SLOTS) g[s] = { uid: `starter-${memberId}-${s}`, baseId: "beta-standard-issue", name: `Worn ${content.itemSlots.get(s)!.name}`, slot: s, specs: [specId], ilvl, rarity: "Common" }
@@ -191,6 +193,9 @@ function loadState(): GameState {
         const merged = { ...freshState(), ...p, ...TRANSIENT }
         // defensive: guarantee every member has a key so shapeKey/keys never deref undefined
         merged.roster = merged.roster.map((m) => (m.key ? m : { ...m, key: freshKey() }))
+        // history changed shape (string[] → RunTicket[]) — drop any legacy/malformed entries so replay can't crash
+        merged.history = ((merged.history as unknown[]) ?? []).filter((t): t is RunTicket =>
+          !!t && typeof t === "object" && typeof (t as RunTicket).seed === "number" && Array.isArray((t as RunTicket).party) && typeof (t as RunTicket).aggression === "string")
         return merged
       }
       // version mismatch → reset (full stepwise migrator goes here later)

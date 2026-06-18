@@ -26,7 +26,7 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
   const ticket = (viewId ? tickets.find((t) => t.id === viewId) : null) ?? tickets[0] ?? null
   const isLatest = ticket != null && ticket.id === tickets[0]?.id
   // re-simulate the selected run from its ticket (deterministic) — no full RunResults are stored
-  const result = useMemo(() => ticket ? g.replayTicket(ticket) : null, [ticket?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  const result = useMemo(() => { try { return ticket ? g.replayTicket(ticket) : null } catch { return null } }, [ticket?.id]) // eslint-disable-line react-hooks/exhaustive-deps
   const runKey = ticket ? { dungeonId: ticket.dungeonId, dungeon: ticket.dungeonName, level: ticket.keyLevel, rating: ticket.rating } : g.keystone
   const affixNames = ticket ? ticket.affixNames : g.weekAffixes.map((a) => a.name)
   const R = useMemo(() => result ? buildReport(result, runKey, affixNames, g.guild?.region ?? "—") : null, [result, ticket?.id, g.guild]) // eslint-disable-line react-hooks/exhaustive-deps
