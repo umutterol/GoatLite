@@ -1,4 +1,8 @@
-export { runDungeon } from "./engine"
+// Combat engine cutover (Phase 5b): the app now runs the EGM-model engine (real per-hit damage,
+// abilities/passives/specials, front/back bands, affixes/tactics/boss mechanics). The legacy flat-power
+// engine is kept exported for rollback/comparison. RunResult shape is identical, so every consumer is unchanged.
+export { runDungeonEGM as runDungeon } from "./egm/engine"
+export { runDungeon as runDungeonLegacy } from "./engine"
 export type { RunInput, RunResult, LogLine, ParseRow, DeathReport, Aggression, LogKind, SimPartyMember } from "./types"
 
 import { content } from "@/content"

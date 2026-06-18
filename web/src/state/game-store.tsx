@@ -1,15 +1,29 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, type ReactNode } from "react"
 import { content } from "@/content"
 import { runDungeon } from "@/sim"
-import type { RunResult, Aggression } from "@/sim"
-import type { Member, Trait, Affix } from "@/data/game"
+import type { RunResult, Aggression, SimPartyMember } from "@/sim"
+import type { Member, Trait, Affix, KeyView } from "@/data/game"
 
 const SAVE_KEY = "goatlite.save"
-const SAVE_VERSION = 2
+const SAVE_VERSION = 4 // bumped: keystones are now per-member (each member holds & levels their own key)
 export const SLOTS = [...content.itemSlots.keys()] // weapon, helm, chest, legs, boots, trinket
+
+export type RoleKey = "tank" | "healer" | "dps"
+export type Phase = "create" | "recruit" | "playing"
 
 export interface GearItem {
   uid: string; baseId: string; name: string; slot: string; specs: string[]; ilvl: number; rarity: string
+}
+export interface GuildInfo { name: string; faction: string; region: string; crest: string; glyph: string; motto: string }
+export interface Recruit {
+  id: string; name: string; specId: string; role: RoleKey; ilvl: number; score: number; morale: number
+  traitId: string; traitName: string; traitGood: boolean; traitFlavor: string; cost: number
+}
+export interface LootDrop extends GearItem { primaryStat: string; upgradeFor: string | null; upgradeAmt: number }
+export interface KeystoneChange {
+  prevLevel: number; prevDungeon: string; prevTime: string; prevPar: string
+  outcome: "timed" | "depleted" | "wipe"; underBy: number; upgrade: number
+  level: number; dungeon: string; dungeonShort: string; timer: string; affixes: string[]
 }
 
 /* ---- gear helpers ---- */
@@ -34,44 +48,137 @@ function makeDrop(baseId: string, key: number, uidSeed: number): GearItem | null
   if (!t) return null
   return { uid: `${baseId}-${uidSeed.toString(36)}`, baseId, name: t.name, slot: t.slot, specs: t.specs, ilvl: dropIlvl(key), rarity: rarityForKey(key) }
 }
+export const roleOf = (specId: string): RoleKey => (content.specs.get(specId)?.role ?? "DPS").toLowerCase() as RoleKey
+export const dShort = (n: string) => n.replace(/^the\s+/i, "").split(/\s+/)[0].slice(0, 3).toUpperCase()
+
+/* ---- per-member keystones ---- */
+export interface MemberKey { dungeonId: string; level: number; best: number; rating: number }
+const DUNGEON_IDS = [...content.dungeons.keys()]
+/** A fresh +2 key on a random dungeon (only Ashveil is authored today, so all keys are Ashveil +2 for now). */
+function freshKey(): MemberKey { return { dungeonId: pick(DUNGEON_IDS), level: 2, best: 0, rating: 0 } }
+const fmtMMSS = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`
+/** Expand a stored key into the display shape the UI consumes. */
+function shapeKey(k: MemberKey): KeyView {
+  const d = content.dungeons.get(k.dungeonId) ?? [...content.dungeons.values()][0]
+  return { dungeonId: k.dungeonId, dungeon: d.name, dungeonShort: dShort(d.name), level: k.level, timer: fmtMMSS(d.timerSeconds), timerSec: d.timerSeconds, best: k.best, rating: k.rating }
+}
+const PRIMARY_BY_CLASS: Record<string, string> = { warrior: "Strength", paladin: "Strength", rogue: "Agility", mage: "Intellect", sage: "Intellect" }
+function primaryStatOf(specId: string): string {
+  const cls = content.specs.get(specId)?.classId
+  return (cls && PRIMARY_BY_CLASS[cls]) || "Versatility"
+}
+
+/* ---- recruitment generation ---- */
+const SPECS_BY_ROLE: Record<RoleKey, string[]> = {
+  tank: ["guardian", "crusader", "mystic"],
+  healer: ["cleric", "lifebinder"],
+  dps: ["berserker", "assassin", "bard", "pyromancer", "arcanist"],
+}
+const START_TRAITS = [...content.traits.values()].filter((t) => t.kind === "start")
+const ALL_TRAITS = [...content.traits.values()]
+const NAME_POOL = content.recruitment.namePool
+const PORTRAITS = content.recruitment.portraitPool
+const rnd = (n: number) => Math.floor(Math.random() * n)
+const pick = <T,>(arr: T[]): T => arr[rnd(arr.length)]
+
+function makeRecruit(role: RoleKey, bestIlvl: number, used: Set<string>): Recruit {
+  const specId = pick(SPECS_BY_ROLE[role])
+  // name (avoid collisions where possible)
+  let name = pick(NAME_POOL), guard = 0
+  while (used.has(name) && guard++ < 12) name = pick(NAME_POOL)
+  if (used.has(name)) name = name + " " + (used.size + 1)
+  used.add(name)
+
+  const isDud = Math.random() < 0.32
+  const floor = Math.max(100, Math.round(bestIlvl * 0.6))
+  const ceil = Math.max(floor + 8, bestIlvl)
+  const ilvl = isDud ? floor + rnd(6) : floor + Math.round((ceil - floor) * (0.55 + Math.random() * 0.45))
+  const score = Math.round(ilvl * 11 + (isDud ? rnd(200) : 350 + rnd(700)))
+  const morale = isDud ? 30 + rnd(26) : 62 + rnd(34)
+  const cost = Math.max(20, Math.round((score / 55 + ilvl / 9) / 5) * 5)
+
+  const pool = (isDud ? START_TRAITS.filter((t) => t.netBudget < 6) : START_TRAITS.filter((t) => t.netBudget >= 0))
+  const trait = (pool.length ? pick(pool) : (START_TRAITS.length ? pick(START_TRAITS) : pick(ALL_TRAITS)))
+  return {
+    id: "rec-" + Math.random().toString(36).slice(2, 9),
+    name, specId, role, ilvl, score, morale,
+    traitId: trait.id, traitName: trait.name, traitGood: !isDud, traitFlavor: trait.effect, cost,
+  }
+}
+function generateRecruits(bestIlvl: number, opts: { balanced?: boolean } = {}): Recruit[] {
+  const used = new Set<string>()
+  const out: Recruit[] = []
+  if (opts.balanced) {
+    // interleaved so the top of the board reads as a fieldable comp (1T·1H·3D), not a wall of tanks
+    const order: RoleKey[] = ["tank", "healer", "dps", "dps", "dps", "tank", "healer", "dps", "dps", "dps", "tank", "healer"]
+    for (const role of order) out.push(makeRecruit(role, bestIlvl, used))
+  } else {
+    out.push(makeRecruit("tank", bestIlvl, used))
+    out.push(makeRecruit("healer", bestIlvl, used))
+    for (let i = 0; i < 7; i++) out.push(makeRecruit(pick(["tank", "healer", "dps", "dps", "dps"]) as RoleKey, bestIlvl, used))
+  }
+  return out
+}
 
 /* ---- persistent state ---- */
 interface RawMember {
   id: string; name: string; title: string; specId: string
   morale: number; portrait: string; traitIds: string[]; note?: string
   gear: Record<string, GearItem>
+  key: MemberKey                  // each member holds & levels their own keystone
 }
 interface PersistState {
   version: number
+  phase: Phase
+  guild: GuildInfo | null
   weekNumber: number
-  keystone: { dungeonId: string; level: number; best: number; rating: number }
+  selectedKeyOwnerId: string | null   // whose key the next run will use (auto-locked into the party)
   wallet: { gold: number; emblem: number; shard: number }
   roster: RawMember[]
   stash: GearItem[]
   partyIds: string[]
-  history: string[]
+  recruits: Recruit[]
+  signedRecruitIds: string[]
+  history: RunTicket[]   // replayable record of past runs, newest first (cap 50)
 }
 interface RunConfig { tactics: Record<string, number>; aggression: Aggression }
+/** A replayable record of one run: enough to deterministically re-simulate it + a summary for the list. */
+export interface RunTicket {
+  id: string; when: number; ownerId: string; ownerName: string
+  // re-sim inputs (RunInput)
+  seed: number; dungeonId: string; keyLevel: number; affixIds: string[]
+  party: SimPartyMember[]; tactics: Record<string, number>; aggression: Aggression
+  // summary (header + list row, no re-sim needed)
+  dungeonName: string; outcome: "timed" | "depleted" | "wipe"
+  durationSec: number; timerSec: number; deaths: number; rating: number; affixNames: string[]
+}
 interface GameState extends PersistState {
   lastResult: RunResult | null
   lastLoot: string | null
   lastConfig: RunConfig | null
+  pendingLoot: LootDrop[] | null
+  lastKeystoneChange: KeystoneChange | null
+  lastRunOwnerId: string | null       // which member's key the last run used (for loot/progression)
+  lastRunKey: MemberKey | null        // snapshot of that key as it was at run time (for the report header)
 }
 const DEFAULT_CONFIG: RunConfig = { tactics: { interrupts: 2, positioning: 1, cooldowns: 1, killorder: 2 }, aggression: "Balanced" }
+const TRANSIENT = { lastResult: null, lastLoot: null, lastConfig: null, pendingLoot: null, lastKeystoneChange: null, lastRunOwnerId: null, lastRunKey: null } as const
 
 function freshState(): GameState {
-  const s = content.save
   return {
     version: SAVE_VERSION,
-    weekNumber: s.week.number,
-    keystone: { dungeonId: s.keystone.dungeonId, level: s.keystone.level, best: s.keystone.best, rating: s.keystone.rating },
-    wallet: { gold: s.wallet.gold ?? 0, emblem: s.wallet.emblem ?? 0, shard: s.wallet.shard ?? 0 },
-    roster: s.roster.map((m) => ({ id: m.id, name: m.name, title: m.title, specId: m.specId, morale: m.morale, portrait: m.portrait, traitIds: m.traitIds, note: m.note, gear: starterGear(m.specId, m.ilvl, m.id) })),
-    // seed the stash with a few upgrades so gearing is immediately interesting
-    stash: [makeDrop("ashveil-cleaver", 14, 101), makeDrop("cuirass-of-interred-kings", 13, 102), makeDrop("icon-of-pale-mercy", 14, 103), makeDrop("pale-mitre-of-ashveil", 13, 104), makeDrop("legplates-of-the-barrow-march", 15, 105)].filter(Boolean) as GearItem[],
-    partyIds: s.roster.slice(0, 5).map((m) => m.id),
+    phase: "create",
+    guild: null,
+    weekNumber: 1,
+    selectedKeyOwnerId: null,
+    wallet: { gold: 0, emblem: 600, shard: 0 }, // recruiting budget for the opening draft
+    roster: [],
+    stash: [],
+    partyIds: [],
+    recruits: generateRecruits(128, { balanced: true }), // opening draft: geared to make a sensible +2 comp timeable
+    signedRecruitIds: [],
     history: [],
-    lastResult: null, lastLoot: null, lastConfig: null,
+    ...TRANSIENT,
   }
 }
 
@@ -80,11 +187,23 @@ function loadState(): GameState {
     const raw = localStorage.getItem(SAVE_KEY)
     if (raw) {
       const p = JSON.parse(raw) as PersistState
-      if (p.version === SAVE_VERSION) return { ...freshState(), ...p, lastResult: null, lastLoot: null, lastConfig: null }
+      if (p.version === SAVE_VERSION) {
+        const merged = { ...freshState(), ...p, ...TRANSIENT }
+        // defensive: guarantee every member has a key so shapeKey/keys never deref undefined
+        merged.roster = merged.roster.map((m) => (m.key ? m : { ...m, key: freshKey() }))
+        return merged
+      }
       // version mismatch → reset (full stepwise migrator goes here later)
     }
   } catch { /* corrupt save */ }
   return freshState()
+}
+
+/** The member whose key is queued (selected, else first party member, else first roster member). */
+function keyOwner(state: GameState): RawMember | undefined {
+  return state.roster.find((m) => m.id === state.selectedKeyOwnerId)
+    ?? state.roster.find((m) => state.partyIds.includes(m.id))
+    ?? state.roster[0]
 }
 
 function weekAffixIds(weekNumber: number): string[] {
@@ -94,28 +213,124 @@ function weekAffixIds(weekNumber: number): string[] {
   return [wk.tier1, ...wk.tier2]
 }
 
+const bestRosterIlvl = (roster: RawMember[]) => roster.length ? Math.max(...roster.map((m) => memberIlvl(m.gear))) : 112
+
 /* ---- actions ---- */
 type Action =
+  | { type: "CREATE_GUILD"; info: GuildInfo }
+  | { type: "TOGGLE_SIGN"; id: string }
+  | { type: "CONFIRM_RECRUITS" }
+  | { type: "REROLL_RECRUITS" }
   | { type: "SET_PARTY"; ids: string[] }
   | { type: "TOGGLE_PARTY"; id: string }
+  | { type: "SELECT_KEY"; ownerId: string }
   | { type: "EQUIP"; memberId: string; uid: string }
-  | { type: "RAN_KEY"; result: RunResult; config: RunConfig }
+  | { type: "RAN_KEY"; result: RunResult; config: RunConfig; ownerId: string; runKey: MemberKey; ticket: RunTicket }
+  | { type: "CONFIRM_LOOT"; assignments: Record<string, string> }
   | { type: "FILE_REPORT" }
   | { type: "ADVANCE_WEEK" }
   | { type: "NEW_GAME" }
 
 const MORALE_DELTA = { timed: 10, depleted: -5, wipe: -20 } as const
+const SHARDS_PER_SCRAP = 8
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
+const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`
+
+/* deterministic loot for a finished run (player distributes it on the Loot screen) */
+function computeLoot(state: GameState, r: RunResult, runKeyState: MemberKey): LootDrop[] {
+  const lootCount = r.outcome === "timed" ? 2 : r.outcome === "depleted" ? 1 : 0
+  const dungeon = content.dungeons.get(runKeyState.dungeonId)
+  const table = dungeon?.lootTable ?? []
+  if (!lootCount || !table.length) return []
+  const party = state.partyIds.map((id) => state.roster.find((m) => m.id === id)).filter(Boolean) as RawMember[]
+  const drops: LootDrop[] = []
+  let seed = r.seed >>> 0
+  for (let i = 0; i < lootCount; i++) {
+    seed = (seed * 1664525 + 1013904223) >>> 0
+    const base = makeDrop(table[seed % table.length], runKeyState.level, seed)
+    if (!base) continue
+    // who does it upgrade most?
+    let upgradeFor: string | null = null, upgradeAmt = 0
+    for (const m of party) {
+      if (!base.specs.includes(m.specId)) continue
+      const cur = m.gear[base.slot]?.ilvl ?? 105
+      const delta = base.ilvl - cur
+      if (delta > upgradeAmt) { upgradeAmt = delta; upgradeFor = m.id }
+    }
+    drops.push({ ...base, primaryStat: primaryStatOf(base.specs[0] ?? "guardian"), upgradeFor, upgradeAmt })
+  }
+  return drops
+}
 
 function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
-    case "SET_PARTY":
-      return { ...state, partyIds: action.ids.slice(0, 5) }
+    case "CREATE_GUILD":
+      return {
+        ...freshState(),
+        phase: "recruit",
+        guild: action.info,
+      }
+    case "TOGGLE_SIGN": {
+      const rec = state.recruits.find((r) => r.id === action.id)
+      if (!rec) return state
+      const signed = state.signedRecruitIds.includes(action.id)
+      if (signed) return { ...state, signedRecruitIds: state.signedRecruitIds.filter((x) => x !== action.id), wallet: { ...state.wallet, emblem: state.wallet.emblem + rec.cost } }
+      if (state.wallet.emblem < rec.cost) return state
+      if (state.roster.length + state.signedRecruitIds.length >= content.recruitment.rosterCap) return state
+      return { ...state, signedRecruitIds: [...state.signedRecruitIds, action.id], wallet: { ...state.wallet, emblem: state.wallet.emblem - rec.cost } }
+    }
+    case "CONFIRM_RECRUITS": {
+      const signed = state.signedRecruitIds.map((id) => state.recruits.find((r) => r.id === id)).filter(Boolean) as Recruit[]
+      if (!signed.length) return state
+      const newMembers: RawMember[] = signed.map((rec) => ({
+        id: "m-" + rec.id, name: rec.name, title: "", specId: rec.specId, morale: rec.morale,
+        portrait: pick(PORTRAITS), traitIds: [rec.traitId], gear: starterGear(rec.specId, rec.ilvl, "m-" + rec.id),
+        key: freshKey(),   // every recruit arrives holding their own random +2 key
+      }))
+      const roster = [...state.roster, ...newMembers]
+      // fill the party up to 5 (keeps existing party, adds the new signs)
+      const partyIds = [...state.partyIds]
+      for (const m of newMembers) { if (partyIds.length >= 5) break; if (!partyIds.includes(m.id)) partyIds.push(m.id) }
+      const phase: Phase = state.phase === "recruit" ? "playing" : state.phase
+      // entering play for the first time → queue the first party member's key
+      const selectedKeyOwnerId = state.selectedKeyOwnerId ?? partyIds[0] ?? roster[0]?.id ?? null
+      return {
+        ...state, roster, partyIds, phase, selectedKeyOwnerId,
+        recruits: generateRecruits(bestRosterIlvl(roster)),
+        signedRecruitIds: [],
+      }
+    }
+    case "REROLL_RECRUITS": {
+      // refund anything currently signed, then draw a fresh pool
+      const refund = state.signedRecruitIds.reduce((s, id) => s + (state.recruits.find((r) => r.id === id)?.cost ?? 0), 0)
+      return {
+        ...state,
+        wallet: { ...state.wallet, emblem: state.wallet.emblem + refund },
+        recruits: generateRecruits(bestRosterIlvl(state.roster), { balanced: state.phase === "recruit" }),
+        signedRecruitIds: [],
+      }
+    }
+    case "SET_PARTY": {
+      // always keep the key owner in the party (locked)
+      let ids = action.ids.slice(0, 5)
+      const owner = state.selectedKeyOwnerId
+      if (owner && !ids.includes(owner)) ids = [owner, ...ids].slice(0, 5)
+      return { ...state, partyIds: ids }
+    }
     case "TOGGLE_PARTY": {
+      if (action.id === state.selectedKeyOwnerId) return state   // key owner is locked into the party
       const has = state.partyIds.includes(action.id)
       if (has) return { ...state, partyIds: state.partyIds.filter((x) => x !== action.id) }
       if (state.partyIds.length >= 5) return state
       return { ...state, partyIds: [...state.partyIds, action.id] }
+    }
+    case "SELECT_KEY": {
+      if (!state.roster.some((m) => m.id === action.ownerId)) return state
+      // force the new owner into the party (locked); if full, bump the last non-owner to make room
+      let partyIds = state.partyIds.filter((id) => id !== action.ownerId)
+      if (partyIds.length >= 5) partyIds = partyIds.slice(0, 4)
+      partyIds = [action.ownerId, ...partyIds]
+      return { ...state, selectedKeyOwnerId: action.ownerId, partyIds }
     }
     case "EQUIP": {
       const item = state.stash.find((i) => i.uid === action.uid)
@@ -125,43 +340,98 @@ function reducer(state: GameState, action: Action): GameState {
       const old = member.gear[slot]
       const roster = state.roster.map((m) => m.id === member.id ? { ...m, gear: { ...m.gear, [slot]: item } } : m)
       const stash = state.stash.filter((i) => i.uid !== item.uid)
-      if (old && old.baseId !== "beta-standard-issue") stash.push(old) // worn starter gear is discarded
+      if (old && old.baseId !== "beta-standard-issue") stash.push(old)
       return { ...state, roster, stash }
     }
     case "RAN_KEY":
-      return { ...state, lastResult: action.result, lastConfig: action.config, lastLoot: null }
+      return {
+        ...state, lastResult: action.result, lastConfig: action.config,
+        lastRunOwnerId: action.ownerId, lastRunKey: action.runKey,
+        lastLoot: null, pendingLoot: computeLoot(state, action.result, action.runKey),
+        history: [action.ticket, ...state.history].slice(0, 50),   // record every run for the Reports list
+      }
+    case "CONFIRM_LOOT": {
+      const r = state.lastResult
+      if (!r) return state
+      const drops = state.pendingLoot ?? []
+      let roster = state.roster.map((m) => ({ ...m, gear: { ...m.gear } }))
+      const stash = [...state.stash]
+      let shardsGained = 0
+      for (const d of drops) {
+        const a = action.assignments[d.uid]
+        if (!a || a === "scrap") { shardsGained += SHARDS_PER_SCRAP; continue }
+        const member = roster.find((m) => m.id === a)
+        if (member && d.specs.includes(member.specId)) {
+          const old = member.gear[d.slot]
+          member.gear[d.slot] = { uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity }
+          if (old && old.baseId !== "beta-standard-issue") stash.push(old)
+        } else {
+          stash.push({ uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity })
+        }
+      }
+      // morale
+      const partySet = new Set(state.partyIds)
+      roster = roster.map((m) => partySet.has(m.id) ? { ...m, morale: clamp(m.morale + MORALE_DELTA[r.outcome], 0, 100) } : m)
+
+      // keystone progression (margin-based) — applied to the KEY OWNER's own key
+      const ownerId = state.lastRunOwnerId
+      const ranKey = state.lastRunKey ?? roster.find((m) => m.id === ownerId)?.key ?? freshKey()
+      const oldLevel = ranKey.level
+      const frac = (r.timerSec - r.durationSec) / r.timerSec
+      const upgrade = r.outcome !== "timed" ? -1 : frac >= 0.40 ? 3 : frac >= 0.20 ? 2 : 1
+      const newLevel = clamp(oldLevel + upgrade, 2, 40)
+      const best = r.outcome === "timed" ? Math.max(ranKey.best, oldLevel) : ranKey.best
+      const rating = r.outcome === "timed"
+        ? Math.max(ranKey.rating, Math.round(best * 95 + oldLevel * 12 + Math.max(0, r.timerSec - r.durationSec) / 60 * 6))
+        : ranKey.rating
+      const newKey: MemberKey = { dungeonId: ranKey.dungeonId, level: newLevel, best, rating }
+      roster = roster.map((m) => m.id === ownerId ? { ...m, key: newKey } : m)
+
+      const emblem = state.wallet.emblem + (r.outcome === "timed" ? 5 : r.outcome === "depleted" ? 2 : 0)
+      const gold = state.wallet.gold + (r.outcome === "wipe" ? 0 : 200 + oldLevel * 40)
+      const weekNumber = state.weekNumber + 1
+      const dungeon = content.dungeons.get(ranKey.dungeonId)!
+      const affixes = weekAffixIds(weekNumber).map((id) => content.affixes.get(id)?.name ?? id)
+      const lootSummary = drops.length ? `${drops.length} drop(s) distributed` : "no loot"
+      const change: KeystoneChange = {
+        prevLevel: oldLevel, prevDungeon: dungeon.name, prevTime: mmss(r.durationSec), prevPar: mmss(r.timerSec),
+        outcome: r.outcome, underBy: Math.round(r.timerSec - r.durationSec), upgrade,
+        level: newLevel, dungeon: dungeon.name, dungeonShort: dShort(dungeon.name), timer: mmss(dungeon.timerSeconds), affixes,
+      }
+      return {
+        ...state, roster, stash,
+        wallet: { ...state.wallet, emblem, gold, shard: state.wallet.shard + shardsGained },
+        weekNumber,
+        lastResult: null, pendingLoot: null, lastLoot: lootSummary, lastKeystoneChange: change,
+      }
+    }
     case "FILE_REPORT": {
+      // legacy all-in-one (retained for the old screens); new flow uses CONFIRM_LOOT
       const r = state.lastResult
       if (!r) return state
       const md = MORALE_DELTA[r.outcome]
+      const ownerId = state.lastRunOwnerId
+      const ranKey = state.lastRunKey ?? state.roster.find((m) => m.id === ownerId)?.key ?? freshKey()
       const partySet = new Set(state.partyIds)
-      const roster = state.roster.map((m) => partySet.has(m.id) ? { ...m, morale: clamp(m.morale + md, 0, 100) } : m)
-      const level = clamp(state.keystone.level + r.keyDelta, 2, 40)
-      const best = r.outcome === "timed" ? Math.max(state.keystone.best, state.keystone.level) : state.keystone.best
-      const rating = r.outcome === "timed"
-        ? Math.max(state.keystone.rating, Math.round(state.keystone.level * 12 + (r.timerSec - r.durationSec) / 60 * 6))
-        : state.keystone.rating
-      const dungeon = content.dungeons.get(state.keystone.dungeonId)
-      const lootCount = r.outcome === "timed" ? 2 : r.outcome === "depleted" ? 1 : 0
-      const table = dungeon?.lootTable ?? []
-      const drops: GearItem[] = []
-      let seed = r.seed
-      for (let i = 0; i < lootCount && table.length; i++) {
-        seed = (seed * 1664525 + 1013904223) >>> 0
-        const d = makeDrop(table[seed % table.length], state.keystone.level, seed)
-        if (d) drops.push(d)
-      }
+      const level = clamp(ranKey.level + r.keyDelta, 2, 40)
+      const best = r.outcome === "timed" ? Math.max(ranKey.best, ranKey.level) : ranKey.best
+      const rating = r.outcome === "timed"   // same formula as CONFIRM_LOOT (best*95 base) so both paths agree
+        ? Math.max(ranKey.rating, Math.round(best * 95 + ranKey.level * 12 + Math.max(0, r.timerSec - r.durationSec) / 60 * 6))
+        : ranKey.rating
+      const newKey: MemberKey = { dungeonId: ranKey.dungeonId, level, best, rating }
+      const roster = state.roster.map((m) => ({
+        ...m,
+        morale: partySet.has(m.id) ? clamp(m.morale + md, 0, 100) : m.morale,
+        key: m.id === ownerId ? newKey : m.key,
+      }))
+      const drops = (state.pendingLoot ?? []).map((d) => ({ uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity }))
       const emblem = state.wallet.emblem + (r.outcome === "timed" ? 5 : r.outcome === "depleted" ? 2 : 0)
-      const gold = state.wallet.gold + (r.outcome === "wipe" ? 0 : 200 + state.keystone.level * 40)
-      const lootSummary = drops.length ? `Looted: ${drops.map((d) => `${d.name} (ilvl ${d.ilvl})`).join(", ")}` : "No loot — the run was lost."
-      const histLine = `+${state.keystone.level} ${r.outcome.toUpperCase()} (${Math.floor(r.durationSec / 60)}:${String(Math.floor(r.durationSec % 60)).padStart(2, "0")}, ${r.deaths.length}d) — ${lootSummary}`
+      const gold = state.wallet.gold + (r.outcome === "wipe" ? 0 : 200 + ranKey.level * 40)
       return {
         ...state, roster,
-        keystone: { ...state.keystone, level, best, rating },
         wallet: { ...state.wallet, emblem, gold },
         stash: [...drops, ...state.stash],
-        history: [histLine, ...state.history].slice(0, 20),
-        lastResult: null, lastLoot: lootSummary,
+        lastResult: null, pendingLoot: null, lastLoot: drops.length ? "Looted." : "No loot.",
       }
     }
     case "ADVANCE_WEEK":
@@ -177,33 +447,49 @@ function reducer(state: GameState, action: Action): GameState {
 function shapeMember(m: RawMember): Member {
   return {
     id: m.id, name: m.name, title: m.title, spec: m.specId, ilvl: memberIlvl(m.gear), morale: m.morale,
-    portrait: `/warcraftcn/${m.portrait}.webp`, note: m.note,
+    portrait: `/warcraftcn/${m.portrait}.webp`, note: m.note, key: m.key ? shapeKey(m.key) : undefined,
     traits: m.traitIds.map((tid) => {
-      const t = content.traits.get(tid)!
+      const t = content.traits.get(tid)
+      if (!t) return { name: tid, rarity: "Common", kind: "Start", effect: "" } as Trait
       return { name: t.name, rarity: t.rarity, kind: t.kind === "start" ? "Start" : "Earned", effect: t.effect } as Trait
     }),
   }
 }
-const fmtTimer = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`
-
 interface GameApi {
+  phase: Phase
+  guild: GuildInfo | null
   members: Member[]
   party: Member[]
   partyIds: string[]
-  keystone: { dungeon: string; level: number; timer: string; best: number; rating: number }
+  keystone: KeyView   // compat: the currently-selected/queued key (shaped) — used by topnav & legacy screens
+  keys: (KeyView & { ownerId: string; ownerName: string; spec: string })[]   // every member's key, for the picker
+  selectedKeyOwnerId: string | null
+  lastRunKey: KeyView | null          // the key as it was at the last run's start (report header)
   wallet: { gold: number; emblems: number; shards: number }
   weekNumber: number
   weekAffixes: Affix[]
   stash: GearItem[]
+  recruits: Recruit[]
+  signedRecruitIds: string[]
   lastResult: RunResult | null
   lastLoot: string | null
-  history: string[]
+  pendingLoot: LootDrop[] | null
+  lastKeystoneChange: KeystoneChange | null
+  history: RunTicket[]
+  replayTicket: (t: RunTicket) => RunResult
   gearFor: (id: string) => Record<string, GearItem>
+  // flow
+  createGuild: (info: GuildInfo) => void
+  toggleSignRecruit: (id: string) => void
+  confirmRecruits: () => void
+  rerollRecruits: () => void
   equip: (memberId: string, uid: string) => void
   togglePartyMember: (id: string) => void
   setParty: (ids: string[]) => void
+  selectKey: (ownerId: string) => void
   runKey: (cfg: RunConfig) => RunResult
   rerun: () => RunResult
+  confirmLoot: (assignments: Record<string, string>) => void
   fileReport: () => void
   advanceWeek: () => void
   newGame: () => void
@@ -215,45 +501,73 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined, loadState)
 
   useEffect(() => {
-    const { lastResult: _lr, lastLoot: _ll, lastConfig: _lc, ...persist } = state
-    void _lr; void _ll; void _lc
+    const persist: Record<string, unknown> = { ...state }
+    for (const k of Object.keys(TRANSIENT)) delete persist[k]   // never persist transient run/UI state
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(persist)) } catch { /* quota */ }
   }, [state])
 
   const api = useMemo<GameApi>(() => {
-    const dungeon = content.dungeons.get(state.keystone.dungeonId)!
     const affIds = weekAffixIds(state.weekNumber)
+    const owner = keyOwner(state)
+    const ownerKey: MemberKey = owner?.key ?? freshKey()
     const doRun = (cfg: RunConfig): RunResult => {
-      const party = state.partyIds
+      const o = keyOwner(state)
+      const runKeyState: MemberKey = o?.key ?? freshKey()
+      const party: SimPartyMember[] = state.partyIds
         .map((id) => state.roster.find((m) => m.id === id))
         .filter(Boolean)
         .map((m) => ({ id: m!.id, name: m!.name, specId: m!.specId, ilvl: memberIlvl(m!.gear), morale: m!.morale, traitIds: m!.traitIds }))
-      const result = runDungeon({
-        dungeonId: state.keystone.dungeonId, keyLevel: state.keystone.level,
-        affixIds: affIds, party, tactics: cfg.tactics, aggression: cfg.aggression,
-        seed: Math.floor(Math.random() * 0xffffffff),
-      })
-      dispatch({ type: "RAN_KEY", result, config: cfg })
+      const seed = Math.floor(Math.random() * 0xffffffff)
+      const result = runDungeon({ dungeonId: runKeyState.dungeonId, keyLevel: runKeyState.level, affixIds: affIds, party, tactics: cfg.tactics, aggression: cfg.aggression, seed })
+      const dgn = content.dungeons.get(runKeyState.dungeonId)
+      const ticket: RunTicket = {
+        id: `run-${seed.toString(36)}-${Date.now().toString(36)}`, when: Date.now(),
+        ownerId: o?.id ?? "", ownerName: o?.name ?? "—",
+        seed, dungeonId: runKeyState.dungeonId, keyLevel: runKeyState.level, affixIds: affIds,
+        party, tactics: cfg.tactics, aggression: cfg.aggression,
+        dungeonName: dgn?.name ?? runKeyState.dungeonId, outcome: result.outcome,
+        durationSec: result.durationSec, timerSec: result.timerSec, deaths: result.deaths.length,
+        rating: runKeyState.rating, affixNames: affIds.map((id) => content.affixes.get(id)?.name ?? id),
+      }
+      dispatch({ type: "RAN_KEY", result, config: cfg, ownerId: o?.id ?? "", runKey: runKeyState, ticket })
       return result
     }
+    const replayTicket = (t: RunTicket): RunResult =>
+      runDungeon({ dungeonId: t.dungeonId, keyLevel: t.keyLevel, affixIds: t.affixIds, party: t.party, tactics: t.tactics, aggression: t.aggression, seed: t.seed })
     return {
+      phase: state.phase,
+      guild: state.guild,
       members: state.roster.map(shapeMember),
       party: state.partyIds.map((id) => state.roster.find((m) => m.id === id)).filter(Boolean).map((m) => shapeMember(m as RawMember)),
       partyIds: state.partyIds,
-      keystone: { dungeon: dungeon.name, level: state.keystone.level, timer: fmtTimer(dungeon.timerSeconds), best: state.keystone.best, rating: state.keystone.rating },
+      keystone: shapeKey(ownerKey),
+      keys: state.roster.map((m) => ({ ownerId: m.id, ownerName: m.name, spec: m.specId, ...shapeKey(m.key) })),
+      selectedKeyOwnerId: state.selectedKeyOwnerId,
+      lastRunKey: state.lastRunKey ? shapeKey(state.lastRunKey) : null,
       wallet: { gold: state.wallet.gold, emblems: state.wallet.emblem, shards: state.wallet.shard },
       weekNumber: state.weekNumber,
       weekAffixes: affIds.map((id) => content.affixes.get(id)).filter(Boolean) as Affix[],
       stash: state.stash,
+      recruits: state.recruits,
+      signedRecruitIds: state.signedRecruitIds,
       lastResult: state.lastResult,
       lastLoot: state.lastLoot,
+      pendingLoot: state.pendingLoot,
+      lastKeystoneChange: state.lastKeystoneChange,
       history: state.history,
+      replayTicket,
       gearFor: (id) => state.roster.find((m) => m.id === id)?.gear ?? {},
+      createGuild: (info) => dispatch({ type: "CREATE_GUILD", info }),
+      toggleSignRecruit: (id) => dispatch({ type: "TOGGLE_SIGN", id }),
+      confirmRecruits: () => dispatch({ type: "CONFIRM_RECRUITS" }),
+      rerollRecruits: () => dispatch({ type: "REROLL_RECRUITS" }),
       equip: (memberId, uid) => dispatch({ type: "EQUIP", memberId, uid }),
       togglePartyMember: (id) => dispatch({ type: "TOGGLE_PARTY", id }),
       setParty: (ids) => dispatch({ type: "SET_PARTY", ids }),
+      selectKey: (ownerId) => dispatch({ type: "SELECT_KEY", ownerId }),
       runKey: doRun,
       rerun: () => doRun(state.lastConfig ?? DEFAULT_CONFIG),
+      confirmLoot: (assignments) => dispatch({ type: "CONFIRM_LOOT", assignments }),
       fileReport: () => dispatch({ type: "FILE_REPORT" }),
       advanceWeek: () => dispatch({ type: "ADVANCE_WEEK" }),
       newGame: () => dispatch({ type: "NEW_GAME" }),

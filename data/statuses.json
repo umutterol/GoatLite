@@ -1,0 +1,18 @@
+[
+  { "id": "bleed",          "name": "Bleed",          "kind": "dot",      "damageType": "Physical", "maxStacks": 1, "refresh": "refresh", "perTick": true, "defaultDurationTurns": 3 },
+  { "id": "poison",         "name": "Poison",         "kind": "dot",      "damageType": "Physical", "maxStacks": 5, "refresh": "stack",   "perTick": true, "defaultDurationTurns": 3, "note": "Stacks; each application adds a stack and refreshes." },
+  { "id": "burn",           "name": "Burn",           "kind": "dot",      "damageType": "Magic",    "maxStacks": 5, "refresh": "stack",   "perTick": true, "defaultDurationTurns": 3, "note": "Stacks; detonatable/spreadable via Pyromancer specials." },
+  { "id": "chill",          "name": "Chill",          "kind": "debuff",   "maxStacks": 2, "refresh": "stack",   "statMods": [{ "stat": "haste", "amountPct": -25 }], "defaultDurationTurns": 2, "note": "Slows (AGI->haste). 2+ stacks enable Frost Nova's Freeze." },
+  { "id": "daze",           "name": "Daze",           "kind": "cc",       "control": "daze",    "maxStacks": 1, "refresh": "replace", "defaultDurationTurns": 1, "note": "Loses next action (mild CC)." },
+  { "id": "stun",           "name": "Stun",           "kind": "cc",       "control": "stun",    "maxStacks": 1, "refresh": "replace", "defaultDurationTurns": 1, "note": "No actions while active." },
+  { "id": "freeze",         "name": "Freeze",         "kind": "cc",       "control": "freeze",  "maxStacks": 1, "refresh": "replace", "defaultDurationTurns": 1, "note": "Full lockout; from Chill." },
+  { "id": "silence",        "name": "Silence",        "kind": "cc",       "control": "silence", "maxStacks": 1, "refresh": "replace", "defaultDurationTurns": 2, "note": "Blocks active skills; auto-attack still allowed." },
+  { "id": "mark",           "name": "Mark",           "kind": "debuff",   "maxStacks": 1, "refresh": "refresh", "statMods": [{ "stat": "damageTaken", "amountPct": 15 }], "defaultDurationTurns": 2, "note": "Target takes increased damage; magnitude set at application." },
+  { "id": "rampage",        "name": "Rampage",        "kind": "resource", "maxStacks": 5, "refresh": "stack",   "defaultDurationTurns": 0, "note": "Berserker self-resource; persists through combat (0 = no expiry)." },
+  { "id": "cold-blood",     "name": "Cold Blood",     "kind": "buff",     "maxStacks": 2, "refresh": "stack",   "statMods": [{ "stat": "crit", "amountPct": 15 }, { "stat": "versatility", "amountPct": 10 }], "defaultDurationTurns": 2, "note": "Assassin crit-chain: +crit and +dodge per stack after a crit." },
+  { "id": "stealth",        "name": "Stealth",        "kind": "buff",     "maxStacks": 1, "refresh": "replace", "untargetable": true, "defaultDurationTurns": 1, "note": "Untargetable; empowers and is consumed by the next attack." },
+  { "id": "regrowth",       "name": "Regrowth",       "kind": "hot",      "maxStacks": 2, "refresh": "stack",   "perTick": true, "defaultDurationTurns": 3 },
+  { "id": "blossom",        "name": "Blossom",        "kind": "hot",      "maxStacks": 3, "refresh": "stack",   "perTick": true, "defaultDurationTurns": 3, "note": "Blooms for burst on trigger/expire (special)." },
+  { "id": "natures-breath", "name": "Nature's Breath","kind": "hot",      "maxStacks": 1, "refresh": "refresh", "perTick": true, "defaultDurationTurns": 3 },
+  { "id": "spirit-link-hot","name": "Spirit Link",    "kind": "hot",      "maxStacks": 1, "refresh": "refresh", "perTick": true, "defaultDurationTurns": 3 }
+]

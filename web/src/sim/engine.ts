@@ -77,9 +77,11 @@ export function runDungeon(input: RunInput): RunResult {
   const log: LogLine[] = []
   const deaths: DeathReport[] = []
   const series: number[][] = []                                   // per-tick cumulative damage per party member
+  const hpSeries: number[][] = []                                 // per-tick HP fraction (0..1) per party member
   const seriesIds = party.map((p) => p.id)
   const partyMeta = party.map((p) => ({ id: p.id, name: p.name, specId: p.specId }))
   series[0] = party.map(() => 0)
+  hpSeries[0] = party.map(() => 1)
   // original-GOAT skill names grouped per spec by category. Names ONLY drive the replay/tooltips;
   // the turn-based formulas/CDs are reference metadata and never feed the 1s-tick sim.
   const skillsBySpec = new Map<string, { dmg: Skill[]; heal: Skill[] }>()
@@ -303,6 +305,9 @@ export function runDungeon(input: RunInput): RunResult {
         emit("death", pickLine("death", { actor: p.name, _i: String(rng.int(0, 9)), _j: String(rng.int(0, 9)) }) ?? `${p.name} dies (${cause}).`,
           { sourceId: p.id, sourceName: p.name, sourceSpec: p.specId, ability: cause, result: "Death" })
       }
+      // snapshot end-of-tick HP fraction per member (downed/dead read as 0) for the live health bars
+      hpSeries[t] = party.map((p) => p.downedUntil >= 0 ? 0 : Math.max(0, Math.min(1, p.hp / p.maxHp)))
+
       if (party.every((p) => p.downedUntil >= 0)) { wiped = true; break }
     }
 
@@ -333,5 +338,5 @@ export function runDungeon(input: RunInput): RunResult {
 
   const finalHpPct = party.map((p) => ({ id: p.id, name: p.name, pct: Math.max(0, Math.round((p.hp / p.maxHp) * 100)), dead: p.downedUntil >= 0 }))
 
-  return { seed: input.seed, outcome, durationSec: duration, timerSec, keyDelta, log, parse, deaths, finalHpPct, series, seriesIds, partyMeta }
+  return { seed: input.seed, outcome, durationSec: duration, timerSec, keyDelta, log, parse, deaths, finalHpPct, series, hpSeries, seriesIds, partyMeta }
 }

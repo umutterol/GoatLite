@@ -1,0 +1,2130 @@
+[
+  {
+    "id": "shield-bash",
+    "name": "Shield Bash",
+    "classId": "warrior",
+    "specId": "guardian",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 40,
+        "scale": 0.6,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "applyStatus",
+        "status": "daze",
+        "chancePct": 15,
+        "durationTurns": 1
+      }
+    ]
+  },
+  {
+    "id": "challenge",
+    "name": "Challenge",
+    "classId": "warrior",
+    "specId": "guardian",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 3,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "taunt",
+        "kind": "hard",
+        "durationTurns": 2
+      },
+      {
+        "type": "buff",
+        "stat": "armour",
+        "amountPct": 20,
+        "durationTurns": 2,
+        "appliesTo": "self"
+      }
+    ]
+  },
+  {
+    "id": "war-cry",
+    "name": "War Cry",
+    "classId": "warrior",
+    "specId": "guardian",
+    "category": "Buff",
+    "trigger": "active",
+    "cooldownTurns": 5,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "all"
+    },
+    "effects": [
+      {
+        "type": "taunt",
+        "kind": "soft",
+        "durationTurns": 2
+      },
+      {
+        "type": "buff",
+        "stat": "armour",
+        "amountPct": 10,
+        "durationTurns": 2,
+        "appliesTo": "all-allies"
+      }
+    ]
+  },
+  {
+    "id": "shield-wall",
+    "name": "Shield Wall",
+    "classId": "warrior",
+    "specId": "guardian",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 6,
+    "targeting": {
+      "side": "self",
+      "pattern": "self"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "shield-wall-block",
+        "params": {
+          "blocks": 2,
+          "blockPct": 100,
+          "reflectPct": 50
+        }
+      }
+    ]
+  },
+  {
+    "id": "revenge",
+    "name": "Revenge",
+    "classId": "warrior",
+    "specId": "guardian",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 4,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 60,
+        "scale": 1,
+        "scaleStat": "power",
+        "critable": true,
+        "modifiers": [
+          {
+            "when": {
+              "type": "selfHitSinceLastAction"
+            },
+            "multiplyDamage": 2
+          }
+        ]
+      },
+      {
+        "type": "applyStatus",
+        "status": "bleed",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "magnitudeScale": 0.05,
+        "magnitudeStat": "power",
+        "onlyIf": {
+          "type": "selfHitSinceLastAction"
+        }
+      }
+    ]
+  },
+  {
+    "id": "thorns-aura",
+    "name": "Thorns Aura",
+    "classId": "warrior",
+    "specId": "guardian",
+    "category": "Passive",
+    "trigger": "passive",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "self",
+      "pattern": "aura"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "thorns-reflect",
+        "params": {
+          "damageType": "Physical",
+          "base": 15,
+          "scale": 0.3,
+          "scaleStat": "power",
+          "trigger": "melee-attacker"
+        }
+      }
+    ]
+  },
+  {
+    "id": "cleaving-strike",
+    "name": "Cleaving Strike",
+    "classId": "warrior",
+    "specId": "berserker",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "adjacent",
+      "count": 1
+    },
+    "generates": {
+      "stacks": 1,
+      "resource": "rampage"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 40,
+        "scale": 0.6,
+        "scaleStat": "power",
+        "critable": true
+      }
+    ]
+  },
+  {
+    "id": "blood-frenzy",
+    "name": "Blood Frenzy",
+    "classId": "warrior",
+    "specId": "berserker",
+    "category": "Buff",
+    "trigger": "active",
+    "cooldownTurns": 2,
+    "targeting": {
+      "side": "self",
+      "pattern": "self"
+    },
+    "resourceCost": {
+      "hpPct": 15
+    },
+    "generates": {
+      "stacks": 2,
+      "resource": "rampage"
+    },
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "power",
+        "amountPct": 25,
+        "durationTurns": 2
+      },
+      {
+        "type": "buff",
+        "stat": "crit",
+        "amountPct": 15,
+        "durationTurns": 2
+      }
+    ]
+  },
+  {
+    "id": "bladestorm",
+    "name": "Bladestorm",
+    "classId": "warrior",
+    "specId": "berserker",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 6,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "all"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 70,
+        "scale": 1,
+        "scaleStat": "power",
+        "critable": true,
+        "modifiers": [
+          {
+            "perStackOf": "rampage",
+            "onSelf": true,
+            "multiplyDamage": 0.2
+          }
+        ]
+      },
+      {
+        "type": "special",
+        "mechanic": "apply-on-max-stacks",
+        "params": {
+          "resource": "rampage",
+          "requiredStacks": 5,
+          "applyStatus": "bleed",
+          "durationTurns": 3,
+          "targets": "all-damaged-enemies",
+          "note": "Only when the caster has 5 Rampage stacks, apply Bleed to every enemy hit. The 5-stack threshold cannot be expressed with the doc's plain Condition shapes (no self-stack condition; selfHasStatus is not a valid condition type), so the conditional Bleed lives entirely in this special handler."
+        }
+      }
+    ]
+  },
+  {
+    "id": "whirlwind",
+    "name": "Whirlwind",
+    "classId": "warrior",
+    "specId": "berserker",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 4,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "adjacent",
+      "count": 2
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 50,
+        "scale": 0.7,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "special",
+        "mechanic": "extend-status-duration",
+        "params": {
+          "status": "bleed",
+          "extendTurns": 1,
+          "targets": "damaged-enemies",
+          "note": "Extends any existing Bleed on each enemy hit by 1 turn; does not apply a new Bleed."
+        }
+      }
+    ]
+  },
+  {
+    "id": "massacre",
+    "name": "Massacre",
+    "classId": "warrior",
+    "specId": "berserker",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 7,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "tags": [
+      "execute"
+    ],
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 60,
+        "scale": 0.9,
+        "scaleStat": "power",
+        "critable": true,
+        "modifiers": [
+          {
+            "when": {
+              "type": "targetHpBelowPct",
+              "value": 20
+            },
+            "multiplyDamage": 2
+          }
+        ]
+      },
+      {
+        "type": "special",
+        "mechanic": "reset-cooldown-on-kill",
+        "params": {
+          "resetAbility": "blood-frenzy",
+          "note": "If this attack kills the target, the Blood Frenzy cooldown is reset."
+        }
+      }
+    ]
+  },
+  {
+    "id": "bloodlust",
+    "name": "Bloodlust",
+    "classId": "warrior",
+    "specId": "berserker",
+    "category": "Passive",
+    "trigger": "passive",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "self",
+      "pattern": "self"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "rampage-damage-bonus",
+        "params": {
+          "perStackPct": 4,
+          "resource": "rampage",
+          "note": "+4% damage per Rampage stack (self damage amplification)."
+        }
+      },
+      {
+        "type": "special",
+        "mechanic": "crit-lifesteal",
+        "params": {
+          "healHpPct": 3,
+          "note": "When the Berserker lands a crit, heal 3% of max HP."
+        }
+      },
+      {
+        "type": "special",
+        "mechanic": "low-hp-bonus-scaling",
+        "params": {
+          "note": "Low current HP grants bonus damage scaling. Exact threshold/curve not specified in source data; flagged for tuning."
+        }
+      }
+    ]
+  },
+  {
+    "id": "holy-strike",
+    "name": "Holy Strike",
+    "classId": "paladin",
+    "specId": "crusader",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 30,
+        "scale": 0.4,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "special",
+        "mechanic": "buff-nearest-ally",
+        "params": {
+          "stat": "armour",
+          "amountPct": 5,
+          "durationTurns": 1,
+          "select": "nearest-ally"
+        }
+      }
+    ]
+  },
+  {
+    "id": "divine-shield",
+    "name": "Divine Shield",
+    "classId": "paladin",
+    "specId": "crusader",
+    "category": "Buff",
+    "trigger": "active",
+    "cooldownTurns": 3,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "shield",
+        "base": 80,
+        "scale": 1,
+        "scaleStat": "maxHp",
+        "durationTurns": 3
+      }
+    ]
+  },
+  {
+    "id": "guardians-oath",
+    "name": "Guardian's Oath",
+    "classId": "paladin",
+    "specId": "crusader",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 4,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "redirect-damage",
+        "params": {
+          "redirectPct": 100,
+          "reductionPct": 20,
+          "toSelf": true,
+          "durationTurns": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "blessing-of-protection",
+    "name": "Blessing of Protection",
+    "classId": "paladin",
+    "specId": "crusader",
+    "category": "Buff",
+    "trigger": "active",
+    "cooldownTurns": 5,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "attack-immunity",
+        "params": {
+          "blocks": 2,
+          "cannotAttackDuringImmunity": true
+        }
+      }
+    ]
+  },
+  {
+    "id": "rally-cry",
+    "name": "Rally Cry",
+    "classId": "paladin",
+    "specId": "crusader",
+    "category": "Buff",
+    "trigger": "active",
+    "cooldownTurns": 6,
+    "targeting": {
+      "side": "ally",
+      "pattern": "all"
+    },
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "power",
+        "amountPct": 15,
+        "durationTurns": 2
+      },
+      {
+        "type": "buff",
+        "stat": "armour",
+        "amountPct": 10,
+        "durationTurns": 2
+      }
+    ]
+  },
+  {
+    "id": "stalwart-defender",
+    "name": "Stalwart Defender",
+    "classId": "paladin",
+    "specId": "crusader",
+    "category": "Passive",
+    "trigger": "passive",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "self",
+      "pattern": "self"
+    },
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "armour",
+        "amountPct": 15
+      },
+      {
+        "type": "special",
+        "mechanic": "shield-amp",
+        "params": {
+          "amountPct": 20,
+          "lowHpAmountPct": 40,
+          "lowHpBelowPct": 30
+        }
+      }
+    ]
+  },
+  {
+    "id": "smite",
+    "name": "Smite",
+    "classId": "paladin",
+    "specId": "cleric",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Magic",
+        "base": 35,
+        "scale": 0.5,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "special",
+        "mechanic": "atonement-heal",
+        "params": {
+          "healPctOfDamage": 50,
+          "target": "lowest-hp-ally"
+        }
+      }
+    ],
+    "tags": [
+      "basic-attack",
+      "atonement"
+    ]
+  },
+  {
+    "id": "flash-heal",
+    "name": "Flash Heal",
+    "classId": "paladin",
+    "specId": "cleric",
+    "category": "Healing",
+    "trigger": "active",
+    "cooldownTurns": 2,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "base": 60,
+        "scale": 1.2,
+        "scaleStat": "power"
+      },
+      {
+        "type": "special",
+        "mechanic": "overheal-to-shield",
+        "params": {
+          "overhealPct": 50
+        }
+      }
+    ]
+  },
+  {
+    "id": "greater-heal",
+    "name": "Greater Heal",
+    "classId": "paladin",
+    "specId": "cleric",
+    "category": "Healing",
+    "trigger": "active",
+    "cooldownTurns": 4,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "heal",
+        "base": 100,
+        "scale": 1.8,
+        "scaleStat": "power",
+        "modifiers": [
+          {
+            "when": {
+              "type": "targetHpBelowPct",
+              "value": 30
+            },
+            "multiplyDamage": 1.5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "holy-fire",
+    "name": "Holy Fire",
+    "classId": "paladin",
+    "specId": "cleric",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 4,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Magic",
+        "base": 50,
+        "scale": 0.8,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "applyStatus",
+        "status": "burn",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "stacks": 1,
+        "magnitudeScale": 0.1,
+        "magnitudeStat": "power"
+      },
+      {
+        "type": "special",
+        "mechanic": "atonement-on-dot",
+        "params": {
+          "status": "burn",
+          "healPctOfDotDamage": 50,
+          "target": "lowest-hp-ally"
+        }
+      }
+    ],
+    "tags": [
+      "atonement"
+    ]
+  },
+  {
+    "id": "mass-dispel",
+    "name": "Mass Dispel",
+    "classId": "paladin",
+    "specId": "cleric",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 5,
+    "targeting": {
+      "side": "ally",
+      "pattern": "all"
+    },
+    "effects": [
+      {
+        "type": "cleanse",
+        "count": 2
+      },
+      {
+        "type": "buff",
+        "stat": "power",
+        "amountPct": 10,
+        "durationTurns": 2,
+        "onlyIf": {
+          "type": "selfWasCleansed"
+        }
+      }
+    ]
+  },
+  {
+    "id": "divine-insight",
+    "name": "Divine Insight",
+    "classId": "paladin",
+    "specId": "cleric",
+    "category": "Passive",
+    "trigger": "passive",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "ally",
+      "pattern": "aura"
+    },
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "power",
+        "amountPct": 20,
+        "durationTurns": 0,
+        "onlyIf": {
+          "type": "targetHpBelowPct",
+          "value": 30
+        }
+      },
+      {
+        "type": "special",
+        "mechanic": "atonement-amp",
+        "params": {
+          "amountPct": 25,
+          "onlyIf": {
+            "type": "targetHpBelowPct",
+            "value": 30
+          }
+        }
+      }
+    ],
+    "tags": [
+      "passive",
+      "atonement"
+    ]
+  },
+  {
+    "id": "poisoned-blade",
+    "name": "Poisoned Blade",
+    "classId": "rogue",
+    "specId": "assassin",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single",
+      "band": "back"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 40,
+        "scale": 0.7,
+        "scaleStat": "power",
+        "critable": true,
+        "modifiers": [
+          {
+            "when": {
+              "type": "targetBand",
+              "band": "back"
+            },
+            "multiplyDamage": 1.3
+          }
+        ]
+      },
+      {
+        "type": "applyStatus",
+        "status": "poison",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "stacks": 1,
+        "magnitudeScale": 0.04,
+        "magnitudeStat": "power"
+      }
+    ],
+    "tags": [
+      "poison"
+    ]
+  },
+  {
+    "id": "camouflage",
+    "name": "Camouflage",
+    "classId": "rogue",
+    "specId": "assassin",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 4,
+    "targeting": {
+      "side": "self",
+      "pattern": "self"
+    },
+    "effects": [
+      {
+        "type": "applyStatus",
+        "status": "stealth",
+        "chancePct": 100,
+        "durationTurns": 1
+      },
+      {
+        "type": "special",
+        "mechanic": "empower-next-attack",
+        "params": {
+          "multiplyDamage": 1.5,
+          "guaranteedCrit": true,
+          "consumesStatus": "stealth"
+        }
+      }
+    ],
+    "tags": [
+      "stealth"
+    ]
+  },
+  {
+    "id": "ambush",
+    "name": "Ambush",
+    "classId": "rogue",
+    "specId": "assassin",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 3,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single",
+      "band": "back"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 70,
+        "scale": 1.1,
+        "scaleStat": "power",
+        "critable": true,
+        "modifiers": [
+          {
+            "when": {
+              "type": "selfHasStatus",
+              "status": "stealth"
+            },
+            "multiplyDamage": 1.3
+          },
+          {
+            "when": {
+              "type": "targetBand",
+              "band": "back"
+            },
+            "multiplyDamage": 1.3
+          }
+        ]
+      }
+    ],
+    "tags": [
+      "stealth"
+    ]
+  },
+  {
+    "id": "eviscerate",
+    "name": "Eviscerate",
+    "classId": "rogue",
+    "specId": "assassin",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 5,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 90,
+        "scale": 1.4,
+        "scaleStat": "power",
+        "critable": true,
+        "modifiers": [
+          {
+            "perStackOf": "poison",
+            "onTarget": true,
+            "multiplyDamage": 0.2
+          },
+          {
+            "when": {
+              "type": "targetHpBelowPct",
+              "value": 20
+            },
+            "multiplyDamage": 2
+          }
+        ]
+      }
+    ],
+    "tags": [
+      "finisher",
+      "execute"
+    ]
+  },
+  {
+    "id": "shadow-step",
+    "name": "Shadow Step",
+    "classId": "rogue",
+    "specId": "assassin",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 4,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 50,
+        "scale": 0.8,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "applyStatus",
+        "status": "poison",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "stacks": 1,
+        "magnitudeScale": 0.04,
+        "magnitudeStat": "power"
+      },
+      {
+        "type": "special",
+        "mechanic": "reset-cooldown-on-crit",
+        "params": {
+          "ability": "camouflage"
+        }
+      }
+    ],
+    "tags": [
+      "poison"
+    ]
+  },
+  {
+    "id": "cold-blood",
+    "name": "Cold Blood",
+    "classId": "rogue",
+    "specId": "assassin",
+    "category": "Passive",
+    "trigger": "passive",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "self",
+      "pattern": "self"
+    },
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "critMult",
+        "amountPct": 25,
+        "durationTurns": 0
+      },
+      {
+        "type": "special",
+        "mechanic": "on-crit-stacking-buff",
+        "params": {
+          "trigger": "self-crit",
+          "appliesStatus": "cold-blood",
+          "critChancePctPerStack": 15,
+          "maxStacks": 2,
+          "dodgePctPerCrit": 10
+        }
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "dissonant-strike",
+    "name": "Dissonant Strike",
+    "classId": "rogue",
+    "specId": "bard",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 30,
+        "scale": 0.5,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "applyStatus",
+        "status": "mark",
+        "chancePct": 100,
+        "durationTurns": 2,
+        "magnitudePct": 15
+      }
+    ]
+  },
+  {
+    "id": "anthem-of-haste",
+    "name": "Anthem of Haste",
+    "classId": "rogue",
+    "specId": "bard",
+    "category": "Buff",
+    "trigger": "active",
+    "cooldownTurns": 5,
+    "targeting": {
+      "side": "ally",
+      "pattern": "all"
+    },
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "haste",
+        "amountPct": 30,
+        "durationTurns": 2,
+        "note": "Reworked from the original turn-order override (allies act before enemies) into a pure tempo buff — our continuous-seconds engine has no turn order; haste already means 'acts faster/more often'."
+      }
+    ],
+    "tags": [
+      "song"
+    ]
+  },
+  {
+    "id": "rhythm-reset",
+    "name": "Rhythm Reset",
+    "classId": "rogue",
+    "specId": "bard",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 6,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "cooldown-reduction",
+        "params": {
+          "reduceTurns": 2,
+          "target": "ally",
+          "note": "Reduces all of the target ally's active cooldowns by 2 turns."
+        }
+      },
+      {
+        "type": "buff",
+        "stat": "power",
+        "amountPct": 15,
+        "durationTurns": 1
+      }
+    ]
+  },
+  {
+    "id": "soothing-ballad",
+    "name": "Soothing Ballad",
+    "classId": "rogue",
+    "specId": "bard",
+    "category": "Healing",
+    "trigger": "active",
+    "cooldownTurns": 4,
+    "targeting": {
+      "side": "ally",
+      "pattern": "all"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "conditional-on-cleanse",
+        "params": {
+          "perAlly": true,
+          "ifCleansed": {
+            "heal": {
+              "base": 25,
+              "scale": 0.4,
+              "scaleStat": "power"
+            }
+          },
+          "ifNoDebuff": {
+            "buff": {
+              "stat": "armour",
+              "amountPct": 10,
+              "durationTurns": 2
+            }
+          },
+          "note": "Per ally: if the preceding cleanse removed a debuff, heal that ally for 25 + 40% power; if the ally had no debuff to remove, instead grant +10% armour for 2 turns. The branch depends on whether a debuff was removed this cast, which cannot be expressed with the doc's plain Condition shapes, so it lives in this special handler."
+        }
+      }
+    ],
+    "tags": [
+      "song"
+    ]
+  },
+  {
+    "id": "crescendo",
+    "name": "Crescendo",
+    "classId": "rogue",
+    "specId": "bard",
+    "category": "Buff",
+    "trigger": "active",
+    "cooldownTurns": 7,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "power",
+        "amountPct": 50,
+        "durationTurns": 1,
+        "note": "Reworked from the original extra-action payoff into a bigger flat burst — the extra action's output is folded into the stronger power/crit buff (no scheduler needed)."
+      },
+      {
+        "type": "buff",
+        "stat": "crit",
+        "amountPct": 30,
+        "durationTurns": 1
+      }
+    ],
+    "tags": [
+      "song"
+    ]
+  },
+  {
+    "id": "inspiring-presence",
+    "name": "Inspiring Presence",
+    "classId": "rogue",
+    "specId": "bard",
+    "category": "Passive",
+    "trigger": "passive",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "ally",
+      "pattern": "aura"
+    },
+    "effects": [
+      {
+        "type": "buff",
+        "stat": "crit",
+        "amountPct": 5,
+        "durationTurns": 0
+      },
+      {
+        "type": "buff",
+        "stat": "power",
+        "amountPct": 5,
+        "durationTurns": 0
+      },
+      {
+        "type": "special",
+        "mechanic": "song-heal-on-cast",
+        "params": {
+          "triggerCategory": "song",
+          "side": "ally",
+          "pattern": "all",
+          "heal": {
+            "base": 10,
+            "scale": 0.2,
+            "scaleStat": "power"
+          },
+          "note": "Whenever a song (Bard ally-buff) ability is cast, heal all allies for 10 + 20% power."
+        }
+      }
+    ]
+  },
+  {
+    "id": "arcane-bolt",
+    "name": "Arcane Bolt",
+    "classId": "mage",
+    "specId": "arcanist",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Magic",
+        "base": 40,
+        "scale": 0.65,
+        "scaleStat": "power",
+        "critable": true,
+        "modifiers": [
+          {
+            "when": {
+              "type": "targetHasStatus",
+              "status": "cc"
+            },
+            "multiplyDamage": 1.3
+          }
+        ]
+      },
+      {
+        "type": "applyStatus",
+        "status": "chill",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "stacks": 1
+      }
+    ],
+    "tags": [
+      "basic-attack"
+    ]
+  },
+  {
+    "id": "silence",
+    "name": "Silence",
+    "classId": "mage",
+    "specId": "arcanist",
+    "category": "CC",
+    "trigger": "active",
+    "cooldownTurns": 4,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Magic",
+        "base": 30,
+        "scale": 0.5,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "applyStatus",
+        "status": "silence",
+        "chancePct": 100,
+        "durationTurns": 2
+      }
+    ],
+    "tags": [
+      "cc"
+    ]
+  },
+  {
+    "id": "frost-nova",
+    "name": "Frost Nova",
+    "classId": "mage",
+    "specId": "arcanist",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 5,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "all"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Magic",
+        "base": 40,
+        "scale": 0.6,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "applyStatus",
+        "status": "chill",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "stacks": 1
+      },
+      {
+        "type": "applyStatus",
+        "status": "freeze",
+        "chancePct": 30,
+        "durationTurns": 1,
+        "onlyIf": {
+          "type": "targetHasStatus",
+          "status": "chill",
+          "minStacks": 2
+        }
+      }
+    ],
+    "tags": [
+      "aoe",
+      "cc"
+    ]
+  },
+  {
+    "id": "arcane-barrier",
+    "name": "Arcane Barrier",
+    "classId": "mage",
+    "specId": "arcanist",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 6,
+    "targeting": {
+      "side": "ally",
+      "pattern": "all"
+    },
+    "effects": [
+      {
+        "type": "shield",
+        "base": 100,
+        "scale": 1.5,
+        "scaleStat": "power",
+        "durationTurns": 3
+      },
+      {
+        "type": "special",
+        "mechanic": "cc-immunity-while-shielded",
+        "params": {
+          "linkedToShield": true
+        }
+      },
+      {
+        "type": "special",
+        "mechanic": "barrier-break-aoe",
+        "params": {
+          "trigger": "shield-broken-or-expired",
+          "side": "enemy",
+          "pattern": "all",
+          "damageType": "Magic",
+          "base": 50,
+          "scale": 0.8,
+          "scaleStat": "power"
+        }
+      }
+    ],
+    "tags": [
+      "shield",
+      "cc-immunity"
+    ]
+  },
+  {
+    "id": "counterspell",
+    "name": "Counterspell",
+    "classId": "mage",
+    "specId": "arcanist",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 3,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Magic",
+        "base": 25,
+        "scale": 0.4,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "interrupt"
+      },
+      {
+        "type": "special",
+        "mechanic": "cooldown-increase",
+        "params": {
+          "target": "enemy",
+          "addTurns": 2,
+          "appliesTo": "next-skill"
+        }
+      }
+    ],
+    "tags": [
+      "interrupt"
+    ]
+  },
+  {
+    "id": "arcane-mastery",
+    "name": "Arcane Mastery",
+    "classId": "mage",
+    "specId": "arcanist",
+    "category": "Passive",
+    "trigger": "passive",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "self",
+      "pattern": "self"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "first-cc-duration-extension",
+        "params": {
+          "addTurns": 1,
+          "scope": "first-cc-application"
+        }
+      },
+      {
+        "type": "special",
+        "mechanic": "barrier-break-damage",
+        "params": {
+          "appliesTo": "arcane-barrier",
+          "damageType": "Magic",
+          "base": 50,
+          "scale": 0.8,
+          "scaleStat": "power"
+        }
+      }
+    ],
+    "tags": [
+      "passive"
+    ]
+  },
+  {
+    "id": "scorch",
+    "name": "Scorch",
+    "classId": "mage",
+    "specId": "pyromancer",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Magic",
+        "base": 35,
+        "scale": 0.6,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "applyStatus",
+        "status": "burn",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "stacks": 1,
+        "magnitudeScale": 0.1,
+        "magnitudeStat": "power"
+      }
+    ],
+    "tags": [
+      "basic-attack",
+      "burn"
+    ]
+  },
+  {
+    "id": "fireball",
+    "name": "Fireball",
+    "classId": "mage",
+    "specId": "pyromancer",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 3,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "adjacent",
+      "count": 1
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Magic",
+        "base": 60,
+        "scale": 1,
+        "scaleStat": "power",
+        "critable": true,
+        "pattern": "single",
+        "note": "single primary hit; splash special handles adjacent at splashPct (no double-count)"
+      },
+      {
+        "type": "special",
+        "mechanic": "splash-damage",
+        "params": {
+          "targets": "adjacent",
+          "count": 1,
+          "splashPct": 50,
+          "damageType": "Magic",
+          "base": 60,
+          "scale": 1,
+          "scaleStat": "power"
+        }
+      },
+      {
+        "type": "applyStatus",
+        "status": "burn",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "stacks": 1,
+        "magnitudeScale": 0.1,
+        "magnitudeStat": "power",
+        "note": "applied to all enemies hit (primary + splashed)"
+      }
+    ],
+    "tags": [
+      "splash",
+      "burn"
+    ]
+  },
+  {
+    "id": "conflagration",
+    "name": "Conflagration",
+    "classId": "mage",
+    "specId": "pyromancer",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 5,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "adjacent",
+      "count": 2
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Magic",
+        "base": 30,
+        "scale": 0.4,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "special",
+        "mechanic": "spread-burn",
+        "params": {
+          "status": "burn",
+          "fromTarget": true,
+          "toTargets": "adjacent",
+          "count": 2,
+          "spreadAllStacks": true
+        }
+      }
+    ],
+    "tags": [
+      "burn",
+      "spread"
+    ]
+  },
+  {
+    "id": "ignite",
+    "name": "Ignite",
+    "classId": "mage",
+    "specId": "pyromancer",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 6,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "adjacent",
+      "count": 2
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "detonate-burn",
+        "params": {
+          "status": "burn",
+          "perStack": {
+            "base": 20,
+            "scale": 0.3,
+            "scaleStat": "power"
+          },
+          "damageType": "Magic",
+          "critable": true,
+          "consumesStacks": true,
+          "splashPct": 50,
+          "splashTargets": "adjacent",
+          "splashCount": 2
+        }
+      }
+    ],
+    "tags": [
+      "burn",
+      "detonate"
+    ]
+  },
+  {
+    "id": "meteor",
+    "name": "Meteor",
+    "classId": "mage",
+    "specId": "pyromancer",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 8,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "all"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Magic",
+        "base": 120,
+        "scale": 1.8,
+        "scaleStat": "power",
+        "critable": true,
+        "pattern": "single",
+        "note": "single primary impact; splash special handles the rest at splashPct (no double-count)"
+      },
+      {
+        "type": "special",
+        "mechanic": "splash-damage",
+        "params": {
+          "targets": "adjacent",
+          "splashPct": 80,
+          "damageType": "Magic",
+          "base": 120,
+          "scale": 1.8,
+          "scaleStat": "power",
+          "note": "80% splash to enemies adjacent to the primary impact"
+        }
+      },
+      {
+        "type": "applyStatus",
+        "status": "stun",
+        "chancePct": 100,
+        "durationTurns": 1,
+        "onlyIf": {
+          "type": "targetHasStatus",
+          "status": "burn"
+        },
+        "note": "stun applies only to targets that already had Burn at the moment of impact; evaluated BEFORE Meteor's own Burn is added (this effect is ordered before the Burn application)"
+      },
+      {
+        "type": "applyStatus",
+        "status": "burn",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "stacks": 3,
+        "magnitudeScale": 0.1,
+        "magnitudeStat": "power",
+        "note": "applied to all enemies hit"
+      }
+    ],
+    "tags": [
+      "ultimate",
+      "aoe",
+      "burn",
+      "cc"
+    ]
+  },
+  {
+    "id": "combustion",
+    "name": "Combustion",
+    "classId": "mage",
+    "specId": "pyromancer",
+    "category": "Passive",
+    "trigger": "passive",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "self",
+      "pattern": "self"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "burn-amplify",
+        "params": {
+          "status": "burn",
+          "amountPct": 20,
+          "note": "all Burn DoT damage dealt by this caster is increased by 20%"
+        }
+      },
+      {
+        "type": "special",
+        "mechanic": "on-detonate-buff",
+        "params": {
+          "trigger": "self-detonate-burn",
+          "minStacksDetonated": 4,
+          "buffStat": "power",
+          "buffAmountPct": 25,
+          "buffDurationTurns": 2,
+          "note": "triggers when this caster detonates 4 or more Burn stacks (e.g. via Ignite); grants +25% power for 2 turns"
+        }
+      }
+    ],
+    "tags": [
+      "passive",
+      "burn"
+    ]
+  },
+  {
+    "id": "palm-strike",
+    "name": "Palm Strike",
+    "classId": "sage",
+    "specId": "mystic",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 35,
+        "scale": 0.6,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "special",
+        "mechanic": "lifesteal",
+        "params": {
+          "pct": 20,
+          "ofEffect": "damage"
+        }
+      }
+    ]
+  },
+  {
+    "id": "earthen-stance",
+    "name": "Earthen Stance",
+    "classId": "sage",
+    "specId": "mystic",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 4,
+    "targeting": {
+      "side": "self",
+      "pattern": "self"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "parry-counter",
+        "params": {
+          "parryChancePct": 40,
+          "counterBase": 30,
+          "counterScale": 0.5,
+          "counterScaleStat": "power",
+          "counterDamageType": "Physical",
+          "durationTurns": 2
+        }
+      },
+      {
+        "type": "buff",
+        "stat": "armour",
+        "amountPct": 15,
+        "durationTurns": 2
+      },
+      {
+        "type": "taunt",
+        "kind": "soft",
+        "durationTurns": 2
+      }
+    ]
+  },
+  {
+    "id": "leg-sweep",
+    "name": "Leg Sweep",
+    "classId": "sage",
+    "specId": "mystic",
+    "category": "CC",
+    "trigger": "active",
+    "cooldownTurns": 3,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "adjacent",
+      "count": 2,
+      "band": "front"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 40,
+        "scale": 0.5,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "applyStatus",
+        "status": "stun",
+        "chancePct": 100,
+        "durationTurns": 1
+      }
+    ]
+  },
+  {
+    "id": "spirit-link",
+    "name": "Spirit Link",
+    "classId": "sage",
+    "specId": "mystic",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 5,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "damage-redirect",
+        "params": {
+          "redirectPct": 30,
+          "reductionPct": 20,
+          "durationTurns": 3
+        }
+      },
+      {
+        "type": "applyStatus",
+        "status": "spirit-link-hot",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "magnitudeBase": 15,
+        "magnitudeScale": 0.25,
+        "magnitudeStat": "power"
+      },
+      {
+        "type": "taunt",
+        "kind": "soft",
+        "durationTurns": 3
+      }
+    ]
+  },
+  {
+    "id": "zen-strike",
+    "name": "Zen Strike",
+    "classId": "sage",
+    "specId": "mystic",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 5,
+    "targeting": {
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 60,
+        "scale": 1,
+        "scaleStat": "power",
+        "critable": true
+      },
+      {
+        "type": "interrupt"
+      },
+      {
+        "type": "heal",
+        "base": 40,
+        "scale": 0.6,
+        "scaleStat": "power",
+        "target": "self"
+      },
+      {
+        "type": "heal",
+        "base": 40,
+        "scale": 0.6,
+        "scaleStat": "power",
+        "target": "lowest-hp-ally"
+      }
+    ]
+  },
+  {
+    "id": "inner-peace",
+    "name": "Inner Peace",
+    "classId": "sage",
+    "specId": "mystic",
+    "category": "Passive",
+    "trigger": "passive",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "self",
+      "pattern": "self"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "on-parry-heal",
+        "params": {
+          "base": 10,
+          "scale": 0.2,
+          "scaleStat": "power",
+          "target": "self"
+        }
+      },
+      {
+        "type": "special",
+        "mechanic": "on-stun-heal-allies",
+        "params": {
+          "base": 15,
+          "scale": 0.2,
+          "scaleStat": "power",
+          "target": "all-allies"
+        }
+      },
+      {
+        "type": "special",
+        "mechanic": "conditional-regen",
+        "params": {
+          "hpPctPerTurn": 5,
+          "onlyIf": {
+            "type": "selfHpAbovePct",
+            "value": 50
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "verdant-touch",
+    "name": "Verdant Touch",
+    "classId": "sage",
+    "specId": "lifebinder",
+    "category": "Healing",
+    "trigger": "active",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "applyStatus",
+        "status": "regrowth",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "stacks": 1,
+        "magnitudeBase": 20,
+        "magnitudeScale": 0.3,
+        "magnitudeStat": "power"
+      }
+    ]
+  },
+  {
+    "id": "blossom-ward",
+    "name": "Blossom Ward",
+    "classId": "sage",
+    "specId": "lifebinder",
+    "category": "Healing",
+    "trigger": "active",
+    "cooldownTurns": 3,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "applyStatus",
+        "status": "blossom",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "stacks": 1,
+        "magnitudeBase": 10,
+        "magnitudeScale": 0.13,
+        "magnitudeStat": "power"
+      },
+      {
+        "type": "special",
+        "mechanic": "blossom-bloom-on-trigger-or-expire",
+        "params": {
+          "bloomHealBasePerStack": 40,
+          "bloomHealScalePerStack": 0.6,
+          "scaleStat": "power",
+          "appliesToStatus": "blossom"
+        }
+      }
+    ]
+  },
+  {
+    "id": "groves-embrace",
+    "name": "Grove's Embrace",
+    "classId": "sage",
+    "specId": "lifebinder",
+    "category": "Healing",
+    "trigger": "active",
+    "cooldownTurns": 5,
+    "targeting": {
+      "side": "ally",
+      "pattern": "all"
+    },
+    "effects": [
+      {
+        "type": "applyStatus",
+        "status": "natures-breath",
+        "chancePct": 100,
+        "durationTurns": 3,
+        "stacks": 1,
+        "magnitudeBase": 25,
+        "magnitudeScale": 0.34,
+        "magnitudeStat": "power"
+      }
+    ]
+  },
+  {
+    "id": "vital-surge",
+    "name": "Vital Surge",
+    "classId": "sage",
+    "specId": "lifebinder",
+    "category": "Healing",
+    "trigger": "active",
+    "cooldownTurns": 4,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "consume-hots-burst-heal",
+        "params": {
+          "consumeStatuses": [
+            "regrowth",
+            "blossom",
+            "natures-breath"
+          ],
+          "burstMultiplier": 1.5
+        }
+      },
+      {
+        "type": "buff",
+        "stat": "armour",
+        "amountPct": 20,
+        "durationTurns": 2,
+        "onlyIf": {
+          "type": "targetHotStacksAtLeast",
+          "value": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": "flourish",
+    "name": "Flourish",
+    "classId": "sage",
+    "specId": "lifebinder",
+    "category": "Healing",
+    "trigger": "active",
+    "cooldownTurns": 3,
+    "targeting": {
+      "side": "ally",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "trigger-blossom-stacks",
+        "params": {
+          "bloomHealBasePerStack": 40,
+          "bloomHealScalePerStack": 0.6,
+          "scaleStat": "power",
+          "appliesToStatus": "blossom",
+          "fallbackIfNoBlossom": {
+            "applyStatus": "regrowth",
+            "stacks": 2,
+            "durationTurns": 3,
+            "magnitudeBase": 20,
+            "magnitudeScale": 0.3,
+            "magnitudeStat": "power"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "natures-grace",
+    "name": "Nature's Grace",
+    "classId": "sage",
+    "specId": "lifebinder",
+    "category": "Passive",
+    "trigger": "passive",
+    "cooldownTurns": 0,
+    "targeting": {
+      "side": "ally",
+      "pattern": "aura"
+    },
+    "effects": [
+      {
+        "type": "special",
+        "mechanic": "hot-amplify-per-stack",
+        "params": {
+          "amountPctPerStack": 15,
+          "maxAmountPct": 45,
+          "affectsStatuses": [
+            "regrowth",
+            "blossom",
+            "natures-breath"
+          ]
+        }
+      },
+      {
+        "type": "special",
+        "mechanic": "emergency-instant-heal",
+        "params": {
+          "triggerHpBelowPct": 25,
+          "requiresStatusAny": [
+            "regrowth",
+            "blossom",
+            "natures-breath"
+          ],
+          "healBase": 50,
+          "healScale": 0.8,
+          "scaleStat": "power",
+          "oncePerCombatPerAlly": true
+        }
+      }
+    ]
+  }
+]

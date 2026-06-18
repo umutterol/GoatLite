@@ -6,8 +6,11 @@
     "softEnrageAfterSeconds": 90,
     "softEnragePerStep": 0.05,
     "softEnrageStepSeconds": 5,
-    "hpUnit": 780,
-    "dmgUnit": 4
+    "hpUnit": 742,
+    "dmgUnit": 4.6,
+    "deathPenaltySec": 15,
+    "rezStartCharges": 1,
+    "rezRegenSec": 300
   },
   "roleModel": {
     "tank":   { "powerPerIlvl": 0.5, "hpPerIlvl": 15, "armourPerIlvl": 8 },

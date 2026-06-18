@@ -24,6 +24,48 @@ export const SkillSchema = z.object({
   targetType: z.string(), damageType: z.string(), baseValues: z.string(), devStatus: z.string(),
 })
 
+/* ---- EGM-model combat (Phase 0): machine-readable player abilities + statuses ----
+   data/abilities-player.json is the converted, runnable form of the prose SkillSchema above.
+   Effects are intentionally LOOSE (passthrough) at Phase 0; the Phase 1 engine will formalise
+   each effect `type` into a strict discriminated union once it consumes them. */
+export const AbilityTargeting = z.object({
+  side: z.enum(["enemy", "ally", "self"]),
+  pattern: z.enum(["single", "adjacent", "all", "lowest-hp", "self", "aura"]),
+  count: z.number().int().positive().optional(),
+  band: z.enum(["front", "back", "any"]).optional(),
+}).passthrough()
+
+export const AbilityEffect = z.object({ type: z.string() }).passthrough()
+
+export const PlayerAbilitySchema = z.object({
+  id: z.string(), name: z.string(), classId: z.string(), specId: z.string(),
+  category: SkillCategory,
+  trigger: z.enum(["active", "passive"]),
+  cooldownTurns: z.number().int().nonnegative(),
+  windupTurns: z.number().nonnegative().optional(),
+  recoveryTurns: z.number().nonnegative().optional(),
+  targeting: AbilityTargeting,
+  resourceCost: z.object({}).passthrough().optional(),
+  generates: z.object({}).passthrough().optional(),
+  effects: z.array(AbilityEffect).min(1),
+  tags: z.array(z.string()).optional(),
+}).passthrough()
+
+export const StatModSchema = z.object({ stat: z.string(), amountPct: z.number() })
+export const StatusDefSchema = z.object({
+  id: z.string(), name: z.string(),
+  kind: z.enum(["dot", "hot", "cc", "debuff", "buff", "shield", "resource"]),
+  damageType: z.enum(["Physical", "Magic"]).optional(),
+  maxStacks: z.number().int().positive(),
+  refresh: z.enum(["stack", "refresh", "replace", "strongest"]),
+  perTick: z.boolean().optional(),
+  statMods: z.array(StatModSchema).optional(),
+  control: z.enum(["stun", "silence", "daze", "freeze"]).optional(),
+  untargetable: z.boolean().optional(),
+  defaultDurationTurns: z.number().int().nonnegative(),
+  note: z.string().optional(),
+})
+
 export const StatDefSchema = z.object({
   id: z.string(), name: z.string(),
   category: z.enum(["primary", "core", "secondary", "defensive", "offensive", "utility"]),
@@ -58,6 +100,7 @@ export const AbilitySchema = z.object({
 
 export const EnemySchema = z.object({
   id: z.string(), name: z.string(), kind: z.enum(["boss", "trash"]),
+  band: z.enum(["front", "back"]).optional(),   // EGM combat band: front=melee, back=ranged/caster (defaults to front)
   baseHp: z.number(), baseDamage: z.number(),
   icon: z.string().optional(), flavor: z.string().optional(), tags: z.array(z.string()).optional(),
   role: z.string().optional(), stage: z.number().optional(), dungeonId: z.string().optional(),
@@ -177,6 +220,9 @@ export const SaveSchema = z.object({
 export type ClassDef = z.infer<typeof ClassSchema>
 export type Spec = z.infer<typeof SpecSchema>
 export type Skill = z.infer<typeof SkillSchema>
+export type PlayerAbility = z.infer<typeof PlayerAbilitySchema>
+export type AbilityEffectT = z.infer<typeof AbilityEffect>
+export type StatusDef = z.infer<typeof StatusDefSchema>
 export type StatDef = z.infer<typeof StatDefSchema>
 export type Tactic = z.infer<typeof TacticSchema>
 export type BehaviorProfile = z.infer<typeof BehaviorProfileSchema>

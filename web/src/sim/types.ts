@@ -44,6 +44,8 @@ export interface RunResult {
   finalHpPct: { id: string; name: string; pct: number; dead: boolean }[]
   // per-tick cumulative damage per party member (parallel to seriesIds), for the live DPS meter
   series: number[][]
+  // per-tick HP fraction (0..1) per party member (parallel to seriesIds), for live health bars
+  hpSeries: number[][]
   seriesIds: string[]
   partyMeta: { id: string; name: string; specId: string }[]
 }

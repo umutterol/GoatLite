@@ -10,9 +10,13 @@ export type Affix = ContentAffix
 
 export interface Spec { id: string; name: string; className: string; role: Role; icon: string; blurb: string }
 export interface Trait { name: string; rarity: Rarity; kind: "Start" | "Earned"; effect: string }
+export interface KeyView {
+  dungeonId: string; dungeon: string; dungeonShort: string
+  level: number; timer: string; timerSec: number; best: number; rating: number
+}
 export interface Member {
   id: string; name: string; title: string; spec: string; ilvl: number; morale: number;
-  portrait: string; traits: Trait[]; note?: string
+  portrait: string; traits: Trait[]; note?: string; key?: KeyView
 }
 export interface Boss { n: number; name: string; ability: string; tests: string; icon: string }
 export interface TacticCat { id: string; name: string; icon: string; starved: string }

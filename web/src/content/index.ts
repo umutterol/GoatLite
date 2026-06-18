@@ -28,6 +28,8 @@ import craftingJson from "@data/crafting.json"
 import recruitmentJson from "@data/recruitment.json"
 import seasonsJson from "@data/season.json"
 import logTemplatesJson from "@data/log-templates.json"
+import abilitiesPlayerJson from "@data/abilities-player.json"
+import statusesJson from "@data/statuses.json"
 import saveJson from "@data/instances/sample-roster.json"
 
 /* index an array of entities into a Map<id, T>, validating shape + uniqueness */
@@ -44,6 +46,8 @@ function index<T extends { id: string }>(schema: ZodType<T>, json: unknown, doma
 const classes = index(S.ClassSchema, classesJson, "classes")
 const specs = index(S.SpecSchema, specsJson, "specs")
 const skills = index(S.SkillSchema, skillsJson, "skills")
+const playerAbilities = index(S.PlayerAbilitySchema, abilitiesPlayerJson, "player-abilities")
+const statuses = index(S.StatusDefSchema, statusesJson, "statuses")
 const stats = index(S.StatDefSchema, statsJson, "stats")
 const tactics = index(S.TacticSchema, tacticsJson, "tactics")
 const profiles = index(S.BehaviorProfileSchema, profilesJson, "behavior-profiles")
@@ -82,6 +86,15 @@ for (const s of specs.values()) {
 for (const sk of skills.values()) {
   ref(classes.has(sk.classId), `skill '${sk.id}' → unknown classId '${sk.classId}'`)
   ref(specs.has(sk.specId), `skill '${sk.id}' → unknown specId '${sk.specId}'`)
+}
+for (const ab of playerAbilities.values()) {
+  ref(classes.has(ab.classId), `player-ability '${ab.id}' → unknown classId '${ab.classId}'`)
+  ref(specs.has(ab.specId), `player-ability '${ab.id}' → unknown specId '${ab.specId}'`)
+  for (const eff of ab.effects) {
+    const e = eff as Record<string, unknown>
+    if (e.type === "applyStatus" && typeof e.status === "string")
+      ref(statuses.has(e.status), `player-ability '${ab.id}' → unknown status '${e.status}'`)
+  }
 }
 for (const a of affixes.values())
   ref(tactics.has(a.punishes) || AFFIX_PUNISH_SPECIAL.has(a.punishes), `affix '${a.id}' → unknown punishes '${a.punishes}'`)
@@ -149,10 +162,10 @@ export const content = {
   classes, specs, skills, stats, tactics, profiles, potentials, affixes, traits,
   abilities, enemies, packs, dungeons, itemSlots, items, currencies, buildings,
   moraleEvents, talents, lootTables, secondaryStats, tierSets, crafting,
-  seasons, logTemplates, tuning, recruitment, save,
+  seasons, logTemplates, playerAbilities, statuses, tuning, recruitment, save,
 }
 
 export type {
-  Spec, Skill, Trait, Affix, Tactic, Enemy, Dungeon, Item, RosterMember, Save,
+  Spec, Skill, PlayerAbility, StatusDef, Trait, Affix, Tactic, Enemy, Dungeon, Item, RosterMember, Save,
   TalentNode, LootTable, SecondaryStat, TierSet, CraftingOp, Recruitment, Season, LogTemplate,
 } from "./schema"
