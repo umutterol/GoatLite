@@ -49,6 +49,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | K | **Combat AI rework (v2)** | ✅ 6/6 — shared priority-rules brain (players + enemies), data-driven profiles, tactics-as-orders, 20-agent adversarial review (3 fixes) |
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
 | L | **Roster expansion — Marksman + Necromancer** | ⬜ 0/7 — **design ✅** (`MMO-Nostalgia-Reference.md` §6) |
+| M | **Guild Feed & Loot Drama (social meta-layer)** | ⬜ 0/5 (+1 v2) — **design ✅** (this session): always-visible meta feed, system notifications + solo barks, loot drama wired in |
 
 ---
 
@@ -107,7 +108,7 @@ memory `combat-model-egm-migration`.*
 | B.2 | JSON save/load + versioned migrator | engine | blocker | M | ✅ | localStorage JSON + version field (now v4); reset-on-mismatch; **plus sanitize-on-load** (backfills any member missing `.key`, drops legacy non-ticket history) — added after a shape-change crash. Full stepwise migrator still later. |
 | B.3 | Keystone progression + week/affix advance | engine | blocker | M | ✅ | **margin-based** (timed +1/+2/+3 by timer margin, deplete/wipe −1, floor 2); week affixes from the season calendar. Now **per-member** (see B.12) — each key levels independently on its owner's run. |
 | B.4 | Full loop wiring | engine | blocker | M | ✅ | party picker → tactics → run → review → File Report applies it → repeat. Verified end-to-end via UI + store |
-| B.5 | Loot generation + assignment + loot drama UI | engine/ux | major | M | 🟡 | generation → real gear items in the stash + equip assignment done (B.8); only the contested-item **loot-drama** modal (two members want the same drop) is still pending |
+| B.5 | Loot generation + assignment + loot drama UI | engine/ux | major | M | 🟡 | generation → real gear items in the stash + equip assignment done (B.8). The **loot-drama** portion (contested-item resolution + consequences + barks) is **expanded and rehomed into Phase M** (M.2 mechanic, M.5 feed integration) — see that phase. |
 | B.6 | Morale runtime (events, bands) | engine | major | M | ✅ | morale events applied on result (timed +10 / depleted −5 / wipe −20); 3-band output already in the sim |
 | B.7 | Talent picker UI + per-member persistence | ux | major | M | ✅ | **2 MVP nodes** (Survival↔Throughput, Focus↔Spread), 3 choices each, shared by all specs — `data/talents.json` options gained machine-readable `effects` (maxHpPct / dmgPct + `onlyIf` gate). Engine applies them (buildParty maxHp mult + `passiveDamageMult` dmg mods); **interactive picker** in the Character sheet (replaces the old read-only auto-pick); saved per member, captured in the run ticket so replays are faithful. Nodes 3-5 stay prose-only until C.2. |
 | B.8 | Gear / 6-slot inventory + assignment | ux | major | L | ✅ | real gear items (uid/baseId/ilvl/rarity) in a guild stash; per-member 6-slot paper-doll; **char ilvl = slot avg → feeds the sim**; spec-tag-validated equip with upgrade deltas; Character Sheet screen (click a roster card). Verified: equip raises ilvl, runs loot the stash, persists |
@@ -279,6 +280,26 @@ nostalgia 10); (2) add a 6th class, **Necromancer**, the pet/summoner class, who
 
 ---
 
+## Phase M — Guild Feed & Loot Drama (always-visible social meta-layer) ⬜ (design ✅, this session)
+
+*An **always-visible** guild-chat panel in the Logs UI, **meta-layer only** (no in-run combat log). Two voices:
+**system notifications** (the game, neutral/factual — the notification-center backbone with complete coverage) and
+**in-character solo barks** (a roster member in their own personality voice — flavor, curated to ~**1–2 barks/run**).
+Multi-character exchanges ("beats" — bots talking **to each other**) are the **v2** upgrade (M.6). The unlock that makes
+it scale to a **procedurally-generated roster**: **voice attaches to personality (trait/archetype), never identity** — a
+random member inherits a voice pack for free. Loot drama is the feed's flagship customer. See memory `goatlite-guild-feed`.*
+
+| # | Task | Axis | Sev | Effort | Status | Notes |
+|---|---|---|---|---|---|---|
+| M.1 | Always-visible feed panel + **system-notification** layer | ux/engine | major | M | ⬜ | the persistent guild-feed panel + the neutral game-voice stream covering every meta-layer state change (run filed, loot ready, trait earned, morale change / at-risk, recruit available, keystone depleted/raised, operator level-up, departure warning). The notification center — ships first, fully functional with **zero comedy**. |
+| M.2 | **Loot-drama mechanic** (contested-item resolution) | engine/ux | major | M | ⬜ | when a drop upgrades **2+ members**, surface the decision; assign; **loser −5 morale** (wire the dormant `lost-loot` event), **winner +5% output next run** (persisted buff → `SAVE_VERSION` bump). **Personality-gated:** Selfish archetypes (Loot Goblin / Solo Player) contest loudly + lose more morale; Boomer / Casual Andy shrug. Rehomes B.5's pending loot-drama UI. |
+| M.3 | **Bark engine** (procedural, deterministic) | engine | major | L | ⬜ | voice packs keyed by personality; template+slot grammar **grounded in real state** (item / key / name / rival / morale); per-member **no-repeat window**; **rarity budget**; **~1–2 barks/run** rate limit; seeded → replay-deterministic. Works for **random characters by construction**. Voice = trait(tone) × spec(vocabulary) × morale(mood) × per-character style seed. **No runtime LLM** (offline/deterministic/free). |
+| M.4 | **Personality voice-pack content** (tiered) | content | major | L | ⬜ | author per-personality bark banks for the highest-frequency events first (loot win/loss, wipe, clutch timed, trait earned, morale crater, farming-boredom); a plain functional line for everything else. Start ~**40 templates**, grow on observed repetition; Claude-assisted drafting, curate keepers. **Two-layer voice:** earnest grim item names, all satire in the reaction. |
+| M.5 | Loot drama **in the feed** (flagship integration) | ux | major | S | ⬜ | wire M.2 through M.1+M.3 so the contested decision + aftermath produce the marquee system-line + bark moments ("*i called that three runs ago*") — the shareable-screenshot content. |
+| M.6 | *(v2)* Multi-character **exchange beats** + **Rival** escalation | content/engine | major | L | 💤 | whole-beat authored exchanges (two members talking **to each other**, cast from real roster + facts → coherent because authored as a unit); repeated loot snubs to the same rival **earn the Rival trait** (+10% output, −15% morale if that teammate dies — already in GDD). Deferred until v1 voice packs prove out. |
+
+---
+
 ## Open Design Decisions (resolve before/while building the dependent task)
 
 | Decision | Blocks | Status | Resolution |
@@ -295,11 +316,22 @@ nostalgia 10); (2) add a 6th class, **Necromancer**, the pet/summoner class, who
 | Capture→rescue + scar ramp scope | D.9 | 💤 Deferred | is permadeath real or flavor? |
 | Leaderboard integrity / accounts / anti-cheat | D.6 | ⬜ Open | client-inspectable save trust model |
 | Per-spec morale bonuses | B.6 | ⬜ Open | all specs vs a few archetypes |
+| Guild feed: form factor + v1 scope | M.1–M.5 | ✅ Resolved | **Always-visible** meta-layer panel (not a tab you visit); **meta-only** (no in-run combat log). v1 = **system notifications + solo barks**, curated **~1–2 barks/run**; multi-character exchange "beats" deferred to **v2 (M.6)**. |
+| Bark authoring for random characters | M.3, M.4 | ✅ Resolved | **Voice attaches to personality (trait/archetype), never identity** → procedurally-generated members inherit a voice pack for free. Voice = trait(tone) × spec(vocabulary) × morale(mood) × per-character style seed; **templated + state-grounded**, no runtime LLM (deterministic/offline). Coherence for v2 exchanges comes from authoring whole multi-role **beats**, not stitching atomic lines. |
+| Loot drama: depth + who contests | B.5, M.2 | ✅ Resolved | Wire the GDD-canon mechanic (loser −5 morale, winner +5% next run) but **personality-gated**: Selfish archetypes contest loudly + lose more, passive ones shrug. Make it a **decision, not a tax** (give to best-fit vs placate fragile morale) + a default auto-assign policy so the modal is opt-in. Rival-trait escalation from repeat snubs → **v2 (M.6)**. |
 
 ---
 
 ## Changelog
 
+- **2026-06-20** — **Planned Phase M — Guild Feed & Loot Drama (social meta-layer).** Design-locked this session: an
+  **always-visible** meta-layer guild-chat panel with two voices — **system notifications** (neutral game-voice, complete
+  coverage, the notification center) and **in-character solo barks** (personality voice, curated to ~**1–2 barks/run**).
+  v1 ships barks + notifications; multi-character exchange "beats" + Rival escalation are v2 (M.6). The scaling unlock:
+  **voice attaches to personality, never identity**, so a procedurally-generated roster gets voices for free (templated +
+  state-grounded, no runtime LLM). Loot drama is the flagship customer — its mechanic (loser −5 / winner +5%, personality-
+  gated) + barks rehome B.5's pending loot-drama UI. Added M.1–M.5 (+M.6 v2 deferred); resolved 3 design decisions (feed
+  form factor/scope, bark-for-random-characters voice model, loot-drama depth). Memory: `goatlite-guild-feed`.
 - **2026-06-20** — **K.6 shipped: Phase K complete — balance + 20-agent adversarial review.** Ran a find→verify review
   workflow over the whole K brain (rotation / targeting / tactics+data+determinism); 3 findings survived independent
   verification (2 major, 1 nit), all fixed in `combat.ts` + `content/index.ts`: **(1)** `triageHeal` was silently dead
