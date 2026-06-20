@@ -2,15 +2,19 @@
    press play to stream the event log and watch the Details! meter + party
    health bars evolve over the run. */
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react"
+import { content } from "@/content"
 import { useGame, roleOf } from "@/state/game-store"
-import { buildReport, liveDamage, liveHealing, hpAt, mc, fmt, mmss, ROLE_ORDER, type DmgRow } from "../analytics"
+import { activeAffixIds } from "@/sim/affixes"
+import { buildReport, liveDamage, liveHealing, hpAt, mc, mmss, ROLE_ORDER, type DmgRow, type LogEntry } from "../analytics"
 import type { Member } from "@/data/game"
 import type { RunResult } from "@/sim"
-import { Icon, Panel, Meter, ClassName } from "../components"
+import { Icon, Panel, Meter, ClassName, AffixChip, LogSpell } from "../components"
 import type { Go, GoChar } from "../LogsApp"
 
 const SPEEDS = [0.5, 1, 2, 4]
 const RATE = 40 // sim-seconds of playback per real second at 1×
+// H.2: the per-spec signature majors — their cast lines get a gold accent in the log
+const MAJOR_IDS = new Set([...content.playerAbilities.values()].filter((a) => (a.tags ?? []).includes("major")).map((a) => a.id))
 
 export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
   const g = useGame()
@@ -19,23 +23,37 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
   const [tab, setTab] = useState<"log" | "deaths" | "casts">("log")
   const [meterMetric, setMeterMetric] = useState<"dps" | "hps">("dps")
   const [clock, setClock] = useState(0)
-  const [playing, setPlaying] = useState(true)
+  const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
 
   // viewId===null follows the latest; a fresh run lands here with null → shows the new run, no effect needed
   const ticket = (viewId ? tickets.find((t) => t.id === viewId) : null) ?? tickets[0] ?? null
   const isLatest = ticket != null && ticket.id === tickets[0]?.id
-  // re-simulate the selected run from its ticket (deterministic) — no full RunResults are stored
-  const result = useMemo(() => { try { return ticket ? g.replayTicket(ticket) : null } catch { return null } }, [ticket?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  // the just-finished run is already in lastResult — reuse it (no re-sim); historical runs re-simulate from the ticket
+  const result = useMemo(() => {
+    if (!ticket) return null
+    if (g.lastResult && g.lastResult.seed === ticket.seed) return g.lastResult
+    try { return g.replayTicket(ticket) } catch { return null }
+  }, [ticket?.id, g.lastResult]) // eslint-disable-line react-hooks/exhaustive-deps
   const runKey = ticket ? { dungeonId: ticket.dungeonId, dungeon: ticket.dungeonName, level: ticket.keyLevel, rating: ticket.rating } : g.keystone
-  const affixNames = ticket ? ticket.affixNames : g.weekAffixes.map((a) => a.name)
-  const R = useMemo(() => result ? buildReport(result, runKey, affixNames, g.guild?.region ?? "—") : null, [result, ticket?.id, g.guild]) // eslint-disable-line react-hooks/exhaustive-deps
+  // show only the affixes that were actually in effect at this run's key level (gating)
+  const affixNames = ticket ? activeAffixIds(ticket.affixIds, ticket.keyLevel).map((id) => content.affixes.get(id)?.name ?? id) : g.weekAffixes.map((a) => a.name)
+  const R = useMemo(() => result ? buildReport(result, runKey, affixNames) : null, [result, ticket?.id]) // eslint-disable-line react-hooks/exhaustive-deps
   const specById = useMemo(() => new Map((result?.partyMeta ?? []).map((m) => [m.id, m.specId])), [result])
   const specByName = useMemo(() => new Map((result?.partyMeta ?? []).map((m) => [m.name, m.specId])), [result])
   const duration = result?.durationSec ?? 0
+  // J.2: a wipe replay stops at the wipe itself (last death) — don't play out the dead air after the party falls
+  const playEnd = result && result.outcome === "wipe" && result.deaths.length
+    ? Math.min(duration, result.deaths[result.deaths.length - 1].tSec + 3)
+    : duration
 
-  // restart playback whenever a new run is simulated
-  useEffect(() => { if (result) { setClock(0); setPlaying(true) } }, [result?.seed]) // eslint-disable-line react-hooks/exhaustive-deps
+  // auto-play ONLY the freshly-run key, and only the first time it's opened (store-backed flag, consumed once —
+  // StrictMode-safe). Historical runs & re-visits show the finished report (paused) — press play to re-watch.
+  useEffect(() => {
+    if (!result) return
+    if (result.seed === g.autoplaySeed) { setClock(0); setPlaying(true); g.consumeAutoplay() }
+    else { setClock(playEnd); setPlaying(false) }
+  }, [result?.seed]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // advance the playback clock
   useEffect(() => {
@@ -43,12 +61,12 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
     const iv = setInterval(() => {
       setClock((c) => {
         const next = c + RATE * speed * 0.12
-        if (next >= duration) { setPlaying(false); return duration }
+        if (next >= playEnd) { setPlaying(false); return playEnd }
         return next
       })
     }, 120)
     return () => clearInterval(iv)
-  }, [playing, speed, duration, result])
+  }, [playing, speed, playEnd, result])
 
   if (!result || !R) {
     return (
@@ -63,7 +81,7 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
     )
   }
 
-  const finished = clock >= duration
+  const finished = clock >= playEnd
   const liveDmg = liveDamage(result, clock)
   const liveHeal = liveHealing(result, clock)
   const meterRows = meterMetric === "hps" ? liveHeal.rows : liveDmg.rows
@@ -85,10 +103,9 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
         <div style={{ padding: "16px 16px 12px", borderBottom: "1px solid var(--line)" }}>
           <div className="eyebrow" style={{ marginBottom: 6 }}>Report</div>
           <div style={{ fontSize: 17, fontWeight: 700 }}>{R.title}</div>
-          <div className="mono" style={{ fontSize: 12, color: "var(--faint)", marginTop: 3 }}>{R.region}</div>
           <div style={{ display: "flex", gap: 6, marginTop: 11, flexWrap: "wrap" }}>
             <span className="chip" style={{ color: "var(--amber)", borderColor: "#4a3a17" }}>+{R.keyLevel} Key</span>
-            {R.affixes.map((a) => <span className="chip" key={a}>{a}</span>)}
+            {R.affixes.map((a) => <AffixChip name={a} key={a} />)}
           </div>
         </div>
         <div style={{ padding: "8px 0", overflowY: "auto", flex: 1 }}>
@@ -139,7 +156,7 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
                 <span className="mono" style={{ fontSize: 18, fontWeight: 700, color: "var(--amber)" }}>+{R.keyLevel}</span>
               </div>
               <div style={{ display: "flex", gap: 6, marginTop: 5 }}>
-                {R.affixes.map((a) => <span className="chip" key={a}>{a}</span>)}
+                {R.affixes.map((a) => <AffixChip name={a} key={a} />)}
                 <span className="chip" style={{ color: "var(--accent)" }}>{finished ? activeFight.name : activeFight.name + " …"}</span>
               </div>
             </div>
@@ -148,7 +165,7 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
             <Summary label="Result" value={<span style={{ color: R.outcomeColor }}>{R.outcome} {R.upgradeLabel}</span>} />
             <Summary label="Time" value={<span className="mono">{R.time}</span>} sub={"par " + R.par} />
             <Summary label="Deaths" value={<span className="mono" style={{ color: visibleDeaths.length ? "var(--danger)" : "var(--good)" }}>{visibleDeaths.length}</span>} />
-            <Summary label="Rating" value={<span className="mono" style={{ color: "var(--amber)" }}>{R.rating}</span>} sub={R.deltaRating ? "▲ " + R.deltaRating : undefined} />
+            <Summary label="Combat Rez" value={<span className="mono" style={{ color: result.finalRezCharges > 0 ? "var(--good)" : "var(--danger)" }}>{result.finalRezCharges}</span>} sub={result.nextRezChargeAtSec > 0 ? "+1 in " + mmss(result.nextRezChargeAtSec) : "charge ready"} />
           </div>
         </div>
 
@@ -167,7 +184,7 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
             <input type="range" min={0} max={Math.max(1, Math.round(duration))} value={Math.round(clock)} onChange={(e) => { setPlaying(false); seek(Number(e.target.value)) }}
               style={{ width: "100%", accentColor: "var(--accent)", cursor: "pointer" }} />
             {result.deaths.map((d, i) => (
-              <span key={i} title={`${d.name} · ${d.t}`} style={{ position: "absolute", left: `calc(${(d.tSec / Math.max(1, duration)) * 100}% - 3px)`, top: 0, width: 6, height: 6, borderRadius: "50%", background: "var(--danger)", boxShadow: "0 0 5px var(--danger)", pointerEvents: "none" }} />
+              <span key={i} title={`${d.name} · ${d.t}`} style={{ position: "absolute", left: `calc(${(d.tSec / Math.max(1, duration)) * 100}% - 3px)`, top: 0, width: 6, height: 6, borderRadius: "50%", background: "var(--danger)", pointerEvents: "none" }} />
             ))}
           </div>
           <span className="mono" style={{ fontSize: 13, color: "var(--muted)", minWidth: 96, textAlign: "right" }}>{mmss(clock)} <span style={{ color: "var(--faint)" }}>/ {mmss(duration)}</span></span>
@@ -187,7 +204,7 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
             <div style={{ padding: 14 }}>
               {tab === "deaths" ? <DeathsTab deaths={visibleDeaths} specByName={specByName} /> : null}
               {tab === "casts" ? <CastsTab rows={liveDmg.rows} dur={liveDmg.dur} /> : null}
-              {tab === "log" ? <EventLog log={visibleLog} specById={specById} playing={playing} /> : null}
+              {tab === "log" ? <EventLog log={visibleLog} specById={specById} playing={playing} speed={speed} /> : null}
             </div>
           </div>
 
@@ -240,7 +257,7 @@ function PartyHealth({ result, hp, members, goChar }: { result: RunResult; hp: R
           const barColor = down ? "#3a3d48" : r.frac > 0.5 ? "var(--good)" : r.frac > 0.25 ? "var(--amber)" : "var(--danger)"
           return (
             <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => goChar(r.id)}>
-              <span style={{ position: "relative", width: 38, height: 38, borderRadius: 9, flex: "none", border: `2px solid ${info.color}`, boxShadow: `0 0 8px ${info.color}44`, overflow: "hidden", background: info.color, filter: down ? "grayscale(1) brightness(.6)" : "none" }}>
+              <span style={{ position: "relative", width: 38, height: 38, borderRadius: 9, flex: "none", border: `2px solid ${info.color}`, overflow: "hidden", background: info.color, filter: down ? "grayscale(1) brightness(.6)" : "none" }}>
                 {r.portrait
                   ? <img src={r.portrait} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: "#0c0d11", fontWeight: 700 }}>{r.name[0]}</span>}
@@ -318,9 +335,12 @@ function CastsTab({ rows, dur }: { rows: DmgRow[]; dur: number }) {
   )
 }
 
-function EventLog({ log, specById, playing }: { log: { tSec: number; tag: string; color: string; who: string | null; whoName: string | null; text: string; amount: number }[]; specById: Map<string, string>; playing: boolean }) {
+function EventLog({ log, specById, playing, speed }: { log: LogEntry[]; specById: Map<string, string>; playing: boolean; speed: number }) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => { if (playing && ref.current) ref.current.scrollTop = ref.current.scrollHeight }, [log.length, playing])
+  // J.3: while playing, each newly-revealed line eases in over a duration that scales with the speed dial
+  // (slow, readable fade at 0.5×; snappy at 4×) so the speed visibly changes the log cadence. Off when paused/seeking.
+  const reveal = playing ? `logIn ${Math.max(0.07, 0.42 / speed).toFixed(2)}s ease-out` : undefined
   return (
     <div ref={ref} className="scroll-thin" style={{ display: "flex", flexDirection: "column", maxHeight: "calc(100vh - 320px)", overflowY: "auto" }}>
       {log.map((e, i) => {
@@ -328,15 +348,24 @@ function EventLog({ log, specById, playing }: { log: { tSec: number; tag: string
         const color = specId ? mc(specId).color : null
         const lead = e.whoName && e.text.startsWith(e.whoName)
         const rest = lead ? e.text.slice(e.whoName!.length) : e.text
+        // a player ability cast → split the spell name out as a bold, underlined, hover-tooltipped LogSpell
+        const si = e.skillId && e.ability && rest.includes(e.ability) ? rest.indexOf(e.ability) : -1
+        const isMajor = !!e.skillId && MAJOR_IDS.has(e.skillId)   // H.2: signature majors get a gold accent
         return (
-          <div key={i} style={{ display: "grid", gridTemplateColumns: "52px 60px 1fr auto", gap: 12, alignItems: "center", padding: "7px 8px", borderBottom: "1px solid var(--line-soft)", fontSize: 13 }}>
+          <div key={i} style={{ display: "grid", gridTemplateColumns: "52px 56px 1fr", gap: 10, alignItems: "baseline", padding: "6px 8px", borderBottom: "1px solid var(--line-soft)", fontSize: 13, animation: reveal, boxShadow: isMajor ? "inset 2px 0 0 var(--amber)" : undefined, background: isMajor ? "rgba(240,165,46,.05)" : undefined }}>
             <span className="mono" style={{ color: "var(--faint)", fontSize: 12 }}>{mmss(e.tSec)}</span>
-            <span className="mono" style={{ color: e.color, fontWeight: 700, fontSize: 11, letterSpacing: ".04em" }}>{e.tag}</span>
-            <span className="flux" style={{ fontSize: 13 }}>
-              {lead && color ? <span style={{ color, fontWeight: 700 }}>{e.whoName}</span> : null}
-              {rest}
+            <span className="mono" style={{ color: isMajor ? "var(--amber)" : e.color, fontWeight: 700, fontSize: 11, letterSpacing: ".04em" }}>{isMajor ? "✦ MAJOR" : e.tag}</span>
+            <span className="flux" style={{ fontSize: 13, lineHeight: 1.5 }}>
+              {/* J.4: paint the source name even for enemy strikes (no spec color) — neutral hostile tone */}
+              {lead ? <span style={{ color: color ?? "#d77b7b", fontWeight: 700 }}>{e.whoName}</span> : null}
+              {si >= 0 ? (
+                <>
+                  {rest.slice(0, si)}
+                  <LogSpell name={e.ability!} skillId={e.skillId} color={isMajor ? "var(--amber)" : (color ?? undefined)} />
+                  {rest.slice(si + e.ability!.length)}
+                </>
+              ) : rest}
             </span>
-            <span className="mono" style={{ color: e.color, fontSize: 12.5, fontWeight: 600 }}>{e.amount ? fmt(e.amount) : ""}</span>
           </div>
         )
       })}

@@ -22,6 +22,7 @@ export interface CombatCtx {
   resolveCombatant: (id: string) => Combatant | undefined
   splashPrimary?: Combatant   // the enemy struck by the current cast's direct damage (so splash/spread anchor correctly post-kill)
   outgoingMult?: number       // party→enemy damage multiplier from tactics (Kill Order on trash / Cooldowns on boss); set per stage
+  partyInDanger?: boolean      // Phase F: any ally <dangerHpPct or a recent death → Composure clutch is active (set per step)
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -280,12 +281,33 @@ export function tickGuards(dt: number, ctx: CombatCtx): void {
   }
 }
 
-/** Continuous outgoing-damage multiplier: attacker passive (Bloodlust: rampage / low-HP) × the stage's tactic mult. */
+/** Continuous outgoing-damage multiplier: attacker passive (Bloodlust) × tactic mult × B.7 talent mods. */
 function passiveDamageMult(attacker: Combatant, ctx: CombatCtx): number {
   let mult = attacker.team === "party" ? (ctx.outgoingMult ?? 1) : 1   // tactics boost only party output
+  if (attacker.team === "party") {   // Phase F: operator output (Execution + Awareness) + Composure clutch when in danger
+    mult *= attacker.opOutputMult
+    if (ctx.partyInDanger) mult *= attacker.opClutchOutMult
+  }
   const ramp = passiveSpecial(attacker, "rampage-damage-bonus") as any
   if (ramp) mult *= 1 + ((ramp.perStackPct ?? 0) / 100) * stacksOf(attacker, ramp.resource ?? "rampage")
   if (passiveSpecial(attacker, "low-hp-bonus-scaling")) mult *= 1 + 0.25 * (1 - attacker.hp / Math.max(1, attacker.maxHp)) // placeholder curve — Phase 5 tuning
+  // B.7 talents: flat / enemy-count / focus-HP-gated damage mods (focus target = the lead living enemy)
+  if (attacker.talents.length) {
+    const mobs = livingMobs(ctx)
+    const focus = mobs[0]
+    for (const t of attacker.talents) {
+      const c = t.onlyIf
+      if (c) {
+        const pass =
+          c.type === "targetHpBelowPct" ? (!!focus && focus.hp / focus.maxHp < c.value / 100) :
+          c.type === "enemiesAtLeast"   ? mobs.length >= c.value :
+          c.type === "enemiesAtMost"    ? mobs.length <= c.value :
+          false   // unknown condition → fail closed (never apply an ungated bonus)
+        if (!pass) continue
+      }
+      mult *= 1 + t.dmgPct / 100
+    }
+  }
   return mult
 }
 
@@ -337,7 +359,7 @@ function detonateBurn(caster: Combatant, ability: PlayerAbility, params: any, ct
   dealDamage(primary, res.dealt); caster.dmgDone += res.dealt
   afterHit(caster, ability, primary, res, ctx)
   ctx.emit(res.isCrit ? "crit" : "normal",
-    `${caster.name} detonates ${stacks} Burn on ${primary.name} for ${Math.round(res.dealt).toLocaleString()} ${dt}${res.isCrit ? " (Critical)" : ""}`,
+    `${caster.name}'s ${ability.name} detonates ${stacks} Burn on ${primary.name} for ${Math.round(res.dealt).toLocaleString()} ${dt}.${res.isCrit ? "(Critical)" : ""}`,
     { sourceId: caster.id, sourceName: caster.name, sourceSpec: caster.specId, ability: ability.name, skillId: ability.id, amount: Math.round(res.dealt), target: primary.name, result: res.isCrit ? "Critical Strike" : "Hit" })
   if (params.consumesStacks !== false && burn) primary.statuses = primary.statuses.filter((s) => s !== burn)
   const odb = passiveSpecial(caster, "on-detonate-buff") as any   // Combustion
@@ -524,6 +546,22 @@ export function applyPassiveAuras(caster: Combatant, ctx: CombatCtx): void {
   }
 }
 
+/** Who a non-damaging cast (buff / shield / redirect / CC) lands on — for the "uses X on Y" log line. */
+function castTargetDesc(ability: PlayerAbility, caster: Combatant, ctx: CombatCtx): { suffix: string; name?: string } {
+  const t = ability.targeting
+  const effs = ability.effects as Effect[]
+  const partyWide = (t.side === "ally" && (t.pattern === "all" || t.pattern === "aura"))
+    || effs.some((e) => (e.type === "buff" || e.type === "debuff" || e.type === "shield") && e.appliesTo === "all-allies")
+  if (partyWide) return { suffix: " on the party" }
+  const side = t.side === "self"
+    ? (effs.some((e) => e.appliesTo === "ally" || e.appliesTo === "all-allies") ? "ally" : "self")
+    : t.side
+  if (side === "self") return { suffix: "" }
+  const tg = targetsFor(side, t.pattern === "all" ? "all" : "single", t.count, caster, ctx, (t as { band?: string }).band)[0]
+  if (tg && tg !== caster) return { suffix: ` on ${tg.name}`, name: tg.name }
+  return { suffix: "" }
+}
+
 export function executeAbility(caster: Combatant, ability: PlayerAbility, ctx: CombatCtx): void {
   caster.cooldowns[ability.id] = ctx.t + ability.cooldownTurns * ctx.secondsPerTurn
   const a = ability as any
@@ -549,7 +587,7 @@ export function executeAbility(caster: Combatant, ability: PlayerAbility, ctx: C
         dealDamage(tg, res.dealt); caster.dmgDone += res.dealt
         const amt = Math.round(res.dealt)
         ctx.emit(res.isCrit ? "crit" : "normal",
-          `${caster.name} casts ${ability.name} on ${tg.name} for ${amt.toLocaleString()} ${res.damageType}${res.isCrit ? " (Critical)" : ""}`,
+          `${caster.name}'s ${ability.name} hits ${tg.name} for ${amt.toLocaleString()} ${res.damageType}.${res.isCrit ? "(Critical)" : ""}`,
           { sourceId: caster.id, sourceName: caster.name, sourceSpec: caster.specId, ability: ability.name, skillId: ability.id, amount: amt, target: tg.name, result: res.isCrit ? "Critical Strike" : "Hit" })
         afterHit(caster, ability, tg, res, ctx)
         logged = true
@@ -564,7 +602,10 @@ export function executeAbility(caster: Combatant, ability: PlayerAbility, ctx: C
         const heal = Math.min(raw, tg.maxHp - tg.hp)
         if (heal > 0) {
           tg.hp += heal; caster.healDone += heal
-          ctx.emit("heal", `${caster.name} casts ${ability.name} on ${tg.name} for ${Math.round(heal).toLocaleString()} Healing`,
+          // WoW-style overhealing: a big heal landing on a near-full target shows the effective heal + the wasted surplus,
+          // so e.g. Greater Heal reads "heals X for 68 (164 Overhealing)" instead of looking weaker than a Flash Heal.
+          const over = Math.round(raw) - Math.round(heal)
+          ctx.emit("heal", `${caster.name}'s ${ability.name} heals ${tg.name} for ${Math.round(heal).toLocaleString()}.${over >= 1 ? ` (${over.toLocaleString()} Overhealing)` : ""}`,
             { sourceId: caster.id, sourceName: caster.name, sourceSpec: caster.specId, ability: ability.name, skillId: ability.id, amount: Math.round(heal), target: tg.name, result: "Heal" })
           logged = true
         }
@@ -648,7 +689,7 @@ export function executeAbility(caster: Combatant, ability: PlayerAbility, ctx: C
     const cap = content.statuses.get(a.generates.resource)?.maxStacks ?? Infinity
     caster.resources[a.generates.resource] = Math.min(cap, (caster.resources[a.generates.resource] ?? 0) + (a.generates.stacks ?? 1))
   }
-  if (a.resourceCost?.hpPct) dealDamage(caster, caster.maxHp * (a.resourceCost.hpPct / 100))
+  if (a.resourceCost?.hpPct) dealDamage(caster, caster.maxHp * (a.resourceCost.hpPct / 100), { bypassIntake: true })   // a deliberate HP cost isn't "incoming damage" — Awareness/Composure must not discount it
 
   // Inspiring Presence: when the bard casts a song, their own passive heals the whole party.
   const songHeal = (ability.tags ?? []).includes("song") ? (passiveSpecial(caster, "song-heal-on-cast") as any) : null
@@ -661,9 +702,11 @@ export function executeAbility(caster: Combatant, ability: PlayerAbility, ctx: C
         { sourceId: caster.id, sourceName: caster.name, sourceSpec: caster.specId, ability: "Inspiring Presence", amount: Math.round(per), result: "Heal" })
   }
 
-  if (!logged)
-    ctx.emit("flavor", `${caster.name} uses ${ability.name}.`,
-      { sourceId: caster.id, sourceName: caster.name, sourceSpec: caster.specId, ability: ability.name, skillId: ability.id, result: "Cast" })
+  if (!logged) {
+    const ct = castTargetDesc(ability, caster, ctx)   // name the friendly target (Guardian's Oath on Velmora, etc.)
+    ctx.emit("flavor", `${caster.name} uses ${ability.name}${ct.suffix}.`,
+      { sourceId: caster.id, sourceName: caster.name, sourceSpec: caster.specId, ability: ability.name, skillId: ability.id, target: ct.name, result: "Cast" })
+  }
 }
 
 /** Fallback when no ability is usable (e.g. a silenced unit, or a healer with nobody hurt): a plain auto-attack. */
@@ -680,7 +723,7 @@ export function basicAttack(caster: Combatant, ctx: CombatCtx): void {
   afterHit(caster, null, target, res, ctx)
   const amt = Math.round(res.dealt)
   ctx.emit(res.isCrit ? "crit" : "normal",
-    `${caster.name} hits ${target.name} for ${amt.toLocaleString()} ${caster.damageType}${res.isCrit ? " (Critical)" : ""}`,
+    `${caster.name}'s melee swing hits ${target.name} for ${amt.toLocaleString()} ${caster.damageType}.${res.isCrit ? "(Critical)" : ""}`,
     { sourceId: caster.id, sourceName: caster.name, sourceSpec: caster.specId, ability: "Attack", amount: amt, target: target.name, result: res.isCrit ? "Critical Strike" : "Hit" })
 }
 
@@ -698,12 +741,14 @@ function usable(a: PlayerAbility, _caster: Combatant, ctx: CombatCtx): boolean {
   const effects = a.effects as Effect[]
   const heals = effects.some((e) => e.type === "heal" || (e.type === "applyStatus" && isHot(e.status)) || (e.type === "special" && HEAL_SPECIALS.has(e.mechanic)))
   const dmg = effects.some((e) => e.type === "damage") || effects.some((e) => e.type === "special" && DAMAGE_SPECIALS.has(e.mechanic))
-  if (heals && !dmg && injuredAllies(ctx).length === 0) return false   // skip PURE heals when nobody's hurt
+  // a proactive payload (shield/cleanse, or a defensive setup-special like parry/redirect) has value at full HP — don't treat it as a pure heal
+  const proactive = effects.some((e) => e.type === "shield" || e.type === "cleanse" || (e.type === "special" && SETUP_SPECIALS.has(e.mechanic)))
+  if (heals && !dmg && !proactive && injuredAllies(ctx).length === 0) return false   // skip ONLY pure heals when nobody's hurt (Zen Mode parry / Hotfix shield still fire)
   if (dmg && livingMobs(ctx).length === 0) return false
   if (a.targeting.side === "enemy" && livingMobs(ctx).length === 0) return false
   // a status-consuming special (e.g. detonate-burn) is pointless if no living enemy carries that status
   const detonate = effects.find((e) => e.type === "special" && e.mechanic === "detonate-burn")
-  if (detonate) {
+  if (detonate && !effects.some((e) => e.type === "damage")) {   // gate PURE detonates (Ignite); a major like Prod Incident does plain AoE too, so it fires regardless of Burn
     const sid = detonate.params?.status ?? "burn"
     if (!livingMobs(ctx).some((m) => m.statuses.some((s) => s.id === sid && s.stacks > 0))) return false
   }

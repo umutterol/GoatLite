@@ -10,6 +10,8 @@ export interface SimPartyMember {
   ilvl: number
   morale: number
   traitIds: string[]
+  talents?: Record<string, string>   // nodeId → chosen optionId (absent → balanced defaults)
+  skills?: Record<string, number>    // Phase F: operator-skill id → current value (1..20); absent → engine uses baseline
   profile?: string
 }
 
@@ -44,8 +46,13 @@ export interface RunResult {
   finalHpPct: { id: string; name: string; pct: number; dead: boolean }[]
   // per-tick cumulative damage per party member (parallel to seriesIds), for the live DPS meter
   series: number[][]
+  // per-tick cumulative HEALING done per party member (parallel to seriesIds), for the live HPS meter (J.5)
+  healSeries: number[][]
   // per-tick HP fraction (0..1) per party member (parallel to seriesIds), for live health bars
   hpSeries: number[][]
   seriesIds: string[]
   partyMeta: { id: string; name: string; specId: string }[]
+  // combat-resurrection state at run end (J.9): charges remaining + seconds until the next charge regenerates
+  finalRezCharges: number
+  nextRezChargeAtSec: number
 }

@@ -6,5 +6,5 @@
   { "id": "volcanic",   "name": "Volcanic",   "tier": 2, "icon": "affix-volcanic",   "punishes": "positioning", "effect": "Eruption under a random character every ~10s on trash" },
   { "id": "sanguine",   "name": "Sanguine",   "tier": 2, "icon": "affix-sanguine",   "punishes": "positioning", "effect": "Dead mobs leave heal pools; mobs standing in them heal 5% HP/s" },
   { "id": "spiteful",   "name": "Spiteful",   "tier": 2, "icon": "affix-spiteful",   "punishes": "behavior",    "effect": "Ghost spawns on each mob death and attacks the lowest-output character" },
-  { "id": "raging",     "name": "Raging",     "tier": 2, "icon": "affix-raging",     "punishes": "cooldowns",   "effect": "Mobs below 30% HP gain +50% damage until death" }
+  { "id": "raging",     "name": "Raging",     "tier": 2, "icon": "affix-raging",     "punishes": "cooldowns",   "effect": "Mobs below 30% HP enrage, gaining +25% haste (attack faster) until death" }
 ]

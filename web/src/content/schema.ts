@@ -79,17 +79,39 @@ export const TacticSchema = z.object({
 export const BehaviorProfileSchema = z.object({ id: z.string(), name: z.string(), behavior: z.string() })
 export const PotentialTagSchema = z.object({ id: z.string(), label: z.string() })
 
+/* ---- Phase F: operator skills (the post-gear-cap power axis) ----
+   A lean, data-driven registry (3 skills today) so role-specific skills can be added later without a rewrite.
+   Per-point numbers / ceiling mapping / XP curve all live in tuning.operator.*, keyed by these ids. */
+export const OperatorSkillSchema = z.object({
+  id: z.string(), name: z.string(), satire: z.string(), effect: z.string(), icon: z.string(),
+})
+
 export const AffixSchema = z.object({
   id: z.string(), name: z.string(), tier: z.union([z.literal(1), z.literal(2)]),
   icon: z.string(), punishes: z.string(), effect: z.string(),
 })
 
+/* Phase F: traits are no longer inert prose. `combat` carries machine-readable modifiers wired into
+   buildParty; `growth` biases the operator-skill layer. Both optional so legacy/flavor-only traits stay valid. */
+export const TraitCombatSchema = z.object({
+  outputPct: z.number().optional(),   // ± output (damage/healing)
+  intakePct: z.number().optional(),   // ± damage taken (negative = takes less)
+  critPct: z.number().optional(),     // ± crit chance, percentage points
+  hpPct: z.number().optional(),       // ± max HP
+}).strict()
+export const TraitGrowthSchema = z.object({
+  skill: z.string(),                  // operator-skill id (cross-ref validated in index.ts)
+  ceilingDelta: z.number().optional(), // ± to that skill's rolled ceiling
+  growthMult: z.number().optional(),   // × XP gain into that skill
+}).strict()
 export const TraitSchema = z.object({
   id: z.string(), name: z.string(), kind: z.enum(["start", "earned"]), rarity: Rarity,
   archetype: Archetype, netBudget: z.number(), effect: z.string(),
   type: z.enum(["Positive", "Negative"]).optional(),
   pool: z.number().int().min(1).max(4).optional(),
   trigger: z.string().optional(), tags: z.array(z.string()).optional(),
+  combat: TraitCombatSchema.optional(),
+  growth: TraitGrowthSchema.optional(),
 })
 
 export const AbilitySchema = z.object({
@@ -134,6 +156,16 @@ export const LogKind = z.enum(["normal", "crit", "dodge", "death", "mechanic", "
 
 export const TalentOptionSchema = z.object({
   id: z.string(), name: z.string(), effect: z.string(), tags: z.array(z.string()),
+  default: z.boolean().optional(),   // the balanced pick a member starts on
+  // machine-readable effect the sim applies. All 5 nodes are wired (H.3 added intakePct/critPct + nodes 3-5).
+  effects: z.object({
+    maxHpPct: z.number().optional(),
+    dmgPct: z.number().optional(),
+    intakePct: z.number().optional(),   // ± damage taken (flat; negative = takes less) — folds into the operator intake channel
+    critPct: z.number().optional(),     // ± crit chance, percentage points
+    // condition type is a closed set the engine understands — a typo fails validation rather than silently un-gating
+    onlyIf: z.object({ type: z.enum(["targetHpBelowPct", "enemiesAtLeast", "enemiesAtMost"]), value: z.number() }).optional(),
+  }).optional(),
 })
 export const TalentNodeSchema = z.object({
   id: z.string(), node: z.number().int().min(1).max(5), name: z.string(),
@@ -200,6 +232,7 @@ export const TuningSchema = z.object({
   loot: z.record(z.string(), z.unknown()),
   keystone: z.object({ startLevel: z.number(), floorLevel: z.number() }),
   tacticsPoints: z.object({ total: z.number(), maxPerCategory: z.number() }),
+  operator: z.record(z.string(), z.unknown()),   // Phase F: per-point %s, ceiling mapping, XP curve, COR weights, gear cap
 })
 
 /* sample save / instance data (references content by id) */
@@ -227,8 +260,11 @@ export type StatDef = z.infer<typeof StatDefSchema>
 export type Tactic = z.infer<typeof TacticSchema>
 export type BehaviorProfile = z.infer<typeof BehaviorProfileSchema>
 export type PotentialTag = z.infer<typeof PotentialTagSchema>
+export type OperatorSkill = z.infer<typeof OperatorSkillSchema>
 export type Affix = z.infer<typeof AffixSchema>
 export type Trait = z.infer<typeof TraitSchema>
+export type TraitCombat = z.infer<typeof TraitCombatSchema>
+export type TraitGrowth = z.infer<typeof TraitGrowthSchema>
 export type Ability = z.infer<typeof AbilitySchema>
 export type Enemy = z.infer<typeof EnemySchema>
 export type Pack = z.infer<typeof PackSchema>

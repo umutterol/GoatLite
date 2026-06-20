@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { useGame, roleOf, type RoleKey } from "@/state/game-store"
 import { mc, memberScore, scoreColor } from "../analytics"
-import { Icon, RolePill } from "../components"
+import { Icon, GameIcon, RolePill } from "../components"
 import type { GoChar } from "../LogsApp"
 
 export function RosterPage({ goChar }: { goChar: GoChar }) {
@@ -37,10 +37,9 @@ export function RosterPage({ goChar }: { goChar: GoChar }) {
         {/* guild header */}
         <div className="panel" style={{ padding: 22, marginBottom: 18, display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(110deg, #1c1f27, #16171c)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <div style={{ width: 58, height: 58, borderRadius: 12, background: `linear-gradient(150deg, ${crest}, ${crest}88)`, display: "flex", alignItems: "center", justifyContent: "center", color: "#04201d", fontWeight: 700, fontSize: 28, boxShadow: `0 0 20px ${crest}55`, border: `2px solid ${crest}` }}>{g.guild?.glyph ?? "G"}</div>
+            <div style={{ width: 58, height: 58, borderRadius: 12, background: `linear-gradient(150deg, ${crest}, ${crest}88)`, display: "flex", alignItems: "center", justifyContent: "center", color: "#04201d", fontWeight: 700, fontSize: 28, border: `2px solid ${crest}` }}>{g.guild?.glyph ?? "G"}</div>
             <div>
               <div style={{ fontSize: 24, fontWeight: 700, whiteSpace: "nowrap" }}>&lt;{g.guild?.name ?? "Greatest of All Time"}&gt;</div>
-              <div className="mono" style={{ color: "var(--faint)", fontSize: 13, marginTop: 3 }}>{g.guild?.region ?? "—"} · {g.guild?.faction === "alliance" ? "Alliance" : "Horde"}</div>
             </div>
           </div>
           <div style={{ display: "flex", gap: 12 }}>
@@ -93,7 +92,7 @@ export function RosterPage({ goChar }: { goChar: GoChar }) {
                         <span style={{ width: 30, height: 30, borderRadius: 7, background: info.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#0c0d11", fontSize: 14, flex: "none" }}>{r.name[0]}</span>
                         <div>
                           <div style={{ color: info.color, fontWeight: 700, fontSize: 14.5 }}>{r.name}</div>
-                          <div style={{ color: "var(--faint)", fontSize: 12 }}>{info.subspec} {info.klass}</div>
+                          <div style={{ color: "var(--faint)", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}><GameIcon kind="spec" id={r.spec} size={12} color={info.color} label={`${info.subspec} ${info.klass}`} />{info.subspec} {info.klass}</div>
                         </div>
                       </div>
                     </td>

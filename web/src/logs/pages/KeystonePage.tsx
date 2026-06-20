@@ -55,13 +55,13 @@ export function KeystonePage({ go }: { go: Go }) {
               <div style={{ position: "relative", padding: "34px 30px 30px" }}>
                 <div className="eyebrow" style={{ marginBottom: 10 }}>New Keystone</div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 18 }}>
-                  <div style={{ width: 84, height: 84, borderRadius: 18, background: "linear-gradient(150deg, var(--accent), var(--accent-dim))", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 30px rgba(43,182,164,.5)", flex: "none" }}>
+                  <div style={{ width: 84, height: 84, borderRadius: 18, background: "linear-gradient(150deg, var(--accent), var(--accent-dim))", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}>
                     <span className="mono" style={{ fontWeight: 700, fontSize: 16, color: "#04201d" }}>{k.dungeonShort}</span>
                   </div>
                   <div style={{ textAlign: "left" }}>
                     <div style={{ fontSize: 27, fontWeight: 700 }}>{k.dungeon}</div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginTop: 4 }}>
-                      <span className="mono" style={{ fontSize: 40, fontWeight: 700, color: "var(--amber)", lineHeight: 1, textShadow: "0 0 22px rgba(240,165,46,.4)" }}>+{k.level}</span>
+                      <span className="mono" style={{ fontSize: 40, fontWeight: 700, color: "var(--amber)", lineHeight: 1 }}>+{k.level}</span>
                       {up !== 0 ? <span className="mono" style={{ fontSize: 15, fontWeight: 700, color: upColor }}>({up > 0 ? "+" + up : up})</span> : null}
                     </div>
                   </div>

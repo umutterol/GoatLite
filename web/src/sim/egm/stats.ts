@@ -5,6 +5,7 @@ import { content } from "@/content"
 import type { PlayerAbility } from "@/content"
 import type { SimPartyMember } from "../types"
 import type { DamageType } from "./pipeline"
+import { resolveOperator } from "./operator"
 
 export interface StatMod { stat: string; amountPct: number }
 
@@ -82,6 +83,33 @@ export interface Combatant {
   lastActionAt: number
   emergencyHealed: boolean              // Nature's Grace emergency heal — once per combat per ally (Phase 3.5)
   guards: Guards                        // Wave 3 transient peel/defensive states (reset per stage)
+  talents: TalentDmg[]                  // B.7 talent damage modifiers (maxHp already baked into maxHp at build)
+  // Phase F operator layer (party only; enemies carry neutral 1s)
+  intakeMult: number          // live damage-taken multiplier — Awareness (static) × Composure clutch; refreshed per step by the engine
+  opOutputMult: number        // static party output multiplier (Execution + Awareness output + trait output)
+  opClutchOutMult: number     // output multiplier applied on top while the party is in danger (Composure)
+  opIntakeStatic: number      // the static part of intakeMult (Awareness reduction + trait intake)
+  opClutchIntakeMult: number  // further intake multiplier applied while in danger (Composure)
+}
+
+/** A talent's outgoing-damage modifier, optionally gated by a condition. */
+export interface TalentDmg { dmgPct: number; onlyIf?: { type: string; value: number } }
+
+/** Resolve a member's chosen talents → maxHp mult + damage modifiers + flat intake/crit deltas (defaults to balanced). */
+function resolveTalents(chosen: Record<string, string> | undefined): { hpMult: number; dmg: TalentDmg[]; intakePct: number; critPct: number } {
+  let hpMult = 1, intakePct = 0, critPct = 0
+  const dmg: TalentDmg[] = []
+  for (const node of content.talents.values()) {
+    // chosen → default → first option (matches the Character-sheet picker's fallback exactly)
+    const opt = (chosen?.[node.id] && node.options.find((o) => o.id === chosen[node.id])) || node.options.find((o) => o.default) || node.options[0]
+    const eff = opt?.effects
+    if (!eff) continue
+    if (eff.maxHpPct) hpMult *= 1 + eff.maxHpPct / 100
+    if (eff.dmgPct) dmg.push({ dmgPct: eff.dmgPct, onlyIf: eff.onlyIf })
+    if (eff.intakePct) intakePct += eff.intakePct
+    if (eff.critPct) critPct += eff.critPct
+  }
+  return { hpMult, dmg, intakePct, critPct }
 }
 
 export function moraleMult(m: number): number {
@@ -110,24 +138,31 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
     const power = c.powerPerIlvl * p.ilvl * moraleMult(p.morale) * aggressionOutput
     const haste = 0 // Phase 1: no haste source yet (gear secondaries land later)
     const attackInterval = ATTACK_INTERVAL_BASE / (1 + haste / 100)
+    const tal = resolveTalents(p.talents)
+    const op = resolveOperator(p.skills, p.traitIds)   // Phase F: operator skills + trait combat → multipliers
+    // H.3: talent intakePct folds into the operator (uniform) intake channel
+    const intakeStatic = Math.max(0.2, Math.min(2, op.intakeStatic * (1 + tal.intakePct / 100)))
+    const maxHp = c.hpPerIlvl * p.ilvl * tal.hpMult * op.hpMult
     const abilities = [...content.playerAbilities.values()].filter((a) => a.specId === p.specId && a.trigger === "active")
     const passive = [...content.playerAbilities.values()].find((a) => a.specId === p.specId && a.trigger === "passive") ?? null
     return {
       id: p.id, name: p.name, specId: p.specId, team: "party",
       role, position: spec.position,
-      maxHp: c.hpPerIlvl * p.ilvl, hp: c.hpPerIlvl * p.ilvl, shield: 0, shieldExpiresAt: 0,
+      maxHp, hp: maxHp, shield: 0, shieldExpiresAt: 0,
       power,
       attackPower: power * attackInterval,   // so pre-crit DPS ≈ power, matching the current balance
       attackInterval,
       damageType: autoDamageType(spec.classId, p.specId),
       armour: (c.armourPerIlvl ?? 0) * p.ilvl, resist: 0,
-      critChance: Math.max(0, baseCrit + dialCrit), critMult,
-      dodgeChance: 0, damageTakenPct: 0,
+      critChance: Math.max(0, baseCrit + dialCrit + op.critBonus + tal.critPct / 100), critMult,
+      dodgeChance: op.dodgeBonus, damageTakenPct: 0,
       mana: c.mana ?? 0, maxMana: c.mana ?? 0, healCost: c.healCost ?? 0,
       manaRegen: c.manaRegenPerSec ?? 0, hps: (c.hpsPerIlvl ?? 0) * p.ilvl,
       nextActionAt: 0, downedUntil: -1, dmgDone: 0, healDone: 0, deaths: 0, isBoss: false,
       abilities, passive, cooldowns: {}, statuses: [], resources: {}, hitSinceAction: false, lastActionAt: 0,
-      emergencyHealed: false, guards: {},
+      emergencyHealed: false, guards: {}, talents: tal.dmg,
+      intakeMult: intakeStatic, opOutputMult: op.outputMult, opClutchOutMult: op.clutchOutMult,
+      opIntakeStatic: intakeStatic, opClutchIntakeMult: op.clutchIntakeMult,
     }
   })
 }
@@ -150,7 +185,8 @@ export function makeEnemy(opts: {
     mana: 0, maxMana: 0, healCost: 0, manaRegen: 0, hps: 0,
     nextActionAt: 0, downedUntil: -1, dmgDone: 0, healDone: 0, deaths: 0, isBoss: opts.isBoss,
     abilities: [], passive: null, cooldowns: {}, statuses: [], resources: {}, hitSinceAction: false, lastActionAt: 0,
-    emergencyHealed: false, guards: {},
+    emergencyHealed: false, guards: {}, talents: [],
+    intakeMult: 1, opOutputMult: 1, opClutchOutMult: 1, opIntakeStatic: 1, opClutchIntakeMult: 1,   // enemies: neutral operator layer
   }
 }
 
@@ -194,9 +230,11 @@ export function eff(c: Combatant): EffStats {
   }
 }
 
-/** Apply damage to a combatant — energy shield soaks it first, then life. */
-export function dealDamage(target: Combatant, amount: number): void {
-  let amt = amount
+/** Apply damage to a combatant — Phase F operator intake (party only) reduces it first, then shield soaks, then life.
+    `bypassIntake` skips the operator multiplier for SELF-INFLICTED costs (ability HP costs aren't "incoming damage"). */
+export function dealDamage(target: Combatant, amount: number, opts?: { bypassIntake?: boolean }): void {
+  // Uniform Awareness/Composure intake: applies to ALL external incoming (auto-attacks, affix ticks, mechanics, redirects).
+  let amt = target.team === "party" && !opts?.bypassIntake ? amount * target.intakeMult : amount
   if (target.shield > 0) { const soak = Math.min(target.shield, amt); target.shield -= soak; amt -= soak }
   target.hp -= amt
 }

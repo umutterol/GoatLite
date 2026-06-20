@@ -2,9 +2,10 @@
 import { useState } from "react"
 import { content } from "@/content"
 import { useGame } from "@/state/game-store"
+import { affixUnlockKey } from "@/sim/affixes"
 import type { Aggression } from "@/sim"
 import { mc } from "../analytics"
-import { Icon, Panel, RolePill } from "../components"
+import { Icon, GameIcon, Panel, RolePill } from "../components"
 import type { Go } from "../LogsApp"
 
 const TACTICS = [...content.tactics.values()]
@@ -51,14 +52,14 @@ export function SetupPage({ go }: { go: Go }) {
             <Panel title="Choose a Key" right={<span className="mono" style={{ fontSize: 11.5, color: "var(--faint)" }}>week {g.weekNumber}</span>} bodyStyle={{ padding: 12 }}>
               {/* selected key — the one this run will use (its holder is locked into the party) */}
               <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "8px 10px 14px", borderBottom: "1px solid var(--line-soft)" }}>
-                <div style={{ width: 50, height: 50, borderRadius: 12, background: "linear-gradient(150deg, var(--accent), var(--accent-dim))", display: "flex", alignItems: "center", justifyContent: "center", flex: "none", boxShadow: "0 0 18px rgba(43,182,164,.4)" }}>
+                <div style={{ width: 50, height: 50, borderRadius: 12, background: "linear-gradient(150deg, var(--accent), var(--accent-dim))", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}>
                   <span className="mono" style={{ fontWeight: 700, fontSize: 14, color: "#04201d" }}>{g.keystone.dungeonShort}</span>
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 18, fontWeight: 700 }}>{g.keystone.dungeon}</div>
                   <div className="flux" style={{ fontSize: 12.5, marginTop: 2 }}>{owner ? `${owner.ownerName}'s key · ` : ""}timer {g.keystone.timer} · best +{g.keystone.best || g.keystone.level}</div>
                 </div>
-                <span className="mono" style={{ fontSize: 34, fontWeight: 700, color: "var(--amber)", textShadow: "0 0 18px rgba(240,165,46,.35)" }}>+{g.keystone.level}</span>
+                <span className="mono" style={{ fontSize: 34, fontWeight: 700, color: "var(--amber)" }}>+{g.keystone.level}</span>
               </div>
               {/* every member's key — pick one to run; its holder auto-joins (and locks into) the party */}
               <div style={{ display: "flex", flexDirection: "column", maxHeight: 280, overflowY: "auto", marginTop: 6 }}>
@@ -80,24 +81,33 @@ export function SetupPage({ go }: { go: Go }) {
               </div>
             </Panel>
 
-            {tier1 ? (
-              <Panel title="Affix · Tier 1" bodyStyle={{ padding: 18 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span className="seg-btn on accent" style={{ cursor: "default" }}>{tier1.name}</span>
-                  <span className="chip" style={{ color: "var(--faint)" }}>this week · fixed</span>
-                </div>
-                <p className="flux" style={{ fontSize: 13.5, marginTop: 12 }}>{tier1.effect}</p>
-              </Panel>
-            ) : null}
+            {tier1 ? (() => {
+              const at = affixUnlockKey(tier1.id), active = g.keystone.level >= at
+              return (
+                <Panel title="Affix · Tier 1" bodyStyle={{ padding: 18 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span className="seg-btn on accent" style={{ cursor: "default", opacity: active ? 1 : .45 }}>{tier1.name}</span>
+                    <span className="chip" style={{ color: active ? "var(--good)" : "var(--faint)" }}>{active ? "active this run" : `unlocks at +${at}`}</span>
+                  </div>
+                  <p className="flux" style={{ fontSize: 13.5, marginTop: 12, opacity: active ? 1 : .55 }}>{tier1.effect}</p>
+                </Panel>
+              )
+            })() : null}
 
             {tier2.length ? (
               <Panel title="Affix · Tier 2" bodyStyle={{ padding: 18 }}>
-                {tier2.map((a) => (
-                  <div key={a.id} style={{ marginBottom: 10 }}>
-                    <div style={{ fontWeight: 700, fontSize: 15 }}>{a.name}</div>
-                    <p className="flux" style={{ fontSize: 13, marginTop: 4 }}>{a.effect}</p>
-                  </div>
-                ))}
+                {tier2.map((a) => {
+                  const at = affixUnlockKey(a.id), active = g.keystone.level >= at
+                  return (
+                    <div key={a.id} style={{ marginBottom: 10, opacity: active ? 1 : .55 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontWeight: 700, fontSize: 15 }}>{a.name}</span>
+                        <span className="chip" style={{ fontSize: 11, color: active ? "var(--good)" : "var(--faint)" }}>{active ? "active" : `+${at}`}</span>
+                      </div>
+                      <p className="flux" style={{ fontSize: 13, marginTop: 4 }}>{a.effect}</p>
+                    </div>
+                  )
+                })}
               </Panel>
             ) : null}
           </div>
@@ -148,9 +158,12 @@ export function SetupPage({ go }: { go: Go }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {TACTICS.map((t) => (
                   <div key={t.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 14 }}>{t.name}</div>
-                      <div className="flux" style={{ fontSize: 12 }}>{t.perPoint}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                      <GameIcon kind="tactic" id={t.id} size={20} color="var(--muted)" label={t.name} />
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: 14 }}>{t.name}</div>
+                        <div className="flux" style={{ fontSize: 12 }}>{t.perPoint}</div>
+                      </div>
                     </div>
                     <div className="stepper" style={{ flex: "none" }}>
                       <button disabled={(tactics[t.id] || 0) <= 0} onClick={() => setTactic(t.id, -1)}>−</button>

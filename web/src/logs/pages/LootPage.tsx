@@ -53,12 +53,11 @@ export function LootPage({ go }: { go: Go }) {
             const choice = assign[it.uid]
             const assignedMember = choice && choice !== "scrap" ? party.find((p) => p.id === choice) : null
             const eligible = party.filter((p) => it.specs.includes(p.spec))
-            const upMember = it.upgradeFor ? g.members.find((m) => m.id === it.upgradeFor) : null
             return (
               <div key={it.uid} className="panel" style={{ padding: 0, overflow: "hidden", borderColor: choice ? (choice === "scrap" ? "var(--line)" : "var(--accent)") : "var(--line)", opacity: choice === "scrap" ? .7 : 1 }}>
                 <div style={{ display: "flex", alignItems: "stretch" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px", flex: "0 0 360px", borderRight: "1px solid var(--line-soft)", background: `linear-gradient(120deg, ${qColor}10, transparent)` }}>
-                    <span style={{ width: 50, height: 50, flex: "none", borderRadius: 11, background: "linear-gradient(145deg,#23252e,#15161b)", border: `2px solid ${qColor}`, boxShadow: `0 0 14px ${qColor}44`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "IBM Plex Mono, monospace", fontWeight: 700, fontSize: 17, color: qColor }}>{slotName[0]}</span>
+                    <span style={{ width: 50, height: 50, flex: "none", borderRadius: 11, background: "linear-gradient(145deg,#23252e,#15161b)", border: `2px solid ${qColor}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "IBM Plex Mono, monospace", fontWeight: 700, fontSize: 17, color: qColor }}>{slotName[0]}</span>
                     <div>
                       <div style={{ color: qColor, fontWeight: 700, fontSize: 16 }}>{it.name}</div>
                       <div style={{ color: "var(--faint)", fontSize: 12.5, marginTop: 2 }}>{slotName} · {it.primaryStat}</div>
@@ -81,16 +80,23 @@ export function LootPage({ go }: { go: Go }) {
                       </div>
                     ) : (
                       <>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9, gap: 12 }}>
-                          <span className="eyebrow" style={{ fontSize: 10, flex: "none" }}>Award to</span>
-                          {upMember && it.upgradeAmt > 0 ? <span style={{ fontSize: 11.5, color: "var(--good)", textAlign: "right", lineHeight: 1.3 }}>▲ +{it.upgradeAmt} ilvl for <b style={{ color: mc(upMember.spec).color }}>{upMember.name}</b></span> : null}
+                        <div style={{ marginBottom: 9 }}>
+                          <span className="eyebrow" style={{ fontSize: 10 }}>Award to <span style={{ letterSpacing: 0, textTransform: "none", fontWeight: 400, color: "var(--faint)" }}>— current → new ilvl</span></span>
                         </div>
                         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                           {eligible.length ? eligible.map((p) => {
-                            const isUp = p.id === it.upgradeFor
+                            const u = it.upgrades.find((x) => x.memberId === p.id)
+                            const delta = u?.delta ?? 0
+                            const isUp = delta > 0
                             return (
-                              <button key={p.id} className="btn btn-sm" onClick={() => setAssign((a) => ({ ...a, [it.uid]: p.id }))} style={{ borderColor: isUp ? "var(--good)" : "var(--line)", color: mc(p.spec).color, fontWeight: 700 }}>
-                                {p.name}{isUp ? <span style={{ color: "var(--good)", marginLeft: 2 }}>▲</span> : null}
+                              <button key={p.id} className="btn btn-sm" onClick={() => setAssign((a) => ({ ...a, [it.uid]: p.id }))}
+                                style={{ flexDirection: "column", alignItems: "flex-start", gap: 1, borderColor: isUp ? "var(--good)" : "var(--line)", padding: "6px 11px" }}>
+                                <span style={{ color: mc(p.spec).color, fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
+                                  {p.name}{isUp ? <span style={{ color: "var(--good)" }}>▲</span> : null}
+                                </span>
+                                <span className="mono" style={{ fontSize: 10.5, color: isUp ? "var(--good)" : "var(--faint)" }}>
+                                  {u?.currentIlvl ?? "—"} → {it.ilvl}{delta !== 0 ? ` (${delta > 0 ? "+" : ""}${delta})` : ""}
+                                </span>
                               </button>
                             )
                           }) : <span className="flux" style={{ fontSize: 12.5 }}>No one in the party can use this.</span>}

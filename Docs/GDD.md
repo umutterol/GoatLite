@@ -206,9 +206,16 @@ Boredom and thrilling-victory are borrowed from the reference game: boredom push
 
 ---
 
-#### Potentials (LOCKED — Phase 2)
+#### Potentials (LOCKED — Phase 2; **extended 2026-06-20**, see `Operator-Skills-Design.md`)
 
-Potentials are the hidden growth profile that makes one recruit feel different from another with the same class and item level. They are **draft-bias weights, not stat bonuses** — they never touch the Output formula directly.
+> **Update (2026-06-20):** Potentials are now **unified with the operator-skill power layer** (Phase F). In addition to
+> biasing the earned-trait draft (below — unchanged), a character's potential tag-weights now set the **hidden Ceiling**
+> on each of their 3 **operator skills** (Execution / Awareness / Composure), which DO feed the Output formula. So the
+> "never touch the Output formula" rule below is **superseded**: Potentials remain hidden-but-active and are still the
+> recruitment hook, but they now also determine *how good a bot's skills can grow* (one hidden "how good can this bot
+> get" system instead of two). The original draft-bias model is retained verbatim for the earned-trait pools.
+
+Potentials are the hidden growth profile that makes one recruit feel different from another with the same class and item level. *(Original framing — they were **draft-bias weights, not stat bonuses** that never touched the Output formula directly; as of the 2026-06-20 unification they additionally set operator-skill Ceilings, which do.)*
 
 **How they work:**
 - Each potential is a **tag → weight** (baseline 1.0, sources add, clamped 0–5). Tags are the same taxonomy the trait pools use — `crit`, `survival`, `interrupt`, `positioning`, `aoe`, `cleave`, `sustain`, etc.
@@ -323,7 +330,7 @@ The guild holds **one keystone**, starting at +2 (Ashveil Crypts at season start
 | Volcanic | Random damage events on trash pulls | Positioning |
 | Sanguine | Mobs heal in pools — time bleeds away if unaddressed | Positioning |
 | Spiteful | Ghosts target lowest-output character after mob deaths | Behavior Profile |
-| Raging | Mobs enrage below 30% HP, spiking damage | Kill Order + Cooldowns |
+| Raging | Mobs enrage below 30% HP, gaining +25% haste (attack faster) | Kill Order + Cooldowns |
 
 **Design rule:** Bursting and Bolstering never appear in the same week — both punish Kill Order and stacking them removes all counterplay.
 
@@ -336,7 +343,7 @@ Each affix maps directly to a tactics category. Starving that category on a week
 - Bursting/Bolstering week + Kill Order 0 → pulls spiral out of control, time collapses
 - Volcanic/Sanguine week + Positioning 0 → deaths on trash, healer overwhelmed
 - Spiteful week + wrong Behavior Profile → ghosts shred your lowest-output character
-- Raging + Cooldowns 0 → enrage phases on bosses hit too hard, Tyrannical week especially brutal
+- Raging + Cooldowns 0 → low-HP trash enrage (attack ~25% faster) goes unblunted, spiking healer load during pulls
 
 ---
 
@@ -704,7 +711,7 @@ All 5 dead = wipe = Depleted, **and the run's loot is forfeited** (the contrast 
 |---|---|---|
 | Interrupts | Dangerous cast interrupted at 20% + 25% per point (max 95%) | Casts go through — heavy party damage / CC events |
 | Positioning | Avoidable event hits its target at 60% − 18% per point | Deaths to avoidables; Sanguine/Volcanic losses |
-| Cooldowns | +4%/pt party damage in boss burn windows; −10%/pt damage taken from boss spike phases and enraged (Raging) mobs | CDs wasted on wrong phase; Raging/Tyrannical spikes hurt |
+| Cooldowns | +4%/pt party damage in boss burn windows; −10%/pt damage taken from boss spike phases, and blunts the Raging haste bonus on enraged trash by 10%/pt | CDs wasted on wrong phase; Raging-fast trash / Tyrannical boss spikes hurt |
 | Kill Order | +6%/pt effective party DPS on trash and boss-summoned adds (target discipline); sets the kill plan — focus-fire by default, staggered kills on Bursting, evened kills on Bolstering | Adds live too long; healer OOMs |
 
 **Solo Player ruling:** that character's individual checks (interrupt assignments, positioning rolls) use half the party's point benefit.
@@ -722,7 +729,7 @@ All 5 dead = wipe = Depleted, **and the run's loot is forfeited** (the contrast 
 | Volcanic | Eruption event under a random character every ~10s on trash; Positioning roll to avoid |
 | Sanguine | Dead mobs leave heal pools; mobs standing in one heal 5% HP/s until the pack repositions (delay scales inversely with Positioning) |
 | Spiteful | Ghost spawns on each mob death and attacks the lowest-output character; tank pickup and the Peel profile mitigate |
-| Raging | Mobs below 30% HP gain +50% damage until death; Cooldowns points absorb the spike, Kill Order kills enraged targets first |
+| Raging | Mobs below 30% HP enrage, gaining +25% haste (attack ~25% faster) until death; Cooldowns points blunt the spike, Kill Order kills enraged targets first |
 
 ---
 

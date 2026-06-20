@@ -3,9 +3,14 @@ import { content } from "@/content"
 import { runDungeon } from "@/sim"
 import type { RunResult, Aggression, SimPartyMember } from "@/sim"
 import type { Member, Trait, Affix, KeyView } from "@/data/game"
+import {
+  freshOperatorSkills, zeroSkillMap, falseRevealMap, rollRevealMask, rollProfile, rollCeilings, rollSkills,
+  corOf, potentialStars, applyGrowth, xpFromRun, GEAR_CAP_ILVL, GEAR_CAP_KEY, ABOVE_CAP_SKILL_XP,
+  type SkillMap, type RevealMap, type OperatorProfile,
+} from "@/data/operator"
 
 const SAVE_KEY = "goatlite.save"
-const SAVE_VERSION = 4 // bumped: keystones are now per-member (each member holds & levels their own key)
+const SAVE_VERSION = 5 // bumped: per-member operator skills + ceilings + Potentials profile (Phase F)
 export const SLOTS = [...content.itemSlots.keys()] // weapon, helm, chest, legs, boots, trinket
 
 export type RoleKey = "tank" | "healer" | "dps"
@@ -14,12 +19,19 @@ export type Phase = "create" | "recruit" | "playing"
 export interface GearItem {
   uid: string; baseId: string; name: string; slot: string; specs: string[]; ilvl: number; rarity: string
 }
-export interface GuildInfo { name: string; faction: string; region: string; crest: string; glyph: string; motto: string }
+export interface GuildInfo { name: string; crest: string; glyph: string; motto: string }
 export interface Recruit {
   id: string; name: string; specId: string; role: RoleKey; ilvl: number; score: number; morale: number
   traitId: string; traitName: string; traitGood: boolean; traitFlavor: string; cost: number
+  // Phase F operator layer (rolled at generation; copied onto the member on sign)
+  skills: SkillMap; ceilings: SkillMap; revealed: RevealMap; potentialProfile: OperatorProfile
+  cor: number; stars: number   // derived display numbers: Current Operator Rating + Potential ★
 }
-export interface LootDrop extends GearItem { primaryStat: string; upgradeFor: string | null; upgradeAmt: number }
+export interface UpgradeCandidate { memberId: string; delta: number; currentIlvl: number }
+export interface LootDrop extends GearItem {
+  primaryStat: string; upgradeFor: string | null; upgradeAmt: number
+  upgrades: UpgradeCandidate[]   // J.6: every spec-eligible party member + their current ilvl in this slot (delta>0 = upgrade)
+}
 export interface KeystoneChange {
   prevLevel: number; prevDungeon: string; prevTime: string; prevPar: string
   outcome: "timed" | "depleted" | "wipe"; underBy: number; upgrade: number
@@ -35,7 +47,9 @@ function rarityForKey(key: number): string {
 }
 // Drops track the key: gear-appropriate ilvl for a key is ~108+4·key, so a drop lands a few above that —
 // a real upgrade that nudges you toward the next key's requirement (timing K gears you to attempt K+1).
-const dropIlvl = (key: number) => 112 + 4 * key
+// Phase F: HARD gear cap — drops stop scaling at the key-12 value (ilvl 160). Past the cap, power hands off
+// to the operator-skill layer (see CONFIRM_LOOT: above-cap keys grant bonus operator XP instead of higher ilvl).
+const dropIlvl = (key: number) => Math.min(112 + 4 * key, GEAR_CAP_ILVL)
 function starterGear(specId: string, ilvl: number, memberId: string): Record<string, GearItem> {
   const g: Record<string, GearItem> = {}
   for (const s of SLOTS) g[s] = { uid: `starter-${memberId}-${s}`, baseId: "beta-standard-issue", name: `Worn ${content.itemSlots.get(s)!.name}`, slot: s, specs: [specId], ilvl, rarity: "Common" }
@@ -101,10 +115,20 @@ function makeRecruit(role: RoleKey, bestIlvl: number, used: Set<string>): Recrui
 
   const pool = (isDud ? START_TRAITS.filter((t) => t.netBudget < 6) : START_TRAITS.filter((t) => t.netBudget >= 0))
   const trait = (pool.length ? pick(pool) : (START_TRAITS.length ? pick(START_TRAITS) : pick(ALL_TRAITS)))
+
+  // Phase F: roll the hidden Potentials profile → operator ceilings → starting skills (scouting bet).
+  // Duds plateau early (low veteran-frac → low current skills); standouts start closer to their ceiling.
+  const profile = rollProfile([trait.id])
+  const ceilings = rollCeilings(profile, [trait.id])
+  const veteranFrac = isDud ? 0.1 + Math.random() * 0.2 : 0.35 + Math.random() * 0.45
+  const skills = rollSkills(ceilings, veteranFrac)
+  const revealed = rollRevealMask()
   return {
     id: "rec-" + Math.random().toString(36).slice(2, 9),
     name, specId, role, ilvl, score, morale,
     traitId: trait.id, traitName: trait.name, traitGood: !isDud, traitFlavor: trait.effect, cost,
+    skills, ceilings, revealed, potentialProfile: profile,
+    cor: corOf(skills, role), stars: potentialStars(ceilings, role),
   }
 }
 function generateRecruits(bestIlvl: number, opts: { balanced?: boolean } = {}): Recruit[] {
@@ -128,6 +152,13 @@ interface RawMember {
   morale: number; portrait: string; traitIds: string[]; note?: string
   gear: Record<string, GearItem>
   key: MemberKey                  // each member holds & levels their own keystone
+  talents: Record<string, string> // B.7: nodeId → chosen optionId (empty → balanced defaults)
+  // Phase F operator layer: current skills (1..20) grow toward hidden ceilings via skillXp; revealed = ceiling known
+  skills: SkillMap
+  ceilings: SkillMap
+  skillXp: SkillMap
+  revealed: RevealMap
+  potentialProfile: OperatorProfile // hidden tag-weights (set the ceilings; bias earned-trait rolls in D.1)
 }
 interface PersistState {
   version: number
@@ -162,9 +193,10 @@ interface GameState extends PersistState {
   lastKeystoneChange: KeystoneChange | null
   lastRunOwnerId: string | null       // which member's key the last run used (for loot/progression)
   lastRunKey: MemberKey | null        // snapshot of that key as it was at run time (for the report header)
+  autoplaySeed: number | null         // the just-run's seed — its Report auto-plays once, then this is consumed
 }
 const DEFAULT_CONFIG: RunConfig = { tactics: { interrupts: 2, positioning: 1, cooldowns: 1, killorder: 2 }, aggression: "Balanced" }
-const TRANSIENT = { lastResult: null, lastLoot: null, lastConfig: null, pendingLoot: null, lastKeystoneChange: null, lastRunOwnerId: null, lastRunKey: null } as const
+const TRANSIENT = { lastResult: null, lastLoot: null, lastConfig: null, pendingLoot: null, lastKeystoneChange: null, lastRunOwnerId: null, lastRunKey: null, autoplaySeed: null } as const
 
 function freshState(): GameState {
   return {
@@ -191,8 +223,12 @@ function loadState(): GameState {
       const p = JSON.parse(raw) as PersistState
       if (p.version === SAVE_VERSION) {
         const merged = { ...freshState(), ...p, ...TRANSIENT }
-        // defensive: guarantee every member has a key so shapeKey/keys never deref undefined
-        merged.roster = merged.roster.map((m) => (m.key ? m : { ...m, key: freshKey() }))
+        // defensive: guarantee every member has a key + talents + the Phase F operator block so engine/UI never deref undefined
+        merged.roster = merged.roster.map((m) => ({
+          ...m, key: m.key ?? freshKey(), talents: m.talents ?? {},
+          skills: m.skills ?? freshOperatorSkills(), ceilings: m.ceilings ?? freshOperatorSkills(),
+          skillXp: m.skillXp ?? zeroSkillMap(), revealed: m.revealed ?? falseRevealMap(), potentialProfile: m.potentialProfile ?? {},
+        }))
         // history changed shape (string[] → RunTicket[]) — drop any legacy/malformed entries so replay can't crash
         merged.history = ((merged.history as unknown[]) ?? []).filter((t): t is RunTicket =>
           !!t && typeof t === "object" && typeof (t as RunTicket).seed === "number" && Array.isArray((t as RunTicket).party) && typeof (t as RunTicket).aggression === "string")
@@ -229,6 +265,8 @@ type Action =
   | { type: "SET_PARTY"; ids: string[] }
   | { type: "TOGGLE_PARTY"; id: string }
   | { type: "SELECT_KEY"; ownerId: string }
+  | { type: "CONSUME_AUTOPLAY" }
+  | { type: "SET_TALENT"; memberId: string; nodeId: string; optionId: string }
   | { type: "EQUIP"; memberId: string; uid: string }
   | { type: "RAN_KEY"; result: RunResult; config: RunConfig; ownerId: string; runKey: MemberKey; ticket: RunTicket }
   | { type: "CONFIRM_LOOT"; assignments: Record<string, string> }
@@ -254,15 +292,17 @@ function computeLoot(state: GameState, r: RunResult, runKeyState: MemberKey): Lo
     seed = (seed * 1664525 + 1013904223) >>> 0
     const base = makeDrop(table[seed % table.length], runKeyState.level, seed)
     if (!base) continue
-    // who does it upgrade most?
+    // J.6: record EVERY spec-eligible member's current ilvl + delta (for the loot screen comparison), and the best upgrade
     let upgradeFor: string | null = null, upgradeAmt = 0
+    const upgrades: UpgradeCandidate[] = []
     for (const m of party) {
       if (!base.specs.includes(m.specId)) continue
       const cur = m.gear[base.slot]?.ilvl ?? 105
       const delta = base.ilvl - cur
+      upgrades.push({ memberId: m.id, delta, currentIlvl: cur })
       if (delta > upgradeAmt) { upgradeAmt = delta; upgradeFor = m.id }
     }
-    drops.push({ ...base, primaryStat: primaryStatOf(base.specs[0] ?? "guardian"), upgradeFor, upgradeAmt })
+    drops.push({ ...base, primaryStat: primaryStatOf(base.specs[0] ?? "guardian"), upgradeFor, upgradeAmt, upgrades })
   }
   return drops
 }
@@ -291,6 +331,10 @@ function reducer(state: GameState, action: Action): GameState {
         id: "m-" + rec.id, name: rec.name, title: "", specId: rec.specId, morale: rec.morale,
         portrait: pick(PORTRAITS), traitIds: [rec.traitId], gear: starterGear(rec.specId, rec.ilvl, "m-" + rec.id),
         key: freshKey(),   // every recruit arrives holding their own random +2 key
+        talents: {},       // starts on balanced defaults; player tunes per member
+        // Phase F: carry over the scouted operator skills/ceilings; XP starts empty and grows with play
+        skills: rec.skills, ceilings: rec.ceilings, skillXp: zeroSkillMap(),
+        revealed: rec.revealed, potentialProfile: rec.potentialProfile,
       }))
       const roster = [...state.roster, ...newMembers]
       // fill the party up to 5 (keeps existing party, adds the new signs)
@@ -337,6 +381,8 @@ function reducer(state: GameState, action: Action): GameState {
       partyIds = [action.ownerId, ...partyIds]
       return { ...state, selectedKeyOwnerId: action.ownerId, partyIds }
     }
+    case "SET_TALENT":
+      return { ...state, roster: state.roster.map((m) => m.id === action.memberId ? { ...m, talents: { ...m.talents, [action.nodeId]: action.optionId } } : m) }
     case "EQUIP": {
       const item = state.stash.find((i) => i.uid === action.uid)
       const member = state.roster.find((m) => m.id === action.memberId)
@@ -351,10 +397,12 @@ function reducer(state: GameState, action: Action): GameState {
     case "RAN_KEY":
       return {
         ...state, lastResult: action.result, lastConfig: action.config,
-        lastRunOwnerId: action.ownerId, lastRunKey: action.runKey,
+        lastRunOwnerId: action.ownerId, lastRunKey: action.runKey, autoplaySeed: action.result.seed,
         lastLoot: null, pendingLoot: computeLoot(state, action.result, action.runKey),
         history: [action.ticket, ...state.history].slice(0, 50),   // record every run for the Reports list
       }
+    case "CONSUME_AUTOPLAY":
+      return state.autoplaySeed == null ? state : { ...state, autoplaySeed: null }
     case "CONFIRM_LOOT": {
       const r = state.lastResult
       if (!r) return state
@@ -391,6 +439,15 @@ function reducer(state: GameState, action: Action): GameState {
         : ranKey.rating
       const newKey: MemberKey = { dungeonId: ranKey.dungeonId, level: newLevel, best, rating }
       roster = roster.map((m) => m.id === ownerId ? { ...m, key: newKey } : m)
+
+      // Phase F: post-run operator growth — each participant earns skill XP toward their hidden ceilings (auto-growth).
+      // Above the gear cap, the upgrade that would have been higher ilvl is converted into extra operator XP (the handoff).
+      const xpGain = xpFromRun(oldLevel, r.outcome) + (oldLevel > GEAR_CAP_KEY ? ABOVE_CAP_SKILL_XP * (oldLevel - GEAR_CAP_KEY) : 0)
+      roster = roster.map((m) => {
+        if (!partySet.has(m.id)) return m
+        const g = applyGrowth(m.skills, m.ceilings, m.skillXp, roleOf(m.specId), m.traitIds, xpGain)
+        return { ...m, skills: g.skills, skillXp: g.skillXp }
+      })
 
       const emblem = state.wallet.emblem + (r.outcome === "timed" ? 5 : r.outcome === "depleted" ? 2 : 0)
       const gold = state.wallet.gold + (r.outcome === "wipe" ? 0 : 200 + oldLevel * 40)
@@ -452,7 +509,8 @@ function reducer(state: GameState, action: Action): GameState {
 function shapeMember(m: RawMember): Member {
   return {
     id: m.id, name: m.name, title: m.title, spec: m.specId, ilvl: memberIlvl(m.gear), morale: m.morale,
-    portrait: `/warcraftcn/${m.portrait}.webp`, note: m.note, key: m.key ? shapeKey(m.key) : undefined,
+    portrait: `/warcraftcn/${m.portrait}.webp`, note: m.note, key: m.key ? shapeKey(m.key) : undefined, talents: m.talents ?? {},
+    skills: m.skills, ceilings: m.ceilings, revealed: m.revealed, skillXp: m.skillXp, traitIds: m.traitIds,
     traits: m.traitIds.map((tid) => {
       const t = content.traits.get(tid)
       if (!t) return { name: tid, rarity: "Common", kind: "Start", effect: "" } as Trait
@@ -480,6 +538,8 @@ interface GameApi {
   lastLoot: string | null
   pendingLoot: LootDrop[] | null
   lastKeystoneChange: KeystoneChange | null
+  autoplaySeed: number | null
+  consumeAutoplay: () => void
   history: RunTicket[]
   replayTicket: (t: RunTicket) => RunResult
   gearFor: (id: string) => Record<string, GearItem>
@@ -492,6 +552,7 @@ interface GameApi {
   togglePartyMember: (id: string) => void
   setParty: (ids: string[]) => void
   selectKey: (ownerId: string) => void
+  setTalent: (memberId: string, nodeId: string, optionId: string) => void
   runKey: (cfg: RunConfig) => RunResult
   rerun: () => RunResult
   confirmLoot: (assignments: Record<string, string>) => void
@@ -521,7 +582,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const party: SimPartyMember[] = state.partyIds
         .map((id) => state.roster.find((m) => m.id === id))
         .filter(Boolean)
-        .map((m) => ({ id: m!.id, name: m!.name, specId: m!.specId, ilvl: memberIlvl(m!.gear), morale: m!.morale, traitIds: m!.traitIds }))
+        .map((m) => ({ id: m!.id, name: m!.name, specId: m!.specId, ilvl: memberIlvl(m!.gear), morale: m!.morale, traitIds: m!.traitIds, talents: m!.talents, skills: m!.skills }))
       const seed = Math.floor(Math.random() * 0xffffffff)
       const result = runDungeon({ dungeonId: runKeyState.dungeonId, keyLevel: runKeyState.level, affixIds: affIds, party, tactics: cfg.tactics, aggression: cfg.aggression, seed })
       const dgn = content.dungeons.get(runKeyState.dungeonId)
@@ -559,6 +620,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       lastLoot: state.lastLoot,
       pendingLoot: state.pendingLoot,
       lastKeystoneChange: state.lastKeystoneChange,
+      autoplaySeed: state.autoplaySeed,
+      consumeAutoplay: () => dispatch({ type: "CONSUME_AUTOPLAY" }),
       history: state.history,
       replayTicket,
       gearFor: (id) => state.roster.find((m) => m.id === id)?.gear ?? {},
@@ -570,6 +633,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       togglePartyMember: (id) => dispatch({ type: "TOGGLE_PARTY", id }),
       setParty: (ids) => dispatch({ type: "SET_PARTY", ids }),
       selectKey: (ownerId) => dispatch({ type: "SELECT_KEY", ownerId }),
+      setTalent: (memberId, nodeId, optionId) => dispatch({ type: "SET_TALENT", memberId, nodeId, optionId }),
       runKey: doRun,
       rerun: () => doRun(state.lastConfig ?? DEFAULT_CONFIG),
       confirmLoot: (assignments) => dispatch({ type: "CONFIRM_LOOT", assignments }),

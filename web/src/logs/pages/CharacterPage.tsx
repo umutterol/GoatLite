@@ -1,8 +1,11 @@
 /* Character profile — Raider.io style, real gear + talents. */
 import { content } from "@/content"
 import { useGame, roleOf, SLOTS, type GearItem } from "@/state/game-store"
+import type { Member } from "@/data/game"
+import { corOf, potentialStars, roleKeyOf } from "@/data/operator"
 import { mc, memberScore, scoreColor, qualityColor, bestRunsFor } from "../analytics"
-import { Icon, Panel, RolePill, Upgrade } from "../components"
+import { Icon, Panel, RolePill, Upgrade, Tip, TipBody, SpellTip } from "../components"
+import { SkillBars, Stars, corColor, traitCombatSummary } from "../OperatorPanel"
 import type { Go, GoChar } from "../LogsApp"
 
 const SEASON_DUNGEONS = ([...content.seasons.values()][0]?.dungeons ?? [...content.dungeons.keys()])
@@ -32,11 +35,11 @@ export function CharacterPage({ id, go }: { id: string; go: Go; goChar: GoChar }
         <div style={{ position: "relative", maxWidth: 1280, margin: "0 auto", padding: "22px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
             <button className="btn btn-ghost btn-sm" onClick={() => go("roster")} style={{ position: "absolute", top: -2, left: 0 }}>← Roster</button>
-            <div style={{ width: 92, height: 92, borderRadius: 16, marginTop: 14, background: `linear-gradient(150deg, ${info.color}, ${info.color}99)`, border: `2px solid ${info.color}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#0c0d11", fontWeight: 700, fontSize: 44, boxShadow: `0 0 28px ${info.color}55` }}>{m.name[0]}</div>
+            <div style={{ width: 92, height: 92, borderRadius: 16, marginTop: 14, background: `linear-gradient(150deg, ${info.color}, ${info.color}99)`, border: `2px solid ${info.color}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#0c0d11", fontWeight: 700, fontSize: 44 }}>{m.name[0]}</div>
             <div style={{ marginTop: 14 }}>
               <div style={{ fontSize: 30, fontWeight: 700, color: info.color, lineHeight: 1.1 }}>{m.name}</div>
               {m.title ? <div style={{ color: "var(--muted)", fontSize: 14, marginTop: 2 }}>{m.name} {m.title}</div> : null}
-              <div className="mono" style={{ color: "var(--faint)", fontSize: 13, marginTop: 6 }}>{g.guild?.region ?? "—"} · &lt;{g.guild?.name ?? "Greatest of All Time"}&gt;</div>
+              <div className="mono" style={{ color: "var(--faint)", fontSize: 13, marginTop: 6 }}>&lt;{g.guild?.name ?? "Greatest of All Time"}&gt;</div>
               <div style={{ display: "flex", gap: 8, marginTop: 10, alignItems: "center", flexWrap: "wrap" }}>
                 <RolePill role={role} />
                 <span className="chip">{info.subspec} {info.klass}</span>
@@ -47,7 +50,7 @@ export function CharacterPage({ id, go }: { id: string; go: Go; goChar: GoChar }
           </div>
           <div style={{ textAlign: "right", marginTop: 14 }}>
             <div className="eyebrow">Mythic+ Score</div>
-            <div className="mono" style={{ fontSize: 52, fontWeight: 700, color: scoreColor(score), lineHeight: 1, textShadow: `0 0 26px ${scoreColor(score)}44` }}>{score}</div>
+            <div className="mono" style={{ fontSize: 52, fontWeight: 700, color: scoreColor(score), lineHeight: 1 }}>{score}</div>
             <div style={{ display: "flex", gap: 16, justifyContent: "flex-end", marginTop: 8 }}>
               <div><span className="eyebrow" style={{ fontSize: 9.5 }}>Item Level</span><div className="mono" style={{ fontWeight: 600, color: "var(--muted)" }}>{m.ilvl}</div></div>
               <div><span className="eyebrow" style={{ fontSize: 9.5 }}>Morale</span><div className="mono" style={{ fontWeight: 600, color: m.morale >= 70 ? "var(--good)" : m.morale >= 50 ? "var(--amber)" : "var(--danger)" }}>{m.morale}%</div></div>
@@ -87,15 +90,56 @@ export function CharacterPage({ id, go }: { id: string; go: Go; goChar: GoChar }
           </div>
         </div>
 
-        {/* right: talents */}
+        {/* right: signature + operator + talents */}
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <Talents memberId={m.id} color={info.color} behavior={profileName} />
+          <SignatureCard specId={m.spec} color={info.color} />
+          <OperatorCard member={m} color={info.color} />
+          <Talents member={m} color={info.color} behavior={profileName} />
           <button className="btn btn-primary" style={{ justifyContent: "center", padding: "11px" }} onClick={() => go("report")}>
             <Icon name="report" size={15} color="#04201d" /> View Latest Report
           </button>
         </div>
       </div>
     </div>
+  )
+}
+
+function SignatureCard({ specId, color }: { specId: string; color: string }) {
+  const major = [...content.playerAbilities.values()].find((a) => a.specId === specId && (a.tags ?? []).includes("major"))
+  if (!major) return null
+  const sk = content.skills.get(major.id)
+  return (
+    <Panel title="Signature" right={<span className="mono" style={{ fontSize: 11, color: "var(--faint)" }}>~60s CD</span>} bodyStyle={{ padding: 14 }}>
+      <Tip tip={<SpellTip skillId={major.id} name={major.name} />} style={{ width: "100%" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 11, width: "100%", cursor: "help" }}>
+          <span style={{ width: 36, height: 36, flex: "none", borderRadius: "var(--radius)", border: `1px solid ${color}55`, background: `${color}14`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Icon name="bolt" size={18} color={color} />
+          </span>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontWeight: 700, color, fontSize: 14 }}>{major.name}</div>
+            <div className="flux" style={{ fontSize: 11.5, lineHeight: 1.4 }}>{(sk?.description ?? "Signature cooldown.").replace(/^MAJOR\.\s*/, "")}</div>
+          </div>
+        </div>
+      </Tip>
+    </Panel>
+  )
+}
+
+function OperatorCard({ member, color }: { member: Member; color: string }) {
+  if (!member.skills) return null
+  const role = roleKeyOf(member.spec)
+  const cor = corOf(member.skills, role)
+  const stars = potentialStars(member.ceilings ?? member.skills, role)
+  const combat = traitCombatSummary(member.traitIds)
+  return (
+    <Panel title="Operator" right={<span className="mono" style={{ fontSize: 13, fontWeight: 700, color: corColor(cor) }}>{cor} <span style={{ color: "var(--faint)", fontWeight: 400, fontSize: 10 }}>COR</span></span>} bodyStyle={{ padding: 14 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 13 }}>
+        <span className="flux" style={{ fontSize: 12 }}>Potential</span>
+        <Stars value={stars} size={15} />
+      </div>
+      <SkillBars skills={member.skills} ceilings={member.ceilings} revealed={member.revealed} skillXp={member.skillXp} color={color} showXp />
+      {combat ? <div className="flux" style={{ fontSize: 11, marginTop: 13, color: "var(--faint)" }}>Trait in combat: <span style={{ color: "var(--muted)" }}>{combat}</span></div> : null}
+    </Panel>
   )
 }
 
@@ -119,8 +163,9 @@ function Equipment({ gear, avg }: { gear: Record<string, GearItem>; avg: number 
 function ItemRow({ label, item }: { label: string; item?: GearItem }) {
   const qColor = item ? qualityColor(item.rarity) : "#444"
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "5px 7px", borderRadius: 7, background: "var(--row)" }}>
-      <span style={{ width: 36, height: 36, flex: "none", borderRadius: 7, background: "linear-gradient(145deg,#23252e,#15161b)", border: `1.5px solid ${qColor}`, boxShadow: `0 0 9px ${qColor}33`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <Tip tip={item ? <TipBody title={item.name} desc={`${label} · ilvl ${item.ilvl} · ${item.rarity}`} accent={qColor} /> : null} style={{ width: "100%" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "5px 7px", borderRadius: "var(--radius)", background: "var(--row)", width: "100%" }}>
+      <span style={{ width: 36, height: 36, flex: "none", borderRadius: 7, background: "linear-gradient(145deg,#23252e,#15161b)", border: `1.5px solid ${qColor}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <span style={{ fontFamily: "IBM Plex Mono, monospace", fontSize: 13, fontWeight: 700, color: qColor, opacity: .9 }}>{label[0]}</span>
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -129,36 +174,43 @@ function ItemRow({ label, item }: { label: string; item?: GearItem }) {
       </div>
       <span className="mono" style={{ fontSize: 13.5, fontWeight: 700, color: qColor, flex: "none" }}>{item?.ilvl ?? "—"}</span>
     </div>
+    </Tip>
   )
 }
 
-function Talents({ memberId, color, behavior }: { memberId: string; color: string; behavior: string }) {
-  const nodes = [...content.talents.values()].sort((a, b) => a.node - b.node)
-  const seedAt = (i: number) => (memberId.charCodeAt((i + 1) % memberId.length) + i * 7) // deterministic pick
+function Talents({ member, color, behavior }: { member: Member; color: string; behavior: string }) {
+  const g = useGame()
+  // MVP: only nodes whose options carry real engine effects are pickable (nodes 3-5 are prose-only until C.2)
+  const nodes = [...content.talents.values()].filter((n) => n.options.some((o) => o.effects)).sort((a, b) => a.node - b.node)
+  const chosenId = (node: typeof nodes[number]) =>
+    member.talents?.[node.id] ?? node.options.find((o) => o.default)?.id ?? node.options[0].id
   return (
     <Panel title="Talents" right={<span className="chip" style={{ color }}>{behavior}</span>} bodyStyle={{ padding: 14 }}>
       {nodes.map((node, gi) => {
-        const sel = seedAt(gi) % node.options.length
+        const cur = chosenId(node)
         return (
           <div key={node.id} style={{ marginBottom: gi === nodes.length - 1 ? 0 : 14 }}>
             <div className="eyebrow" style={{ fontSize: 10, marginBottom: 7 }}>{node.name}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {node.options.map((ch, ci) => {
-                const on = ci === sel
+              {node.options.map((ch) => {
+                const on = ch.id === cur
                 return (
-                  <div key={ch.id} style={{ display: "flex", gap: 9, alignItems: "flex-start", padding: "7px 9px", borderRadius: 7, background: on ? color + "14" : "transparent", border: on ? `1px solid ${color}55` : "1px solid var(--line-soft)", opacity: on ? 1 : .5 }}>
-                    <span style={{ width: 9, height: 9, borderRadius: "50%", marginTop: 4, flex: "none", background: on ? color : "transparent", boxShadow: on ? `0 0 8px ${color}` : "none", border: on ? "none" : "2px solid var(--faint)" }} />
+                  <button key={ch.id} onClick={() => g.setTalent(member.id, node.id, ch.id)}
+                    style={{ display: "flex", gap: 9, alignItems: "flex-start", padding: "7px 9px", borderRadius: 7, width: "100%", textAlign: "left", cursor: "pointer",
+                      background: on ? color + "14" : "transparent", border: on ? `1px solid ${color}55` : "1px solid var(--line-soft)", opacity: on ? 1 : .62 }}>
+                    <span style={{ width: 9, height: 9, borderRadius: "50%", marginTop: 4, flex: "none", background: on ? color : "transparent", border: on ? "none" : "2px solid var(--faint)" }} />
                     <div style={{ lineHeight: 1.4 }}>
                       <span style={{ fontWeight: 700, fontSize: 13.5, color: on ? "var(--text)" : "var(--muted)" }}>{ch.name}</span>
-                      {on ? <div className="flux" style={{ fontSize: 12, marginTop: 2 }}>{ch.effect}</div> : null}
+                      <div className="flux" style={{ fontSize: 12, marginTop: 2 }}>{ch.effect}</div>
                     </div>
-                  </div>
+                  </button>
                 )
               })}
             </div>
           </div>
         )
       })}
+      <div className="flux" style={{ fontSize: 11, marginTop: 12, color: "var(--faint)" }}>Builds are saved per member and applied on the next run. More nodes unlock with talent trees.</div>
     </Panel>
   )
 }

@@ -8,6 +8,7 @@ import statsJson from "@data/stats.json"
 import tacticsJson from "@data/tactics.json"
 import profilesJson from "@data/behavior-profiles.json"
 import potentialsJson from "@data/potentials.json"
+import operatorSkillsJson from "@data/operator-skills.json"
 import affixesJson from "@data/affixes.json"
 import traitsJson from "@data/traits.json"
 import abilitiesJson from "@data/abilities.json"
@@ -52,6 +53,7 @@ const stats = index(S.StatDefSchema, statsJson, "stats")
 const tactics = index(S.TacticSchema, tacticsJson, "tactics")
 const profiles = index(S.BehaviorProfileSchema, profilesJson, "behavior-profiles")
 const potentials = index(S.PotentialTagSchema, potentialsJson, "potentials")
+const operatorSkills = index(S.OperatorSkillSchema, operatorSkillsJson, "operator-skills")
 const affixes = index(S.AffixSchema, affixesJson, "affixes")
 const traits = index(S.TraitSchema, traitsJson, "traits")
 const abilities = index(S.AbilitySchema, abilitiesJson, "abilities")
@@ -100,8 +102,18 @@ for (const a of affixes.values())
   ref(tactics.has(a.punishes) || AFFIX_PUNISH_SPECIAL.has(a.punishes), `affix '${a.id}' → unknown punishes '${a.punishes}'`)
 for (const ab of abilities.values())
   if (ab.tactic) ref(tactics.has(ab.tactic), `ability '${ab.id}' → unknown tactic '${ab.tactic}'`)
-for (const t of traits.values())
+for (const t of traits.values()) {
   for (const tag of t.tags ?? []) ref(potentials.has(tag), `trait '${t.id}' → unknown potential tag '${tag}'`)
+  if (t.growth) ref(operatorSkills.has(t.growth.skill), `trait '${t.id}' → growth references unknown operator skill '${t.growth.skill}'`)
+}
+// Phase F: the operator tuning block's tag→skill ceiling map must reference known skills + potential tags
+{
+  const op = tuning.operator as { ceiling?: { byTag?: Record<string, string[]> } }
+  for (const [skillId, tags] of Object.entries(op.ceiling?.byTag ?? {})) {
+    ref(operatorSkills.has(skillId), `tuning.operator.ceiling.byTag → unknown operator skill '${skillId}'`)
+    for (const tag of tags) ref(potentials.has(tag), `tuning.operator.ceiling.byTag['${skillId}'] → unknown potential tag '${tag}'`)
+  }
+}
 for (const e of enemies.values()) {
   if (e.abilityId) ref(abilities.has(e.abilityId), `enemy '${e.id}' → unknown abilityId '${e.abilityId}'`)
   if (e.testsTactic) ref(tactics.has(e.testsTactic), `enemy '${e.id}' → unknown testsTactic '${e.testsTactic}'`)
@@ -159,13 +171,13 @@ for (const lg of logTemplates.values())
 if (errors.length) throw new Error(`[content] ${errors.length} broken reference(s):\n  - ${errors.join("\n  - ")}`)
 
 export const content = {
-  classes, specs, skills, stats, tactics, profiles, potentials, affixes, traits,
+  classes, specs, skills, stats, tactics, profiles, potentials, operatorSkills, affixes, traits,
   abilities, enemies, packs, dungeons, itemSlots, items, currencies, buildings,
   moraleEvents, talents, lootTables, secondaryStats, tierSets, crafting,
   seasons, logTemplates, playerAbilities, statuses, tuning, recruitment, save,
 }
 
 export type {
-  Spec, Skill, PlayerAbility, StatusDef, Trait, Affix, Tactic, Enemy, Dungeon, Item, RosterMember, Save,
+  Spec, Skill, PlayerAbility, StatusDef, Trait, TraitCombat, TraitGrowth, OperatorSkill, Affix, Tactic, Enemy, Dungeon, Item, RosterMember, Save,
   TalentNode, LootTable, SecondaryStat, TierSet, CraftingOp, Recruitment, Season, LogTemplate,
 } from "./schema"

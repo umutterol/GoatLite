@@ -71,12 +71,12 @@ export const ROLE_ORDER: Record<RoleKey, number> = { tank: 0, healer: 1, dps: 2 
    ============================================================ */
 export interface DmgRow { id: string; name: string; specId: string; amount: number; dps: number; pct: number; parse: number; casts: number; active: number; hps?: number }
 export interface FightView { id: string; name: string; type: "all" | "trash" | "boss"; start: number; end: number; deaths: number }
-export interface LogEntry { tSec: number; kind: string; tag: string; color: string; who: string | null; whoName: string | null; text: string; amount: number }
+export interface LogEntry { tSec: number; kind: string; tag: string; color: string; who: string | null; whoName: string | null; text: string; amount: number; ability?: string; skillId?: string; target?: string; result?: string }
 export interface ReportView {
   title: string; dungeonId: string; keyLevel: number; affixes: string[]
   outcome: string; upgradeLabel: string; outcomeColor: string
   time: string; par: string; deaths: number; rating: number; deltaRating: number
-  duration: number; region: string
+  duration: number
   fights: FightView[]
   damage: DmgRow[]; dmgTotal: number
   healing: DmgRow[]; healTotal: number
@@ -146,22 +146,24 @@ function damageWindow(result: RunResult, start: number, end: number): DmgRow[] {
   return rows
 }
 
-/** Derived healing table (sim doesn't track per-member healing; healer dominates). */
-function healingTable(result: RunResult, duration: number): DmgRow[] {
+/** Per-member healing totals straight from the sim's cumulative healSeries, sliced to a window (J.5 — real heal data). */
+function healingWindow(result: RunResult, start: number, end: number): DmgRow[] {
   const ids = result.seriesIds
-  const rows: DmgRow[] = ids.map((id) => {
+  const heal = result.healSeries ?? []
+  const last = Math.max(0, heal.length - 1)
+  const i0 = Math.max(0, Math.min(last, start))
+  const i1 = Math.max(0, Math.min(last, end - 1))
+  const dur = Math.max(1, end - start)
+  const rows: DmgRow[] = ids.map((id, col) => {
+    const a0 = heal[i0]?.[col] ?? 0
+    const a1 = heal[i1]?.[col] ?? 0
+    const amount = Math.max(0, a1 - a0)
     const meta = result.partyMeta.find((m) => m.id === id)
     const specId = meta?.specId ?? "berserker"
-    const role = roleOf(specId)
-    const r = rng(seedFrom("heal-" + id))
-    const ilvlGuess = 110 // healing scales with throughput; magnitude only matters relatively
-    const weight = role === "healer" ? 1.2 : role === "tank" ? 0.12 : 0.045
-    const amount = Math.round(weight * ilvlGuess * duration * (0.9 + r() * 0.2) * 6)
-    const parse = role === "healer" ? 70 + Math.round(r() * 28) : 20 + Math.round(r() * 35)
-    return { id, name: meta?.name ?? id, specId, amount, dps: 0, hps: 0, pct: 0, parse, casts: 0, active: 0 }
+    return { id, name: meta?.name ?? id, specId, amount, dps: 0, hps: Math.round(amount / dur), pct: 0, parse: 50, casts: 0, active: 0 }
   })
   const total = rows.reduce((s, d) => s + d.amount, 0) || 1
-  rows.forEach((d) => { d.hps = Math.round(d.amount / Math.max(1, duration)); d.pct = (d.amount / total) * 100 })
+  rows.forEach((d) => (d.pct = (d.amount / total) * 100))
   rows.sort((a, b) => b.amount - a.amount)
   return rows
 }
@@ -170,17 +172,16 @@ export function buildReport(
   result: RunResult,
   keystone: { dungeonId: string; dungeon: string; level: number; rating: number },
   affixNames: string[],
-  region: string,
 ): ReportView {
   const duration = Math.round(result.durationSec)
   const fights = buildFights(keystone.dungeonId, duration, result.deaths)
   const damage = damageWindow(result, 0, duration)
   const dmgTotal = damage.reduce((s, d) => s + d.amount, 0)
-  const healing = healingTable(result, duration)
+  const healing = healingWindow(result, 0, duration)
   const healTotal = healing.reduce((s, h) => s + h.amount, 0)
   const log: LogEntry[] = result.log.map((e) => {
     const k = LOG_KIND[e.kind] ?? LOG_KIND.normal
-    return { tSec: e.tSec, kind: e.kind, tag: k.tag, color: k.color, who: e.meta?.sourceId ?? null, whoName: e.meta?.sourceName ?? null, text: e.text, amount: e.meta?.amount ?? 0 }
+    return { tSec: e.tSec, kind: e.kind, tag: k.tag, color: k.color, who: e.meta?.sourceId ?? null, whoName: e.meta?.sourceName ?? null, text: e.text, amount: e.meta?.amount ?? 0, ability: e.meta?.ability, skillId: e.meta?.skillId, target: e.meta?.target, result: e.meta?.result }
   })
   const upgrade = result.outcome === "timed"
     ? (() => { const f = (result.timerSec - result.durationSec) / result.timerSec; return f >= 0.4 ? "+3" : f >= 0.2 ? "+2" : "+1" })()
@@ -191,7 +192,7 @@ export function buildReport(
     outcome, upgradeLabel: upgrade, outcomeColor: result.outcome === "timed" ? "var(--good)" : result.outcome === "depleted" ? "var(--amber)" : "var(--danger)",
     time: mmss(duration), par: mmss(result.timerSec), deaths: result.deaths.length,
     rating: keystone.rating, deltaRating: result.outcome === "timed" ? Math.max(1, result.keyDelta) : 0,
-    duration, region,
+    duration,
     fights, damage, dmgTotal, healing, healTotal, log, partyIds: result.seriesIds,
   }
 }
@@ -214,7 +215,8 @@ export function liveDamage(result: RunResult, clockSec: number): { rows: DmgRow[
 }
 export function liveHealing(result: RunResult, clockSec: number): { rows: DmgRow[]; total: number; dur: number } {
   const dur = Math.max(1, Math.floor(clockSec))
-  const rows = healingTable(result, dur)
+  const idx = Math.max(0, Math.min(result.healSeries.length - 1, Math.floor(clockSec)))
+  const rows = healingWindow(result, 0, idx + 1)
   const total = rows.reduce((s, d) => s + d.amount, 0)
   return { rows, total, dur }
 }

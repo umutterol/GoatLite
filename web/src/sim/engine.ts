@@ -197,7 +197,7 @@ export function runDungeon(input: RunInput): RunResult {
         let taken = 0
         for (const m of mobs) if (m.hp > 0) {
           let hit = m.damage * keyScale * affMult * DMG_UNIT * enrage
-          if (aff.has("raging") && m.hp < 0.3 * m.maxHp) hit *= 1.5 * (1 - 0.1 * (tac.cooldowns ?? 0))  // enraged spike; Cooldowns absorbs
+          if (aff.has("raging") && !m.isBoss && m.hp < 0.3 * m.maxHp) hit *= 1 + 0.25 * (1 - 0.1 * (tac.cooldowns ?? 0))  // Raging: +25% haste, modelled as equivalent DPS in this aggregate sim (trash only); Cooldowns blunts the bonus (always ≥ baseline), mirroring the EGM
           const ratio = tank.armour / Math.max(1, hit)
           const reduction = Math.min(0.9, ratio / (ratio + 10))
           taken += hit * (1 - reduction)
@@ -338,5 +338,6 @@ export function runDungeon(input: RunInput): RunResult {
 
   const finalHpPct = party.map((p) => ({ id: p.id, name: p.name, pct: Math.max(0, Math.round((p.hp / p.maxHp) * 100)), dead: p.downedUntil >= 0 }))
 
-  return { seed: input.seed, outcome, durationSec: duration, timerSec, keyDelta, log, parse, deaths, finalHpPct, series, hpSeries, seriesIds, partyMeta }
+  // legacy/rollback engine: doesn't model healing throughput or combat-rez charges — stub the EGM-only fields
+  return { seed: input.seed, outcome, durationSec: duration, timerSec, keyDelta, log, parse, deaths, finalHpPct, series, healSeries: [], hpSeries, seriesIds, partyMeta, finalRezCharges: 0, nextRezChargeAtSec: 0 }
 }

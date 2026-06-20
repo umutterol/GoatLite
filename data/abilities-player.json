@@ -768,8 +768,7 @@
     "cooldownTurns": 0,
     "targeting": {
       "side": "enemy",
-      "pattern": "single",
-      "band": "back"
+      "pattern": "single"
     },
     "effects": [
       {
@@ -846,8 +845,7 @@
     "cooldownTurns": 3,
     "targeting": {
       "side": "enemy",
-      "pattern": "single",
-      "band": "back"
+      "pattern": "single"
     },
     "effects": [
       {
@@ -2126,5 +2124,105 @@
         }
       }
     ]
+  },
+  {
+    "id": "code-freeze", "name": "Bulwark Banner", "classId": "warrior", "specId": "guardian",
+    "category": "Buff", "trigger": "active", "cooldownTurns": 20,
+    "targeting": { "side": "self", "pattern": "self" },
+    "effects": [
+      { "type": "buff", "stat": "damageTaken", "amountPct": -35, "durationTurns": 3, "appliesTo": "all-allies" }
+    ],
+    "tags": ["major"]
+  },
+  {
+    "id": "rollback-plan", "name": "Sacred Bastion", "classId": "paladin", "specId": "crusader",
+    "category": "Buff", "trigger": "active", "cooldownTurns": 20,
+    "targeting": { "side": "ally", "pattern": "all" },
+    "effects": [
+      { "type": "shield", "base": 0, "scale": 0.35, "scaleStat": "maxHp", "durationTurns": 3 }
+    ],
+    "tags": ["major"]
+  },
+  {
+    "id": "zen-mode", "name": "Unmoving Mountain", "classId": "sage", "specId": "mystic",
+    "category": "Utility", "trigger": "active", "cooldownTurns": 20,
+    "targeting": { "side": "self", "pattern": "self" },
+    "effects": [
+      { "type": "special", "mechanic": "parry-counter", "params": { "parryChancePct": 80, "counterBase": 40, "counterScale": 0.5, "counterScaleStat": "power", "counterDamageType": "Physical", "durationTurns": 3 } },
+      { "type": "applyStatus", "status": "regrowth", "chancePct": 100, "durationTurns": 3, "stacks": 1, "magnitudeBase": 30, "magnitudeScale": 0.04, "magnitudeStat": "maxHp" }
+    ],
+    "tags": ["major"]
+  },
+  {
+    "id": "hotfix-deploy", "name": "Light's Salvation", "classId": "paladin", "specId": "cleric",
+    "category": "Healing", "trigger": "active", "cooldownTurns": 20,
+    "targeting": { "side": "ally", "pattern": "all" },
+    "effects": [
+      { "type": "heal", "base": 120, "scale": 1.6, "scaleStat": "power" },
+      { "type": "shield", "base": 0, "scale": 0.5, "scaleStat": "power", "durationTurns": 2 }
+    ],
+    "tags": ["major"]
+  },
+  {
+    "id": "gradual-rollout", "name": "Blossoming Tide", "classId": "sage", "specId": "lifebinder",
+    "category": "Healing", "trigger": "active", "cooldownTurns": 20,
+    "targeting": { "side": "ally", "pattern": "all" },
+    "effects": [
+      { "type": "applyStatus", "status": "regrowth", "chancePct": 100, "durationTurns": 4, "stacks": 1, "magnitudeBase": 40, "magnitudeScale": 0.09, "magnitudeStat": "power" }
+    ],
+    "tags": ["major"]
+  },
+  {
+    "id": "crunch-time", "name": "Reckless Frenzy", "classId": "warrior", "specId": "berserker",
+    "category": "Buff", "trigger": "active", "cooldownTurns": 20,
+    "targeting": { "side": "self", "pattern": "self" },
+    "resourceCost": { "hpPct": 10 },
+    "effects": [
+      { "type": "buff", "stat": "power", "amountPct": 30, "durationTurns": 3, "appliesTo": "self" },
+      { "type": "buff", "stat": "crit", "amountPct": 15, "durationTurns": 3, "appliesTo": "self" }
+    ],
+    "tags": ["major"]
+  },
+  {
+    "id": "ship-it", "name": "Killing Edge", "classId": "rogue", "specId": "assassin",
+    "category": "Damage", "trigger": "active", "cooldownTurns": 20,
+    "targeting": { "side": "enemy", "pattern": "single" },
+    "effects": [
+      { "type": "damage", "base": 200, "scale": 2.5, "scaleStat": "power", "damageType": "Physical", "critable": true,
+        "modifiers": [ { "when": { "type": "targetHpBelowPct", "value": 35 }, "multiplyDamage": 1.5 } ] },
+      { "type": "special", "mechanic": "empower-next-attack", "params": { "multiplyDamage": 1.5, "guaranteedCrit": true } }
+    ],
+    "tags": ["major"]
+  },
+  {
+    "id": "standup-hype", "name": "Rallying Crescendo", "classId": "rogue", "specId": "bard",
+    "category": "Buff", "trigger": "active", "cooldownTurns": 20,
+    "targeting": { "side": "self", "pattern": "self" },
+    "effects": [
+      { "type": "buff", "stat": "haste", "amountPct": 25, "durationTurns": 3, "appliesTo": "all-allies" },
+      { "type": "buff", "stat": "power", "amountPct": 12, "durationTurns": 3, "appliesTo": "all-allies" }
+    ],
+    "tags": ["major", "song"]
+  },
+  {
+    "id": "prod-incident", "name": "Emberstorm", "classId": "mage", "specId": "pyromancer",
+    "category": "Damage", "trigger": "active", "cooldownTurns": 20,
+    "targeting": { "side": "enemy", "pattern": "all" },
+    "effects": [
+      { "type": "damage", "base": 110, "scale": 1.2, "scaleStat": "power", "damageType": "Magic", "critable": true },
+      { "type": "special", "mechanic": "detonate-burn", "params": { "status": "burn", "perStack": { "base": 30, "scale": 0.4, "scaleStat": "power" }, "damageType": "Magic", "splashPct": 50, "splashCount": 3, "consumesStacks": true } }
+    ],
+    "tags": ["major"]
+  },
+  {
+    "id": "root-cause-analysis", "name": "Nullifying Surge", "classId": "mage", "specId": "arcanist",
+    "category": "Buff", "trigger": "active", "cooldownTurns": 20,
+    "targeting": { "side": "enemy", "pattern": "all" },
+    "effects": [
+      { "type": "buff", "stat": "power", "amountPct": 25, "durationTurns": 3, "appliesTo": "self" },
+      { "type": "applyStatus", "status": "chill", "chancePct": 100, "durationTurns": 3, "stacks": 1 },
+      { "type": "applyStatus", "status": "silence", "chancePct": 100, "durationTurns": 2, "stacks": 1 }
+    ],
+    "tags": ["major"]
   }
 ]

@@ -1,27 +1,27 @@
 [
   { "id": "node-1", "node": 1, "name": "Survival vs. Throughput", "options": [
-    { "id": "iron-will",          "name": "Iron Will",    "effect": "+15% max HP",                                "tags": ["survival"] },
-    { "id": "executioner-talent", "name": "Executioner",  "effect": "+12% damage to targets below 30% HP",        "tags": ["burst"] },
-    { "id": "adaptive",           "name": "Adaptive",     "effect": "+8% HP and +6% damage (balanced)",           "tags": ["survival", "burst"] }
+    { "id": "iron-will",          "name": "Iron Will",    "effect": "+15% max HP",                                "tags": ["survival"],          "effects": { "maxHpPct": 15 } },
+    { "id": "executioner-talent", "name": "Executioner",  "effect": "+12% damage while your focus target is below 30% HP", "tags": ["burst"], "effects": { "dmgPct": 12, "onlyIf": { "type": "targetHpBelowPct", "value": 30 } } },
+    { "id": "adaptive",           "name": "Adaptive",     "effect": "+8% HP and +6% damage (balanced)",           "tags": ["survival", "burst"], "default": true, "effects": { "maxHpPct": 8, "dmgPct": 6 } }
   ] },
   { "id": "node-2", "node": 2, "name": "Single Target vs. AoE", "options": [
-    { "id": "focused-strike",     "name": "Focused Strike","effect": "+20% single-target damage",                 "tags": ["burst"] },
-    { "id": "cleaving-blow",      "name": "Cleaving Blow", "effect": "Attacks hit 2 additional targets for 40% damage", "tags": ["aoe", "cleave"] },
-    { "id": "opportunist-talent", "name": "Opportunist",   "effect": "+15% damage when 3+ enemies are nearby",     "tags": ["aoe"] }
+    { "id": "focused-strike",     "name": "Focused Strike","effect": "+20% damage when 2 or fewer enemies remain (single-target / boss)", "tags": ["burst"], "effects": { "dmgPct": 20, "onlyIf": { "type": "enemiesAtMost", "value": 2 } } },
+    { "id": "cleaving-blow",      "name": "Cleaving Blow", "effect": "+22% damage while 3 or more enemies are up (AoE / trash)",          "tags": ["aoe", "cleave"], "effects": { "dmgPct": 22, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "opportunist-talent", "name": "Opportunist",   "effect": "+10% damage, always (balanced)",            "tags": ["aoe"], "default": true, "effects": { "dmgPct": 10 } }
   ] },
   { "id": "node-3", "node": 3, "name": "Tempo vs. Spike", "options": [
-    { "id": "steady-hand", "name": "Steady Hand", "effect": "+8% sustained output, unaffected by morale-band swings", "tags": ["sustain"] },
-    { "id": "overload",    "name": "Overload",    "effect": "+25% output for the first 30s of each pull, then -5%",   "tags": ["burst"] },
-    { "id": "metronome",   "name": "Metronome",   "effect": "+5% output; the first failed interrupt each boss is ignored", "tags": ["interrupt", "sustain"] }
+    { "id": "steady-hand", "name": "Steady Hand", "effect": "+8% output, always (steady tempo)",                          "tags": ["sustain"], "effects": { "dmgPct": 8 } },
+    { "id": "overload",    "name": "Overload",    "effect": "+16% damage while your focus target is below 50% HP (spike the kill)", "tags": ["burst"], "effects": { "dmgPct": 16, "onlyIf": { "type": "targetHpBelowPct", "value": 50 } } },
+    { "id": "metronome",   "name": "Metronome",   "effect": "+6% output and +5% crit (balanced)",                         "tags": ["sustain", "crit"], "default": true, "effects": { "dmgPct": 6, "critPct": 5 } }
   ] },
   { "id": "node-4", "node": 4, "name": "Defensive Tech", "options": [
-    { "id": "bulwark",       "name": "Bulwark",       "effect": "+10% damage reduction while below 50% HP", "tags": ["survival", "tank"] },
-    { "id": "fleetfoot",     "name": "Fleetfoot",     "effect": "+8% positioning reliability",              "tags": ["positioning"] },
-    { "id": "second-breath", "name": "Second Breath", "effect": "Once per run, survive a lethal hit at 1 HP","tags": ["survival"] }
+    { "id": "bulwark",       "name": "Bulwark",       "effect": "-12% damage taken (the wall)",          "tags": ["survival", "tank"], "effects": { "intakePct": -12 } },
+    { "id": "fleetfoot",     "name": "Fleetfoot",     "effect": "-6% damage taken and +4% output",       "tags": ["positioning"], "default": true, "effects": { "intakePct": -6, "dmgPct": 4 } },
+    { "id": "second-breath", "name": "Second Breath", "effect": "+12% max HP (a deeper buffer)",         "tags": ["survival"], "effects": { "maxHpPct": 12 } }
   ] },
   { "id": "node-5", "node": 5, "name": "Affix Specialist", "options": [
-    { "id": "focus-fire",     "name": "Focus Fire",     "effect": "+10% Kill Order effectiveness for this character",   "tags": ["cleave"] },
-    { "id": "quick-reflexes", "name": "Quick Reflexes", "effect": "+10% Interrupt reliability for this character",      "tags": ["interrupt"] },
-    { "id": "spatial-sense",  "name": "Spatial Sense",  "effect": "+10% Positioning reliability for this character",    "tags": ["positioning"] }
+    { "id": "focus-fire",     "name": "Focus Fire",     "effect": "+10% damage while 3 or more enemies are up (Kill Order)", "tags": ["cleave"], "effects": { "dmgPct": 10, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "quick-reflexes", "name": "Quick Reflexes", "effect": "-7% damage taken (dodge the mechanics)",                 "tags": ["interrupt"], "effects": { "intakePct": -7 } },
+    { "id": "spatial-sense",  "name": "Spatial Sense",  "effect": "-5% damage taken and +5% max HP (positioning)",          "tags": ["positioning"], "default": true, "effects": { "intakePct": -5, "maxHpPct": 5 } }
   ] }
 ]

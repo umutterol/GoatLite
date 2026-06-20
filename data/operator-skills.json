@@ -1,0 +1,23 @@
+[
+  {
+    "id": "execution",
+    "name": "Execution",
+    "satire": "Clean APM, ships clean code, no fat-fingered globals.",
+    "effect": "Raises the bot's damage/healing output.",
+    "icon": "skill-execution"
+  },
+  {
+    "id": "awareness",
+    "name": "Awareness",
+    "satire": "Reads the room, catches the bug before prod, never stands in the bad.",
+    "effect": "Reduces damage taken, with a little extra output.",
+    "icon": "skill-awareness"
+  },
+  {
+    "id": "composure",
+    "name": "Composure",
+    "satire": "Calm during the incident — no grey parses when the raid is on fire.",
+    "effect": "Clutch output and survival while the party is in danger, and steadier (less swingy) results overall.",
+    "icon": "skill-composure"
+  }
+]

@@ -1,7 +1,45 @@
 /* Shared components for the GOAT Lite · Logs reskin. */
-import { type CSSProperties, type ReactNode } from "react"
+import { useRef, useState, type CSSProperties, type ReactNode } from "react"
+import { createPortal } from "react-dom"
+import { content } from "@/content"
 import { mc, parseColor, parseLabel, fmt, fmtInt, mmss, type DmgRow } from "./analytics"
 import type { RoleKey } from "@/state/game-store"
+
+/* ---- J.10: one reusable hover tooltip (fixed-position portal — never clipped, follows the trigger) ---- */
+export function Tip({ tip, children, max = 280, style }: { tip: ReactNode; children: ReactNode; max?: number; style?: CSSProperties }) {
+  const [show, setShow] = useState(false)
+  const [pos, setPos] = useState({ x: 0, y: 0 })
+  const ref = useRef<HTMLSpanElement>(null)
+  if (!tip) return <>{children}</>
+  const place = () => { const r = ref.current?.getBoundingClientRect(); if (r) setPos({ x: r.left + r.width / 2, y: r.top }) }
+  return (
+    <span ref={ref} onMouseEnter={() => { place(); setShow(true) }} onMouseLeave={() => setShow(false)} style={{ display: "inline-flex", alignItems: "center", ...style }}>
+      {children}
+      {show ? createPortal(
+        <div role="tooltip" style={{ position: "fixed", left: pos.x, top: pos.y, transform: "translate(-50%,-100%) translateY(-9px)", zIndex: 9999, pointerEvents: "none", maxWidth: max, background: "var(--panel-3)", border: "1px solid var(--line)", borderRadius: "var(--radius)", boxShadow: "0 8px 24px rgba(0,0,0,.55)", padding: "8px 11px", fontSize: 12.5, lineHeight: 1.5, color: "var(--text)" }}>
+          {tip}
+        </div>, document.body) : null}
+    </span>
+  )
+}
+/** Standard tooltip body: a bold title + optional muted description. */
+export function TipBody({ title, desc, accent }: { title: string; desc?: ReactNode; accent?: string }) {
+  return (
+    <div>
+      <div style={{ fontWeight: 700, marginBottom: desc ? 3 : 0, color: accent ?? "var(--text)" }}>{title}</div>
+      {desc ? <div className="flux" style={{ fontSize: 11.5 }}>{desc}</div> : null}
+    </div>
+  )
+}
+/** Resolve a content tooltip for an asset icon (spec/role/tactic/affix/skill); null = no tooltip. */
+function iconTip(kind: IconKind, id: string, label?: string): ReactNode {
+  if (kind === "spec") { const s = content.specs.get(id); if (s) return <TipBody title={`${s.name} ${content.classes.get(s.classId)?.name ?? ""}`.trim()} desc={s.blurb} accent={mc(id).color} /> }
+  else if (kind === "tactic") { const t = content.tactics.get(id); if (t) return <TipBody title={t.name} desc={t.perPoint} /> }
+  else if (kind === "affix") { const a = content.affixes.get(id); if (a) return <TipBody title={a.name} desc={a.effect} /> }
+  else if (kind === "skill") { const k = content.operatorSkills.get(id); if (k) return <TipBody title={k.name} desc={k.effect} /> }
+  else if (kind === "role") return <TipBody title={id.charAt(0).toUpperCase() + id.slice(1)} desc="Party role" />
+  return label ? <TipBody title={label} /> : null
+}
 
 /* ---- tiny geometric icons (from the design) ---- */
 const ICONS: Record<string, (c: string) => ReactNode> = {
@@ -18,6 +56,49 @@ const ICONS: Record<string, (c: string) => ReactNode> = {
 export function Icon({ name, size = 15, color = "currentColor" }: { name: string; size?: number; color?: string }) {
   const draw = ICONS[name]
   return <svg width={size} height={size} viewBox="0 0 16 16" style={{ display: "block", flex: "none" }}>{draw ? draw(color) : null}</svg>
+}
+
+/* ---- G.2: typed asset-icon registry (the /public/icons/*.svg masks) ----
+   <GameIcon kind id/> resolves to /icons/{prefix}-{id}.svg, tinted via CSS mask (follows `color`). Assets that
+   don't exist yet (skill/class/talent/trait/item/dungeon — G.4 art) degrade to a LABELLED placeholder instead of an
+   empty box. Every icon carries an aria-label. Add new art = drop the file + add its id to ICON_ASSETS below. */
+const ICON_PREFIX = {
+  role: "role", spec: "spec", stat: "stat", tactic: "tac", affix: "affix", currency: "cur", ui: "ico",
+  skill: "skill", class: "class", talent: "talent", trait: "trait", item: "item", dungeon: "dungeon",
+} as const
+export type IconKind = keyof typeof ICON_PREFIX
+const ICON_ASSETS: Partial<Record<IconKind, Set<string>>> = {
+  role: new Set(["tank", "healer", "dps"]),
+  spec: new Set(["arcanist", "assassin", "bard", "berserker", "cleric", "crusader", "guardian", "lifebinder", "mystic", "pyromancer"]),
+  stat: new Set(["crit", "haste", "ilvl", "mastery", "versatility"]),
+  tactic: new Set(["cooldowns", "interrupts", "killorder", "positioning"]),
+  affix: new Set(["bolstering", "bursting", "fortified", "raging", "sanguine", "spiteful", "tyrannical", "volcanic"]),
+  currency: new Set(["emblem", "gold", "shard"]),
+  ui: new Set(["key", "morale", "skull", "timer", "trait", "vault"]),
+  // skill / class / talent / trait / item / dungeon: no assets yet → placeholder until G.4 art lands
+}
+export function GameIcon({ kind, id, size = 16, color = "currentColor", label, style, noTip = false }: {
+  kind: IconKind; id: string; size?: number; color?: string; label?: string; style?: CSSProperties; noTip?: boolean
+}) {
+  const aria = label ?? `${id} ${kind}`
+  const has = ICON_ASSETS[kind]?.has(id)
+  const inner = has ? (
+    <span role="img" aria-label={aria} style={{
+      width: size, height: size, flex: "none", display: "inline-block", background: color,
+      WebkitMaskImage: `url(/icons/${ICON_PREFIX[kind]}-${id}.svg)`, maskImage: `url(/icons/${ICON_PREFIX[kind]}-${id}.svg)`,
+      WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat",
+      WebkitMaskSize: "contain", maskSize: "contain", WebkitMaskPosition: "center", maskPosition: "center", ...style,
+    }} />
+  ) : (
+    <span role="img" aria-label={aria} style={{
+      width: size, height: size, flex: "none", display: "inline-flex", alignItems: "center", justifyContent: "center",
+      borderRadius: "var(--radius)", border: "1px solid var(--line)", background: "var(--panel-2)", lineHeight: 1,
+      fontSize: Math.round(size * 0.56), fontWeight: 700, textTransform: "uppercase",
+      color: color === "currentColor" ? "var(--faint)" : color, ...style,
+    }}>{(id[0] ?? "?")}</span>
+  )
+  if (noTip) return inner
+  return <Tip tip={iconTip(kind, id, label)}>{inner}</Tip>
 }
 
 export function Panel({ title, right, children, className = "", style = {}, bodyStyle = {}, bodyClass = "" }: {
@@ -62,7 +143,57 @@ export const ROLE_META: Record<RoleKey, { label: string; color: string }> = {
 }
 export function RolePill({ role }: { role: RoleKey }) {
   const r = ROLE_META[role]
-  return <span className="role-pill" style={{ color: r.color }}><span className="dot" style={{ background: r.color }} />{r.label}</span>
+  return <span className="role-pill" style={{ color: r.color }}><GameIcon kind="role" id={role} size={12} color={r.color} label={`${r.label} role`} noTip />{r.label}</span>
+}
+
+/* A `.chip` that tooltips its affix's effect (J.10). Looks the affix up by display name. */
+const AFFIX_BY_NAME = new Map([...content.affixes.values()].map((a) => [a.name, a]))
+export function AffixChip({ name, style }: { name: string; style?: CSSProperties }) {
+  const a = AFFIX_BY_NAME.get(name)
+  return <Tip tip={a ? <TipBody title={a.name} desc={a.effect} /> : null}><span className="chip" style={style}>{name}</span></Tip>
+}
+
+/* ---- spell tooltip (WoW-style spell card) + an underlined/bold spell name for the event log ---- */
+/** A WoW-style spell card: name, cd/target, school·formula, then the description as yellow flavor. No SpellID. */
+export function SpellTip({ skillId, name }: { skillId?: string; name?: string }) {
+  const sk = skillId ? content.skills.get(skillId) : undefined
+  const title = sk?.name ?? name ?? "Ability"
+  return (
+    <div style={{ minWidth: 190, maxWidth: 280 }}>
+      <div style={{ fontWeight: 700, fontSize: 14, color: "#fff" }}>{title}</div>
+      {sk ? (
+        <>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginTop: 2, color: "var(--muted)", fontSize: 11.5 }}>
+            <span>{sk.cd > 0 ? `${sk.cd} turn cooldown` : "No cooldown"}</span>
+            <span>{sk.targetType}</span>
+          </div>
+          {sk.damageType && sk.damageType !== "None"
+            ? <div style={{ color: "var(--muted)", fontSize: 11.5 }}>{sk.damageType}{sk.formula && sk.formula !== "0" ? ` · ${sk.formula}` : ""}</div>
+            : (sk.formula && sk.formula !== "0" ? <div style={{ color: "var(--muted)", fontSize: 11.5 }}>{sk.formula}</div> : null)}
+          {sk.description ? <div style={{ color: "#ffd100", fontSize: 12, marginTop: 5, lineHeight: 1.45 }}>{sk.description}</div> : null}
+        </>
+      ) : null}
+    </div>
+  )
+}
+/** A bold, underlined spell name in the combat log; hovering it pops the SpellTip next to the cursor. */
+export function LogSpell({ name, skillId, color }: { name: string; skillId?: string; color?: string }) {
+  const [show, setShow] = useState(false)
+  const [pos, setPos] = useState({ x: 0, y: 0 })
+  const move = (e: { clientX: number; clientY: number }) => {
+    const flip = e.clientX > window.innerWidth - 300
+    setPos({ x: flip ? e.clientX - 300 : e.clientX + 16, y: Math.min(e.clientY + 18, window.innerHeight - 150) })
+  }
+  return (
+    <>
+      <span className="log-spell" onMouseEnter={(e) => { move(e); setShow(true) }} onMouseMove={move} onMouseLeave={() => setShow(false)}
+        style={{ fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 2, cursor: "help", color: color ?? "inherit" }}>{name}</span>
+      {show ? createPortal(
+        <div role="tooltip" style={{ position: "fixed", left: pos.x, top: pos.y, zIndex: 9999, pointerEvents: "none", background: "var(--panel-3)", border: "1px solid var(--line)", borderRadius: "var(--radius)", boxShadow: "0 8px 24px rgba(0,0,0,.55)", padding: "9px 12px" }}>
+          <SpellTip skillId={skillId} name={name} />
+        </div>, document.body) : null}
+    </>
+  )
 }
 
 /* WCL damage/healing table */
@@ -137,7 +268,7 @@ export function Upgrade({ n }: { n: number }) {
 
 export function Stat({ label, val, color }: { label: string; val: ReactNode; color?: string }) {
   return (
-    <div style={{ background: "var(--panel-2)", borderRadius: 7, padding: "7px 9px", textAlign: "center" }}>
+    <div style={{ background: "var(--panel-2)", borderRadius: "var(--radius)", padding: "7px 9px", textAlign: "center" }}>
       <div className="eyebrow" style={{ fontSize: 9 }}>{label}</div>
       <div className="mono" style={{ fontSize: 15, fontWeight: 700, marginTop: 2, color: color || "var(--text)" }}>{val}</div>
     </div>

@@ -38,7 +38,7 @@ export function RunSetup({ setView }: { setView: (v: View) => void }) {
   if (pts.killorder === 0 && affSet.has("bolstering")) warnings.push("Kill Order 0 on Bolstering → survivors snowball out of control.")
   if (pts.interrupts === 0) warnings.push("Interrupts 0 → Embalmer Vesk's Preserving Fume lands on the party.")
   if (pts.positioning === 0 && (affSet.has("volcanic") || affSet.has("sanguine"))) warnings.push("Positioning 0 → avoidable damage / the pack heals in pools.")
-  if (pts.cooldowns === 0 && affSet.has("raging")) warnings.push("Cooldowns 0 on Raging → the enrage spike goes unmitigated.")
+  if (pts.cooldowns === 0 && affSet.has("raging")) warnings.push("Cooldowns 0 on Raging → enraged trash attack at full +25% haste, unblunted.")
   if (aggro === "Yolo") warnings.push("Yolo dial: +40% avoidable damage taken. Riskier, faster.")
 
   const launch = () => { if (partyFull) { runKey({ tactics: pts, aggression: aggro }); setView("replay") } }

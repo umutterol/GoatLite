@@ -9,6 +9,8 @@ import type { RunInput, RunResult, LogLine, LogKind, LogMeta, ParseRow, DeathRep
 import { buildParty, makeEnemy, eff, dealDamage, type Combatant } from "./stats"
 import { selectAbility, executeAbility, basicAttack, applyPassiveAuras, onStatusEvents, emergencyHeals, resolveEnemyAttack, tickGuards, type CombatCtx } from "./combat"
 import { tickStatuses, controlState, consumeDaze } from "./status"
+import { activeAffixIds } from "../affixes"
+import { DANGER_HP_FRAC, RECENT_DEATH_SEC } from "./operator"
 
 const DT = 0.25                       // inner timestep (seconds) for the continuous timeline
 const MAX_ACTIONS_PER_STEP = 8        // safety against degenerate (near-zero) attack intervals
@@ -32,7 +34,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
 
   const party = buildParty(input.party, aggr.output, dialCrit)
   const dungeon = content.dungeons.get(input.dungeonId)!
-  const aff = new Set(input.affixIds)
+  const aff = new Set(activeAffixIds(input.affixIds, input.keyLevel))   // WoW-style: low keys run with fewer/no affixes
   const keyScale = Math.pow(HP_KEY, input.keyLevel - 2)
   const timerSec = dungeon.timerSeconds
 
@@ -46,14 +48,17 @@ export function runDungeonEGM(input: RunInput): RunResult {
   const log: LogLine[] = []
   const deaths: DeathReport[] = []
   const series: number[][] = []
+  const healSeries: number[][] = []
   const hpSeries: number[][] = []
   const seriesIds = party.map((p) => p.id)
   const partyMeta = party.map((p) => ({ id: p.id, name: p.name, specId: p.specId }))
   series[0] = party.map(() => 0)
+  healSeries[0] = party.map(() => 0)
   hpSeries[0] = party.map(() => 1)
 
   let t = 0
   let deathPenalty = 0
+  let lastDeathT = -Infinity                 // Phase F: time of the most recent party death (drives the Composure clutch window)
   let rezCharges = REZ_START                 // shared combat-rez pool; a dead member only revives by spending one
   let nextRezChargeAt = REZ_REGEN_SEC        // run-level (persists across stages); next charge regenerates at this time
   let nextSnapSec = 1
@@ -67,6 +72,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
   const snapshot = () => {
     while (Math.floor(t) >= nextSnapSec) {
       series[nextSnapSec] = party.map((p) => Math.round(p.dmgDone))
+      healSeries[nextSnapSec] = party.map((p) => Math.round(p.healDone))
       hpSeries[nextSnapSec] = party.map((p) => (p.downedUntil >= 0 ? 0 : Math.max(0, Math.min(1, p.hp / p.maxHp))))
       nextSnapSec++
     }
@@ -115,6 +121,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
       emit, resolveCombatant: (id) => party.find((p) => p.id === id),
       // Kill Order boosts trash DPS; Cooldowns boosts boss burn (party→enemy output)
       outgoingMult: 1 + (isBoss ? 0.04 * (tac.cooldowns ?? 0) : 0.06 * (tac.killorder ?? 0)),
+      partyInDanger: false,
     }
     for (const p of aliveParty()) applyPassiveAuras(p, ctx)   // refresh permanent passive auras at stage start
 
@@ -135,6 +142,11 @@ export function runDungeonEGM(input: RunInput): RunResult {
 
       const enrage = t - stageStartT > ENRAGE_AFTER ? 1 + ENRAGE_PER * Math.floor((t - stageStartT - ENRAGE_AFTER) / ENRAGE_STEP) : 1
       const livingMobs = () => mobs.filter((m) => m.hp > 0)
+
+      // --- Phase F: refresh the Composure clutch state for this step (any ally hurt or a recent death) ---
+      const inDanger = aliveParty().some((p) => p.hp / p.maxHp < DANGER_HP_FRAC) || (t - lastDeathT < RECENT_DEATH_SEC)
+      ctx.partyInDanger = inDanger
+      for (const p of party) p.intakeMult = p.opIntakeStatic * (inDanger ? p.opClutchIntakeMult : 1)
 
       // --- party actions: cast the best ready ability, else a basic attack (gated by crowd control) ---
       ctx.t = t
@@ -176,15 +188,16 @@ export function runDungeonEGM(input: RunInput): RunResult {
       for (const m of livingMobs()) {
         let acted = 0
         while (t >= m.nextActionAt && acted < MAX_ACTIONS_PER_STEP) {
-          m.nextActionAt += eff(m).attackInterval   // Chill (−haste) slows enemies
+          let interval = eff(m).attackInterval   // Chill (−haste) slows enemies
+          if (aff.has("raging") && !m.isBoss && m.hp < 0.3 * m.maxHp) interval /= 1 + 0.25 * (1 - 0.1 * (tac.cooldowns ?? 0))   // Raging: enraged trash (sub-30%, never bosses) gains up to +25% haste — attacks faster; Cooldowns blunts it
+          m.nextActionAt += interval
           acted++
           const cc = controlState(m)
           if (cc.blocked) continue                   // mob stunned / frozen (Leg Sweep, Frost Nova, Meteor)
           if (cc.dazed) { consumeDaze(m); continue }
           const victim = tank && tank.downedUntil < 0 ? tank : aliveParty()[0]
           if (!victim) break
-          let amount = m.attackPower * enrage
-          if (aff.has("raging") && m.hp < 0.3 * m.maxHp) amount *= 1.5 * (1 - 0.1 * (tac.cooldowns ?? 0))   // Raging spike; Cooldowns absorbs
+          const amount = m.attackPower * enrage   // Raging no longer spikes per-hit damage — it grants haste (handled at the attack-interval step above)
           const r = resolveEnemyAttack(m, victim, { amount, damageType: m.damageType, critChance: 0, critMult: 1, critable: false }, ctx)
           if (r.dealt > 0) victim.hitSinceAction = true   // Revenge-style procs only off attacks that actually land
           if (Math.floor(t) > lastEnemyEmitSec) {
@@ -195,8 +208,8 @@ export function runDungeonEGM(input: RunInput): RunResult {
               r.outcome === "Parry"      ? `${victim.name} parries ${m.name}` :
               r.outcome === "Blocked"    ? `${victim.name} blocks ${m.name}` :
               r.outcome === "Dodge"      ? `${victim.name} dodges ${m.name}` :
-              r.outcome === "Redirected" ? `${m.name} strikes ${victim.name} for ${dmg} (redirected)` :
-                                           `${m.name} hits ${victim.name} for ${dmg}`
+              r.outcome === "Redirected" ? `${m.name}'s melee swing hits ${victim.name} for ${dmg}. (redirected)` :
+                                           `${m.name}'s melee swing hits ${victim.name} for ${dmg}.`
             emit("normal", msg, { sourceName: m.name, ability: "Strike", amount: Math.round(r.dealt), target: victim.name, result: r.outcome })
           }
         }
@@ -256,7 +269,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
 
       // --- deaths & wipe ---
       for (const p of party) if (p.downedUntil < 0 && p.hp <= 0) {
-        p.downedUntil = Infinity; p.deaths += 1; deathPenalty += DEATH_PENALTY   // dead → awaiting a rez charge (Infinity); revived only when one is spent
+        p.downedUntil = Infinity; p.deaths += 1; deathPenalty += DEATH_PENALTY; lastDeathT = t   // dead → awaiting a rez charge (Infinity); revived only when one is spent
         const cause = isBoss ? "boss damage" : aff.has("bursting") ? "Bursting" : aff.has("spiteful") ? "Spiteful ghost" : "trash damage"
         deaths.push({ tSec: Math.floor(t), t: fmt(t), name: p.name, cause })
         const noRez = rezCharges <= 0 && t < nextRezChargeAt
@@ -296,5 +309,9 @@ export function runDungeonEGM(input: RunInput): RunResult {
 
   const finalHpPct = party.map((p) => ({ id: p.id, name: p.name, pct: Math.max(0, Math.round((p.hp / p.maxHp) * 100)), dead: p.downedUntil >= 0 }))
 
-  return { seed: input.seed, outcome, durationSec: duration, timerSec, keyDelta, log, parse, deaths, finalHpPct, series, hpSeries, seriesIds, partyMeta }
+  return {
+    seed: input.seed, outcome, durationSec: duration, timerSec, keyDelta, log, parse, deaths, finalHpPct,
+    series, healSeries, hpSeries, seriesIds, partyMeta,
+    finalRezCharges: rezCharges, nextRezChargeAtSec: Math.max(0, Math.round(nextRezChargeAt - t)),
+  }
 }

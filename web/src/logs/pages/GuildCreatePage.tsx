@@ -3,11 +3,6 @@ import { useState } from "react"
 import { useGame } from "@/state/game-store"
 import { Panel } from "../components"
 
-const FACTIONS = [
-  { id: "horde", name: "Horde", color: "#c41f3b" },
-  { id: "alliance", name: "Alliance", color: "#4a78c4" },
-]
-const REGIONS = ["EU · Twisting Nether", "US · Illidan", "EU · Draenor", "US · Area 52", "KR · Azshara"]
 const CRESTS = ["#2bb6a4", "#f0a52e", "#a98ce0", "#e0626b", "#56a8ff", "#4ec77b", "#c41f3b", "#e5cc80"]
 const CREST_GLYPHS = ["⚔", "☠", "✦", "❖", "⛨", "✷", "✪", "♆"]
 
@@ -21,13 +16,10 @@ function shade(hex: string, amt: number): string {
 export function GuildCreatePage() {
   const game = useGame()
   const [name, setName] = useState("")
-  const [faction, setFaction] = useState("horde")
-  const [region, setRegion] = useState(REGIONS[0])
   const [crest, setCrest] = useState(CRESTS[0])
   const [glyph, setGlyph] = useState(CREST_GLYPHS[0])
   const [motto, setMotto] = useState("")
 
-  const fac = FACTIONS.find((f) => f.id === faction)!
   const valid = name.trim().length >= 3
 
   return (
@@ -37,7 +29,7 @@ export function GuildCreatePage() {
           <div className="eyebrow" style={{ color: "var(--accent)" }}>Step 1 · Found your guild</div>
           <div style={{ fontSize: 34, fontWeight: 700, marginTop: 8, letterSpacing: "-.01em" }}>Establish a Mythic+ Guild</div>
           <div className="flux" style={{ fontSize: 15, marginTop: 8, maxWidth: 560, margin: "8px auto 0" }}>
-            Name your banner, pick a realm, and choose a crest. You'll draft your first five players next.
+            Name your banner and choose a crest. You'll draft your first five players next.
           </div>
         </div>
 
@@ -45,16 +37,10 @@ export function GuildCreatePage() {
           {/* live crest preview */}
           <div className="panel" style={{ padding: 24, position: "sticky", top: 20, textAlign: "center", background: `linear-gradient(160deg, ${crest}14, var(--panel))` }}>
             <div className="eyebrow" style={{ marginBottom: 16 }}>Preview</div>
-            <div style={{ width: 132, height: 132, margin: "0 auto", borderRadius: 24, background: `linear-gradient(150deg, ${crest}, ${shade(crest, -0.4)})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 34px ${crest}55, inset 0 2px 0 rgba(255,255,255,.18)`, border: `2px solid ${crest}` }}>
+            <div style={{ width: 132, height: 132, margin: "0 auto", borderRadius: 24, background: `linear-gradient(150deg, ${crest}, ${shade(crest, -0.4)})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "inset 0 2px 0 rgba(255,255,255,.18)", border: `2px solid ${crest}` }}>
               <span style={{ fontSize: 64, color: "#0c0d11", lineHeight: 1 }}>{glyph}</span>
             </div>
             <div style={{ fontSize: 22, fontWeight: 700, marginTop: 18, color: crest, minHeight: 28 }}>{name.trim() ? "<" + name.trim() + ">" : "<Your Guild>"}</div>
-            <div style={{ display: "flex", gap: 7, justifyContent: "center", marginTop: 10, alignItems: "center" }}>
-              <span className="dot" style={{ background: fac.color }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: fac.color }}>{fac.name}</span>
-              <span style={{ color: "var(--faint)" }}>·</span>
-              <span className="mono" style={{ fontSize: 12.5, color: "var(--faint)" }}>{region}</span>
-            </div>
             {motto.trim() ? <div className="flux" style={{ fontSize: 13, marginTop: 12, fontStyle: "italic" }}>“{motto.trim()}”</div> : null}
           </div>
 
@@ -65,30 +51,11 @@ export function GuildCreatePage() {
               <div className="flux" style={{ fontSize: 12, marginTop: 7 }}>{name.trim().length < 3 ? "At least 3 characters." : "Looks good. This is how you'll appear on the ladder."}</div>
             </Panel>
 
-            <Panel title="Faction" bodyStyle={{ padding: 16 }}>
-              <div style={{ display: "flex", gap: 12 }}>
-                {FACTIONS.map((f) => (
-                  <button key={f.id} className="fac-card" onClick={() => setFaction(f.id)} style={{ flex: 1, borderColor: faction === f.id ? f.color : "var(--line)", background: faction === f.id ? f.color + "16" : "var(--panel-2)" }}>
-                    <span className="dot" style={{ background: f.color, width: 12, height: 12 }} />
-                    <span style={{ fontWeight: 700, fontSize: 15, color: faction === f.id ? f.color : "var(--text)" }}>{f.name}</span>
-                  </button>
-                ))}
-              </div>
-            </Panel>
-
-            <Panel title="Realm" bodyStyle={{ padding: 16 }}>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {REGIONS.map((rg) => (
-                  <button key={rg} className={"seg-btn" + (region === rg ? " on accent" : "")} style={{ border: "1px solid var(--line)", borderRadius: 7, padding: "7px 12px" }} onClick={() => setRegion(rg)}>{rg}</button>
-                ))}
-              </div>
-            </Panel>
-
             <Panel title="Crest" bodyStyle={{ padding: 16 }}>
               <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>Color</div>
               <div style={{ display: "flex", gap: 9, flexWrap: "wrap", marginBottom: 16 }}>
                 {CRESTS.map((c) => (
-                  <button key={c} onClick={() => setCrest(c)} style={{ width: 34, height: 34, borderRadius: 9, background: c, cursor: "pointer", border: crest === c ? "2px solid #fff" : "2px solid transparent", boxShadow: crest === c ? `0 0 12px ${c}` : "none" }} />
+                  <button key={c} onClick={() => setCrest(c)} style={{ width: 34, height: 34, borderRadius: "var(--radius)", background: c, cursor: "pointer", border: crest === c ? "2px solid #fff" : "2px solid transparent" }} />
                 ))}
               </div>
               <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>Emblem</div>
@@ -104,7 +71,7 @@ export function GuildCreatePage() {
             </Panel>
 
             <button className="btn btn-primary" style={{ justifyContent: "center", padding: 14, fontSize: 15, opacity: valid ? 1 : .5, pointerEvents: valid ? "auto" : "none" }}
-              onClick={() => game.createGuild({ name: name.trim(), faction, region, crest, glyph, motto: motto.trim() })}>
+              onClick={() => game.createGuild({ name: name.trim(), crest, glyph, motto: motto.trim() })}>
               Found Guild → Draft Players
             </button>
           </div>
