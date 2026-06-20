@@ -22,7 +22,9 @@ const ARENA_H = ARENA_BOT - ARENA_TOP
 function hashF(s: string): number { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) } return (h >>> 0) / 4294967295 }
 function hue(s: string): number { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h % 360 }
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
-const spreadY = (i: number, n: number) => (n <= 1 ? 0.5 : 0.18 + (i / (n - 1)) * 0.64)
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t
+interface V { x: number; y: number }
+const unit = (x: number, y: number): V => { const m = Math.hypot(x, y) || 1; return { x: x / m, y: y / m } }
 
 /* HP fraction of a replay mob at a whole second — forward-fills sparse samples, 0 once dead */
 function mobHpFrac(m: ReplayMob, sec: number): number {
@@ -36,7 +38,6 @@ function mobHpFrac(m: ReplayMob, sec: number): number {
 interface Dot {
   key: string; team: "party" | "enemy"; name: string; specId?: string; portrait?: string
   isBoss: boolean; isTank?: boolean; ranged: boolean; frac: number; dead: boolean
-  ax: number; ay: number        // home position in arena units [0,1]
 }
 
 export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLeft, hudRight }: {
@@ -62,78 +63,86 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
   }, [tl, sec])
   const stageMobs = tl && stage ? tl.mobs.filter((m) => m.stageIdx === stage.idx) : []
 
-  // ---- party dots: front column (melee, incl. tank) vs back column (casters/healer) ----
+  // ---- party dots (positions come from the path/formation below; role → melee/caster + tank) ----
   const hp = hpAt(result, clock)
-  const partyDots = useMemo<Array<Dot & { pid: string }>>(() => {
-    const meta = result.partyMeta.map((pm) => ({
-      pid: pm.id, name: pm.name, specId: pm.specId, role: roleOf(pm.specId),
-      back: (content.specs.get(pm.specId)?.position ?? "Front") === "Back",
-      portrait: members.find((m) => m.id === pm.id)?.portrait,
-    }))
-    const front = meta.filter((m) => !m.back), back = meta.filter((m) => m.back)
-    const place = (list: typeof meta, x: number) => list.map((m, i) => ({
-      key: "p:" + m.pid, pid: m.pid, team: "party" as const, name: m.name, specId: m.specId, portrait: m.portrait,
-      isBoss: false, isTank: m.role === "tank", ranged: m.back, frac: 1, dead: false, ax: x, ay: spreadY(i, list.length),
-    }))
-    return [...place(front, 0.24), ...place(back, 0.08)]
-  }, [result, members])
+  const partyDots = useMemo<Array<Dot & { pid: string }>>(() =>
+    result.partyMeta.map((pm) => ({
+      key: "p:" + pm.id, pid: pm.id, team: "party" as const, name: pm.name, specId: pm.specId,
+      isBoss: false, isTank: roleOf(pm.specId) === "tank", ranged: (content.specs.get(pm.specId)?.position ?? "Front") === "Back",
+      frac: 1, dead: false, portrait: members.find((m) => m.id === pm.id)?.portrait,
+    })), [result, members])
 
-  // ---- enemy dots from the active stage (boss centered; trash split front/back like the bands) ----
+  // ---- enemy dots from the active stage (back band → caster/ranged; boss = its own dot) ----
   const enemyDots: Dot[] = useMemo(() => {
-    const boss = stageMobs.find((m) => m.isBoss)
-    const ef = stageMobs.filter((m) => !m.isBoss && m.band === "front")
-    const eb = stageMobs.filter((m) => !m.isBoss && m.band === "back")
-    const place = (list: ReplayMob[], x: number) => list.map((m, i) => ({
-      key: "e:" + m.id, team: "enemy" as const, name: m.name, isBoss: false, ranged: m.band === "back",
-      frac: 1, dead: false, ax: x, ay: spreadY(i, list.length),
+    const dots: Dot[] = stageMobs.filter((m) => !m.isBoss).map((m) => ({
+      key: "e:" + m.id, team: "enemy" as const, name: m.name, isBoss: false, ranged: m.band === "back", frac: 1, dead: false,
     }))
-    // spawn FAR RIGHT (away from the party) so the party visibly travels across to engage → "pack to pack" feel
-    const dots: Dot[] = [...place(ef, 0.80), ...place(eb, 0.93)]
-    if (boss) dots.push({ key: "e:" + boss.id, team: "enemy", name: boss.name, isBoss: true, ranged: false, frac: 1, dead: false, ax: 0.74, ay: 0.5 })
+    const boss = stageMobs.find((m) => m.isBoss)
+    if (boss) dots.push({ key: "e:" + boss.id, team: "enemy", name: boss.name, isBoss: true, ranged: false, frac: 1, dead: false })
     return dots
   }, [stage?.idx, tl]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ---- movement: fake EGM-style engagement (the sim has no positions, so this is purely cosmetic) ----
-  // Both sides leave their start columns and CLOSE into a central melee scrum: the TANK anchors the contact line,
-  // **enemy melee pile onto the tank**, party melee-dps join around it; **ranged hold back and KITE (strafe)** so
-  // they're not static. `eng` ramps over the stage's first seconds (the charge-in); a melee press-sway + a
-  // per-attack lunge (below) keep the scrum churning. The CSS `.replay-dot` transition smooths it frame-to-frame.
+  // ---- movement: a faked TRAVELING PATH through the dungeon (the sim has no positions; purely cosmetic) ----
+  // The party does NOT reset between packs — it walks a continuous path: START → station(pack 1) → station(pack 2) → …
+  // Each pack spawns at a deterministic point ANYWHERE in the arena; the party's "station" for it is a standoff short
+  // of the pack on the approach side. During a stage's first seconds the party MARCHES from the previous station to
+  // this one while the pack's enemies CONVERGE onto the tank; then it holds and brawls. The formation is built along
+  // the engagement axis (party behind the tank, casters tight; enemies pile pack-side), so it faces whichever way the
+  // next pack is. Deterministic (seeded) → scrub-safe; the CSS `.replay-dot` transition smooths it frame-to-frame.
+  const seed = String(result.seed)
   const rawFrac = (d: Dot) => d.team === "party" ? (hp[d.key.slice(2)] ?? 1) : mobHpFrac(stageMobs.find((m) => "e:" + m.id === d.key)!, sec)
-  const stageStart = stage?.startSec ?? 0
-  // SLOW ramp (vs the old 2.5) so the cross-arena travel to the new pack is actually visible at playback speed
-  const eng = clamp((clock - stageStart) / 16, 0, 1)
-  const SCRUM_Y = 0.5
-  const enemyMelee = enemyDots.filter((d) => !d.isBoss && !d.ranged)
-  const partyMeleeDps = partyDots.filter((d) => !d.ranged && !d.isTank)
-  const spread = (list: Dot[], d: Dot, gap: number) => { const n = Math.max(1, list.length), i = Math.max(0, list.indexOf(d)); return clamp(SCRUM_Y + (i - (n - 1) / 2) * gap, 0.12, 0.88) }
-  // the contact/scrum forms on the RIGHT (where the pack stands): the party travels across to it, enemies converge onto the tank
-  const engaged = (d: Dot): { ex: number; ey: number } => {
-    if (d.team === "party") {
-      if (d.ranged) return { ex: 0.30, ey: d.ay }
-      if (d.isTank) return { ex: 0.50, ey: SCRUM_Y }
-      return { ex: 0.45, ey: spread(partyMeleeDps, d, 0.10) }
+  const START: V = { x: 0.12, y: 0.5 }, STANDOFF = 0.13
+  const path = useMemo(() => {
+    const stations = new Map<number, V>(), packs = new Map<number, V>(), prevs = new Map<number, V>()
+    let prev = START
+    for (const st of (tl?.stages ?? [])) {
+      const c: V = { x: lerp(0.32, 0.80, hashF(seed + ":" + st.idx + ":x")), y: lerp(0.30, 0.78, hashF(seed + ":" + st.idx + ":y")) }
+      const u = unit(prev.x - c.x, prev.y - c.y)
+      const station: V = { x: c.x + u.x * STANDOFF, y: c.y + u.y * STANDOFF }
+      packs.set(st.idx, c); stations.set(st.idx, station); prevs.set(st.idx, prev); prev = station
     }
-    if (d.isBoss) return { ex: 0.66, ey: SCRUM_Y }
-    if (d.ranged) return { ex: 0.84, ey: d.ay }
-    return { ex: 0.58, ey: spread(enemyMelee, d, 0.085) }   // enemy melee converge onto the tank at the contact line
-  }
-  // on the first frame of a new pack, snap the (persistent) party dots to their start column instead of sliding them
-  // back from the previous pack's contact — so each stage reads as "enter, then charge the pack", not "retreat".
-  const prevStageRef = useRef(-1)
-  const stageChanged = stage != null && stage.idx !== prevStageRef.current
-  useEffect(() => { if (stage) prevStageRef.current = stage.idx })
+    return { stations, packs, prevs }
+  }, [tl, seed]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const stageStart = stage?.startSec ?? 0
+  const TRAVEL = 14                                    // sim-seconds to march to the next pack (slow → visible)
+  const eng = clamp((clock - stageStart) / TRAVEL, 0, 1)
+  const A: V = (stage && path.stations.get(stage.idx)) || { x: 0.5, y: 0.5 }     // party station for this pack
+  const P: V = (stage && path.packs.get(stage.idx)) || { x: 0.7, y: 0.5 }        // pack center (anywhere)
+  const prevA: V = (stage && path.prevs.get(stage.idx)) || START
+  const anchor: V = { x: lerp(prevA.x, A.x, eng), y: lerp(prevA.y, A.y, eng) }    // tank position mid-march
+  const ax_ = unit(P.x - anchor.x, P.y - anchor.y)     // pack-ward axis from the marching anchor
+  const fx_ = unit(P.x - A.x, P.y - A.y)               // final axis (enemies converge around the tank's destination)
+  const perp: V = { x: -ax_.y, y: ax_.x }, fperp: V = { x: -fx_.y, y: fx_.x }
+  const enemyMelee = enemyDots.filter((d) => !d.isBoss && !d.ranged)
+  const enemyCasters = enemyDots.filter((d) => !d.isBoss && d.ranged)
+  const partyMeleeDps = partyDots.filter((d) => !d.ranged && !d.isTank)
+  const partyCasters = partyDots.filter((d) => d.ranged)
+  const sOff = (list: Dot[], d: Dot, gap: number) => { const n = Math.max(1, list.length), i = Math.max(0, list.indexOf(d)); return (i - (n - 1) / 2) * gap }
+
+  // absolute target (arena units) this frame: party marches in formation around the tank; enemies lerp from their
+  // spawn (a perp line at the pack) onto the tank as the party arrives.
+  const targetPos = (d: Dot): V => {
+    if (d.team === "party") {
+      if (d.isTank) return anchor
+      if (d.ranged) { const o = sOff(partyCasters, d, 0.045); return { x: anchor.x - ax_.x * 0.085 + perp.x * o, y: anchor.y - ax_.y * 0.085 + perp.y * o } }   // casters tight, behind the tank
+      const o = sOff(partyMeleeDps, d, 0.06); return { x: anchor.x - ax_.x * 0.028 + perp.x * o, y: anchor.y - ax_.y * 0.028 + perp.y * o }
+    }
+    let conv: V
+    if (d.isBoss) conv = { x: A.x + fx_.x * 0.12, y: A.y + fx_.y * 0.12 }
+    else if (d.ranged) { const o = sOff(enemyCasters, d, 0.05); conv = { x: A.x + fx_.x * 0.17 + fperp.x * o, y: A.y + fx_.y * 0.17 + fperp.y * o } }
+    else { const o = sOff(enemyMelee, d, 0.055); conv = { x: A.x + fx_.x * 0.05 + fperp.x * o, y: A.y + fx_.y * 0.05 + fperp.y * o } }   // pile onto the tank
+    const so = d.isBoss ? 0 : sOff(d.ranged ? enemyCasters : enemyMelee, d, 0.05)
+    const spawn: V = { x: P.x + fperp.x * so, y: P.y + fperp.y * so }
+    return { x: lerp(spawn.x, conv.x, eng), y: lerp(spawn.y, conv.y, eng) }   // spawn at the pack → converge on the tank
+  }
+
+  // Positions are clock-driven (the march/converge) → the .12s CSS transition interpolates them into smooth travel.
+  // The gentle idle wobble is intentionally NOT done here: the playback clock jumps ~5 sim-sec/tick, so any
+  // clock-based sinusoid aliases into jitter. Idle is a real-time CSS animation (`.replay-idle`) instead.
   const place = (d: Dot) => {
-    const frac = rawFrac(d)
-    const ph = hashF(d.key) * 6.283, ph2 = hashF(d.key + "z") * 6.283
-    const jx = (hashF(d.key + "x") - 0.5) * 0.03, jy = (hashF(d.key + "y") - 0.5) * 0.05
-    const { ex, ey } = engaged(d)
-    let ax = (d.ax + jx) * (1 - eng) + (ex + jx) * eng
-    let ay = (d.ay + jy) * (1 - eng) + (ey + jy) * eng
-    if (d.ranged) { ax += Math.sin(clock * 0.33 + ph) * 0.03 * eng; ay += Math.cos(clock * 0.27 + ph2) * 0.045 * eng }  // ranged kite/strafe
-    else if (!d.isBoss) ax += Math.sin(clock * 0.5 + ph) * 0.012 * eng                                                  // melee press into the contact
-    ax = clamp(ax + Math.cos(clock * 0.9 + ph) * 0.004, 0.04, 0.96)   // idle bob
-    ay = clamp(ay + Math.sin(clock * 0.8 + ph) * 0.007, 0.08, 0.92)
+    const t = targetPos(d), frac = rawFrac(d)
+    const ax = clamp(t.x, 0.03, 0.97), ay = clamp(t.y, 0.06, 0.94)
     return { ...d, frac, dead: frac <= 0.001, px: ax * W, py: ARENA_TOP + ay * ARENA_H, axPct: ax * 100 }
   }
   const dots = [...partyDots.map(place), ...enemyDots.map(place)]
@@ -228,7 +237,7 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
 
       {/* dots */}
       <div style={{ position: "absolute", inset: 0, zIndex: 3 }}>
-        {dots.map((d) => <DotView key={d.key} d={d} lunge={lunge.get(d.key)} snap={stageChanged} />)}
+        {dots.map((d) => <DotView key={d.key} d={d} lunge={lunge.get(d.key)} playing={playing} />)}
       </div>
 
       {/* projectiles / impacts / floats / death bursts / flashes */}
@@ -252,7 +261,7 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
 }
 
 /* one combatant: portrait/glyph dot + name + HP bar; dead → grayed + skull; melee jabs toward its target via `lunge` */
-function DotView({ d, lunge, snap }: { d: Dot & { px: number; py: number; axPct: number; frac: number; dead: boolean }; lunge?: { x: number; y: number }; snap?: boolean }) {
+function DotView({ d, lunge, playing }: { d: Dot & { px: number; py: number; axPct: number; frac: number; dead: boolean }; lunge?: { x: number; y: number }; playing?: boolean }) {
   const info = d.specId ? mc(d.specId) : null
   const size = d.isBoss ? 50 : d.team === "party" ? 38 : 30
   const pct = Math.round(d.frac * 100)
@@ -263,8 +272,8 @@ function DotView({ d, lunge, snap }: { d: Dot & { px: number; py: number; axPct:
   const m = lunge && !d.dead ? (Math.hypot(lunge.x, lunge.y) || 1) : 1
   const lx = lunge && !d.dead ? (lunge.x / m) * 11 : 0, ly = lunge && !d.dead ? (lunge.y / m) * 11 : 0
   return (
-    <div className="replay-dot" style={{ left: d.axPct + "%", top: d.py, width: Math.max(size, 54), opacity: d.dead ? 0.45 : 1, transform: `translate(-50%,-50%) translate(${lx.toFixed(1)}px,${ly.toFixed(1)}px)`, transition: snap ? "none" : undefined }}>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+    <div className="replay-dot" style={{ left: d.axPct + "%", top: d.py, width: Math.max(size, 54), opacity: d.dead ? 0.45 : 1, transform: `translate(-50%,-50%) translate(${lx.toFixed(1)}px,${ly.toFixed(1)}px)` }}>
+      <div className="replay-idle" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, animationDelay: `-${(hashF(d.key) * 2.6).toFixed(2)}s`, animationPlayState: playing ? undefined : "paused" }}>
         <span aria-label={`${d.name} ${pct}%`} style={{
           position: "relative", width: size, height: size, borderRadius: d.isBoss ? 13 : "50%", flex: "none",
           border: `2px solid ${ring}`, overflow: "hidden", background: d.team === "party" ? (info?.color ?? "#244") : d.isBoss ? "radial-gradient(circle at 40% 30%,#5a2e1a,#1c0e0c)" : "radial-gradient(circle at 40% 30%,#5b2226,#210d0f)",

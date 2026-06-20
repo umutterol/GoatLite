@@ -277,9 +277,13 @@ a { color: var(--link); text-decoration: none; }
 .replay-hpbar { transition: width .14s linear, background .2s; }
 
 /* ---- Phase I v2: faked-spatial arena (EGM-style moving dots) ---- */
-/* a combatant dot smoothly tracks its (idle-bobbed, engaging) position between renders → reads as movement;
+/* a combatant dot smoothly tracks its (engaging) position between renders → reads as movement;
    `transform` is transitioned too so the per-attack melee lunge eases in/out */
 .replay-dot { position: absolute; transform: translate(-50%, -50%); transition: left .12s linear, top .12s linear, transform .1s ease-out; }
+/* gentle idle wobble — REAL-TIME CSS (not the coarse sim clock, which would alias into jitter); paused on a
+   scrubbed frame via animation-play-state. Per-dot negative delay desyncs them. */
+@keyframes idleWobble { 0% { transform: translate(0,0); } 25% { transform: translate(2.5px,-3px); } 50% { transform: translate(-2px,1.5px); } 75% { transform: translate(1.5px,3px); } 100% { transform: translate(0,0); } }
+.replay-idle { animation: idleWobble 2.6s ease-in-out infinite; will-change: transform; }
 /* an attack line (melee swipe / faint ranged tracer) flashes from attacker to target, then fades */
 @keyframes shotFade { from { opacity: .8; } to { opacity: 0; } }
 .replay-shot { animation: shotFade .26s ease-out forwards; }
