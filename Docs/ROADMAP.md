@@ -50,6 +50,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
 | L | **Roster expansion — Marksman + Necromancer** | ⬜ 0/7 — **design ✅** (`MMO-Nostalgia-Reference.md` §6) |
 | M | **Guild Feed & Loot Drama (social meta-layer)** | ⬜ 0/5 (+1 v2) — **design ✅** (this session): always-visible meta feed, system notifications + solo barks, loot drama wired in |
+| N | **Intake balance (`enemyDmgMult`) + sim-dump tooling** | ✅ 2/2 — enemy damage is now an **isolated** intake lever (=2.0); survival binds below the timer wall; +2 floor + operator runway (+3) hold; new config/CLI `sim-dump` harness |
 
 ---
 
@@ -300,6 +301,21 @@ random member inherits a voice pack for free. Loot drama is the feed's flagship 
 
 ---
 
+## Phase N — Intake balance (`enemyDmgMult`) + sim-dump tooling ✅ (2/2)
+
+*Closes the 2026-06-20 balance note: enemy DAMAGE was undertuned, so survival/healing/tank/peel were decorative
+(standard comp took 0 deaths through ~+18–21; healing ~all overheal). Investigation corrected the diagnosis —
+`DMG_UNIT` is **not** two-sided (it scales only enemy-dealt damage, never player throughput or enemy HP), so an
+isolated intake lever was a one-line constant change, not a re-architecture. Built the `sim-dump` harness first so
+the investigation (and all future ones) is config-driven and saved to files.*
+
+| # | Task | Axis | Sev | Effort | Status | Notes |
+|---|---|---|---|---|---|---|
+| N.1 | **`sim-dump` harness** — config/CLI sim runner that saves runs to files | tooling | major | M | ✅ | `web/scripts/sim-dump.mjs` (+ `sim-config.example.json`). **single** mode → full input + RunResult + derived analytics (per-member min-HP/DPS/HPS, party min-HP, seconds-in-danger, timer margin) as JSON **plus a readable combat-log `.md`**; **sweep** mode → matrix over keyLevels × affixSets × aggressions × seeds → aggregated table. Inputs: comp (presets `standard`/`probe`/`safety` or per-member objects), per-member ilvl/morale/skills/traits/talents, tactics, affix, aggression, key, seed, dungeon. `--ilvl-mode auto` = gear-appropriate (112+4·key, cap 160). Output → `web/sim-logs/` (gitignored). Supersedes `lifebinder-probe.mjs`. |
+| N.2 | **`enemyDmgMult` intake lever** — isolate + raise enemy damage | engine/balance | major | S | ✅ | added `tuning.sim.enemyDmgMult` (default 1 = no-op) folded into the `DMG_UNIT` constant in **both** `egm/stats.ts:~49` and `egm/engine.ts:~44` → one isolated "all enemy-dealt damage ×N" knob (auto-attacks + the 6 boss/affix mechanics), with **zero** effect on enemy HP (`HP_UNIT`), player throughput (`power`, no `DMG_UNIT` term), or kill-speed. Set to **2.0** from sim-dump sweeps. **Result (gate comp = safety 2H):** +2 floor still **6/6** timed at starting gear; +8 comfortable (54% min-HP, 0 danger); **survival now binds below the timer wall** (+17 wipes with time on the clock); gear-cap ceiling fresh +15 / maxed +18 → **operator runway +3** (was +17/+19 — the drop is intended: survival co-limits the ceiling now). Determinism intact (op-verify 6/6). **egm-smoke goldens shifted** (even 0-death low/over-geared runs ~8% slower — the AI now spends actions on healing/defense): week +8 868→**914s**, Volcanic +8 826→**884s**, all-3 1097→**1182s**, all-0 1258→**1367s**. No save migration (tuning is content, not persisted). |
+
+---
+
 ## Open Design Decisions (resolve before/while building the dependent task)
 
 | Decision | Blocks | Status | Resolution |
@@ -324,6 +340,45 @@ random member inherits a voice pack for free. Loot drama is the feed's flagship 
 
 ## Changelog
 
+- **2026-06-20** — **Phase N shipped: intake balance (`enemyDmgMult`) + `sim-dump` tooling — the enemy-damage gap
+  is fixed.** First built **`web/scripts/sim-dump.mjs`** (N.1), a config/CLI sim harness that **saves runs to files**:
+  `single` mode dumps the full input + RunResult + derived analytics (per-member min-HP/DPS/HPS, party min-HP,
+  seconds-in-danger, timer margin) as JSON **plus a readable combat-log `.md`**; `sweep` mode runs a matrix
+  (keyLevels × affixSets × aggressions × seeds) → aggregated table. Comp presets + per-member ilvl/morale/skills/
+  traits/talents/tactics/affix/aggression/seed; `--ilvl-mode auto` = gear-appropriate. Output → `web/sim-logs/`
+  (gitignored). Then the **investigation corrected the prior diagnosis**: `DMG_UNIT` is **NOT** two-sided — grep +
+  engine read prove it appears ONLY in enemy-dealt damage (auto-attacks `stats.ts:181` + the 6 boss/affix mechanics
+  in `egm/engine.ts`); player damage uses `power` (no `DMG_UNIT`), enemy HP uses `HP_UNIT`. So the isolated lever was
+  a one-line constant change (N.2): added **`tuning.sim.enemyDmgMult`** (default 1) folded into `DMG_UNIT` in both
+  `egm/stats.ts:~49` and `egm/engine.ts:~44` → one "all enemy-dealt damage ×N" knob, zero leak to HP/throughput/
+  kill-speed. Swept candidates with sim-dump and **set 2.0**: reproduces the bug at 1.0 (gate comp 0 deaths through
+  +20, decorative survival), and at 2.0 **survival binds below the timer wall** (+17 wipes with time on the clock)
+  while +2 floor stays **6/6** timed and +8 stays comfortable (54% min-HP). Verified: `tsc -b` clean; **op-verify
+  6/6** (operator deltas + determinism + floor); **f6-balance** +2 floor 6/6, gear-cap ceiling fresh +15 / maxed +18
+  → **operator runway +3** (down from +17/+19 — intended, survival co-limits the ceiling now). egm-smoke goldens
+  shifted (intake now costs clear-time via healing/defense even at 0 deaths): week +8 868→**914s**, Volcanic +8
+  826→**884s**, all-3 1097→**1182s**, all-0 1258→**1367s**; all still timed. No save migration (tuning is content).
+  **24-agent adversarial review** (5 find lenses → adversarial verify): 19 findings → 12 confirmed (11 were
+  *confirmations the lever is correct* — isolation/determinism/no-double-count/clean-build/no-migration), 7 refuted,
+  **0 real bugs in the change**. One pre-existing nit surfaced: the **Volcanic** affix scales its frequency with
+  aggression but not its per-hit damage (unlike Spiteful/Positioning) — documented in `engine.ts` with a code comment
+  (behaviour unchanged; deferred to the next balance pass). Memory: `enemy-damage-undertuned` (now RESOLVED +
+  corrected), `sim-dump-tool`.
+- **2026-06-20** — **⚠️ Balance note (✅ FIXED — see Phase N / enemyDmgMult): enemy DAMAGE is undertuned — intake is not a real difficulty
+  lever at/around the floor.** Player report (facerolled to **+15 on ilvl 110**) reproduced in the headless sim:
+  with starting gear (ilvl 110–120) the standard comp (Mystic/Lifebinder/Bard/Pyro/Assassin) takes **0 deaths through
+  ~+18–21** on both the week affixes (fortified/bursting/spiteful) *and* volcanic/raging; first 4+ deaths only appear
+  at **+22–23**, guaranteed by +24–26. At +5 nobody drops below **86% HP** (tank ~96%), so the Lifebinder's healing is
+  ~all overheal → effective **HPS ≈ 8–11** (the meter only credits non-overheal — `combat.ts:100`). Crucially, every
+  +14 **depletion** we could produce was a **0-death throughput fail** (Safe aggression and/or morale<50 cutting output
+  to as low as 0.63×), never a survival fail. **Diagnosis:** the F.6/H.4/K.6 balance passes calibrated the *timer/clear-speed*
+  curve, but enemy damage scales via `attackPower = baseDamage × keyScale × affMult × DMG_UNIT` (`stats.ts:181`) where
+  `keyScalingPerLevel` (1.052) and `DMG_UNIT` (4.6) move enemy HP/damage **and** player throughput together — so tuning
+  the kill-speed curve never isolated intake, leaving deaths/healing/peeling as essentially decorative until ~+22.
+  **Fix candidates (TBD, needs its own balance ticket):** raise per-enemy `baseDamage` in dungeon content, or add an
+  **enemy-damage-only** global multiplier (isolates intake from kill speed; `DMG_UNIT`/`keyScalingPerLevel` cannot, since
+  they're two-sided). Goal: make survival a binding constraint *below* the timer wall at gear-appropriate keys, so healer
+  HPS and tank/peel play actually matter. Harness left at `web/scripts/lifebinder-probe.mjs`. Memory: `enemy-damage-undertuned`.
 - **2026-06-20** — **Planned Phase M — Guild Feed & Loot Drama (social meta-layer).** Design-locked this session: an
   **always-visible** meta-layer guild-chat panel with two voices — **system notifications** (neutral game-voice, complete
   coverage, the notification center) and **in-character solo barks** (personality voice, curated to ~**1–2 barks/run**).

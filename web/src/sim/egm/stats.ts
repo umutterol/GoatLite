@@ -46,7 +46,12 @@ export interface EffStats {
 
 const SIM = content.tuning.sim as Record<string, number>
 export const HP_UNIT = SIM.hpUnit ?? 780
-export const DMG_UNIT = SIM.dmgUnit ?? 4
+// `enemyDmgMult` is the isolated INTAKE difficulty lever (default 1 = no change). It folds into
+// DMG_UNIT, which is referenced ONLY by enemy-dealt damage (enemy auto-attacks here + the 6 boss/
+// affix mechanics in engine.ts) — never by player throughput (player power has no DMG_UNIT term)
+// or enemy HP (HP_UNIT). So raising it makes survival bind harder without touching kill-speed.
+export const ENEMY_DMG_MULT = SIM.enemyDmgMult ?? 1
+export const DMG_UNIT = (SIM.dmgUnit ?? 4) * ENEMY_DMG_MULT
 export const ATTACK_INTERVAL_BASE = SIM.attackIntervalBase ?? 2.0   // seconds between auto-attacks at 0 haste
 export const ENEMY_ATTACK_INTERVAL = SIM.enemyAttackInterval ?? 1.0
 

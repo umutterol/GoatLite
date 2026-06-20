@@ -8,6 +8,7 @@
     "softEnrageStepSeconds": 5,
     "hpUnit": 1020,
     "dmgUnit": 4.6,
+    "enemyDmgMult": 2.0,
     "deathPenaltySec": 15,
     "rezStartCharges": 1,
     "rezRegenSec": 300,

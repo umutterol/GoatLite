@@ -41,7 +41,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
   // affix / tactics wiring (Phase 5a)
   const tac = input.tactics
   const aggroIntake = aggr.avoidableIntake
-  const DMG_UNIT = SIM.dmgUnit ?? 4
+  const DMG_UNIT = (SIM.dmgUnit ?? 4) * (SIM.enemyDmgMult ?? 1)   // enemyDmgMult: isolated intake lever (see stats.ts); scales boss/affix mechanic damage too
   const hasPeel = input.party.some((p) => (p.profile ?? content.specs.get(p.specId)?.defaultProfile) === "peel")
   let burstStacks = 0   // Bursting affix DoT stacks (persist across stages, decay over time)
 
@@ -248,6 +248,9 @@ export function runDungeonEGM(input: RunInput): RunResult {
 
         if (!isBoss && since % 10 === 0) {   // avoidable trash affixes (Positioning roll)
           const hitChance = Math.max(0.06, 0.6 - 0.18 * (tac.positioning ?? 0)) * aggroIntake
+          // KNOWN ASYMMETRY (pre-existing): Volcanic per-hit damage is NOT scaled by aggroIntake — aggression changes how
+          // OFTEN you eat it (hitChance above), not how hard — unlike Spiteful/Positioning, which scale both. Fine at
+          // enemyDmgMult=2.0 (the +2 floor + curve were verified with this behaviour); revisit in the next balance pass.
           if (aff.has("volcanic") && rng.chance(hitChance)) {
             const v = rand(); if (v) { dealDamage(v, 40 * keyScale * DMG_UNIT); emit("mechanic", `${v.name} eats a Volcanic eruption. Positioning ${tac.positioning ?? 0}.`, { sourceName: "Volcanic", ability: "Volcanic Plume", target: v.name, result: "Avoidable" }) }
           }
