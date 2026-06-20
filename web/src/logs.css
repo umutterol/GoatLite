@@ -268,13 +268,6 @@ a { color: var(--link); text-decoration: none; }
 @keyframes logIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
 
 /* ---- Phase I: 2D replay canvas ---- */
-.replay-stage { container-type: inline-size; }
-/* a fresh pack/boss slides in when the stage changes (keyed on stage idx) */
-@keyframes packIn { from { opacity: 0; transform: translateX(22px); } to { opacity: 1; transform: none; } }
-.replay-pack { animation: packIn .35s ease-out; }
-/* floating combat text rises off a token and fades */
-@keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 4px) scale(.85); } 16% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -30px) scale(1); } }
-.replay-float { position: absolute; transform: translate(-50%, 0); font-weight: 800; font-family: var(--mono, ui-monospace, monospace); pointer-events: none; white-space: nowrap; text-shadow: 0 1px 3px rgba(0,0,0,.85); animation: floatUp 1.05s ease-out forwards; }
 /* a screen flash when a boss mechanic / affix proc fires */
 @keyframes mechFlash { 0% { opacity: 0; } 22% { opacity: .5; } 100% { opacity: 0; } }
 .replay-flash { position: absolute; inset: 0; pointer-events: none; animation: mechFlash 0.9s ease-out forwards; }
@@ -282,6 +275,23 @@ a { color: var(--link); text-decoration: none; }
 @keyframes dieBurst { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.4); } 30% { opacity: 1; transform: translate(-50%, -50%) scale(1.25); } 100% { opacity: 0; transform: translate(-50%, -90%) scale(1); } }
 .replay-die { position: absolute; transform: translate(-50%, -50%); pointer-events: none; animation: dieBurst 1.1s ease-out forwards; }
 .replay-hpbar { transition: width .14s linear, background .2s; }
+
+/* ---- Phase I v2: faked-spatial arena (EGM-style moving dots) ---- */
+/* a combatant dot smoothly tracks its (idle-bobbed) home between renders → reads as movement */
+.replay-dot { position: absolute; transform: translate(-50%, -50%); transition: left .12s linear, top .12s linear; }
+/* an attack line (melee swipe / faint ranged tracer) flashes from attacker to target, then fades */
+@keyframes shotFade { from { opacity: .8; } to { opacity: 0; } }
+.replay-shot { animation: shotFade .26s ease-out forwards; }
+/* a ranged projectile flies from source to target via per-element --dx/--dy custom props */
+@keyframes shoot { from { transform: translate(0,0); opacity: 1; } to { transform: translate(var(--dx,0), var(--dy,0)); opacity: .4; } }
+.replay-proj { position: absolute; transform: translate(-50%, -50%); pointer-events: none; }
+.replay-proj > i { display: block; animation: shoot var(--dur, .34s) linear forwards; }
+/* impact burst ring at the point of contact */
+@keyframes impactRing { from { opacity: .85; transform: translate(-50%, -50%) scale(.25); } to { opacity: 0; transform: translate(-50%, -50%) scale(1.9); } }
+.replay-impact { position: absolute; pointer-events: none; border-radius: 50%; animation: impactRing .42s ease-out forwards; }
+/* arcing pop-in damage/heal number (overshoot → settle → rise + fade) */
+@keyframes floatPop { 0% { opacity: 0; transform: translate(-50%,-50%) scale(.45); } 16% { opacity: 1; transform: translate(-50%,-95%) scale(1.25); } 36% { transform: translate(-50%,-120%) scale(1); } 100% { opacity: 0; transform: translate(-50%,-235%) scale(1); } }
+.replay-float2 { position: absolute; font-weight: 800; font-family: var(--mono, ui-monospace, monospace); pointer-events: none; white-space: nowrap; text-shadow: 0 1px 3px rgba(0,0,0,.92); animation: floatPop 1.0s ease-out forwards; }
 
 /* text fields */
 .field {

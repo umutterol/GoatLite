@@ -209,7 +209,7 @@ Built this session; user layout: replay leads the report with the summary header
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
 | I.1 | Engine emits `ReplayTimeline` on `RunResult`: stage/pack/boss events + per-mob spawn/death/HP with stable seed IDs | engine | major | L | ✅ | `egm/engine.ts` emits `ReplayTimeline` (`types.ts`): stages with **real** start/end timing + per-mob spawn/death + per-second HP-fraction samples + stable ids `s{stage}m{i}` + front/back band. Hooked into `snapshot()` (whole-sec) + a stage-finalize block. **Additive: egm-smoke goldens BYTE-IDENTICAL** (884/914/1182/1367, 0 deaths) → zero balance impact. **Transient** (in the store `TRANSIENT` set → stripped from saves; recomputed from the ticket). `replay?` optional so the legacy engine's `RunResult` stays valid. |
-| I.2 | Replay canvas (SVG/DOM): backdrop, party orbs, pack rows, HP bars, status pips, floating text | ux | major | L | ✅ | `ReplayCanvas.tsx` (DOM/SVG): dungeon-tinted **abstract backdrop** (placeholder for G.4 art), party portrait orbs (lower-left, live HP from `hpSeries` via `hpAt`), the active stage's enemies as a **pack split into front/back rows** (bosses = large gold token), draining HP bars. Pure `clock`-driven → **scrub-safe**, no internal timers. (Status/cooldown pips deferred — see I.4.) |
+| I.2 | Replay canvas (SVG/DOM): backdrop, party orbs, pack rows, HP bars, status pips, floating text | ux | major | L | ✅ | **v2 = faked-spatial arena** (reworked from band-rows after an EGM-decompile study — see the 2026-06-20 changelog): combatants are **dots on a dungeon-tinted field** (party = portrait dots in front/back columns by spec position; enemies = the active stage's mobs split front/back + centered boss) with **deterministic seeded positions + an idle bob** — the sim stays band-based, so positions are cosmetic/derived (no engine change). Per-dot HP bars; attacks fire as **SVG targeting lines + melee swipes + ranged projectiles + impact rings + arcing pop-in damage numbers**, derived from the log, windowed + **gated to playback** (scrub-safe). Width measured via ResizeObserver for px geometry. (Status pips still deferred — they need an additive per-combatant status emit.) |
 | I.3 | Scrubber + transport synced to the log clock; "Replay" tab on ReportPage | ux | major | M | ✅ | ReportPage **re-laid-out top-down** per the user's spec: replay canvas on top with the **summary header overlaid top-LEFT** and the **live DPS/HPS meter overlaid top-RIGHT** *inside* the canvas (meter moved out of the right column); **timer adjuster** (play/speed dial/scrubber + death markers) directly **below**; then Event Log/Deaths/Casts + Party Health as usual. (Replay *leads* the report — not a separate "Replay tab".) |
 | I.4 | Polish: death anim, mechanic/affix flashes, speed dial | ux | minor | M | 🟡 | **Shipped:** floating combat text + boss-mechanic/affix flashes + death bursts (skull). **Windowed event layer** — covers the ~5 sim-sec/tick clock skip (an `=== sec` gate dropped ~80% of events), plays only while PLAYING, enemy bursts read the FULL timeline so a boundary-killed mob still flashes. Speed dial pre-existed. **Deferred:** status/cooldown pips on orbs (per the build decision); float/burst anchors are name-keyed (exact-duplicate display names misroute — cosmetic nit, documented in `ReplayCanvas.tsx`). **Adversarial review** (4 review dims + per-finding verify, 14 agents → 10 findings → 6 confirmed): **all 6 fixed** (windowed event layer [major]; full-timeline enemy bursts [2× minor]; crit float-size dead branch [nit]; restored combat-rez recharge ETA dropped in the HUD compaction [minor]) bar the name-key nit. |
 
@@ -341,6 +341,26 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-20** — **Replay v2: reworked into an EGM-style "faked-spatial" arena (I.2 rework).** Studied how the
+  EGM reference handles its 2D combat (4 parallel readers over `Extract/recovered/gameUI/combat/` +
+  `systems/combat/`): EGM's `CombatPlaybackScreen` is one immediate-mode `draw_arena()` driven by **two sim
+  timelines** — an `event_log` *and* per-tick `snapshots` carrying every unit's `pos: Vector2` / `state` /
+  `life_pct` / `target_id` — i.e. it is **fully spatial** (free x/y movement, kiting), with projectile/pulse attack
+  VFX + particle impact bursts + arcing damage numbers + per-ailment status pips, all RNG seeded by `(tick, id)` so
+  it stays deterministic. Our web sim is deliberately **band-based (no x/y)**, so going truly spatial would mean an
+  engine change; per the user's call we took the **faked-spatial (UI-only)** route. Reworked `ReplayCanvas.tsx`
+  from band-rows into a 2D arena: combatants are **dots with deterministic seeded positions + an idle bob** (party
+  = front/back columns by spec position; enemies = the active stage's mobs front/back + centered boss), with
+  **SVG targeting lines + melee swipes + ranged projectiles (CSS `--dx/--dy`) + impact rings + arcing pop-in
+  damage numbers** derived from the existing log (windowed, gated to playback, scrub-safe). **No engine/sim change
+  → determinism untouched by construction.** Verified: `tsc -b` clean; Playwright live check (`scripts/i-live.mjs`)
+  9/9, **0 console errors** (arena, HUD overlays, HP bars, projectiles + numbers during playback, scrubbing).
+  **Adversarial review** (3 dims → per-finding verify, 15 agents → 3 confirmed, all fixed): same-named pack mobs
+  were collapsing their floats/shots/impacts/death-skulls onto one dot — now enemy deaths resolve by **precise
+  per-mob id** and enemy-target VFX anchor to the **lowest-HP living dot of that name** (numbers track the draining
+  mob); plus dead v1 CSS removed. **Deferred:** status/cooldown pips (need a small additive per-combatant status
+  emit — same deterministic/transient pattern as the replay timeline). Memory: `goatlite-2d-replay`,
+  `egm-combat-playback-reference`.
 - **2026-06-20** — **Phase I (mostly) shipped: the 2D "abstract packs" replay — the report now LEADS with a live
   combat viewport.** Built top-to-bottom: **I.1** — `egm/engine.ts` now emits a deterministic, **additive**
   `ReplayTimeline` on `RunResult` (new types in `sim/types.ts`, re-exported from `sim/index.ts`): real stage

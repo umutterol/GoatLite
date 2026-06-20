@@ -21,8 +21,8 @@ try {
   await page.waitForTimeout(800)
 
   // I.2/I.3: the replay canvas is present and leads the report
-  const canvas = page.locator(".replay-stage")
-  check(await canvas.count() === 1, "I.2 replay canvas (.replay-stage) renders on the report")
+  const canvas = page.locator(".replay-arena")
+  check(await canvas.count() === 1, "I.2 replay arena (.replay-arena) renders on the report")
 
   // HUD overlays live INSIDE the canvas: summary title top-left + live meter top-right
   check(await canvas.getByText("Ashveil Crypts").count() > 0, "I summary header is overlaid inside the canvas (top-left)")
@@ -36,7 +36,7 @@ try {
 
   // I.4: floating combat text fires during playback (windowed event layer — not just on exact landed seconds)
   let sawFloat = false
-  for (let i = 0; i < 28 && !sawFloat; i++) { if (await canvas.locator(".replay-float").count() > 0) sawFloat = true; else await page.waitForTimeout(110) }
+  for (let i = 0; i < 28 && !sawFloat; i++) { if (await canvas.locator(".replay-float2").count() > 0) sawFloat = true; else await page.waitForTimeout(110) }
   check(sawFloat, "I.4 floating combat text renders during playback")
 
   // let it autoplay a bit more, then confirm the scene is still animating
@@ -49,7 +49,7 @@ try {
   // scrub to ~60% and confirm the canvas still renders a pack (stage switched, no crash)
   await scrub.first().evaluate((el) => { const max = Number(el.max); el.value = String(Math.round(max * 0.6)); el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })) })
   await page.waitForTimeout(400)
-  check(await canvas.locator(".replay-pack").count() > 0, "I.3 scrubbing updates the scene (pack still renders)")
+  check(await canvas.locator(".replay-dot").count() > 0, "I.3 scrubbing updates the scene (dots still render)")
   const captionAfter = await canvas.getByText(/Pull ·|Boss ·/).count()
   check(captionAfter > 0, "I.3 stage caption present after scrub")
 
