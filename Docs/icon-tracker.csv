@@ -1,0 +1,195 @@
+icon_id,category,display_name,source_file,placeholder_on_disk,priority,notes
+spec-guardian,spec,Guardian,specs.json,yes,P1,warrior / Tank
+spec-berserker,spec,Berserker,specs.json,yes,P1,warrior / DPS
+spec-crusader,spec,Crusader,specs.json,yes,P1,paladin / Tank
+spec-cleric,spec,Cleric,specs.json,yes,P1,paladin / Healer
+spec-assassin,spec,Assassin,specs.json,yes,P1,rogue / DPS
+spec-bard,spec,Bard,specs.json,yes,P1,rogue / DPS
+spec-pyromancer,spec,Pyromancer,specs.json,yes,P1,mage / DPS
+spec-arcanist,spec,Arcanist,specs.json,yes,P1,mage / DPS
+spec-lifebinder,spec,Lifebinder,specs.json,yes,P1,sage / Healer
+spec-mystic,spec,Mystic,specs.json,yes,P1,sage / Tank
+tac-interrupts,tactic,Interrupts,tactics.json,yes,P1,
+tac-positioning,tactic,Positioning,tactics.json,yes,P1,
+tac-cooldowns,tactic,Cooldowns,tactics.json,yes,P1,
+tac-killorder,tactic,Kill Order,tactics.json,yes,P1,
+skill-execution,operator-skill,Execution,operator-skills.json,no,P1,
+skill-awareness,operator-skill,Awareness,operator-skills.json,no,P1,
+skill-composure,operator-skill,Composure,operator-skills.json,no,P1,
+role-tank,role,Tank,(specs.json role field),yes,P1,
+role-healer,role,Healer,(specs.json role field),yes,P1,
+role-dps,role,DPS,(specs.json role field),yes,P1,
+affix-fortified,affix,Fortified,affixes.json,yes,P2,Trash HP / damage ×1.3
+affix-tyrannical,affix,Tyrannical,affixes.json,yes,P2,Boss HP / damage ×1.3
+affix-bursting,affix,Bursting,affixes.json,yes,P2,Each mob death applies a 4s stacking party DoT (~1% party HP/stack/s)
+affix-bolstering,affix,Bolstering,affixes.json,yes,P2,Each mob death grants surviving pack +15% HP and damage
+affix-volcanic,affix,Volcanic,affixes.json,yes,P2,Eruption under a random character every ~10s on trash
+affix-sanguine,affix,Sanguine,affixes.json,yes,P2,Dead mobs leave heal pools; mobs standing in them heal 5% HP/s
+affix-spiteful,affix,Spiteful,affixes.json,yes,P2,Ghost spawns on each mob death and attacks the lowest-output character
+affix-raging,affix,Raging,affixes.json,yes,P2,"Mobs below 30% HP enrage, gaining +25% haste (attack faster) until death"
+cur-gold,currency,Gold,currencies.json,yes,P2,
+cur-emblem,currency,Emblems of Heroism,currencies.json,yes,P2,
+cur-shard,currency,Shards,currencies.json,yes,P2,
+stat-ilvl,stat,Item Level,stats.json / secondary-stats.json,yes,P2,
+stat-crit,stat,Crit,stats.json / secondary-stats.json,yes,P2,
+stat-haste,stat,Haste,stats.json / secondary-stats.json,yes,P2,
+stat-mastery,stat,Mastery,stats.json / secondary-stats.json,yes,P2,
+stat-versatility,stat,Versatility,stats.json / secondary-stats.json,yes,P2,
+class-warrior,class,Warrior,classes.json,no,P2,
+class-paladin,class,Paladin,classes.json,no,P2,
+class-rogue,class,Rogue,classes.json,no,P2,
+class-mage,class,Mage,classes.json,no,P2,
+class-sage,class,Sage,classes.json,no,P2,
+dungeon-ashveil-crypts,dungeon,Ashveil Crypts,dungeons.json,no,P2,Undead catacombs beneath a fallen city
+trait-jenkins,trait,Jenkins,traits.json,no,P2,start / Common
+trait-boomer,trait,Boomer,traits.json,no,P2,start / Common
+trait-prog-andy,trait,Prog Andy,traits.json,no,P2,start / Common
+trait-duo-queue,trait,Duo Queue,traits.json,no,P2,start / Common
+trait-casual-andy,trait,Casual Andy,traits.json,no,P2,start / Uncommon
+trait-drama-queen,trait,Drama Queen,traits.json,no,P2,start / Uncommon
+trait-solo-player,trait,Solo Player,traits.json,no,P2,start / Rare
+trait-loot-goblin,trait,Loot Goblin,traits.json,no,P2,start / Rare
+trait-tilted,trait,Tilted,traits.json,no,P2,earned / Common
+trait-triggered,trait,Triggered,traits.json,no,P2,earned / Uncommon
+trait-second-wind,trait,Second Wind,traits.json,no,P2,earned / Uncommon
+trait-hard-carry,trait,Hard Carry,traits.json,no,P2,earned / Rare
+trait-standing-in-fire,trait,Standing in Fire,traits.json,no,P2,earned / Common
+trait-pool-dweller,trait,Pool Dweller,traits.json,no,P2,earned / Common
+trait-mechanic-master,trait,Mechanic Master,traits.json,no,P2,earned / Uncommon
+trait-spatial-awareness,trait,Spatial Awareness,traits.json,no,P2,earned / Rare
+trait-burnout,trait,Burnout,traits.json,no,P2,earned / Common
+trait-cocky,trait,Cocky,traits.json,no,P2,earned / Uncommon
+trait-redemption-arc,trait,Redemption Arc,traits.json,no,P2,earned / Uncommon
+trait-cracked,trait,Cracked,traits.json,no,P2,earned / Rare
+trait-survivors-guilt,trait,Survivor's Guilt,traits.json,no,P2,earned / Common
+trait-rival,trait,Rival,traits.json,no,P2,earned / Uncommon
+trait-battle-hardened,trait,Battle-Hardened,traits.json,no,P2,earned / Uncommon
+trait-guild-leader,trait,Guild Leader,traits.json,no,P2,earned / Rare
+talent-node-1,talent-node,Survival vs. Throughput,talents.json,no,P2,talent tree node
+talent-iron-will,talent-option,Iron Will,talents.json,no,P2,+15% max HP
+talent-executioner-talent,talent-option,Executioner,talents.json,no,P2,+12% damage while your focus target is below 30% HP
+talent-adaptive,talent-option,Adaptive,talents.json,no,P2,+8% HP and +6% damage (balanced)
+talent-node-2,talent-node,Single Target vs. AoE,talents.json,no,P2,talent tree node
+talent-focused-strike,talent-option,Focused Strike,talents.json,no,P2,+20% damage when 2 or fewer enemies remain (single-target / boss)
+talent-cleaving-blow,talent-option,Cleaving Blow,talents.json,no,P2,+22% damage while 3 or more enemies are up (AoE / trash)
+talent-opportunist-talent,talent-option,Opportunist,talents.json,no,P2,"+10% damage, always (balanced)"
+talent-node-3,talent-node,Tempo vs. Spike,talents.json,no,P2,talent tree node
+talent-steady-hand,talent-option,Steady Hand,talents.json,no,P2,"+8% output, always (steady tempo)"
+talent-overload,talent-option,Overload,talents.json,no,P2,+16% damage while your focus target is below 50% HP (spike the kill)
+talent-metronome,talent-option,Metronome,talents.json,no,P2,+6% output and +5% crit (balanced)
+talent-node-4,talent-node,Defensive Tech,talents.json,no,P2,talent tree node
+talent-bulwark,talent-option,Bulwark,talents.json,no,P2,-12% damage taken (the wall)
+talent-fleetfoot,talent-option,Fleetfoot,talents.json,no,P2,-6% damage taken and +4% output
+talent-second-breath,talent-option,Second Breath,talents.json,no,P2,+12% max HP (a deeper buffer)
+talent-node-5,talent-node,Affix Specialist,talents.json,no,P2,talent tree node
+talent-focus-fire,talent-option,Focus Fire,talents.json,no,P2,+10% damage while 3 or more enemies are up (Kill Order)
+talent-quick-reflexes,talent-option,Quick Reflexes,talents.json,no,P2,-7% damage taken (dodge the mechanics)
+talent-spatial-sense,talent-option,Spatial Sense,talents.json,no,P2,-5% damage taken and +5% max HP (positioning)
+item-bastion-of-the-barrow-march,item,Bastion of the Barrow March,items.json,no,P2,weapon
+item-scepter-of-quiet-rest,item,Scepter of Quiet Rest,items.json,no,P2,weapon
+item-ashveil-cleaver,item,Ashveil Cleaver,items.json,no,P2,weapon
+item-faceguard-of-interred-kings,item,Faceguard of Interred Kings,items.json,no,P2,helm
+item-pale-mitre-of-ashveil,item,Pale Mitre of Ashveil,items.json,no,P2,helm
+item-cuirass-of-interred-kings,item,Cuirass of Interred Kings,items.json,no,P2,chest
+item-shroudweave-vestments,item,Shroudweave Vestments,items.json,no,P2,chest
+item-legplates-of-the-barrow-march,item,Legplates of the Barrow March,items.json,no,P2,legs
+item-shroudweave-leggings,item,Shroudweave Leggings,items.json,no,P2,legs
+item-treads-of-quiet-rest,item,Treads of Quiet Rest,items.json,no,P2,boots
+item-vial-of-crypt-dust,item,Vial of Crypt Dust,items.json,no,P2,trinket
+item-icon-of-pale-mercy,item,Icon of Pale Mercy,items.json,no,P2,trinket
+ico-key,ui,Keystone,(UI / buildings.json),yes,P2,
+ico-morale,ui,Morale,(UI / buildings.json),yes,P2,
+ico-skull,ui,Death/Skull,(UI / buildings.json),yes,P2,
+ico-timer,ui,Timer,(UI / buildings.json),yes,P2,
+ico-trait,ui,Trait,(UI / buildings.json),yes,P2,
+ico-vault,ui,Vault/Reward,(UI / buildings.json),yes,P2,
+ability-shield-bash,ability-player,Shield Bash,abilities-player.json,no,P3,warrior/guardian Damage
+ability-challenge,ability-player,Challenge,abilities-player.json,no,P3,warrior/guardian Utility
+ability-war-cry,ability-player,War Cry,abilities-player.json,no,P3,warrior/guardian Buff
+ability-shield-wall,ability-player,Shield Wall,abilities-player.json,no,P3,warrior/guardian Utility
+ability-revenge,ability-player,Revenge,abilities-player.json,no,P3,warrior/guardian Damage
+ability-thorns-aura,ability-player,Thorns Aura,abilities-player.json,no,P3,warrior/guardian Passive
+ability-cleaving-strike,ability-player,Cleaving Strike,abilities-player.json,no,P3,warrior/berserker Damage
+ability-blood-frenzy,ability-player,Blood Frenzy,abilities-player.json,no,P3,warrior/berserker Buff
+ability-bladestorm,ability-player,Bladestorm,abilities-player.json,no,P3,warrior/berserker Damage
+ability-whirlwind,ability-player,Whirlwind,abilities-player.json,no,P3,warrior/berserker Damage
+ability-massacre,ability-player,Massacre,abilities-player.json,no,P3,warrior/berserker Damage
+ability-bloodlust,ability-player,Bloodlust,abilities-player.json,no,P3,warrior/berserker Passive
+ability-holy-strike,ability-player,Holy Strike,abilities-player.json,no,P3,paladin/crusader Damage
+ability-divine-shield,ability-player,Divine Shield,abilities-player.json,no,P3,paladin/crusader Buff
+ability-guardians-oath,ability-player,Guardian's Oath,abilities-player.json,no,P3,paladin/crusader Utility
+ability-blessing-of-protection,ability-player,Blessing of Protection,abilities-player.json,no,P3,paladin/crusader Buff
+ability-rally-cry,ability-player,Rally Cry,abilities-player.json,no,P3,paladin/crusader Buff
+ability-stalwart-defender,ability-player,Stalwart Defender,abilities-player.json,no,P3,paladin/crusader Passive
+ability-smite,ability-player,Smite,abilities-player.json,no,P3,paladin/cleric Damage
+ability-flash-heal,ability-player,Flash Heal,abilities-player.json,no,P3,paladin/cleric Healing
+ability-greater-heal,ability-player,Greater Heal,abilities-player.json,no,P3,paladin/cleric Healing
+ability-holy-fire,ability-player,Holy Fire,abilities-player.json,no,P3,paladin/cleric Damage
+ability-mass-dispel,ability-player,Mass Dispel,abilities-player.json,no,P3,paladin/cleric Utility
+ability-divine-insight,ability-player,Divine Insight,abilities-player.json,no,P3,paladin/cleric Passive
+ability-poisoned-blade,ability-player,Poisoned Blade,abilities-player.json,no,P3,rogue/assassin Damage
+ability-camouflage,ability-player,Camouflage,abilities-player.json,no,P3,rogue/assassin Utility
+ability-ambush,ability-player,Ambush,abilities-player.json,no,P3,rogue/assassin Damage
+ability-eviscerate,ability-player,Eviscerate,abilities-player.json,no,P3,rogue/assassin Damage
+ability-shadow-step,ability-player,Shadow Step,abilities-player.json,no,P3,rogue/assassin Damage
+ability-cold-blood,ability-player,Cold Blood,abilities-player.json,no,P3,rogue/assassin Passive
+ability-dissonant-strike,ability-player,Dissonant Strike,abilities-player.json,no,P3,rogue/bard Damage
+ability-anthem-of-haste,ability-player,Anthem of Haste,abilities-player.json,no,P3,rogue/bard Buff
+ability-rhythm-reset,ability-player,Rhythm Reset,abilities-player.json,no,P3,rogue/bard Utility
+ability-soothing-ballad,ability-player,Soothing Ballad,abilities-player.json,no,P3,rogue/bard Healing
+ability-crescendo,ability-player,Crescendo,abilities-player.json,no,P3,rogue/bard Buff
+ability-inspiring-presence,ability-player,Inspiring Presence,abilities-player.json,no,P3,rogue/bard Passive
+ability-arcane-bolt,ability-player,Arcane Bolt,abilities-player.json,no,P3,mage/arcanist Damage
+ability-silence,ability-player,Silence,abilities-player.json,no,P3,mage/arcanist CC
+ability-frost-nova,ability-player,Frost Nova,abilities-player.json,no,P3,mage/arcanist Damage
+ability-arcane-barrier,ability-player,Arcane Barrier,abilities-player.json,no,P3,mage/arcanist Utility
+ability-counterspell,ability-player,Counterspell,abilities-player.json,no,P3,mage/arcanist Utility
+ability-arcane-mastery,ability-player,Arcane Mastery,abilities-player.json,no,P3,mage/arcanist Passive
+ability-scorch,ability-player,Scorch,abilities-player.json,no,P3,mage/pyromancer Damage
+ability-fireball,ability-player,Fireball,abilities-player.json,no,P3,mage/pyromancer Damage
+ability-conflagration,ability-player,Conflagration,abilities-player.json,no,P3,mage/pyromancer Utility
+ability-ignite,ability-player,Ignite,abilities-player.json,no,P3,mage/pyromancer Damage
+ability-meteor,ability-player,Meteor,abilities-player.json,no,P3,mage/pyromancer Damage
+ability-combustion,ability-player,Combustion,abilities-player.json,no,P3,mage/pyromancer Passive
+ability-palm-strike,ability-player,Palm Strike,abilities-player.json,no,P3,sage/mystic Damage
+ability-earthen-stance,ability-player,Earthen Stance,abilities-player.json,no,P3,sage/mystic Utility
+ability-leg-sweep,ability-player,Leg Sweep,abilities-player.json,no,P3,sage/mystic CC
+ability-spirit-link,ability-player,Spirit Link,abilities-player.json,no,P3,sage/mystic Utility
+ability-zen-strike,ability-player,Zen Strike,abilities-player.json,no,P3,sage/mystic Damage
+ability-inner-peace,ability-player,Inner Peace,abilities-player.json,no,P3,sage/mystic Passive
+ability-verdant-touch,ability-player,Verdant Touch,abilities-player.json,no,P3,sage/lifebinder Healing
+ability-blossom-ward,ability-player,Blossom Ward,abilities-player.json,no,P3,sage/lifebinder Healing
+ability-groves-embrace,ability-player,Grove's Embrace,abilities-player.json,no,P3,sage/lifebinder Healing
+ability-vital-surge,ability-player,Vital Surge,abilities-player.json,no,P3,sage/lifebinder Healing
+ability-flourish,ability-player,Flourish,abilities-player.json,no,P3,sage/lifebinder Healing
+ability-natures-grace,ability-player,Nature's Grace,abilities-player.json,no,P3,sage/lifebinder Passive
+ability-code-freeze,ability-player,Bulwark Banner,abilities-player.json,no,P3,warrior/guardian Buff
+ability-rollback-plan,ability-player,Sacred Bastion,abilities-player.json,no,P3,paladin/crusader Buff
+ability-zen-mode,ability-player,Unmoving Mountain,abilities-player.json,no,P3,sage/mystic Utility
+ability-hotfix-deploy,ability-player,Light's Salvation,abilities-player.json,no,P3,paladin/cleric Healing
+ability-gradual-rollout,ability-player,Blossoming Tide,abilities-player.json,no,P3,sage/lifebinder Healing
+ability-crunch-time,ability-player,Reckless Frenzy,abilities-player.json,no,P3,warrior/berserker Buff
+ability-ship-it,ability-player,Killing Edge,abilities-player.json,no,P3,rogue/assassin Damage
+ability-standup-hype,ability-player,Rallying Crescendo,abilities-player.json,no,P3,rogue/bard Buff
+ability-prod-incident,ability-player,Emberstorm,abilities-player.json,no,P3,mage/pyromancer Damage
+ability-root-cause-analysis,ability-player,Nullifying Surge,abilities-player.json,no,P3,mage/arcanist Buff
+ability-grave-detail,ability-enemy,Grave Detail,abilities.json,no,P3,boss mechanic
+ability-preserving-fume,ability-enemy,Preserving Fume,abilities.json,no,P3,boss mechanic
+ability-pooling-sorrow,ability-enemy,Pooling Sorrow,abilities.json,no,P3,boss mechanic
+ability-final-coronation,ability-enemy,Final Coronation,abilities.json,no,P3,boss mechanic
+status-bleed,status,Bleed,statuses.json,no,P3,dot
+status-poison,status,Poison,statuses.json,no,P3,dot
+status-burn,status,Burn,statuses.json,no,P3,dot
+status-chill,status,Chill,statuses.json,no,P3,debuff
+status-daze,status,Daze,statuses.json,no,P3,cc
+status-stun,status,Stun,statuses.json,no,P3,cc
+status-freeze,status,Freeze,statuses.json,no,P3,cc
+status-silence,status,Silence,statuses.json,no,P3,cc
+status-mark,status,Mark,statuses.json,no,P3,debuff
+status-rampage,status,Rampage,statuses.json,no,P3,resource
+status-cold-blood,status,Cold Blood,statuses.json,no,P3,buff
+status-stealth,status,Stealth,statuses.json,no,P3,buff
+status-regrowth,status,Regrowth,statuses.json,no,P3,hot
+status-blossom,status,Blossom,statuses.json,no,P3,hot
+status-natures-breath,status,Nature's Breath,statuses.json,no,P3,hot
+status-spirit-link-hot,status,Spirit Link,statuses.json,no,P3,hot
