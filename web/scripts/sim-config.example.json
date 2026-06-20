@@ -1,0 +1,36 @@
+{
+  "_comment": "Example sim-dump config. Copy, edit, then: node scripts/sim-dump.mjs --config myscenario.json . All fields optional; defaults shown. comp accepts specId strings or per-member objects.",
+
+  "mode": "single",
+  "name": "example",
+
+  "dungeonId": "ashveil-crypts",
+  "keyLevel": 14,
+  "affixIds": ["fortified", "bursting", "spiteful"],
+  "aggression": "Balanced",
+  "tactics": { "interrupts": 2, "positioning": 1, "cooldowns": 1, "killorder": 2 },
+  "seed": 12345,
+
+  "ilvl": 115,
+  "morale": 60,
+  "skills": { "execution": 1, "awareness": 1, "composure": 1 },
+
+  "comp": [
+    { "specId": "guardian", "name": "Tank" },
+    { "specId": "cleric", "name": "Healer" },
+    { "specId": "assassin", "ilvl": 118 },
+    "pyromancer",
+    "berserker"
+  ],
+
+  "sweep": {
+    "keyLevels": [2, 5, 8, 11, 14, 17, 20, 23, 26],
+    "seeds": [12345, 7, 99, 2024, 31337],
+    "ilvlMode": "auto",
+    "affixSets": [
+      { "id": "week", "affixIds": ["fortified", "bursting", "spiteful"] },
+      { "id": "volcanic-raging", "affixIds": ["tyrannical", "volcanic", "raging"] }
+    ],
+    "aggressions": ["Balanced"]
+  }
+}

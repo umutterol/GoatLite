@@ -1,6 +1,9 @@
 # Logs (anchored to the web root so it doesn't swallow src/logs — the app's UI dir)
 /logs
 *.log
+
+# sim-dump output (generated run logs/JSON — the tool is committed, its output is not)
+/sim-logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
