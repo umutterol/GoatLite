@@ -35,7 +35,7 @@ function mobHpFrac(m: ReplayMob, sec: number): number {
 
 interface Dot {
   key: string; team: "party" | "enemy"; name: string; specId?: string; portrait?: string
-  isBoss: boolean; ranged: boolean; frac: number; dead: boolean
+  isBoss: boolean; isTank?: boolean; ranged: boolean; frac: number; dead: boolean
   ax: number; ay: number        // home position in arena units [0,1]
 }
 
@@ -73,7 +73,7 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
     const front = meta.filter((m) => !m.back), back = meta.filter((m) => m.back)
     const place = (list: typeof meta, x: number) => list.map((m, i) => ({
       key: "p:" + m.pid, pid: m.pid, team: "party" as const, name: m.name, specId: m.specId, portrait: m.portrait,
-      isBoss: false, ranged: m.back, frac: 1, dead: false, ax: x, ay: spreadY(i, list.length),
+      isBoss: false, isTank: m.role === "tank", ranged: m.back, frac: 1, dead: false, ax: x, ay: spreadY(i, list.length),
     }))
     return [...place(front, 0.24), ...place(back, 0.08)]
   }, [result, members])
@@ -93,32 +93,38 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
   }, [stage?.idx, tl]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---- movement: fake EGM-style engagement (the sim has no positions, so this is purely cosmetic) ----
-  // Combatants leave their start columns and CLOSE on each other: melee charge to a center contact line and pair
-  // off against a living foe (re-seeking as foes die), ranged hold back. `eng` ramps over the stage's first
-  // seconds (the charge-in). On top sits a melee press/sway + an idle bob, so the scrum keeps moving; a per-attack
-  // lunge (below) makes attackers jab at their target. The CSS `.replay-dot` transition smooths it frame-to-frame.
+  // Both sides leave their start columns and CLOSE into a central melee scrum: the TANK anchors the contact line,
+  // **enemy melee pile onto the tank**, party melee-dps join around it; **ranged hold back and KITE (strafe)** so
+  // they're not static. `eng` ramps over the stage's first seconds (the charge-in); a melee press-sway + a
+  // per-attack lunge (below) keep the scrum churning. The CSS `.replay-dot` transition smooths it frame-to-frame.
   const rawFrac = (d: Dot) => d.team === "party" ? (hp[d.key.slice(2)] ?? 1) : mobHpFrac(stageMobs.find((m) => "e:" + m.id === d.key)!, sec)
   const stageStart = stage?.startSec ?? 0
   const eng = clamp((clock - stageStart) / 2.5, 0, 1)
-  const livingEnemyFront = enemyDots.filter((d) => !d.ranged && rawFrac(d) > 0.001).sort((a, b) => a.ay - b.ay)
-  const meleeY = new Map<string, number>()
-  partyDots.filter((d) => !d.ranged).sort((a, b) => a.ay - b.ay)
-    .forEach((d, i) => { const t = livingEnemyFront[i % livingEnemyFront.length]; if (t) meleeY.set(d.key, t.ay) })
+  const SCRUM_Y = 0.5
+  const enemyMelee = enemyDots.filter((d) => !d.isBoss && !d.ranged)
+  const partyMeleeDps = partyDots.filter((d) => !d.ranged && !d.isTank)
+  const spread = (list: Dot[], d: Dot, gap: number) => { const n = Math.max(1, list.length), i = Math.max(0, list.indexOf(d)); return clamp(SCRUM_Y + (i - (n - 1) / 2) * gap, 0.12, 0.88) }
   const engaged = (d: Dot): { ex: number; ey: number } => {
-    if (d.team === "party") return d.ranged ? { ex: 0.17, ey: d.ay } : { ex: 0.43, ey: meleeY.get(d.key) ?? d.ay }
-    if (d.isBoss) return { ex: 0.52, ey: 0.5 }
-    return d.ranged ? { ex: 0.73, ey: d.ay } : { ex: 0.49, ey: d.ay }
+    if (d.team === "party") {
+      if (d.ranged) return { ex: 0.17, ey: d.ay }
+      if (d.isTank) return { ex: 0.43, ey: SCRUM_Y }
+      return { ex: 0.38, ey: spread(partyMeleeDps, d, 0.10) }
+    }
+    if (d.isBoss) return { ex: 0.52, ey: SCRUM_Y }
+    if (d.ranged) return { ex: 0.73, ey: d.ay }
+    return { ex: 0.49, ey: spread(enemyMelee, d, 0.085) }   // enemy melee pile onto the tank at the contact line
   }
 
   const place = (d: Dot) => {
     const frac = rawFrac(d)
-    const ph = hashF(d.key) * 6.283
+    const ph = hashF(d.key) * 6.283, ph2 = hashF(d.key + "z") * 6.283
     const jx = (hashF(d.key + "x") - 0.5) * 0.03, jy = (hashF(d.key + "y") - 0.5) * 0.05
     const { ex, ey } = engaged(d)
     let ax = (d.ax + jx) * (1 - eng) + (ex + jx) * eng
     let ay = (d.ay + jy) * (1 - eng) + (ey + jy) * eng
-    if (!d.ranged && !d.isBoss) ax += Math.sin(clock * 0.5 + ph) * 0.012 * eng   // melee press into the contact
-    ax = clamp(ax + Math.cos(clock * 0.9 + ph) * 0.004, 0.04, 0.96)              // idle bob
+    if (d.ranged) { ax += Math.sin(clock * 0.33 + ph) * 0.03 * eng; ay += Math.cos(clock * 0.27 + ph2) * 0.045 * eng }  // ranged kite/strafe
+    else if (!d.isBoss) ax += Math.sin(clock * 0.5 + ph) * 0.012 * eng                                                  // melee press into the contact
+    ax = clamp(ax + Math.cos(clock * 0.9 + ph) * 0.004, 0.04, 0.96)   // idle bob
     ay = clamp(ay + Math.sin(clock * 0.8 + ph) * 0.007, 0.08, 0.92)
     return { ...d, frac, dead: frac <= 0.001, px: ax * W, py: ARENA_TOP + ay * ARENA_H, axPct: ax * 100 }
   }
