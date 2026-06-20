@@ -7,7 +7,7 @@ import { content } from "@/content"
 import { Rng } from "../rng"
 import type { RunInput, RunResult, LogLine, LogKind, LogMeta, ParseRow, DeathReport } from "../types"
 import { buildParty, makeEnemy, eff, dealDamage, type Combatant } from "./stats"
-import { selectAbility, executeAbility, basicAttack, applyPassiveAuras, onStatusEvents, emergencyHeals, resolveEnemyAttack, tickGuards, type CombatCtx } from "./combat"
+import { decideAction, decideEnemyTarget, executeAbility, basicAttack, applyPassiveAuras, onStatusEvents, emergencyHeals, resolveEnemyAttack, tickGuards, type CombatCtx } from "./combat"
 import { tickStatuses, controlState, consumeDaze } from "./status"
 import { activeAffixIds } from "../affixes"
 import { DANGER_HP_FRAC, RECENT_DEATH_SEC } from "./operator"
@@ -159,7 +159,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
           if (cc.blocked) continue                    // stunned / frozen: lose the action
           if (cc.dazed) { consumeDaze(p); continue }   // daze: lose one action, then it clears
           if ((p.guards.immunityCharges ?? 0) > 0 && p.guards.immuneNoAttack && t < (p.guards.immunityExpiresAt ?? Infinity)) continue  // Blessing of Protection: immune but can't act
-          const ability = cc.silenced ? null : selectAbility(p, ctx)  // silence: basic attack only
+          const ability = cc.silenced ? null : decideAction(p, ctx)  // silence: basic attack only
           if (ability) executeAbility(p, ability, ctx)
           else basicAttack(p, ctx)
           p.hitSinceAction = false
@@ -195,7 +195,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
           const cc = controlState(m)
           if (cc.blocked) continue                   // mob stunned / frozen (Leg Sweep, Frost Nova, Meteor)
           if (cc.dazed) { consumeDaze(m); continue }
-          const victim = tank && tank.downedUntil < 0 ? tank : aliveParty()[0]
+          const victim = decideEnemyTarget(m, ctx, tank)
           if (!victim) break
           const amount = m.attackPower * enrage   // Raging no longer spikes per-hit damage — it grants haste (handled at the attack-interval step above)
           const r = resolveEnemyAttack(m, victim, { amount, damageType: m.damageType, critChance: 0, critMult: 1, critable: false }, ctx)

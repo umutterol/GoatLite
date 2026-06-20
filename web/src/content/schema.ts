@@ -76,7 +76,12 @@ export const TacticSchema = z.object({
   id: z.string(), name: z.string(), icon: z.string(), perPoint: z.string(), starved: z.string(),
 })
 
-export const BehaviorProfileSchema = z.object({ id: z.string(), name: z.string(), behavior: z.string() })
+export const BehaviorProfileSchema = z.object({
+  id: z.string(), name: z.string(), behavior: z.string(),
+  // Phase K: machine-readable behaviour overlay onto a role base. Absent today → the brain uses role defaults (K.5 populates).
+  base: z.enum(["tank", "healer", "dps", "enemy"]).optional(),
+  behaviours: z.array(z.object({ id: z.string(), weight: z.number().optional(), params: z.record(z.string(), z.unknown()).optional() })).optional(),
+})
 export const PotentialTagSchema = z.object({ id: z.string(), label: z.string() })
 
 /* ---- Phase F: operator skills (the post-gear-cap power axis) ----

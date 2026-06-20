@@ -46,7 +46,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | H | **Combat depth (per-spec majors + talents)** | ✅ 4/4 — 10 majors live + talents 3–5 wired + rebalanced |
 | I | **2D replay (abstract packs)** | ⬜ 0/4 — **design ✅** (`Post-F-Clusters-Plan.md`) |
 | J | **Feedback & polish batch (10 user reports)** | ✅ 10/10 — shipped + live-verified (`Post-F-Clusters-Plan.md` Cluster J) |
-| K | **Combat AI rework (v2)** | ⬜ 0/6 — planned; do AFTER content/majors (H) so the AI has the full kit |
+| K | **Combat AI rework (v2)** | 🟡 1/6 — K.1 scaffold done (byte-identical); design `Combat-AI-Design.md` |
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
 
 ---
@@ -226,22 +226,23 @@ No spatial arena (sim has no positions). Heaviest cluster; needs G's dungeon bac
 | J.9 | Battle-Res count + timer on report (not Rating) | engine/ux | minor | S | ✅ | `RunResult.finalRezCharges` + `nextRezChargeAtSec` emitted; report header "Combat Rez = N · +1 in m:ss / ready" |
 | J.10 | Tooltips everywhere | ux | major | M | ✅ | reusable `<Tip>` (fixed-position portal) + `<TipBody>`/`<AffixChip>` on `GameIcon` (role/spec/tactic/affix/skill), affix chips, gear rows. **Event-log spell names are bold+underlined → hover pops a WoW-style `SpellTip` at the cursor** (cd/target/school/formula + yellow desc, no SpellID). Plus the combat log was reworded to possessive style ("X's Spell hits Y for N School.(Critical)", inline amounts). Custom, not Radix |
 
-## Phase K — Combat AI rework (v2) ⬜ (planned)
+## Phase K — Combat AI rework (v2) ⬜ (design ✅ — `Combat-AI-Design.md`)
 
-*Today's combat AI is deliberately simple and shows its seams: `selectAbility` fires the **longest-CD ready ability
-first** (`combat.ts`), so healers dump Greater Heal on light damage (huge overheal), DPS don't save burst for priority
-targets, and tanks don't use defensives reactively; target selection is **focus = lead living enemy** + **enemies always
-hit the tank**; the GDD's per-spec **behavior profiles are read but inert**. **Do this AFTER the combat kit is complete
-(Phase H majors especially)** so the AI has the full toolset to reason about — a rework now would be redone after H.*
+*One **shared brain** for players AND enemies: each turn decides *what* + *who* by walking an ordered list of **behaviour
+primitives** (priority rules + utility tiebreak — legible/deterministic, not opaque utility AI). **Data-driven profiles**
+(JSON composing code primitives, extending the inert `behavior-profiles.json`) so future enemies are data, not code. The
+**tactics dials become the party's AI orders**, and operator/aggression/trait become modifiers. v1 = core brain + role/spec
++ tactics-as-orders (aggression / operator-as-competence / trait-as-personality / threat model / real interrupt cast-bars /
+boss-script integration are fast-follows). Full design + open questions in `Combat-AI-Design.md`.*
 
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
-| K.1 | Player rotation rework: utility-scored ability selection | engine | major | L | ⬜ | replace "longest-CD-first": healers size the heal to the injury (Flash topup vs Greater for real damage) + save emergency heals; DPS execute low-HP / AoE on packs / save burst for bosses; tanks use defensives reactively |
-| K.2 | Target selection rework | engine | major | M | ⬜ | kill-order-aware enemy focus (priority/casters, respects the Kill Order tactic), healer picks the right ally, peel/taunt, assassin backline *preference* (ties to J.7) |
-| K.3 | Behavior-profile-driven AI | engine | major | M | ⬜ | wire the GDD per-spec profiles (peel/greedy/safe/…) to bias K.1/K.2 — `defaultProfile`/`profile` are plumbed but unused today |
-| K.4 | Enemy AI beyond auto-attack-the-tank | engine | major | L | ⬜ | casters act from the back band, target variety (dive squishies), interruptible casts, telegraphs; integrates with affixes/boss mechanics |
-| K.5 | Major-cooldown timing (needs Phase H) | engine | major | M | ⬜ | the AI holds ~60s **majors** for boss/danger windows instead of on-CD; **blocked by H.1** |
-| K.6 | Balance + verification pass | engine | major | M | ⬜ | re-tune vs the GDD timer curve; `egm-smoke` sweeps hold the +2 floor; determinism preserved; adversarial review |
+| K.1 | Brain scaffold + behaviour primitive kit + profile schema | engine | major | L | ✅ | `decideAction`/`decideEnemyTarget` single decision points in `combat.ts` walk a profile-resolved behaviour list (`brainOf`); default `dumpRotation`/tank-focus reproduce current play; `Combatant.profile` wired (spec defaultProfile / enemy melee\|caster); `BehaviorProfileSchema` gained optional `base`+`behaviours` (K.5 populates). **Byte-identical proven** — egm-smoke matches golden (798/868/1068/1202) + op-verify determinism 6/6, `tsc` clean |
+| K.2 | Player rotation behaviours | engine | major | M | ⬜ | `triageHeal` (size the heal to the injury → fixes Flash-vs-Greater), `holdForWindow` (save majors/burst for boss/danger → fixes majors-on-CD), `emergencyDefensive`, `dumpRotation` |
+| K.3 | Player + enemy target selection | engine | major | M | ⬜ | players: `focusByPriority`/`focusLowestHp`/`diveBackline`/`peel`; enemies: `caster`(back-band, dive squishy)/`fixate`/`focusByThreat` profiles — smarter than "always the tank" |
+| K.4 | Tactics-as-orders | engine | major | M | ⬜ | Kill Order→`focusByPriority`, Interrupts→`interruptCast` readiness, Cooldowns→`holdForWindow`, Positioning→avoidance; reconcile with the existing affix/boss-mechanic rolls (no double-count) |
+| K.5 | Spec overlays | engine | major | M | ⬜ | machine-readable `behaviours` on the 4 GDD profiles (executioner/opportunist/peel/tunnel-vision) + per-spec assignment; verify each spec plays to flavour |
+| K.6 | Balance + verification pass | engine | major | M | ⬜ | smarter AI ≈ more output/survival → expect a difficulty nudge (like H.4); `egm-smoke` holds the +2 floor; determinism; adversarial review |
 
 ## ※ Affix swap — apply "Ship It Anyway" (IP scrub) ⬜ (design ✅, ready)
 
@@ -276,6 +277,27 @@ trademark (a pre-launch IP blocker). Isolated — good warm-up commit. Full desi
 
 ## Changelog
 
+- **2026-06-20** — **K.1 shipped: AI brain scaffold (pure refactor, byte-identical).** Introduced the single decision
+  points the rest of Phase K builds on — `decideAction` (party: which ability) and `decideEnemyTarget` (enemy: who to hit)
+  in `combat.ts`, each walking an ordered behaviour list resolved from the actor's profile (`brainOf`). For K.1 every
+  profile maps to the **defaults that reproduce today's play exactly**: `dumpRotation` delegates to the unchanged
+  `selectAbility`, and enemy targeting reproduces the per-tick tank-focus rule. Added `Combatant.profile` (spec
+  `defaultProfile` / per-member override; enemies = `melee`\|`caster` by band) and an optional `base`+`behaviours` overlay
+  on `BehaviorProfileSchema` (K.5 fills it). Wired `engine.ts` to call the brain instead of `selectAbility`/the inline
+  victim pick. **Acceptance = byte-identical:** captured a golden, and after the refactor egm-smoke matches it exactly
+  (+8 798s/868s, tactics 1068s/1202s), op-verify determinism 6/6, `tsc` clean. Zero behaviour change — the seams now exist
+  for K.2 (rotation behaviours: triageHeal/holdForWindow) and K.3 (targeting) to plug into.
+- **2026-06-20** — **Phase K designed: combat AI rework — one shared, data-driven behaviour brain for players + enemies.**
+  Design session with Umut. Locked: (1) **priority rules + utility tiebreak** (legible/deterministic — fits "review the
+  pull" — over opaque utility AI); (2) **data-driven profiles** (JSON composing code-side behaviour primitives, extending
+  the inert `behavior-profiles.json`) so future enemies are data not code; (3) **v1 = core brain + role/spec + tactics-as-
+  orders**. The model: every actor runs the same brain (decide *what* + *who* by walking an ordered behaviour list);
+  3 layers (common primitives → role templates → spec/enemy overlays). Key insight: the **tactics dials become the party's
+  AI orders** (Kill Order→target priority, Interrupts→interrupt readiness, Cooldowns→hold-for-window, Positioning→avoidance),
+  and operator-skills/aggression/traits become competence/risk/personality **modifiers** (fast-follow). Grounded the spec in
+  the current seams: `selectAbility` longest-CD-first, enemies-always-hit-the-tank, the 95%-dead profile system, tactics-as-
+  abstract-scalars. New `Docs/Combat-AI-Design.md` (architecture + behaviour catalog + profile schema + tactics mapping +
+  open questions: threat model, interrupt cast-bars + refined tickets K.1–K.6, K.1 = pure-refactor-first). **No code.**
 - **2026-06-20** — **Phase H complete — combat depth: 10 per-spec major cooldowns + talent nodes 3–5 + rebalance.**
   **H.1:** every spec now has a ~60s **signature major** (`cooldownTurns:20`, since secondsPerTurn=3), named as
   **fantasy MMO spells** (the bots cast in-world spells; the QA satire stays in the meta layer — affixes/tactics/UI):

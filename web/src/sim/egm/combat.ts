@@ -770,3 +770,34 @@ export function selectAbility(caster: Combatant, ctx: CombatCtx): PlayerAbility 
   ready.sort((a, b) => b.cooldownTurns - a.cooldownTurns || catWeight(b) - catWeight(a))
   return ready[0]
 }
+
+/* ============================================================
+   Phase K — the shared AI "brain" (one model for players AND enemies).
+   K.1 is a PURE-REFACTOR SCAFFOLD: the single decision points exist (`decideAction`, `decideEnemyTarget`) and walk an
+   ordered behaviour list resolved from the actor's profile, but every profile currently maps to the defaults that
+   reproduce today's play byte-identically. K.2+ add real behaviours; K.5 reads machine-readable `behaviours` off the
+   profile data. Behaviours are pure functions of state + the seeded RNG (determinism).
+   ============================================================ */
+type ActionBehaviour = (actor: Combatant, ctx: CombatCtx) => PlayerAbility | null
+const ACTION_BEHAVIOURS: Record<string, ActionBehaviour> = {
+  // current play: the highest-priority ready+usable ability (longest CD first), else null → basic attack
+  dumpRotation: (caster, ctx) => selectAbility(caster, ctx),
+}
+
+/** Resolve an actor's ordered behaviour lists from its profile. K.1: team-based defaults that reproduce current play.
+    (K.5 will read `content.profiles.get(actor.profile)?.behaviours` and overlay onto the role base.) */
+function brainOf(actor: Combatant): { action: string[] } {
+  return { action: actor.team === "party" ? ["dumpRotation"] : [] }
+}
+
+/** Brain — which ability the actor casts this turn (null → basic attack). The single action decision point. */
+export function decideAction(actor: Combatant, ctx: CombatCtx): PlayerAbility | null {
+  for (const id of brainOf(actor).action) { const a = ACTION_BEHAVIOURS[id]?.(actor, ctx); if (a) return a }
+  return null
+}
+
+/** Brain — who an enemy attacks. K.1 reproduces the current rule exactly (the tick's tank if standing, else first alive).
+    `tickTank` is the per-tick cached tank from the engine; K.3 replaces the body with profile-driven targeting. */
+export function decideEnemyTarget(_enemy: Combatant, ctx: CombatCtx, tickTank: Combatant | undefined): Combatant | undefined {
+  return tickTank && tickTank.downedUntil < 0 ? tickTank : ctx.party.filter((p) => p.downedUntil < 0)[0]
+}

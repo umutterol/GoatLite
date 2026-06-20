@@ -57,6 +57,7 @@ export interface Combatant {
   id: string; name: string; specId: string
   team: "party" | "enemy"
   role: Role; position: "Front" | "Back"
+  profile: string             // Phase K: behaviour profile id (spec defaultProfile / per-member override; enemy = melee|caster). Drives the AI brain
   maxHp: number; hp: number; shield: number; shieldExpiresAt: number
   power: number               // primary scaler (party); parse basis
   attackPower: number         // raw damage per auto-attack, pre crit/mitigation
@@ -147,7 +148,7 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
     const passive = [...content.playerAbilities.values()].find((a) => a.specId === p.specId && a.trigger === "passive") ?? null
     return {
       id: p.id, name: p.name, specId: p.specId, team: "party",
-      role, position: spec.position,
+      role, position: spec.position, profile: p.profile ?? spec.defaultProfile,
       maxHp, hp: maxHp, shield: 0, shieldExpiresAt: 0,
       power,
       attackPower: power * attackInterval,   // so pre-crit DPS ≈ power, matching the current balance
@@ -174,7 +175,7 @@ export function makeEnemy(opts: {
   const hp = opts.baseHp * HP_UNIT * opts.keyScale * opts.affMult
   return {
     id: "", name: opts.name, specId: "", team: "enemy",
-    role: "dps", position: opts.band === "back" ? "Back" : "Front",
+    role: "dps", position: opts.band === "back" ? "Back" : "Front", profile: opts.band === "back" ? "caster" : "melee",
     maxHp: hp, hp, shield: 0, shieldExpiresAt: 0,
     power: 0,
     attackPower: opts.baseDamage * opts.keyScale * opts.affMult * DMG_UNIT,
