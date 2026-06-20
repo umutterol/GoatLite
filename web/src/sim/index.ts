@@ -3,7 +3,7 @@
 // engine is kept exported for rollback/comparison. RunResult shape is identical, so every consumer is unchanged.
 export { runDungeonEGM as runDungeon } from "./egm/engine"
 export { runDungeon as runDungeonLegacy } from "./engine"
-export type { RunInput, RunResult, LogLine, ParseRow, DeathReport, Aggression, LogKind, SimPartyMember } from "./types"
+export type { RunInput, RunResult, LogLine, ParseRow, DeathReport, Aggression, LogKind, SimPartyMember, ReplayTimeline, ReplayStage, ReplayMob } from "./types"
 
 import { content } from "@/content"
 import type { RunInput, Aggression } from "./types"

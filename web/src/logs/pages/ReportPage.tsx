@@ -9,6 +9,7 @@ import { buildReport, liveDamage, liveHealing, hpAt, mc, mmss, ROLE_ORDER, type 
 import type { Member } from "@/data/game"
 import type { RunResult } from "@/sim"
 import { Icon, Panel, Meter, ClassName, AffixChip, LogSpell } from "../components"
+import { ReplayCanvas } from "../ReplayCanvas"
 import type { Go, GoChar } from "../LogsApp"
 
 const SPEEDS = [0.5, 1, 2, 4]
@@ -144,32 +145,44 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
 
       {/* ---- main ---- */}
       <div className="page-scroll" style={{ padding: 20 }}>
-        {/* summary */}
-        <div className="panel" style={{ padding: "16px 20px", marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ width: 46, height: 46, borderRadius: 10, background: "linear-gradient(150deg,#2a2d37,#15161b)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Icon name="skull" size={24} color="#8b93a3" />
-            </div>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 21, fontWeight: 700 }}>{R.title}</span>
-                <span className="mono" style={{ fontSize: 18, fontWeight: 700, color: "var(--amber)" }}>+{R.keyLevel}</span>
+        {/* replay (top) — summary HUD top-left, live meter top-right, both overlaid inside the canvas */}
+        <div style={{ marginBottom: 14 }}>
+          <ReplayCanvas
+            result={result} clock={clock} playing={playing} members={g.members} dungeonId={R.dungeonId}
+            hudLeft={
+              <div style={{ background: "rgba(10,11,15,.62)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "8px 12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 9, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 16, fontWeight: 700 }}>{R.title}</span>
+                  <span className="mono" style={{ fontSize: 15, fontWeight: 700, color: "var(--amber)" }}>+{R.keyLevel}</span>
+                  <span className="chip" style={{ color: "var(--accent)" }}>{finished ? activeFight.name : activeFight.name + " …"}</span>
+                </div>
+                <div style={{ display: "flex", gap: 5, marginTop: 6, flexWrap: "wrap" }}>
+                  {R.affixes.map((a) => <AffixChip name={a} key={a} />)}
+                </div>
+                <div style={{ display: "flex", gap: 18, marginTop: 8 }}>
+                  <Summary label="Result" value={<span style={{ color: R.outcomeColor }}>{R.outcome} {R.upgradeLabel}</span>} />
+                  <Summary label="Time" value={<span className="mono">{mmss(clock)}</span>} sub={"par " + R.par} />
+                  <Summary label="Deaths" value={<span className="mono" style={{ color: visibleDeaths.length ? "var(--danger)" : "var(--good)" }}>{visibleDeaths.length}</span>} />
+                  <Summary label="Rez" value={<span className="mono" style={{ color: result.finalRezCharges > 0 ? "var(--good)" : "var(--danger)" }}>{result.finalRezCharges}</span>} sub={result.nextRezChargeAtSec > 0 ? "+1 in " + mmss(result.nextRezChargeAtSec) : "ready"} />
+                </div>
               </div>
-              <div style={{ display: "flex", gap: 6, marginTop: 5 }}>
-                {R.affixes.map((a) => <AffixChip name={a} key={a} />)}
-                <span className="chip" style={{ color: "var(--accent)" }}>{finished ? activeFight.name : activeFight.name + " …"}</span>
+            }
+            hudRight={
+              <div style={{ background: "rgba(10,11,15,.62)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "8px 10px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
+                  <span className="eyebrow">Live Meter</span>
+                  <div className="seg-group" style={{ padding: 2 }}>
+                    <button className={"seg-btn" + (meterMetric === "dps" ? " on accent" : "")} style={{ padding: "3px 9px", fontSize: 11 }} onClick={() => setMeterMetric("dps")}>Damage</button>
+                    <button className={"seg-btn" + (meterMetric === "hps" ? " on accent" : "")} style={{ padding: "3px 9px", fontSize: 11 }} onClick={() => setMeterMetric("hps")}>Healing</button>
+                  </div>
+                </div>
+                <Meter rows={meterRows} metric={meterMetric} segName="Overall" total={meterTotal} duration={liveDmg.dur} />
               </div>
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 26 }}>
-            <Summary label="Result" value={<span style={{ color: R.outcomeColor }}>{R.outcome} {R.upgradeLabel}</span>} />
-            <Summary label="Time" value={<span className="mono">{R.time}</span>} sub={"par " + R.par} />
-            <Summary label="Deaths" value={<span className="mono" style={{ color: visibleDeaths.length ? "var(--danger)" : "var(--good)" }}>{visibleDeaths.length}</span>} />
-            <Summary label="Combat Rez" value={<span className="mono" style={{ color: result.finalRezCharges > 0 ? "var(--good)" : "var(--danger)" }}>{result.finalRezCharges}</span>} sub={result.nextRezChargeAtSec > 0 ? "+1 in " + mmss(result.nextRezChargeAtSec) : "charge ready"} />
-          </div>
+            }
+          />
         </div>
 
-        {/* playback bar */}
+        {/* timer adjuster (directly below the replay) */}
         <div className="panel" style={{ padding: "10px 16px", marginBottom: 14, display: "flex", alignItems: "center", gap: 16 }}>
           <button className="btn btn-primary btn-sm" style={{ width: 38, height: 34, justifyContent: "center", padding: 0, fontSize: 15 }} onClick={togglePlay} title={playing ? "Pause" : finished ? "Replay" : "Play"}>
             {playing ? "❚❚" : finished ? "↻" : "▶"}
@@ -190,7 +203,7 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
           <span className="mono" style={{ fontSize: 13, color: "var(--muted)", minWidth: 96, textAlign: "right" }}>{mmss(clock)} <span style={{ color: "var(--faint)" }}>/ {mmss(duration)}</span></span>
         </div>
 
-        {/* content row */}
+        {/* the rest, as usual: event log + party health */}
         <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
           <div className="panel" style={{ flex: 1, minWidth: 0 }}>
             <div className="panel-head" style={{ padding: "10px 14px" }}>
@@ -208,19 +221,8 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
             </div>
           </div>
 
-          {/* right column: meter + party health */}
+          {/* right column: party health + action */}
           <div style={{ width: 320, flex: "none", display: "flex", flexDirection: "column", gap: 16 }}>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
-                <span className="eyebrow">Live Meter</span>
-                <div className="seg-group" style={{ padding: 2 }}>
-                  <button className={"seg-btn" + (meterMetric === "dps" ? " on accent" : "")} style={{ padding: "4px 12px", fontSize: 11.5 }} onClick={() => setMeterMetric("dps")}>Damage</button>
-                  <button className={"seg-btn" + (meterMetric === "hps" ? " on accent" : "")} style={{ padding: "4px 12px", fontSize: 11.5 }} onClick={() => setMeterMetric("hps")}>Healing</button>
-                </div>
-              </div>
-              <Meter rows={meterRows} metric={meterMetric} segName="Overall" total={meterTotal} duration={liveDmg.dur} />
-            </div>
-
             <PartyHealth result={result} hp={hp} members={g.members} goChar={goChar} />
 
             {showAction ? (

@@ -5,7 +5,7 @@
    Additive: the live engine (../engine.ts) is still what the UI calls. */
 import { content } from "@/content"
 import { Rng } from "../rng"
-import type { RunInput, RunResult, LogLine, LogKind, LogMeta, ParseRow, DeathReport } from "../types"
+import type { RunInput, RunResult, LogLine, LogKind, LogMeta, ParseRow, DeathReport, ReplayStage, ReplayMob, ReplayTimeline } from "../types"
 import { buildParty, makeEnemy, eff, dealDamage, type Combatant } from "./stats"
 import { decideAction, decideEnemyTarget, executeAbility, basicAttack, applyPassiveAuras, onStatusEvents, emergencyHeals, resolveEnemyAttack, tickGuards, type CombatCtx } from "./combat"
 import { tickStatuses, controlState, consumeDaze } from "./status"
@@ -52,6 +52,11 @@ export function runDungeonEGM(input: RunInput): RunResult {
   const hpSeries: number[][] = []
   const seriesIds = party.map((p) => p.id)
   const partyMeta = party.map((p) => ({ id: p.id, name: p.name, specId: p.specId }))
+  // I.1: 2D-replay accumulators (additive recording — no RNG/combat values consumed)
+  const replayStages: ReplayStage[] = []
+  const replayMobs: ReplayMob[] = []
+  let activeStage: { rec: ReplayStage; mobs: { c: Combatant; rec: ReplayMob }[] } | null = null
+  const hpFrac = (c: Combatant) => (c.hp > 0 ? Math.max(0, Math.min(1, c.hp / c.maxHp)) : 0)
   series[0] = party.map(() => 0)
   healSeries[0] = party.map(() => 0)
   hpSeries[0] = party.map(() => 1)
@@ -74,6 +79,11 @@ export function runDungeonEGM(input: RunInput): RunResult {
       series[nextSnapSec] = party.map((p) => Math.round(p.dmgDone))
       healSeries[nextSnapSec] = party.map((p) => Math.round(p.healDone))
       hpSeries[nextSnapSec] = party.map((p) => (p.downedUntil >= 0 ? 0 : Math.max(0, Math.min(1, p.hp / p.maxHp))))
+      // I.1: sample the active stage's mob HP (+ capture death-second) on the same whole-second cadence
+      if (activeStage) for (const { c, rec } of activeStage.mobs) {
+        rec.hp[nextSnapSec - rec.spawnSec] = hpFrac(c)
+        if (c.hp <= 0 && rec.deathSec === null) rec.deathSec = nextSnapSec
+      }
       nextSnapSec++
     }
   }
@@ -89,17 +99,20 @@ export function runDungeonEGM(input: RunInput): RunResult {
     const affMult = isBoss ? (aff.has("tyrannical") ? AFFX : 1) : (aff.has("fortified") ? AFFX : 1)
     const mobs: Combatant[] = []
     let bossTest = "", bossName = "The boss", bossAbil = "its mechanic"
+    let stageName = "Trash"
 
     if (isBoss) {
       const b = content.enemies.get(slot.boss!)!
       bossTest = b.testsTactic ?? ""
       bossName = b.name
+      stageName = b.name
       bossAbil = content.abilities.get(b.abilityId ?? "")?.name ?? "its mechanic"
       mobs.push(makeEnemy({ name: b.name, baseHp: b.baseHp, baseDamage: b.baseDamage, isBoss: true, keyScale, affMult, band: b.band }))
       const tested = content.tactics.get(bossTest)?.name
       emit("good", `${b.name} engages. ${bossAbil} incoming${tested ? ` — tests ${tested}` : ""}.`)
     } else {
       const pack = [...content.packs.values()].find((p) => (slot.packTags ?? []).some((tag) => p.tags.includes(tag))) ?? [...content.packs.values()][0]
+      stageName = pack.name
       for (const m of pack.mobs) {
         const e = content.enemies.get(m.enemyId)!
         for (let i = 0; i < m.count; i++) mobs.push(makeEnemy({ name: e.name, baseHp: e.baseHp, baseDamage: e.baseDamage, isBoss: false, keyScale, affMult, band: e.band }))
@@ -111,6 +124,16 @@ export function runDungeonEGM(input: RunInput): RunResult {
     for (const m of mobs) m.nextActionAt = t
 
     const stageStartT = t
+    // I.1: open a replay stage record + per-mob trackers (deterministic; pure recording)
+    const stageRec: ReplayStage = { idx: stageIdx, kind: isBoss ? "boss" : "trash", name: stageName, startSec: Math.floor(t), endSec: Math.floor(t), mobIds: [] }
+    const stageMobs = mobs.map((m, i) => {
+      const rec: ReplayMob = { id: `s${stageIdx}m${i}`, name: m.name, band: m.position === "Back" ? "back" : "front", isBoss: m.isBoss, stageIdx, spawnSec: Math.floor(t), deathSec: null, hp: [hpFrac(m)] }
+      stageRec.mobIds.push(rec.id)
+      return { c: m, rec }
+    })
+    replayStages.push(stageRec)
+    for (const sm of stageMobs) replayMobs.push(sm.rec)
+    activeStage = { rec: stageRec, mobs: stageMobs }
     let lastEnemyEmitSec = -1
     let lastEventSec = Math.floor(t)   // absolute whole-second cursor (one affix tick per real second)
     let stageSec = 0                   // whole seconds elapsed since stage start (exact cadence, no fractional drift)
@@ -285,6 +308,15 @@ export function runDungeonEGM(input: RunInput): RunResult {
       if (party.every((p) => p.downedUntil >= 0)) { wiped = true; break }
     }
 
+    // I.1: close the replay stage — final HP sample + death-second for anything still tracked
+    stageRec.endSec = Math.floor(t)
+    for (const { c, rec } of stageMobs) {
+      const idx = Math.floor(t) - rec.spawnSec
+      if (idx >= 0) rec.hp[idx] = hpFrac(c)
+      if (c.hp <= 0 && rec.deathSec === null) rec.deathSec = Math.floor(t)
+    }
+    activeStage = null
+
     if (!wiped) emit("good", isBoss ? `${mobs[0].name} falls.` : `Pack cleared. Onward.`)
     if (!wiped && input.stopAfterStage && stageIdx >= input.stopAfterStage) {
       called = true
@@ -312,9 +344,12 @@ export function runDungeonEGM(input: RunInput): RunResult {
 
   const finalHpPct = party.map((p) => ({ id: p.id, name: p.name, pct: Math.max(0, Math.round((p.hp / p.maxHp) * 100)), dead: p.downedUntil >= 0 }))
 
+  const replay: ReplayTimeline = { stages: replayStages, mobs: replayMobs, durationSec: duration }
+
   return {
     seed: input.seed, outcome, durationSec: duration, timerSec, keyDelta, log, parse, deaths, finalHpPct,
     series, healSeries, hpSeries, seriesIds, partyMeta,
     finalRezCharges: rezCharges, nextRezChargeAtSec: Math.max(0, Math.round(nextRezChargeAt - t)),
+    replay,
   }
 }

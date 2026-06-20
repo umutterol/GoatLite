@@ -44,7 +44,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | F | **Endgame & Identity (operator skills)** | ✅ 6/6 — live + balanced (operator runway ≈ +3 keys; +2 floor holds) |
 | G | **Visual pass (icons + squared corners)** | 🟡 3/4 — G.1–G.3 done (`--radius` token, `<GameIcon>` registry, role/spec/tactic icons wired); G.4 = new art |
 | H | **Combat depth (per-spec majors + talents)** | ✅ 4/4 — 10 majors live + talents 3–5 wired + rebalanced |
-| I | **2D replay (abstract packs)** | ⬜ 0/4 — **design ✅** (`Post-F-Clusters-Plan.md`) |
+| I | **2D replay (abstract packs)** | 🟡 3/4 — I.1–I.3 done (engine `ReplayTimeline` + SVG canvas + replay-led report layout); I.4 partial (floats/flashes/death-anim in; status pips deferred) |
 | J | **Feedback & polish batch (10 user reports)** | ✅ 10/10 — shipped + live-verified (`Post-F-Clusters-Plan.md` Cluster J) |
 | K | **Combat AI rework (v2)** | ✅ 6/6 — shared priority-rules brain (players + enemies), data-driven profiles, tactics-as-orders, 20-agent adversarial review (3 fixes) |
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
@@ -200,17 +200,18 @@ mechanics + unique flavor, ~60s CD, net-power then balance pass, mostly free-fir
 | H.3 | Finish **talent nodes 3–5** with machine-readable `effects`+`onlyIf` (closes C.2 MVP gap) | content | major | M | ✅ | extended talent effects schema with `intakePct`+`critPct` (wired in `resolveTalents`/`buildParty`; talent intakePct folds into the operator intake channel); nodes 3–5 got real effects + defaults. Picker now shows all 5 nodes |
 | H.4 | Balance pass: baseline vs major windows; smoke sweeps hold the timer curve | engine | major | M | ✅ | majors + the now-5 talent nodes added ~+4 net power → nudged `keyScalingPerLevel` 1.043→1.052 to restore the curve (fresh ceiling +18, maxed +20 ≈ F.6; operator runway +2). +2 floor 6/6, determinism holds. Adversarial review (35 agents) → 4 findings, 2 fixed (Zen Mode counter over-scale; `usable()` gate narrowed so Zen Mode/Hotfix fire at full HP) |
 
-## Phase I — 2D replay (abstract packs) ⬜ (design ✅)
+## Phase I — 2D replay (abstract packs) 🟡 (3/4 — I.4 partial)
 
 *Request #2. One backdrop, packs spawn in sequence, front/back rows, HP bars + status pips, scrubber synced to the log.
-No spatial arena (sim has no positions). Heaviest cluster; needs G's dungeon backdrops. Full spec: `Post-F-Clusters-Plan.md`.*
+No spatial arena (sim has no positions). Heaviest cluster; needs G's dungeon backdrops. Full spec: `Post-F-Clusters-Plan.md`.
+Built this session; user layout: replay leads the report with the summary header + live meter overlaid INSIDE the canvas.*
 
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
-| I.1 | Engine emits `ReplayTimeline` on `RunResult`: stage/pack/boss events + per-mob spawn/death/HP with stable seed IDs | engine | major | L | ⬜ | nothing spatial/structural emitted today (`engine.ts`); additive, deterministic |
-| I.2 | Replay canvas (SVG/DOM): backdrop, party orbs, pack rows, HP bars, status pips, floating text | ux | major | L | ⬜ | reuses icon registry (G.2) |
-| I.3 | Scrubber + transport synced to the log clock; "Replay" tab on ReportPage | ux | major | M | ⬜ | |
-| I.4 | Polish: death anim, mechanic/affix flashes, speed dial | ux | minor | M | ⬜ | |
+| I.1 | Engine emits `ReplayTimeline` on `RunResult`: stage/pack/boss events + per-mob spawn/death/HP with stable seed IDs | engine | major | L | ✅ | `egm/engine.ts` emits `ReplayTimeline` (`types.ts`): stages with **real** start/end timing + per-mob spawn/death + per-second HP-fraction samples + stable ids `s{stage}m{i}` + front/back band. Hooked into `snapshot()` (whole-sec) + a stage-finalize block. **Additive: egm-smoke goldens BYTE-IDENTICAL** (884/914/1182/1367, 0 deaths) → zero balance impact. **Transient** (in the store `TRANSIENT` set → stripped from saves; recomputed from the ticket). `replay?` optional so the legacy engine's `RunResult` stays valid. |
+| I.2 | Replay canvas (SVG/DOM): backdrop, party orbs, pack rows, HP bars, status pips, floating text | ux | major | L | ✅ | `ReplayCanvas.tsx` (DOM/SVG): dungeon-tinted **abstract backdrop** (placeholder for G.4 art), party portrait orbs (lower-left, live HP from `hpSeries` via `hpAt`), the active stage's enemies as a **pack split into front/back rows** (bosses = large gold token), draining HP bars. Pure `clock`-driven → **scrub-safe**, no internal timers. (Status/cooldown pips deferred — see I.4.) |
+| I.3 | Scrubber + transport synced to the log clock; "Replay" tab on ReportPage | ux | major | M | ✅ | ReportPage **re-laid-out top-down** per the user's spec: replay canvas on top with the **summary header overlaid top-LEFT** and the **live DPS/HPS meter overlaid top-RIGHT** *inside* the canvas (meter moved out of the right column); **timer adjuster** (play/speed dial/scrubber + death markers) directly **below**; then Event Log/Deaths/Casts + Party Health as usual. (Replay *leads* the report — not a separate "Replay tab".) |
+| I.4 | Polish: death anim, mechanic/affix flashes, speed dial | ux | minor | M | 🟡 | **Shipped:** floating combat text + boss-mechanic/affix flashes + death bursts (skull). **Windowed event layer** — covers the ~5 sim-sec/tick clock skip (an `=== sec` gate dropped ~80% of events), plays only while PLAYING, enemy bursts read the FULL timeline so a boundary-killed mob still flashes. Speed dial pre-existed. **Deferred:** status/cooldown pips on orbs (per the build decision); float/burst anchors are name-keyed (exact-duplicate display names misroute — cosmetic nit, documented in `ReplayCanvas.tsx`). **Adversarial review** (4 review dims + per-finding verify, 14 agents → 10 findings → 6 confirmed): **all 6 fixed** (windowed event layer [major]; full-timeline enemy bursts [2× minor]; crit float-size dead branch [nit]; restored combat-rez recharge ETA dropped in the HUD compaction [minor]) bar the name-key nit. |
 
 ## Phase J — Feedback & polish batch ✅ (10/10)
 
@@ -340,6 +341,30 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-20** — **Phase I (mostly) shipped: the 2D "abstract packs" replay — the report now LEADS with a live
+  combat viewport.** Built top-to-bottom: **I.1** — `egm/engine.ts` now emits a deterministic, **additive**
+  `ReplayTimeline` on `RunResult` (new types in `sim/types.ts`, re-exported from `sim/index.ts`): real stage
+  start/end timing, per-mob spawn/death + per-second HP-fraction samples, stable ids `s{stage}m{i}`, front/back
+  band — recorded purely by reading values the sim already computes (hooked into `snapshot()` + a stage-finalize
+  block; no RNG consumed, no combat state touched). **egm-smoke goldens BYTE-IDENTICAL** (884/914/1182/1367, 0
+  deaths) → zero balance impact; **transient** (`lastResult` is in the store `TRANSIENT` set → stripped before
+  `localStorage`, recomputed from the ticket, so no save migration); `replay?` optional so the legacy engine stays
+  valid. **I.2** — new `ReplayCanvas.tsx` (DOM/SVG): dungeon-tinted **abstract backdrop** (placeholder for G.4
+  art), party portrait orbs (lower-left, live HP via `hpAt`), the active stage's enemies as a **pack split into
+  front/back rows** (bosses = large gold token), draining HP bars — **pure `clock`-driven, scrub-safe**. **I.3** —
+  ReportPage **re-laid-out per the user's spec**: the replay canvas leads, with the **summary header overlaid
+  top-left** and the **live DPS/HPS meter overlaid top-right INSIDE the canvas** (the meter moved out of the right
+  column), the **timer adjuster** (play / speed dial / scrubber + death markers) directly **below**, then the
+  usual Event Log/Deaths/Casts + Party Health. **I.4 (partial)** — floating combat text + boss-mechanic/affix
+  flashes + death bursts, via a **windowed event layer** that covers the ~5 sim-sec/tick playback skip (a naive
+  `=== sec` gate dropped ~80% of events), plays only while PLAYING, and reads enemy deaths from the full timeline
+  so a boundary-killed mob still flashes. **Deferred:** status/cooldown pips on orbs (per the build decision);
+  name-keyed float/burst anchors (cosmetic dup-name nit, documented). Verified: `tsc -b` clean; egm-smoke
+  determinism intact; Playwright live check (`scripts/i-live.mjs`) 9/9 green, **0 console errors** (canvas renders,
+  HUD overlays inside the canvas, front/back band split, floats during playback, scrubbing). **Adversarial review**
+  (4 dimensions → per-finding verify, 14 agents → 10 findings → 6 confirmed): **all 6 fixed** (windowed event layer
+  [major]; full-timeline enemy bursts [2× minor]; crit float-size dead branch [nit]; restored combat-rez recharge
+  ETA dropped in the HUD compaction [minor]) bar the documented name-key nit. Memory: `goatlite-2d-replay`.
 - **2026-06-20** — **Phase N shipped: intake balance (`enemyDmgMult`) + `sim-dump` tooling — the enemy-damage gap
   is fixed.** First built **`web/scripts/sim-dump.mjs`** (N.1), a config/CLI sim harness that **saves runs to files**:
   `single` mode dumps the full input + RunResult + derived analytics (per-member min-HP/DPS/HPS, party min-HP,
