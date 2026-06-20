@@ -122,6 +122,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
       // Kill Order boosts trash DPS; Cooldowns boosts boss burn (party→enemy output)
       outgoingMult: 1 + (isBoss ? 0.04 * (tac.cooldowns ?? 0) : 0.06 * (tac.killorder ?? 0)),
       partyInDanger: false,
+      tactics: tac,   // K.4: the dials drive the brain (Kill Order → kill priority, Cooldowns → defensive timing)
     }
     for (const p of aliveParty()) applyPassiveAuras(p, ctx)   // refresh permanent passive auras at stage start
 

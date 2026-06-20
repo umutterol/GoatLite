@@ -46,8 +46,9 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | H | **Combat depth (per-spec majors + talents)** | ✅ 4/4 — 10 majors live + talents 3–5 wired + rebalanced |
 | I | **2D replay (abstract packs)** | ⬜ 0/4 — **design ✅** (`Post-F-Clusters-Plan.md`) |
 | J | **Feedback & polish batch (10 user reports)** | ✅ 10/10 — shipped + live-verified (`Post-F-Clusters-Plan.md` Cluster J) |
-| K | **Combat AI rework (v2)** | 🟡 3/6 — K.1–K.3 done (brain + rotations + targeting); design `Combat-AI-Design.md` |
+| K | **Combat AI rework (v2)** | 🟡 4/6 — K.1–K.4 done (brain + rotations + targeting + tactics-as-orders); design `Combat-AI-Design.md` |
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
+| L | **Roster expansion — Marksman + Necromancer** | ⬜ 0/7 — **design ✅** (`MMO-Nostalgia-Reference.md` §6) |
 
 ---
 
@@ -240,19 +241,41 @@ boss-script integration are fast-follows). Full design + open questions in `Comb
 | K.1 | Brain scaffold + behaviour primitive kit + profile schema | engine | major | L | ✅ | `decideAction`/`decideEnemyTarget` single decision points in `combat.ts` walk a profile-resolved behaviour list (`brainOf`); default `dumpRotation`/tank-focus reproduce current play; `Combatant.profile` wired (spec defaultProfile / enemy melee\|caster); `BehaviorProfileSchema` gained optional `base`+`behaviours` (K.5 populates). **Byte-identical proven** — egm-smoke matches golden (798/868/1068/1202) + op-verify determinism 6/6, `tsc` clean |
 | K.2 | Player rotation behaviours | engine | major | M | ✅ | `holdForWindow` (defensive majors wait for danger/boss; offensive majors fire on boss/≥3-pack — no more dumping on a straggler), `triageHeal` (healer casts the heal SIZED to the injury, skips near-full allies → fixes Flash-vs-Greater overheal), `emergencyDefensive`, `dumpRotation` now excludes majors. Verified: healer mixes Flash 84×/Greater 68× (was always-Greater), +2 floor 6/6, determinism holds, **ceiling unchanged (+18/+20) → no nudge needed** |
 | K.3 | Player + enemy target selection | engine | major | M | ✅ | `TARGET_BEHAVIOURS`: party `focusByPriority` (kill back-band casters first, focus-fire), `focusLowestHp` (executioner snipe), `focusHighestHp` (tunnel-vision tank) — profile-driven; enemy `caster`→`focusSquishy` (dive non-tank back-line), melee/adds→`focusTank`. Wired into `targetsFor` single-target + `basicAttack` + `decideEnemyTarget`. Verified: casters now hit squishies (180× non-tank / 0× tank), +2 floor 6/6, determinism holds, ceiling back to fresh +17/maxed +20/runway +3 (≈ F.6) — no nudge. (peel folds into focusByPriority; no threat system per design) |
-| K.4 | Tactics-as-orders | engine | major | M | ⬜ | Kill Order→`focusByPriority`, Interrupts→`interruptCast` readiness, Cooldowns→`holdForWindow`, Positioning→avoidance; reconcile with the existing affix/boss-mechanic rolls (no double-count) |
+| K.4 | Tactics-as-orders | engine | major | M | ✅ | `ctx.tactics` threaded into the brain. **Kill Order** gates `focusByPriority` (0 → just hit the lead, no caster priority); **Cooldowns** scales the `emergencyDefensive` threshold + pre-empts defensive majors on big packs. **Interrupts/Positioning** stay the existing affix/boss rolls (already real — real interrupt cast-bars are a fast-follow). Verified: all-0 (1238s) vs all-3 (1097s) diverge more; +2 floor 6/6; determinism + ceiling (+17/+20/+3) hold (no double-count surfaced) |
 | K.5 | Spec overlays | engine | major | M | ⬜ | machine-readable `behaviours` on the 4 GDD profiles (executioner/opportunist/peel/tunnel-vision) + per-spec assignment; verify each spec plays to flavour |
 | K.6 | Balance + verification pass | engine | major | M | ⬜ | smarter AI ≈ more output/survival → expect a difficulty nudge (like H.4); `egm-smoke` holds the +2 floor; determinism; adversarial review |
 
-## ※ Affix swap — apply "Ship It Anyway" (IP scrub) ⬜ (design ✅, ready)
+## ※ Affix swap — original fantasy season (IP scrub) ⬜ (design ✅, ready)
 
 *Replace the 8 verbatim-WoW affixes with the original season. **Must rename the engine `id` literals**, not just display
 names — ids are hardcoded (`aff.has(...)`, ~9 sites) and persist into saves, so a display-only rename does NOT scrub the
-trademark (a pre-launch IP blocker). Isolated — good warm-up commit. Full design in chat / earlier workflow output.*
+trademark (a pre-launch IP blocker). Isolated — good warm-up commit. **Names follow the in-world fantasy direction**
+(`MMO-Nostalgia-Reference.md` §2 — Barrow-Bound / Crowned in Ash / Plaguebloom / Wake the Kin / Pyre-Vents /
+Lifeblood Mire / Restless Shade / Death-Frenzy), NOT QA/dev puns (supersedes the earlier "Ship It Anyway" / "Merge
+Conflict" placeholders, per the 2026-06-20 in-world-naming decision).*
 
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
-| Affix.1 | Swap `data/affixes.json` (8 new ids/names/effects), rename the ~9 `aff.has` literals + death-cause string in `engine.ts`, fix `spiteful.punishes` bug, theme the 4 tactic dial labels; optional new **Merge Conflict** affix | engine/data | minor | M | ⬜ | verify `tsc -b` + `egm-smoke` times the +2 floor on all weeks |
+| Affix.1 | Swap `data/affixes.json` (8 new ids/names/effects), rename the ~9 `aff.has` literals + death-cause string in `engine.ts`, fix `spiteful.punishes` bug, theme the 4 tactic dial labels; optional new fantasy affix (e.g. **Gravechill**) | engine/data | minor | M | ⬜ | verify `tsc -b` + `egm-smoke` times the +2 floor on all weeks |
+
+---
+
+## Phase L — Roster expansion: Marksman + Necromancer ⬜ (design ✅ — `MMO-Nostalgia-Reference.md` §6)
+
+*Two roster decisions (2026-06-20): (1) repurpose the **Bard** spec into a **ranged Rogue (Marksman)** — the more
+universal back-line-physical fantasy — **keeping its Overdrive party-haste kit** (the only Bloodlust/Heroism carrier,
+nostalgia 10); (2) add a 6th class, **Necromancer**, the pet/summoner class, whose healer spec also fills the thin
+3rd-healer slot. Result: **6 classes / 12 specs = 3 tanks / 3 healers / 6 DPS**.*
+
+| # | Task | Axis | Sev | Effort | Status | Notes |
+|---|---|---|---|---|---|---|
+| L.1 | **Bard → Marksman** rework | content/ux | major | M | ⬜ | rename `bard` spec → `marksman` (ranged Rogue, Back); reskin lute→bow/hunting-horn; **keep the Overdrive party-haste + crit-setup kit intact**. Stays pet-less (pets = Necromancer). Name alts: Stalker / Deadeye. |
+| L.2 | **Necromancer** — 6th class | content | major | S | ⬜ | add `necromancer` to `classes.json`; the pet/summoner class; two specs (L.3/L.4). |
+| L.3 | **Bonecaller** spec (Necro DPS, Back) | content | major | L | ⬜ | raises skeletal servants + wasting curses/DoTs (Affliction / EQ-Necro / GW2 Reaper). Depends on the pet mechanic (L.5). |
+| L.4 | **Pallbinder** spec (Necro Healer, Back) | content | major | L | ⬜ | bound guardian-wraith + leech/anima heal (FFXIV Scholar pet-healer pattern); **fills the 3rd healer slot** (2→3 healers). |
+| L.5 | **Pet/minion engine mechanic** (net-new) | engine | major | L | ⬜ | persistent summoned combatant(s) acting on the tick loop, contributing output/threat; no analog exists today. Consumed by Bonecaller (+ optional Marksman beast). |
+| L.6 | New-spec content (abilities/talents/loot/icons) | content | major | XL | ⬜ | author majors/abilities in `abilities-player.json` + `skills.json`; **bumps C.2 to 12 specs**, adds a Necromancer tier set (**bumps C.5**), spec loot/items (**C.4**), default behaviour profiles, role/spec icons. |
+| L.7 | Save migration for the roster change | engine | major | M | ⬜ | rewrite `bard`→`marksman` specId on load + register new class/specs; bump `SAVE_VERSION` or sanitize so existing rosters with Bard members don't crash. |
 
 ---
 
@@ -277,6 +300,20 @@ trademark (a pre-launch IP blocker). Isolated — good warm-up commit. Full desi
 
 ## Changelog
 
+- **2026-06-20** — **K.4 shipped: tactics dials are now the party's AI orders.** Threaded `ctx.tactics` (the 4 dials) into
+  the brain. **Kill Order** gates `focusByPriority` — at 0 the party just hits the lead enemy (no caster priority), at ≥1
+  it kills back-band casters first. **Cooldowns** makes defence proactive — it raises the `emergencyDefensive` HP threshold
+  (pop walls earlier) and lets defensive majors pre-empt on big packs. **Interrupts** and **Positioning** stay the existing
+  affix/boss-mechanic rolls (already real per-dial; real interrupt cast-bars deferred to the fast-follow). The pre-existing
+  abstract tactic scalars (Kill Order→trash-DPS, Cooldowns→spike-reduction) were kept alongside the new behaviours with
+  **no double-count** in the curve. **Verified:** `tsc` clean; all-0 vs all-3 now diverge more (1238s vs 1097s); +2 floor
+  6/6; determinism holds; ceiling unchanged for the standard tactics (fresh +17 / maxed +20 / runway +3).
+- **2026-06-20** — **Phase L queued — roster expansion (Marksman + Necromancer).** Logged two roster decisions:
+  repurpose **Bard → Marksman** (ranged Rogue, keeps the Overdrive party-haste — the only Bloodlust carrier), and add
+  a 6th class **Necromancer** (the pet/summoner class: **Bonecaller** DPS + **Pallbinder** healer, which fills the thin
+  3rd-healer slot) → **6 classes / 12 specs = 3T/3H/6D**. Seven tasks (L.1–L.7), incl. a net-new pet/minion engine
+  mechanic and a `bard→marksman` save migration. Also **aligned the ※ affix-swap names to the in-world fantasy
+  direction** (Barrow-Bound, etc.), superseding the QA-pun placeholders ("Ship It Anyway"/"Merge Conflict").
 - **2026-06-20** — **K.3 shipped: brain-driven target selection (players + enemies).** `TARGET_BEHAVIOURS` kit: party
   `focusByPriority` (kill back-band casters first, then lowest HP — stable so the party focus-fires together), `focusLowestHp`
   (executioner specs snipe almost-dead mobs), `focusHighestHp` (tunnel-vision tanks hold the biggest); enemy `caster` profile

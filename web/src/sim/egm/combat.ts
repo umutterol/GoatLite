@@ -23,6 +23,7 @@ export interface CombatCtx {
   splashPrimary?: Combatant   // the enemy struck by the current cast's direct damage (so splash/spread anchor correctly post-kill)
   outgoingMult?: number       // party→enemy damage multiplier from tactics (Kill Order on trash / Cooldowns on boss); set per stage
   partyInDanger?: boolean      // Phase F: any ally <dangerHpPct or a recent death → Composure clutch is active (set per step)
+  tactics?: Record<string, number>   // K.4: the 4 dials (interrupts/positioning/cooldowns/killorder, 0..3) — drive the party AI brain
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -805,8 +806,9 @@ const ACTION_BEHAVIOURS: Record<string, ActionBehaviour> = {
     const major = readyUsable(caster, ctx, isMajor)[0]
     if (!major) return null
     const boss = ctx.mobs.some((m) => m.isBoss && m.hp > 0)
+    const cd = ctx.tactics?.cooldowns ?? 0   // K.4: high Cooldowns → defensives fire more proactively (also pre-empt big packs)
     return majorKind(major) === "defensive"
-      ? (ctx.partyInDanger || boss ? major : null)
+      ? (ctx.partyInDanger || boss || (cd >= 2 && livingMobs(ctx).length >= 3) ? major : null)
       : (boss || livingMobs(ctx).length >= 3 ? major : null)
   },
   // K.2: healer triage — cast the direct heal SIZED to the most-injured ally so a light scratch doesn't eat a Greater
@@ -823,7 +825,7 @@ const ACTION_BEHAVIOURS: Record<string, ActionBehaviour> = {
   },
   // K.2: pop a defensive cooldown (shield / parry / redirect / immunity) when this actor itself drops low.
   emergencyDefensive: (caster, ctx) => {
-    if (caster.hp / caster.maxHp >= 0.4) return null
+    if (caster.hp / caster.maxHp >= 0.4 + 0.05 * (ctx.tactics?.cooldowns ?? 0)) return null   // K.4: high Cooldowns → pop defensives earlier
     const DEF = new Set(["shield-wall-block", "parry-counter", "redirect-damage", "damage-redirect", "attack-immunity"])
     return readyUsable(caster, ctx, (a) => !isMajor(a) && (a.effects as Effect[]).some((e) => e.type === "shield" || (e.type === "special" && DEF.has(e.mechanic))))[0] ?? null
   },
@@ -834,8 +836,12 @@ const ACTION_BEHAVIOURS: Record<string, ActionBehaviour> = {
 /* ---- K.3: target-selection behaviours (shared — pick one combatant from a candidate pool; stable/deterministic) ---- */
 type TargetBehaviour = (candidates: Combatant[], actor: Combatant, ctx: CombatCtx) => Combatant | undefined
 const TARGET_BEHAVIOURS: Record<string, TargetBehaviour> = {
-  // kill priority: back-band (casters/ranged) first, then lowest HP (secure the kill) — stable so the party focus-fires together
-  focusByPriority: (c) => (c.length ? [...c].sort((a, b) => (a.position === "Back" ? 0 : 1) - (b.position === "Back" ? 0 : 1) || a.hp - b.hp)[0] : undefined),
+  // kill priority (K.4: gated by the Kill Order dial): back-band casters first, then lowest HP — stable so the party focus-fires together
+  focusByPriority: (c, _actor, ctx) => {
+    if (!c.length) return undefined
+    if ((ctx.tactics?.killorder ?? 0) <= 0) return c[0]   // no Kill Order assigned → just hit the lead (no caster priority)
+    return [...c].sort((a, b) => (a.position === "Back" ? 0 : 1) - (b.position === "Back" ? 0 : 1) || a.hp - b.hp)[0]
+  },
   focusLowestHp: (c) => (c.length ? [...c].sort((a, b) => a.hp - b.hp)[0] : undefined),     // executioner: snipe almost-dead mobs
   focusHighestHp: (c) => (c.length ? [...c].sort((a, b) => b.hp - a.hp)[0] : undefined),     // tunnel-vision tank: hold the biggest
   focusLead: (c) => c[0],
