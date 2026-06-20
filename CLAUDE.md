@@ -15,6 +15,14 @@ This is a hard requirement, not a nicety — a tracker that reflects reality is 
 change "counts," err toward adding a changelog line. (Also update the relevant `…/memory/` file for non-obvious
 project facts — see the memory section the harness injects.)
 
+## ⚠️ MANDATORY: commit at every milestone (effective Phase K.2, 2026-06-20)
+**Each completed milestone (a roadmap ticket like K.2/K.3/…, or a self-contained feature/fix) MUST end with a git
+commit** — once it's verified (build gate + sim/UI checks green) and the roadmap+changelog are updated. Do NOT batch
+several milestones into one commit; one commit per milestone keeps history reviewable and rollback cheap. Solo project —
+commit on the working branch (currently `master`, matching the existing history); no feature branch needed unless the work
+is risky/experimental. Use a clear message summarising the milestone, and end it with the `Co-Authored-By:` trailer. Never
+skip hooks or signing. This is a hard requirement, not optional.
+
 ## Where things live
 - **Live app UI:** `web/src/logs/` — the "Logs" (WCL/Raider.io) reskin. The old `web/src/screens/` parchment
   screens are retired (they still compile but aren't routed; don't build on them).

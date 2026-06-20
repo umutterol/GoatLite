@@ -46,7 +46,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | H | **Combat depth (per-spec majors + talents)** | ✅ 4/4 — 10 majors live + talents 3–5 wired + rebalanced |
 | I | **2D replay (abstract packs)** | ⬜ 0/4 — **design ✅** (`Post-F-Clusters-Plan.md`) |
 | J | **Feedback & polish batch (10 user reports)** | ✅ 10/10 — shipped + live-verified (`Post-F-Clusters-Plan.md` Cluster J) |
-| K | **Combat AI rework (v2)** | 🟡 1/6 — K.1 scaffold done (byte-identical); design `Combat-AI-Design.md` |
+| K | **Combat AI rework (v2)** | 🟡 2/6 — K.1 scaffold + K.2 rotation behaviours done; design `Combat-AI-Design.md` |
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
 
 ---
@@ -238,7 +238,7 @@ boss-script integration are fast-follows). Full design + open questions in `Comb
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
 | K.1 | Brain scaffold + behaviour primitive kit + profile schema | engine | major | L | ✅ | `decideAction`/`decideEnemyTarget` single decision points in `combat.ts` walk a profile-resolved behaviour list (`brainOf`); default `dumpRotation`/tank-focus reproduce current play; `Combatant.profile` wired (spec defaultProfile / enemy melee\|caster); `BehaviorProfileSchema` gained optional `base`+`behaviours` (K.5 populates). **Byte-identical proven** — egm-smoke matches golden (798/868/1068/1202) + op-verify determinism 6/6, `tsc` clean |
-| K.2 | Player rotation behaviours | engine | major | M | ⬜ | `triageHeal` (size the heal to the injury → fixes Flash-vs-Greater), `holdForWindow` (save majors/burst for boss/danger → fixes majors-on-CD), `emergencyDefensive`, `dumpRotation` |
+| K.2 | Player rotation behaviours | engine | major | M | ✅ | `holdForWindow` (defensive majors wait for danger/boss; offensive majors fire on boss/≥3-pack — no more dumping on a straggler), `triageHeal` (healer casts the heal SIZED to the injury, skips near-full allies → fixes Flash-vs-Greater overheal), `emergencyDefensive`, `dumpRotation` now excludes majors. Verified: healer mixes Flash 84×/Greater 68× (was always-Greater), +2 floor 6/6, determinism holds, **ceiling unchanged (+18/+20) → no nudge needed** |
 | K.3 | Player + enemy target selection | engine | major | M | ⬜ | players: `focusByPriority`/`focusLowestHp`/`diveBackline`/`peel`; enemies: `caster`(back-band, dive squishy)/`fixate`/`focusByThreat` profiles — smarter than "always the tank" |
 | K.4 | Tactics-as-orders | engine | major | M | ⬜ | Kill Order→`focusByPriority`, Interrupts→`interruptCast` readiness, Cooldowns→`holdForWindow`, Positioning→avoidance; reconcile with the existing affix/boss-mechanic rolls (no double-count) |
 | K.5 | Spec overlays | engine | major | M | ⬜ | machine-readable `behaviours` on the 4 GDD profiles (executioner/opportunist/peel/tunnel-vision) + per-spec assignment; verify each spec plays to flavour |
@@ -277,6 +277,25 @@ trademark (a pre-launch IP blocker). Isolated — good warm-up commit. Full desi
 
 ## Changelog
 
+- **2026-06-20** — **K.2 shipped: player rotation behaviours (the first real AI smarts).** Replaced the brain's default
+  behaviours with: `holdForWindow` — the spec major no longer fires on cooldown; **defensive** majors (walls/absorbs/raid
+  heals, classified by effect) wait for `partyInDanger` or a boss, **offensive** majors fire on a boss or a ≥3-enemy pack
+  (so a burst/AoE isn't wasted on a lone straggler); `triageHeal` — a healer now casts the heal **sized to the most-injured
+  ally** (light scratch → the small/efficient heal, big drop → the big heal) and skips near-full allies, killing the
+  "Greater Heal overheals a topped target" problem; `emergencyDefensive` (pop a shield/parry when self drops <40%); and
+  `dumpRotation` now **excludes majors** (they're decided by `holdForWindow`). Also added the **commit-per-milestone**
+  mandate to `CLAUDE.md` (effective K.2). **Verified:** `tsc` clean; the cleric now mixes **Flash Heal 84× / Greater Heal
+  68×** (vs always-Greater before); +2 floor 6/6; determinism holds; key ceiling **unchanged (fresh +18 / maxed +20)** so no
+  difficulty nudge needed. First per-milestone commit lands here (bundles the uncommitted session: F, G.1–3, H, Cluster J, K.1).
+- **2026-06-20** — **Design reference added: `Docs/MMO-Nostalgia-Reference.md`.** Multi-MMO nostalgia survey
+  (WoW/FFXIV/GW2/ESO/Lost Ark/BDO/OSRS/EQ/FFXI/SWTOR/Rift/WildStar/New World/TERA/Aion) distilled into
+  GOAT-Lite design hooks, **recast into the Ashveil gothic-fantasy voice** (satire stays in the wrapper;
+  in-world content is earnest). Includes: the 8 laws of MMO nostalgia; an **affix rename table** (the 8
+  verbatim-WoW affixes → Barrow-Bound / Crowned in Ash / Plaguebloom / Wake the Kin / Pyre-Vents /
+  Lifeblood Mire / Restless Shade / Death-Frenzy, effects unchanged) + 4 new affixes; 10 dungeons, 16
+  bosses (with barks), 9 missing signature-verb abilities, an items/rarity catalog, and a **Classes & Specs**
+  gap analysis recommending a 6th class **Necromancer** (Bonecaller DPS + Pallbinder healer) and a
+  **Houndmaster** ranged-pet Rogue spec. No code/data changed yet — affix rename is the top actionable.
 - **2026-06-20** — **K.1 shipped: AI brain scaffold (pure refactor, byte-identical).** Introduced the single decision
   points the rest of Phase K builds on — `decideAction` (party: which ability) and `decideEnemyTarget` (enemy: who to hit)
   in `combat.ts`, each walking an ordered behaviour list resolved from the actor's profile (`brainOf`). For K.1 every

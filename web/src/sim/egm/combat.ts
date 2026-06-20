@@ -778,16 +778,66 @@ export function selectAbility(caster: Combatant, ctx: CombatCtx): PlayerAbility 
    reproduce today's play byte-identically. K.2+ add real behaviours; K.5 reads machine-readable `behaviours` off the
    profile data. Behaviours are pure functions of state + the seeded RNG (determinism).
    ============================================================ */
-type ActionBehaviour = (actor: Combatant, ctx: CombatCtx) => PlayerAbility | null
-const ACTION_BEHAVIOURS: Record<string, ActionBehaviour> = {
-  // current play: the highest-priority ready+usable ability (longest CD first), else null → basic attack
-  dumpRotation: (caster, ctx) => selectAbility(caster, ctx),
+const isMajor = (a: PlayerAbility) => (a.tags ?? []).includes("major")
+/** Ready + usable abilities matching a filter, in the engine's priority order (longest CD, then category weight). */
+function readyUsable(caster: Combatant, ctx: CombatCtx, filter: (a: PlayerAbility) => boolean): PlayerAbility[] {
+  return caster.abilities
+    .filter((a) => filter(a) && (caster.cooldowns[a.id] ?? 0) <= ctx.t && usable(a, caster, ctx))
+    .sort((a, b) => b.cooldownTurns - a.cooldownTurns || catWeight(b) - catWeight(a))
+}
+/** Defensive major (walls / absorbs / raid heals → hold for danger) vs offensive (damage / output → fire in damage windows). */
+function majorKind(a: PlayerAbility): "defensive" | "offensive" {
+  const effs = a.effects as Effect[]
+  const def = effs.some((e) => e.type === "shield" || e.type === "heal"
+    || (e.type === "buff" && ["damageTaken", "armour", "resist"].includes(e.stat))
+    || (e.type === "special" && ["parry-counter", "redirect-damage", "damage-redirect", "attack-immunity"].includes(e.mechanic)))
+  const off = effs.some((e) => e.type === "damage"
+    || (e.type === "buff" && ["power", "haste", "crit", "critMult"].includes(e.stat))
+    || (e.type === "special" && e.mechanic === "detonate-burn"))
+  return def && !off ? "defensive" : "offensive"
 }
 
-/** Resolve an actor's ordered behaviour lists from its profile. K.1: team-based defaults that reproduce current play.
-    (K.5 will read `content.profiles.get(actor.profile)?.behaviours` and overlay onto the role base.) */
+type ActionBehaviour = (actor: Combatant, ctx: CombatCtx) => PlayerAbility | null
+const ACTION_BEHAVIOURS: Record<string, ActionBehaviour> = {
+  // K.2: hold the spec's signature major for a meaningful window instead of dumping it on cooldown. Defensive majors
+  // (walls/absorbs/raid heals) wait for danger or a boss; offensive majors fire on a boss or a big pack (≥3 enemies).
+  holdForWindow: (caster, ctx) => {
+    const major = readyUsable(caster, ctx, isMajor)[0]
+    if (!major) return null
+    const boss = ctx.mobs.some((m) => m.isBoss && m.hp > 0)
+    return majorKind(major) === "defensive"
+      ? (ctx.partyInDanger || boss ? major : null)
+      : (boss || livingMobs(ctx).length >= 3 ? major : null)
+  },
+  // K.2: healer triage — cast the direct heal SIZED to the most-injured ally so a light scratch doesn't eat a Greater
+  // Heal (which would mostly overheal). Skips near-full allies (do damage instead). HoTs/major/damage flow elsewhere.
+  triageHeal: (caster, ctx) => {
+    if (caster.role !== "healer") return null
+    const hurt = injuredAllies(ctx)[0]
+    if (!hurt || hurt.hp / hurt.maxHp >= 0.85) return null
+    const heals = readyUsable(caster, ctx, (a) => !isMajor(a) && (a.effects as Effect[]).some((e) => e.type === "heal"))
+    if (!heals.length) return null
+    const sizeOf = (a: PlayerAbility) => { const e = (a.effects as Effect[]).find((x) => x.type === "heal"); return (e?.base ?? 0) + (e?.scale ?? 0) * 100 }
+    const bySize = [...heals].sort((a, b) => sizeOf(b) - sizeOf(a))   // biggest first
+    return (1 - hurt.hp / hurt.maxHp) >= 0.4 ? bySize[0] : bySize[bySize.length - 1]   // big injury → biggest heal; light → smallest
+  },
+  // K.2: pop a defensive cooldown (shield / parry / redirect / immunity) when this actor itself drops low.
+  emergencyDefensive: (caster, ctx) => {
+    if (caster.hp / caster.maxHp >= 0.4) return null
+    const DEF = new Set(["shield-wall-block", "parry-counter", "redirect-damage", "damage-redirect", "attack-immunity"])
+    return readyUsable(caster, ctx, (a) => !isMajor(a) && (a.effects as Effect[]).some((e) => e.type === "shield" || (e.type === "special" && DEF.has(e.mechanic))))[0] ?? null
+  },
+  // the spec's normal rotation, EXCLUDING majors (the major is decided by holdForWindow) — the previous longest-CD-first pick
+  dumpRotation: (caster, ctx) => readyUsable(caster, ctx, (a) => !isMajor(a))[0] ?? null,
+}
+
+/** Resolve an actor's ordered action behaviour list from its role/profile. (K.5 will read machine-readable `behaviours`
+    off `content.profiles.get(actor.profile)` and overlay onto the role base; K.2 uses role defaults.) */
 function brainOf(actor: Combatant): { action: string[] } {
-  return { action: actor.team === "party" ? ["dumpRotation"] : [] }
+  if (actor.team !== "party") return { action: [] }
+  if (actor.role === "healer") return { action: ["holdForWindow", "triageHeal", "dumpRotation"] }
+  if (actor.role === "tank") return { action: ["holdForWindow", "emergencyDefensive", "dumpRotation"] }
+  return { action: ["holdForWindow", "dumpRotation"] }   // dps
 }
 
 /** Brain — which ability the actor casts this turn (null → basic attack). The single action decision point. */
