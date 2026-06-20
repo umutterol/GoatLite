@@ -852,20 +852,17 @@ const TARGET_BEHAVIOURS: Record<string, TargetBehaviour> = {
   },
 }
 
-/** Resolve an actor's ordered behaviour lists from its role + GDD profile. (K.5 moves these to machine-readable profile data.) */
+/** Resolve an actor's ordered behaviour lists. K.5: targeting comes from machine-readable `behavior-profiles.json` data
+    (the role provides the action base since profiles span roles; the profile overrides targeting + optionally the action). */
 function brainOf(actor: Combatant): { action: string[]; targetEnemy: string[]; targetAlly: string[] } {
+  const prof = content.profiles.get(actor.profile)
   if (actor.team !== "party") {
-    // enemy: a back-band 'caster' dives the squishy; melee/adds focus the tank
-    return { action: [], targetEnemy: [], targetAlly: actor.profile === "caster" ? ["focusSquishy"] : ["focusTank"] }
+    return { action: [], targetEnemy: [], targetAlly: prof?.targetAlly ?? ["focusTank"] }   // enemy: melee→tank, caster→squishy (from data)
   }
-  const action = actor.role === "healer" ? ["holdForWindow", "triageHeal", "dumpRotation"]
+  const roleAction = actor.role === "healer" ? ["holdForWindow", "triageHeal", "dumpRotation"]
     : actor.role === "tank" ? ["holdForWindow", "emergencyDefensive", "dumpRotation"]
     : ["holdForWindow", "dumpRotation"]
-  // the GDD profile drives enemy-target priority (K.4 layers the Kill Order tactic on top; K.5 moves to data)
-  const targetEnemy = actor.profile === "executioner" ? ["focusLowestHp", "focusByPriority"]
-    : actor.profile === "tunnel-vision" ? ["focusHighestHp"]
-    : ["focusByPriority"]   // peel / opportunist / default → kill casters/threats first, focus-fire
-  return { action, targetEnemy, targetAlly: [] }
+  return { action: prof?.action ?? roleAction, targetEnemy: prof?.targetEnemy ?? ["focusByPriority"], targetAlly: [] }
 }
 
 /** Brain — which ability the actor casts this turn (null → basic attack). The single action decision point. */

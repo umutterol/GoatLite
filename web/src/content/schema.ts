@@ -78,9 +78,11 @@ export const TacticSchema = z.object({
 
 export const BehaviorProfileSchema = z.object({
   id: z.string(), name: z.string(), behavior: z.string(),
-  // Phase K: machine-readable behaviour overlay onto a role base. Absent today → the brain uses role defaults (K.5 populates).
-  base: z.enum(["tank", "healer", "dps", "enemy"]).optional(),
-  behaviours: z.array(z.object({ id: z.string(), weight: z.number().optional(), params: z.record(z.string(), z.unknown()).optional() })).optional(),
+  // Phase K: machine-readable behaviour lists the brain walks (ids resolve to the code-side behaviour registry).
+  // Absent → the brain falls back to the role default. `action`/`targetEnemy` are for party specs; `targetAlly` for enemies.
+  action: z.array(z.string()).optional(),
+  targetEnemy: z.array(z.string()).optional(),
+  targetAlly: z.array(z.string()).optional(),
 })
 export const PotentialTagSchema = z.object({ id: z.string(), label: z.string() })
 

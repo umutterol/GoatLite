@@ -46,7 +46,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | H | **Combat depth (per-spec majors + talents)** | ✅ 4/4 — 10 majors live + talents 3–5 wired + rebalanced |
 | I | **2D replay (abstract packs)** | ⬜ 0/4 — **design ✅** (`Post-F-Clusters-Plan.md`) |
 | J | **Feedback & polish batch (10 user reports)** | ✅ 10/10 — shipped + live-verified (`Post-F-Clusters-Plan.md` Cluster J) |
-| K | **Combat AI rework (v2)** | 🟡 4/6 — K.1–K.4 done (brain + rotations + targeting + tactics-as-orders); design `Combat-AI-Design.md` |
+| K | **Combat AI rework (v2)** | 🟡 5/6 — K.1–K.5 done (data-driven profiles); K.6 balance/review left |
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
 | L | **Roster expansion — Marksman + Necromancer** | ⬜ 0/7 — **design ✅** (`MMO-Nostalgia-Reference.md` §6) |
 
@@ -242,7 +242,7 @@ boss-script integration are fast-follows). Full design + open questions in `Comb
 | K.2 | Player rotation behaviours | engine | major | M | ✅ | `holdForWindow` (defensive majors wait for danger/boss; offensive majors fire on boss/≥3-pack — no more dumping on a straggler), `triageHeal` (healer casts the heal SIZED to the injury, skips near-full allies → fixes Flash-vs-Greater overheal), `emergencyDefensive`, `dumpRotation` now excludes majors. Verified: healer mixes Flash 84×/Greater 68× (was always-Greater), +2 floor 6/6, determinism holds, **ceiling unchanged (+18/+20) → no nudge needed** |
 | K.3 | Player + enemy target selection | engine | major | M | ✅ | `TARGET_BEHAVIOURS`: party `focusByPriority` (kill back-band casters first, focus-fire), `focusLowestHp` (executioner snipe), `focusHighestHp` (tunnel-vision tank) — profile-driven; enemy `caster`→`focusSquishy` (dive non-tank back-line), melee/adds→`focusTank`. Wired into `targetsFor` single-target + `basicAttack` + `decideEnemyTarget`. Verified: casters now hit squishies (180× non-tank / 0× tank), +2 floor 6/6, determinism holds, ceiling back to fresh +17/maxed +20/runway +3 (≈ F.6) — no nudge. (peel folds into focusByPriority; no threat system per design) |
 | K.4 | Tactics-as-orders | engine | major | M | ✅ | `ctx.tactics` threaded into the brain. **Kill Order** gates `focusByPriority` (0 → just hit the lead, no caster priority); **Cooldowns** scales the `emergencyDefensive` threshold + pre-empts defensive majors on big packs. **Interrupts/Positioning** stay the existing affix/boss rolls (already real — real interrupt cast-bars are a fast-follow). Verified: all-0 (1238s) vs all-3 (1097s) diverge more; +2 floor 6/6; determinism + ceiling (+17/+20/+3) hold (no double-count surfaced) |
-| K.5 | Spec overlays | engine | major | M | ⬜ | machine-readable `behaviours` on the 4 GDD profiles (executioner/opportunist/peel/tunnel-vision) + per-spec assignment; verify each spec plays to flavour |
+| K.5 | Spec overlays (data-driven profiles) | engine | major | M | ✅ | moved the profile→behaviour mapping from `brainOf` code into `behavior-profiles.json` data: the 4 GDD profiles got `targetEnemy` (tunnel-vision→focusHighestHp, executioner→focusLowestHp+priority, peel/opportunist→focusByPriority) + 2 new enemy profiles (melee→focusTank, caster→focusSquishy) with `targetAlly`. `BehaviorProfileSchema` now `action?`/`targetEnemy?`/`targetAlly?` string lists; `brainOf` reads them (role provides the action base). **New enemy/spec = author a profile, no engine code.** Byte-identical to K.4 (egm-smoke 816/868/1097/1238, op-verify 6/6) |
 | K.6 | Balance + verification pass | engine | major | M | ⬜ | smarter AI ≈ more output/survival → expect a difficulty nudge (like H.4); `egm-smoke` holds the +2 floor; determinism; adversarial review |
 
 ## ※ Affix swap — original fantasy season (IP scrub) ⬜ (design ✅, ready)
@@ -300,6 +300,13 @@ nostalgia 10); (2) add a 6th class, **Necromancer**, the pet/summoner class, who
 
 ## Changelog
 
+- **2026-06-20** — **K.5 shipped: data-driven AI profiles.** Moved the profile→behaviour mapping out of `brainOf` code
+  into `behavior-profiles.json` data — the 4 GDD profiles gained machine-readable `targetEnemy` lists (tunnel-vision →
+  focusHighestHp, executioner → focusLowestHp+priority, peel/opportunist → focusByPriority) and 2 new **enemy profiles**
+  (melee → focusTank, caster → focusSquishy) carry `targetAlly`. `BehaviorProfileSchema` is now `action?`/`targetEnemy?`/
+  `targetAlly?` string lists; `brainOf` reads them (the role still provides the action base since profiles span roles).
+  **The payoff: a new enemy or spec is now authored as a profile, with no engine code.** Byte-identical to K.4 (egm-smoke
+  816/868/1097/1238, op-verify 6/6, ceiling +17/+20/+3, `tsc` clean).
 - **2026-06-20** — **K.4 shipped: tactics dials are now the party's AI orders.** Threaded `ctx.tactics` (the 4 dials) into
   the brain. **Kill Order** gates `focusByPriority` — at 0 the party just hits the lead enemy (no caster priority), at ≥1
   it kills back-band casters first. **Cooldowns** makes defence proactive — it raises the `emergencyDefensive` HP threshold

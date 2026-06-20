@@ -1,6 +1,8 @@
 [
-  { "id": "tunnel-vision", "name": "Tunnel Vision", "behavior": "Always hits highest HP target, ignores adds" },
-  { "id": "executioner",   "name": "Executioner",   "behavior": "Switches to lowest HP target to secure kills" },
-  { "id": "peel",          "name": "Peel",          "behavior": "Prioritizes targets attacking allies" },
-  { "id": "opportunist",   "name": "Opportunist",   "behavior": "Mirrors the tank's current target" }
+  { "id": "tunnel-vision", "name": "Tunnel Vision", "behavior": "Always hits highest HP target, ignores adds",     "targetEnemy": ["focusHighestHp"] },
+  { "id": "executioner",   "name": "Executioner",   "behavior": "Switches to lowest HP target to secure kills",    "targetEnemy": ["focusLowestHp", "focusByPriority"] },
+  { "id": "peel",          "name": "Peel",          "behavior": "Prioritizes targets attacking allies",            "targetEnemy": ["focusByPriority"] },
+  { "id": "opportunist",   "name": "Opportunist",   "behavior": "Mirrors the tank's current target",               "targetEnemy": ["focusByPriority"] },
+  { "id": "melee",         "name": "Melee",         "behavior": "Front-line bruiser — smashes the party tank",      "targetAlly": ["focusTank"] },
+  { "id": "caster",        "name": "Caster",        "behavior": "Acts from the back band, dives the squishiest ally", "targetAlly": ["focusSquishy"] }
 ]
