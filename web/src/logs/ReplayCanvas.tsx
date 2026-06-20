@@ -75,7 +75,7 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
       key: "p:" + m.pid, pid: m.pid, team: "party" as const, name: m.name, specId: m.specId, portrait: m.portrait,
       isBoss: false, ranged: m.back, frac: 1, dead: false, ax: x, ay: spreadY(i, list.length),
     }))
-    return [...place(front, 0.27), ...place(back, 0.10)]
+    return [...place(front, 0.24), ...place(back, 0.08)]
   }, [result, members])
 
   // ---- enemy dots from the active stage (boss centered; trash split front/back like the bands) ----
@@ -87,19 +87,39 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
       key: "e:" + m.id, team: "enemy" as const, name: m.name, isBoss: false, ranged: m.band === "back",
       frac: 1, dead: false, ax: x, ay: spreadY(i, list.length),
     }))
-    const dots: Dot[] = [...place(ef, 0.50), ...place(eb, 0.78)]
-    if (boss) dots.push({ key: "e:" + boss.id, team: "enemy", name: boss.name, isBoss: true, ranged: false, frac: 1, dead: false, ax: 0.57, ay: 0.5 })
+    const dots: Dot[] = [...place(ef, 0.56), ...place(eb, 0.82)]
+    if (boss) dots.push({ key: "e:" + boss.id, team: "enemy", name: boss.name, isBoss: true, ranged: false, frac: 1, dead: false, ax: 0.64, ay: 0.5 })
     return dots
   }, [stage?.idx, tl]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // live HP + dead state + idle-bobbed pixel position for every dot this frame
+  // ---- movement: fake EGM-style engagement (the sim has no positions, so this is purely cosmetic) ----
+  // Combatants leave their start columns and CLOSE on each other: melee charge to a center contact line and pair
+  // off against a living foe (re-seeking as foes die), ranged hold back. `eng` ramps over the stage's first
+  // seconds (the charge-in). On top sits a melee press/sway + an idle bob, so the scrum keeps moving; a per-attack
+  // lunge (below) makes attackers jab at their target. The CSS `.replay-dot` transition smooths it frame-to-frame.
+  const rawFrac = (d: Dot) => d.team === "party" ? (hp[d.key.slice(2)] ?? 1) : mobHpFrac(stageMobs.find((m) => "e:" + m.id === d.key)!, sec)
+  const stageStart = stage?.startSec ?? 0
+  const eng = clamp((clock - stageStart) / 2.5, 0, 1)
+  const livingEnemyFront = enemyDots.filter((d) => !d.ranged && rawFrac(d) > 0.001).sort((a, b) => a.ay - b.ay)
+  const meleeY = new Map<string, number>()
+  partyDots.filter((d) => !d.ranged).sort((a, b) => a.ay - b.ay)
+    .forEach((d, i) => { const t = livingEnemyFront[i % livingEnemyFront.length]; if (t) meleeY.set(d.key, t.ay) })
+  const engaged = (d: Dot): { ex: number; ey: number } => {
+    if (d.team === "party") return d.ranged ? { ex: 0.17, ey: d.ay } : { ex: 0.43, ey: meleeY.get(d.key) ?? d.ay }
+    if (d.isBoss) return { ex: 0.52, ey: 0.5 }
+    return d.ranged ? { ex: 0.73, ey: d.ay } : { ex: 0.49, ey: d.ay }
+  }
+
   const place = (d: Dot) => {
-    const frac = d.team === "party"
-      ? (hp[d.key.slice(2)] ?? 1)
-      : mobHpFrac(stageMobs.find((m) => "e:" + m.id === d.key)!, sec)
+    const frac = rawFrac(d)
     const ph = hashF(d.key) * 6.283
-    const ax = clamp(d.ax + (hashF(d.key + "x") - 0.5) * 0.03 + Math.cos(clock * 0.9 + ph) * 0.004, 0.04, 0.96)
-    const ay = clamp(d.ay + (hashF(d.key + "y") - 0.5) * 0.05 + Math.sin(clock * 0.8 + ph) * 0.007, 0.08, 0.92)
+    const jx = (hashF(d.key + "x") - 0.5) * 0.03, jy = (hashF(d.key + "y") - 0.5) * 0.05
+    const { ex, ey } = engaged(d)
+    let ax = (d.ax + jx) * (1 - eng) + (ex + jx) * eng
+    let ay = (d.ay + jy) * (1 - eng) + (ey + jy) * eng
+    if (!d.ranged && !d.isBoss) ax += Math.sin(clock * 0.5 + ph) * 0.012 * eng   // melee press into the contact
+    ax = clamp(ax + Math.cos(clock * 0.9 + ph) * 0.004, 0.04, 0.96)              // idle bob
+    ay = clamp(ay + Math.sin(clock * 0.8 + ph) * 0.007, 0.08, 0.92)
     return { ...d, frac, dead: frac <= 0.001, px: ax * W, py: ARENA_TOP + ay * ARENA_H, axPct: ax * 100 }
   }
   const dots = [...partyDots.map(place), ...enemyDots.map(place)]
@@ -131,6 +151,7 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
   type FloatN = { key: string; x: number; y: number; color: string; txt: string; big: boolean }
   type ImpactN = { key: string; x: number; y: number; color: string }
   const shots: Shot[] = [], floats: FloatN[] = [], impacts: ImpactN[] = []
+  const lunge = new Map<string, { x: number; y: number }>()   // melee attacker key → jab vector toward its target
 
   const hits = result.log
     .filter((e) => inWin(e.tSec) && (e.meta?.amount ?? 0) > 0)
@@ -150,6 +171,7 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
         const sc = src.team === "party" ? "rgba(120,220,160,.75)" : "rgba(230,120,120,.7)"
         shots.push({ key: `${e.tSec}:s${j}`, sx: src.px, sy: src.py, tx: tgt.px, ty: tgt.py, ranged: src.ranged, color: sc })
         impacts.push({ key: `${e.tSec}:i${j}`, x: tgt.px, y: tgt.py, color: tgt.team === "party" ? "rgba(224,68,78,.6)" : "rgba(240,165,46,.6)" })
+        if (!src.ranged) lunge.set(src.key, { x: tgt.px - src.px, y: tgt.py - src.py })   // melee jabs toward its target this beat
       }
     }
   })
@@ -192,7 +214,7 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
 
       {/* dots */}
       <div style={{ position: "absolute", inset: 0, zIndex: 3 }}>
-        {dots.map((d) => <DotView key={d.key} d={d} />)}
+        {dots.map((d) => <DotView key={d.key} d={d} lunge={lunge.get(d.key)} />)}
       </div>
 
       {/* projectiles / impacts / floats / death bursts / flashes */}
@@ -215,8 +237,8 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
   )
 }
 
-/* one combatant: portrait/glyph dot + name + HP bar; dead → grayed + skull */
-function DotView({ d }: { d: Dot & { px: number; py: number; axPct: number; frac: number; dead: boolean } }) {
+/* one combatant: portrait/glyph dot + name + HP bar; dead → grayed + skull; melee jabs toward its target via `lunge` */
+function DotView({ d, lunge }: { d: Dot & { px: number; py: number; axPct: number; frac: number; dead: boolean }; lunge?: { x: number; y: number } }) {
   const info = d.specId ? mc(d.specId) : null
   const size = d.isBoss ? 50 : d.team === "party" ? 38 : 30
   const pct = Math.round(d.frac * 100)
@@ -224,8 +246,10 @@ function DotView({ d }: { d: Dot & { px: number; py: number; axPct: number; frac
   const barColor = d.dead ? "#3a3d48"
     : d.team === "party" ? (d.frac > 0.5 ? "var(--good)" : d.frac > 0.25 ? "var(--amber)" : "var(--danger)")
     : "linear-gradient(90deg,#e0626b,#f0a52e)"
+  const m = lunge && !d.dead ? (Math.hypot(lunge.x, lunge.y) || 1) : 1
+  const lx = lunge && !d.dead ? (lunge.x / m) * 11 : 0, ly = lunge && !d.dead ? (lunge.y / m) * 11 : 0
   return (
-    <div className="replay-dot" style={{ left: d.axPct + "%", top: d.py, width: Math.max(size, 54), opacity: d.dead ? 0.45 : 1 }}>
+    <div className="replay-dot" style={{ left: d.axPct + "%", top: d.py, width: Math.max(size, 54), opacity: d.dead ? 0.45 : 1, transform: `translate(-50%,-50%) translate(${lx.toFixed(1)}px,${ly.toFixed(1)}px)` }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
         <span aria-label={`${d.name} ${pct}%`} style={{
           position: "relative", width: size, height: size, borderRadius: d.isBoss ? 13 : "50%", flex: "none",

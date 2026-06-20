@@ -277,8 +277,9 @@ a { color: var(--link); text-decoration: none; }
 .replay-hpbar { transition: width .14s linear, background .2s; }
 
 /* ---- Phase I v2: faked-spatial arena (EGM-style moving dots) ---- */
-/* a combatant dot smoothly tracks its (idle-bobbed) home between renders → reads as movement */
-.replay-dot { position: absolute; transform: translate(-50%, -50%); transition: left .12s linear, top .12s linear; }
+/* a combatant dot smoothly tracks its (idle-bobbed, engaging) position between renders → reads as movement;
+   `transform` is transitioned too so the per-attack melee lunge eases in/out */
+.replay-dot { position: absolute; transform: translate(-50%, -50%); transition: left .12s linear, top .12s linear, transform .1s ease-out; }
 /* an attack line (melee swipe / faint ranged tracer) flashes from attacker to target, then fades */
 @keyframes shotFade { from { opacity: .8; } to { opacity: 0; } }
 .replay-shot { animation: shotFade .26s ease-out forwards; }
