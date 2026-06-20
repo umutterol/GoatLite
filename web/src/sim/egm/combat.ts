@@ -85,7 +85,7 @@ function targetsFor(side: string, pattern: string, count: number | undefined, ca
     if (pattern === "all") return living
     if (pattern === "lowest-hp") return [living.slice().sort((a, b) => a.hp - b.hp)[0]]
     if (pattern === "adjacent") return living.slice(0, 1 + (count ?? 1))
-    return [living[0]]
+    return [decidePartyFocus(caster, living, ctx) ?? living[0]]   // K.3: single-target hits the brain's chosen focus (kill order / execute)
   }
   // ally
   if (pattern === "all" || pattern === "aura") return aliveAllies(ctx)
@@ -711,7 +711,7 @@ export function executeAbility(caster: Combatant, ability: PlayerAbility, ctx: C
 
 /** Fallback when no ability is usable (e.g. a silenced unit, or a healer with nobody hurt): a plain auto-attack. */
 export function basicAttack(caster: Combatant, ctx: CombatCtx): void {
-  const target = livingMobs(ctx)[0]
+  const target = decidePartyFocus(caster, livingMobs(ctx), ctx)   // K.3: auto-attack the brain's focus
   if (!target) return
   const e = eff(caster)
   const emp = takeEmpower(caster)   // Camouflage: empower the auto-attack out of stealth
@@ -831,13 +831,35 @@ const ACTION_BEHAVIOURS: Record<string, ActionBehaviour> = {
   dumpRotation: (caster, ctx) => readyUsable(caster, ctx, (a) => !isMajor(a))[0] ?? null,
 }
 
-/** Resolve an actor's ordered action behaviour list from its role/profile. (K.5 will read machine-readable `behaviours`
-    off `content.profiles.get(actor.profile)` and overlay onto the role base; K.2 uses role defaults.) */
-function brainOf(actor: Combatant): { action: string[] } {
-  if (actor.team !== "party") return { action: [] }
-  if (actor.role === "healer") return { action: ["holdForWindow", "triageHeal", "dumpRotation"] }
-  if (actor.role === "tank") return { action: ["holdForWindow", "emergencyDefensive", "dumpRotation"] }
-  return { action: ["holdForWindow", "dumpRotation"] }   // dps
+/* ---- K.3: target-selection behaviours (shared — pick one combatant from a candidate pool; stable/deterministic) ---- */
+type TargetBehaviour = (candidates: Combatant[], actor: Combatant, ctx: CombatCtx) => Combatant | undefined
+const TARGET_BEHAVIOURS: Record<string, TargetBehaviour> = {
+  // kill priority: back-band (casters/ranged) first, then lowest HP (secure the kill) — stable so the party focus-fires together
+  focusByPriority: (c) => (c.length ? [...c].sort((a, b) => (a.position === "Back" ? 0 : 1) - (b.position === "Back" ? 0 : 1) || a.hp - b.hp)[0] : undefined),
+  focusLowestHp: (c) => (c.length ? [...c].sort((a, b) => a.hp - b.hp)[0] : undefined),     // executioner: snipe almost-dead mobs
+  focusHighestHp: (c) => (c.length ? [...c].sort((a, b) => b.hp - a.hp)[0] : undefined),     // tunnel-vision tank: hold the biggest
+  focusLead: (c) => c[0],
+  focusTank: (c) => c.find((p) => p.role === "tank") ?? c[0],                                 // melee/adds smash the tank
+  focusSquishy: (c) => {                                                                       // casters dive the squishiest non-tank (back line first)
+    const nonTank = c.filter((p) => p.role !== "tank")
+    return [...(nonTank.length ? nonTank : c)].sort((a, b) => (a.position === "Back" ? 0 : 1) - (b.position === "Back" ? 0 : 1) || a.maxHp - b.maxHp)[0]
+  },
+}
+
+/** Resolve an actor's ordered behaviour lists from its role + GDD profile. (K.5 moves these to machine-readable profile data.) */
+function brainOf(actor: Combatant): { action: string[]; targetEnemy: string[]; targetAlly: string[] } {
+  if (actor.team !== "party") {
+    // enemy: a back-band 'caster' dives the squishy; melee/adds focus the tank
+    return { action: [], targetEnemy: [], targetAlly: actor.profile === "caster" ? ["focusSquishy"] : ["focusTank"] }
+  }
+  const action = actor.role === "healer" ? ["holdForWindow", "triageHeal", "dumpRotation"]
+    : actor.role === "tank" ? ["holdForWindow", "emergencyDefensive", "dumpRotation"]
+    : ["holdForWindow", "dumpRotation"]
+  // the GDD profile drives enemy-target priority (K.4 layers the Kill Order tactic on top; K.5 moves to data)
+  const targetEnemy = actor.profile === "executioner" ? ["focusLowestHp", "focusByPriority"]
+    : actor.profile === "tunnel-vision" ? ["focusHighestHp"]
+    : ["focusByPriority"]   // peel / opportunist / default → kill casters/threats first, focus-fire
+  return { action, targetEnemy, targetAlly: [] }
 }
 
 /** Brain — which ability the actor casts this turn (null → basic attack). The single action decision point. */
@@ -846,8 +868,17 @@ export function decideAction(actor: Combatant, ctx: CombatCtx): PlayerAbility | 
   return null
 }
 
-/** Brain — who an enemy attacks. K.1 reproduces the current rule exactly (the tick's tank if standing, else first alive).
-    `tickTank` is the per-tick cached tank from the engine; K.3 replaces the body with profile-driven targeting. */
-export function decideEnemyTarget(_enemy: Combatant, ctx: CombatCtx, tickTank: Combatant | undefined): Combatant | undefined {
-  return tickTank && tickTank.downedUntil < 0 ? tickTank : ctx.party.filter((p) => p.downedUntil < 0)[0]
+/** Brain — a party member's chosen ENEMY focus among `candidates` (the band-narrowed living mobs). Drives single-target picks. */
+export function decidePartyFocus(actor: Combatant, candidates: Combatant[], ctx: CombatCtx): Combatant | undefined {
+  if (!candidates.length) return undefined
+  for (const id of brainOf(actor).targetEnemy) { const t = TARGET_BEHAVIOURS[id]?.(candidates, actor, ctx); if (t) return t }
+  return candidates[0]
+}
+
+/** Brain — who an enemy attacks (K.3: profile-driven — melee → tank, caster → squishy). */
+export function decideEnemyTarget(enemy: Combatant, ctx: CombatCtx): Combatant | undefined {
+  const alive = ctx.party.filter((p) => p.downedUntil < 0)
+  if (!alive.length) return undefined
+  for (const id of brainOf(enemy).targetAlly) { const t = TARGET_BEHAVIOURS[id]?.(alive, enemy, ctx); if (t) return t }
+  return alive[0]
 }

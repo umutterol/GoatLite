@@ -183,8 +183,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
         }
       }
 
-      // --- enemy actions (focus the tank; mitigated by armour) ---
-      const tank = aliveParty().find((p) => p.role === "tank") ?? aliveParty()[0]
+      // --- enemy actions (K.3: target via the brain — melee→tank, caster→squishy; mitigated by armour) ---
       for (const m of livingMobs()) {
         let acted = 0
         while (t >= m.nextActionAt && acted < MAX_ACTIONS_PER_STEP) {
@@ -195,7 +194,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
           const cc = controlState(m)
           if (cc.blocked) continue                   // mob stunned / frozen (Leg Sweep, Frost Nova, Meteor)
           if (cc.dazed) { consumeDaze(m); continue }
-          const victim = decideEnemyTarget(m, ctx, tank)
+          const victim = decideEnemyTarget(m, ctx)
           if (!victim) break
           const amount = m.attackPower * enrage   // Raging no longer spikes per-hit damage — it grants haste (handled at the attack-interval step above)
           const r = resolveEnemyAttack(m, victim, { amount, damageType: m.damageType, critChance: 0, critMult: 1, critable: false }, ctx)

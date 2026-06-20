@@ -46,7 +46,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | H | **Combat depth (per-spec majors + talents)** | ✅ 4/4 — 10 majors live + talents 3–5 wired + rebalanced |
 | I | **2D replay (abstract packs)** | ⬜ 0/4 — **design ✅** (`Post-F-Clusters-Plan.md`) |
 | J | **Feedback & polish batch (10 user reports)** | ✅ 10/10 — shipped + live-verified (`Post-F-Clusters-Plan.md` Cluster J) |
-| K | **Combat AI rework (v2)** | 🟡 2/6 — K.1 scaffold + K.2 rotation behaviours done; design `Combat-AI-Design.md` |
+| K | **Combat AI rework (v2)** | 🟡 3/6 — K.1–K.3 done (brain + rotations + targeting); design `Combat-AI-Design.md` |
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
 
 ---
@@ -239,7 +239,7 @@ boss-script integration are fast-follows). Full design + open questions in `Comb
 |---|---|---|---|---|---|---|
 | K.1 | Brain scaffold + behaviour primitive kit + profile schema | engine | major | L | ✅ | `decideAction`/`decideEnemyTarget` single decision points in `combat.ts` walk a profile-resolved behaviour list (`brainOf`); default `dumpRotation`/tank-focus reproduce current play; `Combatant.profile` wired (spec defaultProfile / enemy melee\|caster); `BehaviorProfileSchema` gained optional `base`+`behaviours` (K.5 populates). **Byte-identical proven** — egm-smoke matches golden (798/868/1068/1202) + op-verify determinism 6/6, `tsc` clean |
 | K.2 | Player rotation behaviours | engine | major | M | ✅ | `holdForWindow` (defensive majors wait for danger/boss; offensive majors fire on boss/≥3-pack — no more dumping on a straggler), `triageHeal` (healer casts the heal SIZED to the injury, skips near-full allies → fixes Flash-vs-Greater overheal), `emergencyDefensive`, `dumpRotation` now excludes majors. Verified: healer mixes Flash 84×/Greater 68× (was always-Greater), +2 floor 6/6, determinism holds, **ceiling unchanged (+18/+20) → no nudge needed** |
-| K.3 | Player + enemy target selection | engine | major | M | ⬜ | players: `focusByPriority`/`focusLowestHp`/`diveBackline`/`peel`; enemies: `caster`(back-band, dive squishy)/`fixate`/`focusByThreat` profiles — smarter than "always the tank" |
+| K.3 | Player + enemy target selection | engine | major | M | ✅ | `TARGET_BEHAVIOURS`: party `focusByPriority` (kill back-band casters first, focus-fire), `focusLowestHp` (executioner snipe), `focusHighestHp` (tunnel-vision tank) — profile-driven; enemy `caster`→`focusSquishy` (dive non-tank back-line), melee/adds→`focusTank`. Wired into `targetsFor` single-target + `basicAttack` + `decideEnemyTarget`. Verified: casters now hit squishies (180× non-tank / 0× tank), +2 floor 6/6, determinism holds, ceiling back to fresh +17/maxed +20/runway +3 (≈ F.6) — no nudge. (peel folds into focusByPriority; no threat system per design) |
 | K.4 | Tactics-as-orders | engine | major | M | ⬜ | Kill Order→`focusByPriority`, Interrupts→`interruptCast` readiness, Cooldowns→`holdForWindow`, Positioning→avoidance; reconcile with the existing affix/boss-mechanic rolls (no double-count) |
 | K.5 | Spec overlays | engine | major | M | ⬜ | machine-readable `behaviours` on the 4 GDD profiles (executioner/opportunist/peel/tunnel-vision) + per-spec assignment; verify each spec plays to flavour |
 | K.6 | Balance + verification pass | engine | major | M | ⬜ | smarter AI ≈ more output/survival → expect a difficulty nudge (like H.4); `egm-smoke` holds the +2 floor; determinism; adversarial review |
@@ -277,6 +277,15 @@ trademark (a pre-launch IP blocker). Isolated — good warm-up commit. Full desi
 
 ## Changelog
 
+- **2026-06-20** — **K.3 shipped: brain-driven target selection (players + enemies).** `TARGET_BEHAVIOURS` kit: party
+  `focusByPriority` (kill back-band casters first, then lowest HP — stable so the party focus-fires together), `focusLowestHp`
+  (executioner specs snipe almost-dead mobs), `focusHighestHp` (tunnel-vision tanks hold the biggest); enemy `caster` profile
+  → `focusSquishy` (dive the squishiest non-tank, back line first), melee/adds → `focusTank`. The GDD profile picks the
+  party targeting list; wired into `targetsFor` (single-target), `basicAttack`, and `decideEnemyTarget` (which dropped its
+  cached-tank param). **Verified:** `tsc` clean; Bone Acolyte casters now hit non-tanks 180× / tank 0× (were glued to the
+  tank); +2 floor 6/6; determinism holds; key ceiling settled at **fresh +17 / maxed +20 / runway +3** — back at the F.6
+  calibration (the caster-dive pressure offset by smarter kill-priority), so no nudge needed. (Peel folds into
+  focusByPriority — no threat system in v1, per the design lean.)
 - **2026-06-20** — **K.2 shipped: player rotation behaviours (the first real AI smarts).** Replaced the brain's default
   behaviours with: `holdForWindow` — the spec major no longer fires on cooldown; **defensive** majors (walls/absorbs/raid
   heals, classified by effect) wait for `partyInDanger` or a boss, **offensive** majors fire on a boss or a ≥3-enemy pack
