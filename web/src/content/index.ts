@@ -85,6 +85,8 @@ for (const s of specs.values()) {
   ref(classes.has(s.classId), `spec '${s.id}' → unknown classId '${s.classId}'`)
   ref(profiles.has(s.defaultProfile), `spec '${s.id}' → unknown defaultProfile '${s.defaultProfile}'`)
 }
+// K.6: enemy profiles are hardcoded in makeEnemy (stats.ts — band 'back' → 'caster', else → 'melee'); pin that the data backs them
+for (const p of ["melee", "caster"]) ref(profiles.has(p), `enemy profile '${p}' (assigned in makeEnemy) is not defined in behavior-profiles.json`)
 for (const sk of skills.values()) {
   ref(classes.has(sk.classId), `skill '${sk.id}' → unknown classId '${sk.classId}'`)
   ref(specs.has(sk.specId), `skill '${sk.id}' → unknown specId '${sk.specId}'`)

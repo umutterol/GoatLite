@@ -22,7 +22,7 @@ try {
   const majorLines = await page.getByText("✦ MAJOR").count()
   check(majorLines > 0, `replay log has ✦ MAJOR lines (${majorLines})`)
   // a major spell name should also be an underlined LogSpell with a tooltip
-  const majorNames = await page.getByText(/Code Freeze|Hotfix Deploy|Ship It|Prod Incident|Standup Hype|Crunch Time|Rollback Plan|Zen Mode|Gradual Rollout|Root-Cause/).count()
+  const majorNames = await page.getByText(/Bulwark Banner|Sacred Bastion|Unmoving Mountain|Light's Salvation|Blossoming Tide|Reckless Frenzy|Killing Edge|Rallying Crescendo|Emberstorm|Nullifying Surge/).count()
   check(majorNames > 0, `major spell names render in the log (${majorNames})`)
 
   // H.2: Character-sheet Signature card

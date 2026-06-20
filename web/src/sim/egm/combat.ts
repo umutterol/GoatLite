@@ -790,6 +790,8 @@ function readyUsable(caster: Combatant, ctx: CombatCtx, filter: (a: PlayerAbilit
 function majorKind(a: PlayerAbility): "defensive" | "offensive" {
   const effs = a.effects as Effect[]
   const def = effs.some((e) => e.type === "shield" || e.type === "heal"
+    || (e.type === "applyStatus" && isHot(e.status))                                  // K.6: HoT-only majors (Blossoming Tide) are defensive — hold for danger
+    || (e.type === "special" && HEAL_SPECIALS.has(e.mechanic))
     || (e.type === "buff" && ["damageTaken", "armour", "resist"].includes(e.stat))
     || (e.type === "special" && ["parry-counter", "redirect-damage", "damage-redirect", "attack-immunity"].includes(e.mechanic)))
   const off = effs.some((e) => e.type === "damage"
@@ -817,9 +819,18 @@ const ACTION_BEHAVIOURS: Record<string, ActionBehaviour> = {
     if (caster.role !== "healer") return null
     const hurt = injuredAllies(ctx)[0]
     if (!hurt || hurt.hp / hurt.maxHp >= 0.85) return null
-    const heals = readyUsable(caster, ctx, (a) => !isMajor(a) && (a.effects as Effect[]).some((e) => e.type === "heal"))
+    // K.6: recognise HoT/special heals, not just plain "heal" effects — the Lifebinder heals ENTIRELY through HoTs, so the
+    // old `e.type === "heal"` filter left triage dead for that spec. Mirror usable()'s heal detection.
+    const isHeal = (e: Effect) => e.type === "heal" || (e.type === "applyStatus" && isHot(e.status)) || (e.type === "special" && HEAL_SPECIALS.has(e.mechanic))
+    const heals = readyUsable(caster, ctx, (a) => !isMajor(a) && (a.effects as Effect[]).some(isHeal))
     if (!heals.length) return null
-    const sizeOf = (a: PlayerAbility) => { const e = (a.effects as Effect[]).find((x) => x.type === "heal"); return (e?.base ?? 0) + (e?.scale ?? 0) * 100 }
+    // estimate an ability's total heal so triage can size it to the injury (direct heal, HoT tick×duration, or burst special)
+    const sizeOf = (a: PlayerAbility) => (a.effects as Effect[]).reduce((s, e) => {
+      if (e.type === "heal") return s + (e.base ?? 0) + (e.scale ?? 0) * 100
+      if (e.type === "applyStatus" && isHot(e.status)) return s + ((e.magnitudeBase ?? 0) + (e.magnitudeScale ?? 0) * 100) * (e.durationTurns ?? 1)
+      if (e.type === "special" && HEAL_SPECIALS.has(e.mechanic)) { const p = e.params ?? {}; return s + ((p.bloomHealBasePerStack ?? p.healBase ?? 60) + (p.bloomHealScalePerStack ?? p.healScale ?? 0) * 100) * (p.burstMultiplier ?? 1) }
+      return s
+    }, 0)
     const bySize = [...heals].sort((a, b) => sizeOf(b) - sizeOf(a))   // biggest first
     return (1 - hurt.hp / hurt.maxHp) >= 0.4 ? bySize[0] : bySize[bySize.length - 1]   // big injury → biggest heal; light → smallest
   },

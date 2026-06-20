@@ -46,7 +46,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | H | **Combat depth (per-spec majors + talents)** | ✅ 4/4 — 10 majors live + talents 3–5 wired + rebalanced |
 | I | **2D replay (abstract packs)** | ⬜ 0/4 — **design ✅** (`Post-F-Clusters-Plan.md`) |
 | J | **Feedback & polish batch (10 user reports)** | ✅ 10/10 — shipped + live-verified (`Post-F-Clusters-Plan.md` Cluster J) |
-| K | **Combat AI rework (v2)** | 🟡 5/6 — K.1–K.5 done (data-driven profiles); K.6 balance/review left |
+| K | **Combat AI rework (v2)** | ✅ 6/6 — shared priority-rules brain (players + enemies), data-driven profiles, tactics-as-orders, 20-agent adversarial review (3 fixes) |
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
 | L | **Roster expansion — Marksman + Necromancer** | ⬜ 0/7 — **design ✅** (`MMO-Nostalgia-Reference.md` §6) |
 
@@ -243,7 +243,7 @@ boss-script integration are fast-follows). Full design + open questions in `Comb
 | K.3 | Player + enemy target selection | engine | major | M | ✅ | `TARGET_BEHAVIOURS`: party `focusByPriority` (kill back-band casters first, focus-fire), `focusLowestHp` (executioner snipe), `focusHighestHp` (tunnel-vision tank) — profile-driven; enemy `caster`→`focusSquishy` (dive non-tank back-line), melee/adds→`focusTank`. Wired into `targetsFor` single-target + `basicAttack` + `decideEnemyTarget`. Verified: casters now hit squishies (180× non-tank / 0× tank), +2 floor 6/6, determinism holds, ceiling back to fresh +17/maxed +20/runway +3 (≈ F.6) — no nudge. (peel folds into focusByPriority; no threat system per design) |
 | K.4 | Tactics-as-orders | engine | major | M | ✅ | `ctx.tactics` threaded into the brain. **Kill Order** gates `focusByPriority` (0 → just hit the lead, no caster priority); **Cooldowns** scales the `emergencyDefensive` threshold + pre-empts defensive majors on big packs. **Interrupts/Positioning** stay the existing affix/boss rolls (already real — real interrupt cast-bars are a fast-follow). Verified: all-0 (1238s) vs all-3 (1097s) diverge more; +2 floor 6/6; determinism + ceiling (+17/+20/+3) hold (no double-count surfaced) |
 | K.5 | Spec overlays (data-driven profiles) | engine | major | M | ✅ | moved the profile→behaviour mapping from `brainOf` code into `behavior-profiles.json` data: the 4 GDD profiles got `targetEnemy` (tunnel-vision→focusHighestHp, executioner→focusLowestHp+priority, peel/opportunist→focusByPriority) + 2 new enemy profiles (melee→focusTank, caster→focusSquishy) with `targetAlly`. `BehaviorProfileSchema` now `action?`/`targetEnemy?`/`targetAlly?` string lists; `brainOf` reads them (role provides the action base). **New enemy/spec = author a profile, no engine code.** Byte-identical to K.4 (egm-smoke 816/868/1097/1238, op-verify 6/6) |
-| K.6 | Balance + verification pass | engine | major | M | ⬜ | smarter AI ≈ more output/survival → expect a difficulty nudge (like H.4); `egm-smoke` holds the +2 floor; determinism; adversarial review |
+| K.6 | Balance + verification pass | engine | major | M | ✅ | 20-agent adversarial review of the K brain → 3 confirmed (2 major, 1 nit), all fixed: (1) `triageHeal` was dead for the Lifebinder (filtered only `heal`-type effects; that spec heals entirely via HoTs) → broadened to HoT/special heals with HoT-aware sizing; (2) `majorKind` misclassified the HoT-only major **Blossoming Tide** as offensive → now HoT/heal-special majors are defensive (held for danger, not dumped on packs); (3) hardened content load to cross-validate the hardcoded enemy `melee`/`caster` profiles. No difficulty nudge needed — fixing the over-dumped raid HoT naturally tightened the maxed ceiling +20→**+19** (fresh **+17** unchanged, **+2** operator runway); +2 floor 6/6, determinism holds, live UI clean |
 
 ## ※ Affix swap — original fantasy season (IP scrub) ⬜ (design ✅, ready)
 
@@ -300,6 +300,20 @@ nostalgia 10); (2) add a 6th class, **Necromancer**, the pet/summoner class, who
 
 ## Changelog
 
+- **2026-06-20** — **K.6 shipped: Phase K complete — balance + 20-agent adversarial review.** Ran a find→verify review
+  workflow over the whole K brain (rotation / targeting / tactics+data+determinism); 3 findings survived independent
+  verification (2 major, 1 nit), all fixed in `combat.ts` + `content/index.ts`: **(1)** `triageHeal` was silently dead
+  for the Lifebinder healer — it filtered only plain `heal` effects, but that spec heals *entirely* through HoTs
+  (`applyStatus`) and heal-specials, so triage never fired (it fell through to `dumpRotation`). Broadened the heal filter
+  to mirror `usable()`'s detection and gave `sizeOf` HoT-aware sizing (tick×duration) + burst-special sizing, so both
+  healer specs now size their heal to the injury. **(2)** `majorKind()` misclassified the HoT-only major **Blossoming
+  Tide** as *offensive* (its lone effect is an applyStatus regrowth HoT, which matched neither the def nor off predicate)
+  → it was being dumped on every 3+ trash pack instead of held for danger. HoT/heal-special majors are now **defensive**.
+  **(3)** Hardened `content/index.ts` to cross-validate the two enemy profile ids (`melee`/`caster`) that `makeEnemy`
+  hardcodes. **No difficulty nudge needed:** fixing the over-dumped raid HoT honestly tightened the maxed ceiling
+  +20→**+19** (fresh **+17** unchanged → **+2** operator runway, still "a few keys"); the +2 floor holds 6/6, determinism
+  holds (op-verify), smoke all-timed (Volcanic 826s / week 868s / all-3 1097s / all-0 1258s), live UI clean (24 majors,
+  0 console errors). Phase K (shared combat-AI brain) is done.
 - **2026-06-20** — **K.5 shipped: data-driven AI profiles.** Moved the profile→behaviour mapping out of `brainOf` code
   into `behavior-profiles.json` data — the 4 GDD profiles gained machine-readable `targetEnemy` lists (tunnel-vision →
   focusHighestHp, executioner → focusLowestHp+priority, peel/opportunist → focusByPriority) and 2 new **enemy profiles**
