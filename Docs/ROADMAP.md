@@ -341,6 +341,15 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-21** — **Icon-tracker triage: dropped the 16 `status-*` icons; kept all ability icons.** Audited (3-reader
+  workflow + a direct grep) whether P3 ability/status icons surface anywhere in the live UI. Finding: the `GameIcon`
+  registry (`web/src/logs/components.tsx:65-79`) has **no `status` kind and no aura/buff-bar UI exists** — statuses
+  (dots/hots/buffs/debuffs/cc) live only inside the sim and are never drawn, so the 16 `status-*` rows were **removed
+  from `Docs/icon-tracker.csv`** (re-add only if a status/aura surface is ever designed). Per design decision, **all
+  ~70 `ability-*` rows (player + enemy) are kept** as needed — the user wants every ability to carry an icon. ⚠️
+  Follow-up (not done here): abilities currently render as **text only** (Event Log `LogSpell`; the per-spec MAJOR on
+  `CharacterPage` SignatureCard still uses a generic `bolt`) — making them show real icons needs an `ability` kind
+  wired into `GameIcon` + the render surfaces updated, in addition to sourcing the art.
 - **2026-06-21** — **Replay arena: continuous traveling path + tighter casters + de-aliased idle.** Reworked the
   movement from a per-pack reset into a **continuous seeded path**: a `useMemo` computes, per replay stage, a
   deterministic **pack center anywhere in the arena** (`hashF(seed+idx)` → `[0.32,0.80]×[0.30,0.78]`) and a party

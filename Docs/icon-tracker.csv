@@ -177,19 +177,3 @@ ability-grave-detail,ability-enemy,Grave Detail,abilities.json,no,P3,boss mechan
 ability-preserving-fume,ability-enemy,Preserving Fume,abilities.json,no,P3,boss mechanic
 ability-pooling-sorrow,ability-enemy,Pooling Sorrow,abilities.json,no,P3,boss mechanic
 ability-final-coronation,ability-enemy,Final Coronation,abilities.json,no,P3,boss mechanic
-status-bleed,status,Bleed,statuses.json,no,P3,dot
-status-poison,status,Poison,statuses.json,no,P3,dot
-status-burn,status,Burn,statuses.json,no,P3,dot
-status-chill,status,Chill,statuses.json,no,P3,debuff
-status-daze,status,Daze,statuses.json,no,P3,cc
-status-stun,status,Stun,statuses.json,no,P3,cc
-status-freeze,status,Freeze,statuses.json,no,P3,cc
-status-silence,status,Silence,statuses.json,no,P3,cc
-status-mark,status,Mark,statuses.json,no,P3,debuff
-status-rampage,status,Rampage,statuses.json,no,P3,resource
-status-cold-blood,status,Cold Blood,statuses.json,no,P3,buff
-status-stealth,status,Stealth,statuses.json,no,P3,buff
-status-regrowth,status,Regrowth,statuses.json,no,P3,hot
-status-blossom,status,Blossom,statuses.json,no,P3,hot
-status-natures-breath,status,Nature's Breath,statuses.json,no,P3,hot
-status-spirit-link-hot,status,Spirit Link,statuses.json,no,P3,hot
