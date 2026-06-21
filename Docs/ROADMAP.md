@@ -51,6 +51,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | L | **Roster expansion — Marksman + Necromancer** | ⬜ 0/7 — **design ✅** (`MMO-Nostalgia-Reference.md` §6) |
 | M | **Guild Feed & Loot Drama (social meta-layer)** | ✅ 5/5 (+1 v2) — feed + system notifications (M.1), loot-drama snub (M.2), deterministic bark engine (M.3) + voice packs (M.4) + snub-in-feed (M.5), all live-verified. M.6 (exchange beats + Rival) = v2 💤 |
 | N | **Intake balance (`enemyDmgMult`) + sim-dump tooling** | ✅ 2/2 — enemy damage is now an **isolated** intake lever (=2.0); survival binds below the timer wall; +2 floor + operator runway (+3) hold; new config/CLI `sim-dump` harness |
+| **P** | **Class-Tools System** (classes bring different tools to solve different problems) | ⬜ 0/6 — **design ✅** (`Class-Tools-System.md`); replaces C.10/C.8 "player not class"; GATE 0 → cast scheduler → typed dispels/reach/anti-heal; execute later |
 
 ---
 
@@ -319,6 +320,24 @@ the investigation (and all future ones) is config-driven and saved to files.*
 | N.1 | **`sim-dump` harness** — config/CLI sim runner that saves runs to files | tooling | major | M | ✅ | `web/scripts/sim-dump.mjs` (+ `sim-config.example.json`). **single** mode → full input + RunResult + derived analytics (per-member min-HP/DPS/HPS, party min-HP, seconds-in-danger, timer margin) as JSON **plus a readable combat-log `.md`**; **sweep** mode → matrix over keyLevels × affixSets × aggressions × seeds → aggregated table. Inputs: comp (presets `standard`/`probe`/`safety` or per-member objects), per-member ilvl/morale/skills/traits/talents, tactics, affix, aggression, key, seed, dungeon. `--ilvl-mode auto` = gear-appropriate (112+4·key, cap 160). Output → `web/sim-logs/` (gitignored). Supersedes `lifebinder-probe.mjs`. |
 | N.2 | **`enemyDmgMult` intake lever** — isolate + raise enemy damage | engine/balance | major | S | ✅ | added `tuning.sim.enemyDmgMult` (default 1 = no-op) folded into the `DMG_UNIT` constant in **both** `egm/stats.ts:~49` and `egm/engine.ts:~44` → one isolated "all enemy-dealt damage ×N" knob (auto-attacks + the 6 boss/affix mechanics), with **zero** effect on enemy HP (`HP_UNIT`), player throughput (`power`, no `DMG_UNIT` term), or kill-speed. Set to **2.0** from sim-dump sweeps. **Result (gate comp = safety 2H):** +2 floor still **6/6** timed at starting gear; +8 comfortable (54% min-HP, 0 danger); **survival now binds below the timer wall** (+17 wipes with time on the clock); gear-cap ceiling fresh +15 / maxed +18 → **operator runway +3** (was +17/+19 — the drop is intended: survival co-limits the ceiling now). Determinism intact (op-verify 6/6). **egm-smoke goldens shifted** (even 0-death low/over-geared runs ~8% slower — the AI now spends actions on healing/defense): week +8 868→**914s**, Volcanic +8 826→**884s**, all-3 1097→**1182s**, all-0 1258→**1367s**. No save migration (tuning is content, not persisted). |
 
+## Phase P — Class-Tools System (classes bring different tools to solve different problems) ⬜
+
+*Design ✅ `Class-Tools-System.md` (2026-06-22). **Replaces the "player not class" tuning of C.10/C.8**: class choice now
+MATTERS — each dungeon poses a typed PROBLEM answered by **2–3 different class TOOLS** (diversity, no mandatory comp), and
+the SPECIFIC tool wins, never generic survivability. Resolves the C.11 audit's open conflict. One commit per milestone;
+execute later.*
+
+| # | Task | Axis | Sev | Effort | Status | Notes |
+|---|---|---|---|---|---|---|
+| P.0 | **GATE 0** — fix boss-dive bug + global intake-floor (40% / cap-60% stacked) + steepen `resolveHit` school curves; **bump SAVE_VERSION** | engine/balance | major | M | ⬜ | Prereq for everything: the C.11 sweep proved the current reads are survival artifacts. Verify `tsc -b`+egm-smoke+`balance-sweep` → Ashveil comp spread **<2 keys**; record which P5/P6/P2/P3 gaps survive (survivors real, collapsed get re-tuned not designed around) |
+| P.1 | **Pyreward school re-tune (works-now) + Bard→Archer recut** | balance/content | major | M | ⬜ | Steepen the off-school tax to **+3–5 keys** (mixed-school core tops, single-school falls); add all-melee/all-magic comps to the sweep. Re-validate Stillhour (P5) / Mire (P6) burst/rot as real *shape* reads post-GATE-0. Remake Bard→**Archer** (ranged physical; drop lust+dispel). *Cheapest proof — no new engine system* |
+| P.2 | **Enemy cast scheduler + real interrupt** → Bellreach = P1 | engine | **major** | **L** | ⬜ | Pending-cast state (windup/telegraph/payload from `abilities.json`); wire interrupt (`combat.ts:675`)+landed-CC to cancel; demote interrupts dial to fallback. Verify: a no-kicker comp wipes Bellreach where Arcanist/Mystic/Pyromancer times. **The flagship** — also unlocks P8/P11 |
+| P.3 | **Dispel typing + enemy→party status** → Weltering Mire = P6+**P4** | engine/content | major | M | ⬜ | Magic/Curse vs Nature/Poison status field; spreading rot-curse on the Mire; Cleric (Magic) vs Lifebinder (Nature). Verify the wrong-type healer fails. (DPS don't dispel) |
+| P.4 | **Reach primitive + real adds + avoidable-immunity** → P11/P8/P7 | engine/content | major | M | ⬜ | Back-band reach penalty + Assassin dive + Guardian grip (P11); CC-able/castable adds (P8); immunity/relocate on the eruption (P7). Verify all-melee can't reach the sheltered caster; an add demands lock-or-kill |
+| P.5 | **Anti-heal/purge + self-healing enemy (P9) + final kit recut** | engine/balance | major | L | ⬜ | Self-mending boss on Pyreward; Berserker Grave-Wound; enemy-purge. **Narrow the 5 majors** (delete Bulwark Banner; recost Sacred Bastion / Light's Salvation→reactive-burst-not-rez / Blossoming Tide→rot-keyed / Arcane Barrier→CC-rider; gate Divine Shield; cap healer throughput). Full `balance-sweep`: no generic comp tops the avg, every problem ≥2 diverse top answers, wrong-tool falls +3–5 |
+
+*Dropped: P10 tank-buster / threat-model (needs a 2nd tank). Hour of Bells keeps its cooldowns-dial identity; Ashveil stays the dial sampler. Cleaner standalone homes for P4/P9 reserved for the Necromancer-expansion dungeons.*
+
 ---
 
 ## Open Design Decisions (resolve before/while building the dependent task)
@@ -345,6 +364,17 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-22** — **Phase P designed — the "Class-Tools System" (`Class-Tools-System.md`); goal flipped to "class choice
+  MATTERS".** After the C.11 audit, the user clarified the real goal is the OPPOSITE of "player not class": **classes
+  bring different tools to solve different dungeon problems**, class choice is a rewarding edge, and the user will redesign
+  the classes for cohesion. A multi-agent design pass produced a **12-problem taxonomy** (interrupt / school walls /
+  curse-dispel / burst / rot / eruption / adds / empowered-enemy / reach / enrage), a **cohesive 10-spec recut** (every
+  spec a signature verb, 2–3 diverse answers per problem, no dead weight), the **anti-generic-EHP plan** (narrow the 5
+  fungible majors), the **dungeon remap**, the **engine backlog** (cast scheduler is the key unlock), and a 6-milestone
+  build plan. User corrections locked: **2-healer must be timer-limited** (timer = real DPS check); **Bard→Archer**
+  (ranged physical); **DPS don't dispel** (healer-only); **P10 tank-buster DROPPED** (no 2nd tank) → Hour of Bells keeps
+  cooldowns; **Light's Salvation → reactive burst heal**, not a rez (combat-rez already exists); **intake floor 40%/cap-60%**;
+  **tool-tax +3–5 keys** with full-substitute alternates; **SAVE_VERSION bump at P.0**. Design-only — execution deferred.
 - **2026-06-21** — **Balance audit (C.11 opened) — comp spread is 7–12 keys, and the class-reads are survival artifacts.**
   Ran `balance-sweep.mjs` (10 comps × 6 dungeons). Found comp ceilings spread **7–12 keys** (vs intended ~1–2), driven by
   a **survival-bound regime** (2-healer caps above 3-DPS; party-mitigation specs dominate). Root causes: spec-utility
@@ -354,7 +384,9 @@ the investigation (and all future ones) is config-driven and saved to files.*
   survival-dominance artifacts, not the burst/rot/armour mechanics (the **dial** reads are real and survive). So balance
   and the class-reads conflict → directional decision pending (regime-shift + re-tune reads, vs keep reads + spread).
   Committed the audit tooling (`balance-sweep.mjs`, `balance-probe.mjs`); no balance values changed yet (exploration
-  reverted to keep the repo stable). Blocks loot/ilvl calibration until resolved.
+  reverted to keep the repo stable). Blocks loot/ilvl calibration until resolved. **→ Resolved 2026-06-22 into Phase P
+  (Class-Tools System): the goal flipped to "class choice MATTERS" — classes bring different tools, the specific tool
+  wins not generic EHP. See `Class-Tools-System.md`.**
 - **2026-06-21** — **C.1 DONE — The Hour of Bells (5/5); the 6-dungeon season is complete.** Authored the final dungeon
   as **pure data** (no engine work): a boss-dense gauntlet of **5 cooldowns-spike bosses** + 3 trash, added to the
   season, placeholder loot. Verified via `hour-of-bells-live.mjs`: **+2 floor times** (600s/1500s), and the **Cooldowns
