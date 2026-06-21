@@ -15,5 +15,14 @@
 
   { "id": "drowned-chorister", "name": "Drowned Chorister", "kind": "trash", "role": "caster", "band": "back",  "baseHp": 11, "baseDamage": 4, "tags": ["bellreach", "drowned", "caster"] },
   { "id": "sunken-acolyte",    "name": "Sunken Acolyte",    "kind": "trash", "role": "caster", "band": "back",  "baseHp": 9,  "baseDamage": 4, "tags": ["bellreach", "drowned", "caster"] },
-  { "id": "cathedral-warden",  "name": "Cathedral Warden",  "kind": "trash", "role": "melee",  "band": "front", "baseHp": 16, "baseDamage": 6, "tags": ["bellreach", "drowned", "melee"] }
+  { "id": "cathedral-warden",  "name": "Cathedral Warden",  "kind": "trash", "role": "melee",  "band": "front", "baseHp": 16, "baseDamage": 6, "tags": ["bellreach", "drowned", "melee"] },
+
+  { "id": "verger-antiphon",   "name": "Verger Antiphon",                 "kind": "boss", "stage": 2, "dungeonId": "stillhour-abbey", "abilityId": "stillwater-pool", "testsTactic": "positioning", "band": "front", "baseHp": 60, "baseDamage": 8,  "icon": "tac-positioning", "flavor": "The hour is kept. Kneel for it." },
+  { "id": "the-sunken-choir",  "name": "The Sunken Choir",                "kind": "boss", "stage": 4, "dungeonId": "stillhour-abbey", "abilityId": "evensong",       "testsTactic": "cooldowns", "spikeProfile": "burst", "band": "back",  "baseHp": 66, "baseDamage": 9,  "icon": "tac-cooldowns",   "flavor": "All voices, on the hour. None after." },
+  { "id": "drowned-sacristan", "name": "Drowned Sacristan",               "kind": "boss", "stage": 6, "dungeonId": "stillhour-abbey", "abilityId": "vespers-toll",   "testsTactic": "cooldowns", "spikeProfile": "burst", "band": "front", "baseHp": 72, "baseDamage": 10, "icon": "tac-cooldowns",   "flavor": "Kneel or stand, the bell counts you the same." },
+  { "id": "bellwarden-mire",   "name": "Bellwarden Mire, Keeper of the Hour", "kind": "boss", "stage": 8, "dungeonId": "stillhour-abbey", "abilityId": "the-final-hour", "testsTactic": "cooldowns", "spikeProfile": "burst", "band": "front", "baseHp": 80, "baseDamage": 11, "icon": "tac-cooldowns",   "flavor": "I ring it whether you are ready or not." },
+
+  { "id": "pew-verger",      "name": "Pew Verger",      "kind": "trash", "role": "melee",  "band": "front", "baseHp": 13, "baseDamage": 4, "tags": ["stillhour", "drowned", "melee"] },
+  { "id": "censing-acolyte", "name": "Censing Acolyte", "kind": "trash", "role": "caster", "band": "back",  "baseHp": 10, "baseDamage": 4, "tags": ["stillhour", "drowned", "caster"] },
+  { "id": "choirling",       "name": "Choirling",       "kind": "trash", "role": "add",    "band": "back",  "baseHp": 7,  "baseDamage": 3, "tags": ["stillhour", "drowned", "add"] }
 ]

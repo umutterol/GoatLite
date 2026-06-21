@@ -78,7 +78,7 @@ These are the mechanical ideas a dungeon can be wrapped around. ✅ = pure data 
 | Positioning / floor-is-lava | Avoidable ground damage dominates; raise Positioning, drop aggression | Positioning slider + Safe aggression | ✅ |
 | Kill-order / triage queue | Sequence casters & priority adds or Bursting/Bolstering snowball | Kill Order slider | ✅ |
 | Sustained-HoT read | Continuous chip, no spikes → roll HoTs that pre-tick the carpet | Lifebinder | ✅ |
-| Burst-triage read | Discrete spikes a HoT can't un-do → instant top-ups + absorbs | Cleric (Mystic/Lifebinder partial) | ✅ |
+| Burst-triage read | A single hard toll on the flagging one → instant top-ups + absorbs (a HoT can't) | Cleric (Mystic/Lifebinder partial) | 🔧→✅ C.10 |
 | Anti-yolo aggression tax | Avoidable/Spiteful/Bursting intake scales ~2× with Yolo; dial down | Aggression posture | ✅ |
 | Soft-enrage DPS race | Beat the 90s enrage by output or eat ramping damage | Output + Cooldowns | ✅ |
 | Spiteful "weakest link" | Ghosts hunt your lowest-**power** member → don't field a passenger | Roster floor + any peel spec | ✅ |
@@ -164,7 +164,7 @@ follow-up, not a data fix.
 
 > *A drowned monastery where the bells still toll the hours; between each toll the air is dead-calm, and on the hour
 > the silence breaks all at once.* **Signature:** low trash density, spike-punishing. **Difficulty:** mid-band; the
-> clock is easy, the difficulty is entirely the healer read. **Build:** pure data.
+> clock is easy, the difficulty is entirely the healer read. **Build:** needed the **C.10 burst-spike** engine pattern (now shipped + verified).
 
 **The puzzle.** Long calm windows, then a discrete spike on the :00 beat that a HoT **cannot retroactively un-do**.
 Read *"big infrequent hits, not constant chip"* → bring the **triage Cleric** (Flash Heal instant top-ups, sub-30%
@@ -175,23 +175,25 @@ party-wide toll (−12%/pt). The deliberate **inverse twin** of the Weltering Mi
 "fine, fine, fine, DEAD, fine, fine, DEAD." A Lifebinder's Regrowth ticks a beat behind the spike instead of ahead of
 the next one.
 
-**Comp answer (honest).** A **soft preference**, not a one-spec wall: burst-heal coverage is *strong* (Cleric, with
-Mystic/Lifebinder partial), so own this as a **"diagnose the damage profile"** dungeon, not a forced recruit. The real
-lever is *reading spike-vs-rot*. Tactic: max Cooldowns.
+**Comp answer (verified).** Bring the **triage Cleric** — proven in-sim: the burst toll (C.10) reliably **wipes** a
+rolling-HoT **Lifebinder** at the +2 floor while the Cleric **times** it, because a HoT can't recover a focused target
+between 6s tolls but the Cleric's instant Flash/Greater Heal (and overheal→shield) can. Raise **Cooldowns** (−12%/toll)
+and **Positioning** (for the stage-2 avoidable). The inverse twin of the Weltering Mire (the HoT side).
 
-| Stage | Boss | Shape→Tactic | Mechanic (≈) | Flavor |
+| Stage | Boss | Shape→Tactic | Mechanic | Flavor |
 |---|---|---|---|---|
-| 2 | Verger Antiphon | ground→positioning | the toll floods under **one** random celebrant (18·keyScale single victim) — teaches "a HoT can't pre-load a target it doesn't know will be hit" | "The hour is kept. Kneel for it." |
-| 5 | The Sunken Choir | phase→cooldowns | the toll goes **party-wide** (14·keyScale, −12%/pt); the burn-window between tolls grants +4%/pt | "All voices, on the hour. None after." |
-| 8 | Bellwarden Mire, Keeper of the Hour | phase→cooldowns | the loudest toll; an un-triaged party loses someone every beat | "I ring it whether you are ready or not." |
+| 2 | Verger Antiphon | ground→positioning | single-victim avoidable toll (18·keyScale) — teaches "a HoT can't pre-load a target it doesn't yet know will be hit" | "The hour is kept. Kneel for it." |
+| 4 | The Sunken Choir | **burst**→cooldowns | **C.10 burst:** every 6s the toll falls on the **lowest-HP non-tank** for `0.35·maxHp` (−12%/pt Cooldowns) — top them fast or lose them | "All voices, on the hour. None after." |
+| 6 | Drowned Sacristan | **burst**→cooldowns | the same burst, escalating | "Kneel or stand, the bell counts you the same." |
+| 8 | Bellwarden Mire, Keeper of the Hour | **burst**→cooldowns | the capstone burst | "I ring it whether you are ready or not." |
 
-**Honesty caveats (must respect):** keep `baseDamage` **low** (the toll ignores it; high baseDamage floods the calm).
-At the +2 floor the spike is only ~11–16% of a DPS's HP — **the spike read only emerges above the floor / on Yolo**;
-document that rather than dramatizing "100%→15%." Don't teach "Cooldowns pre-pops your save on bosses" (false). The
-Lifebinder has a built-in sub-25% instant (Nature's Grace) + Vital Surge, so it under-performs on *throughput-per-spike*,
-it doesn't "heal a corpse." **Reward hook:** the "Stillhour" healer/absorb set (Censer of the Last Hour, Tolling-Bell
-Reliquary). **Open question:** is a soft-preference lesson compelling enough, or add a Bursting layer to genuinely
-punish HoTs and harden the choice?
+**Build status (2026-06-21): authored + the C.10 burst pattern shipped & verified.** The original design here was a
+soft party-wide toll — the sim proved it **inverted** (the HoT Lifebinder out-healed the burst Cleric, the opposite of
+the intended lesson). Fixed by **C.10**: an opt-in `spikeProfile:"burst"` boss variant — a single hard hit on the
+**lowest-HP non-tank every 6s** (`0.35·maxHp`, still `testsTactic:cooldowns` so the dial mitigates; Ashveil untouched).
+Verified across 5 seeds at the +2 floor — **Cleric times (1–3 deaths), Lifebinder wipes 4/5**; the gap holds at +7;
+`tsc -b` clean; egm-smoke (Ashveil) unchanged. Keep `baseDamage` low (auto-attack chip only). **Reward hook:** the
+"Stillhour" healer/absorb set. **Loot = placeholder (Ashveil items) pending the polish pass.**
 
 ---
 
@@ -309,6 +311,7 @@ and the exact curves:
 
 | Item | Unlocks | Effort |
 |---|---|---|
+| ~~**Burst-spike boss variant**~~ — ✅ **DONE (C.10)**: opt-in `spikeProfile:"burst"`, single hard toll on the lowest-HP non-tank every 6s | **Stillhour Abbey** (the burst-heal read; Mire is the native HoT inverse) | small |
 | **Per-enemy `armour`/`resist`** — schema fields + un-hardcode `makeEnemy`; decide hit-size scaling | **The Pyreward Ossuary** (the chosen flagship) | **small** |
 | **"The Tolling" affix** — new hard-coded branch perturbing the interrupt catch term | Bellreach v2 difficulty layer | small |
 | **Per-encounter mechanic cadence/coefficients in data** — so same-tactic bosses differ mechanically | breaks "same spike, bigger numbers" across Bellreach/Hour/Stillhour/Mire | medium |
@@ -351,15 +354,15 @@ enrage) → Pyreward Ossuary (the one lesson no dial fixes: bring the right scho
 - **Roster size** — staying at **6 (Ashveil + 5)**; not funding the 🚧 levers to chase 8 for now (CC / dispel / reach /
   real-interrupt remain a future-wave menu in §6, each buying one more distinct dungeon if we ever want them).
 - **IP affix rename** — **deferred, low priority**; off the content critical path (dungeons reference affix `id`s).
+- **Stillhour's healer read** — was a soft/inverted preference; **resolved by the C.10 burst pattern** (verified: Cleric
+  times the +2 floor, HoT Lifebinder wipes). It's now a real read, not a soft preference.
 
 **⬜ Still open**
-1. **Stillhour's healer split is a *soft* preference** (both healers viable). Compelling enough as a diagnose-the-profile
-   lesson, or add a Bursting layer to harden it into a real wall?
-2. **Hour of Bells needs Tyrannical+Raging** (outside MVP pool). Lift the affix-pool restriction, or design a
+1. **Hour of Bells needs Tyrannical+Raging** (outside MVP pool). Lift the affix-pool restriction, or design a
    Fortified+Bursting variant of its spike pressure? *(Deferred to when we author Hour of Bells — it ships last.)*
-3. **Per-encounter mechanic cadence** (medium effort) would end "same spike, bigger numbers" monotony across the spike
+2. **Per-encounter mechanic cadence** (medium effort) would end "same spike, bigger numbers" monotony across the spike
    dungeons. Worth it for v1, or accept thematic-only differentiation?
-4. **Bellreach's interrupt read doesn't flip the outcome yet** (verified 2026-06-21 — log-visible casts-through + a
+3. **Bellreach's interrupt read doesn't flip the outcome yet** (verified 2026-06-21 — log-visible casts-through + a
    duration delta, but timed↔wipe is unchanged at the floor). Tune the **global** interrupt cast coefficient (also
    hits Ashveil's Vesk), or land **per-encounter weighting**, so Interrupts-0 actually wipes where Interrupts-3 times?
    Separately: a 6-point budget can't fund interrupts+cooldowns **and** kill-order, so +12-ish wipes on trash under

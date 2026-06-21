@@ -98,7 +98,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
     const isBoss = slot.kind === "boss"
     const affMult = isBoss ? (aff.has("tyrannical") ? AFFX : 1) : (aff.has("fortified") ? AFFX : 1)
     const mobs: Combatant[] = []
-    let bossTest = "", bossName = "The boss", bossAbil = "its mechanic"
+    let bossTest = "", bossName = "The boss", bossAbil = "its mechanic", bossSpike = ""
     let stageName = "Trash"
 
     if (isBoss) {
@@ -107,6 +107,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
       bossName = b.name
       stageName = b.name
       bossAbil = content.abilities.get(b.abilityId ?? "")?.name ?? "its mechanic"
+      bossSpike = b.spikeProfile ?? ""
       mobs.push(makeEnemy({ name: b.name, baseHp: b.baseHp, baseDamage: b.baseDamage, isBoss: true, keyScale, affMult, band: b.band }))
       const tested = content.tactics.get(bossTest)?.name
       emit("good", `${b.name} engages. ${bossAbil} incoming${tested ? ` — tests ${tested}` : ""}.`)
@@ -249,23 +250,38 @@ export function runDungeonEGM(input: RunInput): RunResult {
           burstStacks = Math.max(0, burstStacks - 0.3)
         }
 
-        if (isBoss && since % 12 === 0 && mobs.some((m) => m.isBoss && m.hp > 0)) {   // boss signature (skip if boss already dead this step)
+        if (isBoss && mobs.some((m) => m.isBoss && m.hp > 0)) {   // boss signature (skip if boss already dead this step)
           const bn = bossName, abil = bossAbil
           const m = (target: string, result: string): LogMeta => ({ sourceName: bn, ability: abil, target, result })
-          if (bossTest === "interrupts") {
-            if (!rng.chance(Math.min(0.95, 0.2 + 0.25 * (tac.interrupts ?? 0)))) {
-              for (const pp of aliveParty()) dealDamage(pp, 16 * keyScale * DMG_UNIT * aggroIntake)
-              emit("mechanic", `${bn}'s ${abil} goes through — the party is hurting. Interrupts ${tac.interrupts ?? 0}.`, m("party", "Cast not interrupted"))
+          if (bossSpike === "burst") {
+            // C.10: a TRUE burst — a single hard hit on whoever is flagging, on a tight 6s cadence. A rolling HoT can't
+            // recover a focused target before the next toll; an instant burst heal or a pre-applied absorb (shield) can.
+            // This is the one pattern that rewards a triage Cleric over a HoT Lifebinder. testsTactic stays "cooldowns",
+            // so the Cooldowns dial still blunts it; opt-in (enemy.spikeProfile) so Ashveil's cooldowns boss is untouched.
+            if (since % 6 === 0) {
+              const v = aliveParty().filter((pp) => pp.role !== "tank").sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0] ?? aliveParty()[0]
+              if (v) {
+                dealDamage(v, 0.35 * v.maxHp * aggroIntake * (1 - 0.12 * (tac.cooldowns ?? 0)))
+                emit("mechanic", `${bn}'s ${abil} falls on ${v.name} — top them fast or lose them. Cooldowns ${tac.cooldowns ?? 0}.`, m(v.name, "Burst spike"))
+              }
             }
-          } else if (bossTest === "positioning") {
-            if (rng.chance(Math.max(0.06, 0.6 - 0.18 * (tac.positioning ?? 0)) * aggroIntake)) {
-              const v = rand(); if (v) { dealDamage(v, 18 * keyScale * DMG_UNIT * aggroIntake); emit("mechanic", `${bn} drops ${abil} — ${v.name} is caught in it. Positioning ${tac.positioning ?? 0}.`, m(v.name, "Stood in fire")) }
-          } } else if (bossTest === "cooldowns") {
-            for (const pp of aliveParty()) dealDamage(pp, 14 * keyScale * DMG_UNIT * aggroIntake * (1 - 0.12 * (tac.cooldowns ?? 0)))
-            emit("mechanic", `${bn} enters ${abil} — a damage spike. Cooldowns ${tac.cooldowns ?? 0}.`, m("party", "Damage spike"))
-          } else if (bossTest === "killorder") {
-            const tk = aliveParty().find((pp) => pp.role === "tank") ?? aliveParty()[0]
-            if (tk) { dealDamage(tk, 14 * keyScale * DMG_UNIT * (1 - 0.25 * (tac.killorder ?? 0))); emit("mechanic", `${bn}'s ${abil} summons diggers. Kill Order ${tac.killorder ?? 0}.`, m(tk.name, "Adds spawned")) }
+          } else if (since % 12 === 0) {
+            if (bossTest === "interrupts") {
+              if (!rng.chance(Math.min(0.95, 0.2 + 0.25 * (tac.interrupts ?? 0)))) {
+                for (const pp of aliveParty()) dealDamage(pp, 16 * keyScale * DMG_UNIT * aggroIntake)
+                emit("mechanic", `${bn}'s ${abil} goes through — the party is hurting. Interrupts ${tac.interrupts ?? 0}.`, m("party", "Cast not interrupted"))
+              }
+            } else if (bossTest === "positioning") {
+              if (rng.chance(Math.max(0.06, 0.6 - 0.18 * (tac.positioning ?? 0)) * aggroIntake)) {
+                const v = rand(); if (v) { dealDamage(v, 18 * keyScale * DMG_UNIT * aggroIntake); emit("mechanic", `${bn} drops ${abil} — ${v.name} is caught in it. Positioning ${tac.positioning ?? 0}.`, m(v.name, "Stood in fire")) }
+              }
+            } else if (bossTest === "cooldowns") {
+              for (const pp of aliveParty()) dealDamage(pp, 14 * keyScale * DMG_UNIT * aggroIntake * (1 - 0.12 * (tac.cooldowns ?? 0)))
+              emit("mechanic", `${bn} enters ${abil} — a damage spike. Cooldowns ${tac.cooldowns ?? 0}.`, m("party", "Damage spike"))
+            } else if (bossTest === "killorder") {
+              const tk = aliveParty().find((pp) => pp.role === "tank") ?? aliveParty()[0]
+              if (tk) { dealDamage(tk, 14 * keyScale * DMG_UNIT * (1 - 0.25 * (tac.killorder ?? 0))); emit("mechanic", `${bn}'s ${abil} summons diggers. Kill Order ${tac.killorder ?? 0}.`, m(tk.name, "Adds spawned")) }
+            }
           }
         }
 

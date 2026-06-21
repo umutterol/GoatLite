@@ -43,5 +43,27 @@
       "faceguard-of-interred-kings", "pale-mitre-of-ashveil", "shroudweave-vestments",
       "treads-of-quiet-rest", "icon-of-pale-mercy"
     ]
+  },
+  {
+    "id": "stillhour-abbey",
+    "name": "Stillhour Abbey",
+    "theme": "A drowned monastery where the bells still toll the hours for a congregation that never left; between each toll the air is dead-calm, and on the hour the silence breaks all at once",
+    "timerSeconds": 1500,
+    "signature": "Low trash density, spike-punishing — long calm, sharp on-the-hour tolls",
+    "slots": [
+      { "stage": 1, "kind": "trash", "packTags": ["stillhour"] },
+      { "stage": 2, "kind": "boss",  "boss": "verger-antiphon" },
+      { "stage": 3, "kind": "trash", "packTags": ["stillhour"] },
+      { "stage": 4, "kind": "boss",  "boss": "the-sunken-choir" },
+      { "stage": 5, "kind": "trash", "packTags": ["stillhour"] },
+      { "stage": 6, "kind": "boss",  "boss": "drowned-sacristan" },
+      { "stage": 7, "kind": "trash", "packTags": ["stillhour"] },
+      { "stage": 8, "kind": "boss",  "boss": "bellwarden-mire" }
+    ],
+    "lootTable": [
+      "cuirass-of-interred-kings", "scepter-of-quiet-rest", "shroudweave-vestments",
+      "legplates-of-the-barrow-march", "shroudweave-leggings", "treads-of-quiet-rest",
+      "vial-of-crypt-dust", "icon-of-pale-mercy"
+    ]
   }
 ]

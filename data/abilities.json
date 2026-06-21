@@ -7,5 +7,10 @@
   { "id": "antiphon",       "name": "Antiphon",       "kind": "enemy", "shape": "cast",  "tactic": "interrupts", "telegraph": 2.5, "desc": "A party-wide liturgical nuke sung every ~12s; uninterrupted, the whole party craters together." },
   { "id": "drowning-psalm", "name": "Drowning Psalm", "kind": "enemy", "shape": "cast",  "tactic": "interrupts", "telegraph": 2,   "desc": "The fused chorus sings the same party-wide nuke faster — too many throats for a careless interrupt budget." },
   { "id": "toll-the-hours", "name": "Toll the Hours", "kind": "enemy", "shape": "phase", "tactic": "cooldowns",  "telegraph": 3,   "desc": "The one breather: a timed party-wide spike with burn windows between — rewards the points banked into Cooldowns." },
-  { "id": "final-peal",     "name": "Final Peal",     "kind": "enemy", "shape": "cast",  "tactic": "interrupts", "telegraph": 2.5, "desc": "The capstone cast: one uninterrupted peal into soft-enrage ends the run." }
+  { "id": "final-peal",     "name": "Final Peal",     "kind": "enemy", "shape": "cast",  "tactic": "interrupts", "telegraph": 2.5, "desc": "The capstone cast: one uninterrupted peal into soft-enrage ends the run." },
+
+  { "id": "stillwater-pool", "name": "Stillwater Pool", "kind": "enemy", "shape": "ground", "tactic": "positioning", "telegraph": 1.5, "desc": "On each toll a pool floods under one celebrant — an avoidable single-target spike a rolling HoT can't pre-load." },
+  { "id": "evensong",        "name": "Evensong",        "kind": "enemy", "shape": "burst",  "tactic": "cooldowns",   "telegraph": 3,   "desc": "On a tight cadence the toll falls on whoever is already flagging — an instant burst heal or a pre-applied absorb saves them; a rolling HoT recovers too slowly." },
+  { "id": "vespers-toll",    "name": "Vespers Toll",    "kind": "enemy", "shape": "burst",  "tactic": "cooldowns",   "telegraph": 3,   "desc": "A heavier toll that hunts the weakest in the party; top them fast or lose them between beats." },
+  { "id": "the-final-hour",  "name": "The Final Hour",  "kind": "enemy", "shape": "burst",  "tactic": "cooldowns",   "telegraph": 3,   "desc": "The loudest toll on the tightest cadence — the flagging one drops every beat unless burst-healed or pre-shielded." }
 ]
