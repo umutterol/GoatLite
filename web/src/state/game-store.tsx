@@ -38,6 +38,17 @@ export interface KeystoneChange {
   level: number; dungeon: string; dungeonShort: string; timer: string; affixes: string[]
 }
 
+/* ---- guild feed (Phase M.1): the always-visible meta-layer notification stream ----
+   System notifications only here (neutral game-voice, zero comedy). In-character barks land in M.3/M.4. */
+export type FeedKind = "system" | "run" | "loot" | "keystone" | "operator" | "morale" | "recruit"
+export type FeedTone = "neutral" | "good" | "bad" | "warn"
+export interface FeedEntry {
+  id: string; week: number; kind: FeedKind; tone: FeedTone; text: string
+  memberId?: string                       // click → that member's character sheet
+  icon?: { kind: string; id: string }     // optional GameIcon (kind is an IconKind; kept loose to avoid a UI import here)
+}
+type FeedPartial = Omit<FeedEntry, "id" | "week">
+
 /* ---- gear helpers ---- */
 function rarityForKey(key: number): string {
   if (key <= 5) return "Uncommon"
@@ -173,6 +184,8 @@ interface PersistState {
   recruits: Recruit[]
   signedRecruitIds: string[]
   history: RunTicket[]   // replayable record of past runs, newest first (cap 50)
+  feed: FeedEntry[]      // M.1: guild-feed notification stream, oldest→newest (cap 200)
+  feedSeq: number        // monotonic id counter for feed entries (stable React keys)
 }
 interface RunConfig { tactics: Record<string, number>; aggression: Aggression }
 /** A replayable record of one run: enough to deterministically re-simulate it + a summary for the list. */
@@ -212,6 +225,8 @@ function freshState(): GameState {
     recruits: generateRecruits(128, { balanced: true }), // opening draft: geared to make a sensible +2 comp timeable
     signedRecruitIds: [],
     history: [],
+    feed: [],
+    feedSeq: 0,
     ...TRANSIENT,
   }
 }
@@ -232,6 +247,9 @@ function loadState(): GameState {
         // history changed shape (string[] → RunTicket[]) — drop any legacy/malformed entries so replay can't crash
         merged.history = ((merged.history as unknown[]) ?? []).filter((t): t is RunTicket =>
           !!t && typeof t === "object" && typeof (t as RunTicket).seed === "number" && Array.isArray((t as RunTicket).party) && typeof (t as RunTicket).aggression === "string")
+        // M.1: guild feed is additive (no SAVE_VERSION bump) — pre-M saves load with an empty feed
+        merged.feed = Array.isArray(merged.feed) ? merged.feed : []
+        merged.feedSeq = typeof merged.feedSeq === "number" ? merged.feedSeq : 0
         return merged
       }
       // version mismatch → reset (full stepwise migrator goes here later)
@@ -307,14 +325,25 @@ function computeLoot(state: GameState, r: RunResult, runKeyState: MemberKey): Lo
   return drops
 }
 
+/* ---- guild-feed emit (M.1) ---- */
+const FEED_CAP = 200
+const LOW_MORALE = 25
+const specIcon = (specId: string | undefined): { kind: string; id: string } | undefined =>
+  specId ? { kind: "spec", id: specId } : undefined
+/** Append neutral system notifications to the feed. Stamps a stable id from a persisted counter + the current week. */
+function pushFeed(s: PersistState, ...entries: FeedPartial[]): { feed: FeedEntry[]; feedSeq: number } {
+  if (!entries.length) return { feed: s.feed, feedSeq: s.feedSeq }
+  let seq = s.feedSeq
+  const made: FeedEntry[] = entries.map((e) => ({ ...e, id: `f${seq++}`, week: s.weekNumber }))
+  return { feed: [...s.feed, ...made].slice(-FEED_CAP), feedSeq: seq }
+}
+
 function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
-    case "CREATE_GUILD":
-      return {
-        ...freshState(),
-        phase: "recruit",
-        guild: action.info,
-      }
+    case "CREATE_GUILD": {
+      const base: GameState = { ...freshState(), phase: "recruit", guild: action.info }
+      return { ...base, ...pushFeed(base, { kind: "system", tone: "neutral", text: `${action.info.name} founded. Assemble a roster from the scouting board.` }) }
+    }
     case "TOGGLE_SIGN": {
       const rec = state.recruits.find((r) => r.id === action.id)
       if (!rec) return state
@@ -347,6 +376,10 @@ function reducer(state: GameState, action: Action): GameState {
         ...state, roster, partyIds, phase, selectedKeyOwnerId,
         recruits: generateRecruits(bestRosterIlvl(roster)),
         signedRecruitIds: [],
+        ...pushFeed(state, ...newMembers.map((m): FeedPartial => ({
+          kind: "recruit", tone: "good", memberId: m.id, icon: specIcon(m.specId),
+          text: `${m.name} the ${content.specs.get(m.specId)?.name ?? m.specId} joined the guild.`,
+        }))),
       }
     }
     case "REROLL_RECRUITS": {
@@ -394,19 +427,32 @@ function reducer(state: GameState, action: Action): GameState {
       if (old && old.baseId !== "beta-standard-issue") stash.push(old)
       return { ...state, roster, stash }
     }
-    case "RAN_KEY":
+    case "RAN_KEY": {
+      const drops = computeLoot(state, action.result, action.runKey)
+      const t = action.ticket
+      const outWord = t.outcome === "timed" ? "Timed" : t.outcome === "depleted" ? "Depleted" : "Wiped"
+      const tone: FeedTone = t.outcome === "timed" ? "good" : t.outcome === "wipe" ? "bad" : "warn"
+      const deaths = t.deaths === 1 ? "1 death" : `${t.deaths} deaths`
+      const runLines: FeedPartial[] = [{
+        kind: "run", tone, memberId: t.ownerId || undefined, icon: specIcon(state.roster.find((m) => m.id === t.ownerId)?.specId),
+        text: `${t.ownerName}'s +${t.keyLevel} ${t.dungeonName} — ${outWord} in ${mmss(t.durationSec)}, ${deaths}.`,
+      }]
+      if (drops.length) runLines.push({ kind: "loot", tone: "neutral", text: `${drops.length === 1 ? "1 item" : `${drops.length} items`} dropped — awaiting distribution.` })
       return {
         ...state, lastResult: action.result, lastConfig: action.config,
         lastRunOwnerId: action.ownerId, lastRunKey: action.runKey, autoplaySeed: action.result.seed,
-        lastLoot: null, pendingLoot: computeLoot(state, action.result, action.runKey),
+        lastLoot: null, pendingLoot: drops,
         history: [action.ticket, ...state.history].slice(0, 50),   // record every run for the Reports list
+        ...pushFeed(state, ...runLines),
       }
+    }
     case "CONSUME_AUTOPLAY":
       return state.autoplaySeed == null ? state : { ...state, autoplaySeed: null }
     case "CONFIRM_LOOT": {
       const r = state.lastResult
       if (!r) return state
       const drops = state.pendingLoot ?? []
+      const feed: FeedPartial[] = []   // M.1: collected as we resolve loot/morale/keystone/growth below
       let roster = state.roster.map((m) => ({ ...m, gear: { ...m.gear } }))
       const stash = [...state.stash]
       let shardsGained = 0
@@ -418,13 +464,20 @@ function reducer(state: GameState, action: Action): GameState {
           const old = member.gear[d.slot]
           member.gear[d.slot] = { uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity }
           if (old && old.baseId !== "beta-standard-issue") stash.push(old)
+          feed.push({ kind: "loot", tone: "good", memberId: member.id, icon: specIcon(member.specId), text: `${member.name} equipped ${d.name} (ilvl ${d.ilvl}).` })
         } else {
           stash.push({ uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity })
         }
       }
       // morale
       const partySet = new Set(state.partyIds)
-      roster = roster.map((m) => partySet.has(m.id) ? { ...m, morale: clamp(m.morale + MORALE_DELTA[r.outcome], 0, 100) } : m)
+      roster = roster.map((m) => {
+        if (!partySet.has(m.id)) return m
+        const nm = clamp(m.morale + MORALE_DELTA[r.outcome], 0, 100)
+        // M.1: warn only when a member CROSSES below the low-morale line this run (no spam while they sit low)
+        if (m.morale >= LOW_MORALE && nm < LOW_MORALE) feed.push({ kind: "morale", tone: "warn", memberId: m.id, icon: specIcon(m.specId), text: `${m.name}'s morale fell to ${nm}. At risk of leaving the guild.` })
+        return { ...m, morale: nm }
+      })
 
       // keystone progression (margin-based) — applied to the KEY OWNER's own key
       const ownerId = state.lastRunOwnerId
@@ -439,6 +492,12 @@ function reducer(state: GameState, action: Action): GameState {
         : ranKey.rating
       const newKey: MemberKey = { dungeonId: ranKey.dungeonId, level: newLevel, best, rating }
       roster = roster.map((m) => m.id === ownerId ? { ...m, key: newKey } : m)
+      {
+        const owner = roster.find((m) => m.id === ownerId)
+        const short = dShort(content.dungeons.get(ranKey.dungeonId)?.name ?? "")
+        if (owner && upgrade > 0) feed.push({ kind: "keystone", tone: "good", memberId: owner.id, icon: specIcon(owner.specId), text: `${owner.name}'s keystone upgraded to +${newLevel} ${short}.` })
+        else if (owner) feed.push({ kind: "keystone", tone: "bad", memberId: owner.id, icon: specIcon(owner.specId), text: `${owner.name}'s keystone depleted to +${newLevel} ${short}.` })
+      }
 
       // Phase F: post-run operator growth — each participant earns skill XP toward their hidden ceilings (auto-growth).
       // Above the gear cap, the upgrade that would have been higher ilvl is converted into extra operator XP (the handoff).
@@ -446,6 +505,11 @@ function reducer(state: GameState, action: Action): GameState {
       roster = roster.map((m) => {
         if (!partySet.has(m.id)) return m
         const g = applyGrowth(m.skills, m.ceilings, m.skillXp, roleOf(m.specId), m.traitIds, xpGain)
+        // M.1: surface an operator level-up when a skill's integer level ticks up this run
+        for (const k of Object.keys(g.skills)) {
+          if (Math.floor(g.skills[k]) > Math.floor(m.skills[k] ?? 0))
+            feed.push({ kind: "operator", tone: "good", memberId: m.id, icon: specIcon(m.specId), text: `${m.name}'s ${content.operatorSkills.get(k)?.name ?? k} rose to ${Math.floor(g.skills[k])}.` })
+        }
         return { ...m, skills: g.skills, skillXp: g.skillXp }
       })
 
@@ -465,6 +529,7 @@ function reducer(state: GameState, action: Action): GameState {
         wallet: { ...state.wallet, emblem, gold, shard: state.wallet.shard + shardsGained },
         weekNumber,
         lastResult: null, pendingLoot: null, lastLoot: lootSummary, lastKeystoneChange: change,
+        ...pushFeed(state, ...feed),
       }
     }
     case "FILE_REPORT": {
@@ -541,6 +606,7 @@ interface GameApi {
   autoplaySeed: number | null
   consumeAutoplay: () => void
   history: RunTicket[]
+  feed: FeedEntry[]
   replayTicket: (t: RunTicket) => RunResult
   gearFor: (id: string) => Record<string, GearItem>
   // flow
@@ -623,6 +689,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       autoplaySeed: state.autoplaySeed,
       consumeAutoplay: () => dispatch({ type: "CONSUME_AUTOPLAY" }),
       history: state.history,
+      feed: state.feed,
       replayTicket,
       gearFor: (id) => state.roster.find((m) => m.id === id)?.gear ?? {},
       createGuild: (info) => dispatch({ type: "CREATE_GUILD", info }),

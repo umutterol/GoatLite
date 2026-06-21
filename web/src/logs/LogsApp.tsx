@@ -11,6 +11,7 @@ import { GuildCreatePage } from "./pages/GuildCreatePage"
 import { RecruitPage } from "./pages/RecruitPage"
 import { LootPage } from "./pages/LootPage"
 import { KeystonePage } from "./pages/KeystonePage"
+import { GuildFeed } from "./GuildFeed"
 
 export type Page = "report" | "roster" | "character" | "setup" | "recruit" | "guild" | "loot" | "keystone"
 export interface Route { page: Page; charId: string | null }
@@ -62,14 +63,19 @@ export function LogsApp() {
         ) : null}
       </nav>
 
-      {page === "guild" ? <GuildCreatePage /> : null}
-      {page === "recruit" ? <RecruitPage go={go} /> : null}
-      {page === "setup" ? <SetupPage go={go} /> : null}
-      {page === "report" ? <ReportPage go={go} goChar={goChar} /> : null}
-      {page === "loot" ? <LootPage go={go} /> : null}
-      {page === "keystone" ? <KeystonePage go={go} /> : null}
-      {page === "roster" ? <RosterPage goChar={goChar} /> : null}
-      {page === "character" && route.charId ? <CharacterPage id={route.charId} go={go} goChar={goChar} /> : null}
+      <div className="app-body">
+        <div className="app-main">
+          {page === "guild" ? <GuildCreatePage /> : null}
+          {page === "recruit" ? <RecruitPage go={go} /> : null}
+          {page === "setup" ? <SetupPage go={go} /> : null}
+          {page === "report" ? <ReportPage go={go} goChar={goChar} /> : null}
+          {page === "loot" ? <LootPage go={go} /> : null}
+          {page === "keystone" ? <KeystonePage go={go} /> : null}
+          {page === "roster" ? <RosterPage goChar={goChar} /> : null}
+          {page === "character" && route.charId ? <CharacterPage id={route.charId} go={go} goChar={goChar} /> : null}
+        </div>
+        {playing ? <GuildFeed goChar={goChar} /> : null}
+      </div>
     </div>
   )
 }

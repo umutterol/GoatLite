@@ -49,7 +49,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | K | **Combat AI rework (v2)** | ✅ 6/6 — shared priority-rules brain (players + enemies), data-driven profiles, tactics-as-orders, 20-agent adversarial review (3 fixes) |
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
 | L | **Roster expansion — Marksman + Necromancer** | ⬜ 0/7 — **design ✅** (`MMO-Nostalgia-Reference.md` §6) |
-| M | **Guild Feed & Loot Drama (social meta-layer)** | ⬜ 0/5 (+1 v2) — **design ✅** (this session): always-visible meta feed, system notifications + solo barks, loot drama wired in |
+| M | **Guild Feed & Loot Drama (social meta-layer)** | 🟡 1/5 (+1 v2) — M.1 done (always-visible feed rail + system-notification stream, live-verified); barks (M.3/M.4) + loot drama (M.2/M.5) next |
 | N | **Intake balance (`enemyDmgMult`) + sim-dump tooling** | ✅ 2/2 — enemy damage is now an **isolated** intake lever (=2.0); survival binds below the timer wall; +2 floor + operator runway (+3) hold; new config/CLI `sim-dump` harness |
 
 ---
@@ -282,7 +282,7 @@ nostalgia 10); (2) add a 6th class, **Necromancer**, the pet/summoner class, who
 
 ---
 
-## Phase M — Guild Feed & Loot Drama (always-visible social meta-layer) ⬜ (design ✅, this session)
+## Phase M — Guild Feed & Loot Drama (always-visible social meta-layer) 🟡 (1/5 — design ✅)
 
 *An **always-visible** guild-chat panel in the Logs UI, **meta-layer only** (no in-run combat log). Two voices:
 **system notifications** (the game, neutral/factual — the notification-center backbone with complete coverage) and
@@ -293,7 +293,7 @@ random member inherits a voice pack for free. Loot drama is the feed's flagship 
 
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
-| M.1 | Always-visible feed panel + **system-notification** layer | ux/engine | major | M | ⬜ | the persistent guild-feed panel + the neutral game-voice stream covering every meta-layer state change (run filed, loot ready, trait earned, morale change / at-risk, recruit available, keystone depleted/raised, operator level-up, departure warning). The notification center — ships first, fully functional with **zero comedy**. |
+| M.1 | Always-visible feed panel + **system-notification** layer | ux/engine | major | M | ✅ | persistent right-rail `GuildFeed.tsx` (visible only in the `playing` phase) reading a new persisted `feed: FeedEntry[]` + `feedSeq` on `PersistState`; notifications **emitted from the reducer** (all data in scope) in neutral game-voice, **zero comedy**: guild founded (`CREATE_GUILD`), member joined (`CONFIRM_RECRUITS`), run filed w/ outcome+time+deaths + loot-dropped (`RAN_KEY`), loot equipped + keystone raised/depleted + operator level-up + morale **at-risk crossing** (all `CONFIRM_LOOT`). Member-tagged lines click → character sheet. **No SAVE_VERSION bump** (additive field + defensive load guard → pre-M saves load with an empty feed); feed capped at 200. **Deferred (no engine yet):** trait-earned (D.1) + departure-warning (D.2) lines. Verified: `tsc -b` clean, `egm-smoke` goldens **byte-identical** (914/884/1182/1367 — no engine touched), Playwright `m-live.mjs` 9/9 + 0 console errors. |
 | M.2 | **Loot-drama mechanic** (contested-item resolution) | engine/ux | major | M | ⬜ | when a drop upgrades **2+ members**, surface the decision; assign; **loser −5 morale** (wire the dormant `lost-loot` event), **winner +5% output next run** (persisted buff → `SAVE_VERSION` bump). **Personality-gated:** Selfish archetypes (Loot Goblin / Solo Player) contest loudly + lose more morale; Boomer / Casual Andy shrug. Rehomes B.5's pending loot-drama UI. |
 | M.3 | **Bark engine** (procedural, deterministic) | engine | major | L | ⬜ | voice packs keyed by personality; template+slot grammar **grounded in real state** (item / key / name / rival / morale); per-member **no-repeat window**; **rarity budget**; **~1–2 barks/run** rate limit; seeded → replay-deterministic. Works for **random characters by construction**. Voice = trait(tone) × spec(vocabulary) × morale(mood) × per-character style seed. **No runtime LLM** (offline/deterministic/free). |
 | M.4 | **Personality voice-pack content** (tiered) | content | major | L | ⬜ | author per-personality bark banks for the highest-frequency events first (loot win/loss, wipe, clutch timed, trait earned, morale crater, farming-boredom); a plain functional line for everything else. Start ~**40 templates**, grow on observed repetition; Claude-assisted drafting, curate keepers. **Two-layer voice:** earnest grim item names, all satire in the reaction. |
@@ -341,6 +341,23 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-21** — **M.1 shipped: the always-visible Guild Feed + system-notification stream (Phase M started).** Built
+  the meta-layer notification center first (zero comedy — barks land in M.3/M.4). **State:** added a persisted
+  `feed: FeedEntry[]` + monotonic `feedSeq` to `PersistState` (`game-store.tsx`) — **no `SAVE_VERSION` bump** (additive
+  field; `freshState` seeds `[]` and a defensive load-guard means pre-M saves load with an empty feed), capped at 200
+  entries. **Emit from the reducer** (every event's data is already in scope, deterministic): `CREATE_GUILD` → "founded";
+  `CONFIRM_RECRUITS` → one "{name} the {Spec} joined the guild" per sign; `RAN_KEY` → "{owner}'s +{lvl} {dungeon} —
+  {Timed/Depleted/Wiped} in m:ss, N deaths" + "N items dropped — awaiting distribution"; `CONFIRM_LOOT` → "{name}
+  equipped {item} (ilvl X)", "{owner}'s keystone upgraded/depleted to +N", operator level-up (integer-tick), and a
+  morale **at-risk** line only when a member **crosses** below 25 this run (no spam). Each line carries an optional spec
+  `GameIcon` + a tone (good/bad/warn/neutral, tinted left border). **UI:** new `GuildFeed.tsx` mounted as a persistent
+  300px right rail in `LogsApp.tsx` (wrapped the page render in `.app-body`/`.app-main`; rail shows only in the `playing`
+  phase), chat-style newest-at-bottom with auto-scroll; member-tagged lines click through to the character sheet. Reuses
+  `Panel`/`GameIcon` idioms + existing CSS vars (new `.guild-feed`/`.feed-item` styles in `logs.css`). **Deferred** (no
+  engine yet): trait-earned (D.1) + departure-warning (D.2) notifications. **Verified:** `tsc -b` clean; `egm-smoke`
+  goldens **byte-identical** (914/884/1182/1367, 0 deaths — confirms zero engine/sim impact); new Playwright
+  `m-live.mjs` 9/9 green + **0 console errors** (feed hidden in onboarding → visible in play → founding/join/run/loot/
+  keystone lines → click-through). Memory: `goatlite-guild-feed`.
 - **2026-06-21** — **Icon-tracker triage: dropped the 16 `status-*` icons; kept all ability icons.** Audited (3-reader
   workflow + a direct grep) whether P3 ability/status icons surface anywhere in the live UI. Finding: the `GameIcon`
   registry (`web/src/logs/components.tsx:65-79`) has **no `status` kind and no aura/buff-bar UI exists** — statuses

@@ -100,8 +100,40 @@ a { color: var(--link); text-decoration: none; }
 .nav-stat .k { color: var(--faint); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
 
 /* ---------- page area ---------- */
+.app-body { flex: 1; min-height: 0; display: flex; }
+.app-main { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
 .page { flex: 1; min-height: 0; display: flex; overflow: hidden; }
 .page-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+
+/* ---------- guild feed (Phase M.1) ---------- */
+.guild-feed {
+  width: 300px; flex: none; background: var(--rail); border-left: 1px solid var(--line);
+  display: flex; flex-direction: column; min-height: 0;
+}
+.feed-head {
+  flex: 0 0 auto; height: 44px; display: flex; align-items: center; gap: 8px;
+  padding: 0 14px; border-bottom: 1px solid var(--line);
+}
+.feed-count {
+  font-size: 11px; font-weight: 700; color: var(--faint); background: var(--panel-3);
+  border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 1px 7px; font-variant-numeric: tabular-nums;
+}
+.feed-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.feed-empty { color: var(--faint); font-size: 12px; padding: 18px 10px; text-align: center; line-height: 1.5; }
+.feed-item {
+  display: flex; gap: 9px; align-items: flex-start; padding: 8px 10px;
+  background: var(--panel-2); border: 1px solid var(--line-soft); border-left: 2px solid var(--line);
+  border-radius: var(--radius); font-size: 12px; line-height: 1.38;
+}
+.feed-item.clickable { cursor: pointer; }
+.feed-item.clickable:hover { background: var(--panel-3); }
+.feed-ico { flex: none; margin-top: 1px; color: var(--muted); }
+.feed-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--faint); display: inline-block; margin: 5px 4px 0; }
+.feed-text { color: var(--text); }
+.feed-item.tone-good { border-left-color: var(--good); }
+.feed-item.tone-bad { border-left-color: var(--danger); }
+.feed-item.tone-warn { border-left-color: var(--amber); }
+.feed-item.tone-neutral { border-left-color: var(--line); }
 
 /* ---------- generic panel ---------- */
 .panel {
