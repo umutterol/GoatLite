@@ -2126,7 +2126,7 @@
     ]
   },
   {
-    "id": "code-freeze", "name": "Bulwark Banner", "classId": "warrior", "specId": "guardian",
+    "id": "bulwark-banner", "name": "Bulwark Banner", "classId": "warrior", "specId": "guardian",
     "category": "Buff", "trigger": "active", "cooldownTurns": 20,
     "targeting": { "side": "self", "pattern": "self" },
     "effects": [
@@ -2135,7 +2135,7 @@
     "tags": ["major"]
   },
   {
-    "id": "rollback-plan", "name": "Sacred Bastion", "classId": "paladin", "specId": "crusader",
+    "id": "sacred-bastion", "name": "Sacred Bastion", "classId": "paladin", "specId": "crusader",
     "category": "Buff", "trigger": "active", "cooldownTurns": 20,
     "targeting": { "side": "ally", "pattern": "all" },
     "effects": [
@@ -2144,7 +2144,7 @@
     "tags": ["major"]
   },
   {
-    "id": "zen-mode", "name": "Unmoving Mountain", "classId": "sage", "specId": "mystic",
+    "id": "unmoving-mountain", "name": "Unmoving Mountain", "classId": "sage", "specId": "mystic",
     "category": "Utility", "trigger": "active", "cooldownTurns": 20,
     "targeting": { "side": "self", "pattern": "self" },
     "effects": [
@@ -2154,7 +2154,7 @@
     "tags": ["major"]
   },
   {
-    "id": "hotfix-deploy", "name": "Light's Salvation", "classId": "paladin", "specId": "cleric",
+    "id": "lights-salvation", "name": "Light's Salvation", "classId": "paladin", "specId": "cleric",
     "category": "Healing", "trigger": "active", "cooldownTurns": 20,
     "targeting": { "side": "ally", "pattern": "all" },
     "effects": [
@@ -2164,7 +2164,7 @@
     "tags": ["major"]
   },
   {
-    "id": "gradual-rollout", "name": "Blossoming Tide", "classId": "sage", "specId": "lifebinder",
+    "id": "blossoming-tide", "name": "Blossoming Tide", "classId": "sage", "specId": "lifebinder",
     "category": "Healing", "trigger": "active", "cooldownTurns": 20,
     "targeting": { "side": "ally", "pattern": "all" },
     "effects": [
@@ -2173,7 +2173,7 @@
     "tags": ["major"]
   },
   {
-    "id": "crunch-time", "name": "Reckless Frenzy", "classId": "warrior", "specId": "berserker",
+    "id": "reckless-frenzy", "name": "Reckless Frenzy", "classId": "warrior", "specId": "berserker",
     "category": "Buff", "trigger": "active", "cooldownTurns": 20,
     "targeting": { "side": "self", "pattern": "self" },
     "resourceCost": { "hpPct": 10 },
@@ -2184,7 +2184,7 @@
     "tags": ["major"]
   },
   {
-    "id": "ship-it", "name": "Killing Edge", "classId": "rogue", "specId": "assassin",
+    "id": "killing-edge", "name": "Killing Edge", "classId": "rogue", "specId": "assassin",
     "category": "Damage", "trigger": "active", "cooldownTurns": 20,
     "targeting": { "side": "enemy", "pattern": "single" },
     "effects": [
@@ -2195,7 +2195,7 @@
     "tags": ["major"]
   },
   {
-    "id": "standup-hype", "name": "Rallying Crescendo", "classId": "rogue", "specId": "bard",
+    "id": "rallying-crescendo", "name": "Rallying Crescendo", "classId": "rogue", "specId": "bard",
     "category": "Buff", "trigger": "active", "cooldownTurns": 20,
     "targeting": { "side": "self", "pattern": "self" },
     "effects": [
@@ -2205,7 +2205,7 @@
     "tags": ["major", "song"]
   },
   {
-    "id": "prod-incident", "name": "Emberstorm", "classId": "mage", "specId": "pyromancer",
+    "id": "emberstorm", "name": "Emberstorm", "classId": "mage", "specId": "pyromancer",
     "category": "Damage", "trigger": "active", "cooldownTurns": 20,
     "targeting": { "side": "enemy", "pattern": "all" },
     "effects": [
@@ -2215,7 +2215,7 @@
     "tags": ["major"]
   },
   {
-    "id": "root-cause-analysis", "name": "Nullifying Surge", "classId": "mage", "specId": "arcanist",
+    "id": "nullifying-surge", "name": "Nullifying Surge", "classId": "mage", "specId": "arcanist",
     "category": "Buff", "trigger": "active", "cooldownTurns": 20,
     "targeting": { "side": "enemy", "pattern": "all" },
     "effects": [

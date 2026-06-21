@@ -341,6 +341,17 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-21** — **Signature-major ids de-metaed: internal ids now match the in-world spell name.** The 10 Phase-H
+  per-spec majors still carried their pre-H.1 **QA/dev codenames** as their `id` (`code-freeze`, `hotfix-deploy`,
+  `prod-incident`, `zen-mode`, …) while their display `name` had been renamed to fantasy MMO spells — so the
+  `icon-tracker.csv` `icon_id`s (derived as `ability-{id}`) read as meta names, not the spell. Renamed each `id` to the
+  kebab of its display name (`bulwark-banner`, `lights-salvation`, `emberstorm`, …) across **`data/abilities-player.json`
+  + `data/skills.json`** (one shared id namespace — the engine emits `skillId: ability.id`, the UI resolves the tooltip
+  via `content.skills.get(skillId)`, so both files must rename together) and updated the **`Docs/icon-tracker.csv`**
+  `icon_id`s to match, restoring the `icon_id == ability-{id}` convention. Safe by construction: majors are selected by
+  the `"major"` **tag** (not id) in `combat.ts`/`ReportPage` `MAJOR_IDS`, no behaviour-profile/talent/save references the
+  codenames, and file order (determinism) is unchanged. **Verified:** `tsc -b` clean; `egm-smoke` green; **10/10
+  major→skill joins resolve**.
 - **2026-06-21** — **M.2 reworked: loot drama is a SNUB, not a per-run tax (+ winner buff dropped).** Umut flagged that
   the first cut drained morale on *every* run — with the multi-spec Ashveil items almost every drop has 2+ eligible
   members, so "contested = 2+ can use it" punished the roster passively. Reframed: **shared loot is normal and free; only

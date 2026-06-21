@@ -163,16 +163,16 @@ ability-groves-embrace,ability-player,Grove's Embrace,abilities-player.json,no,P
 ability-vital-surge,ability-player,Vital Surge,abilities-player.json,no,P3,sage/lifebinder Healing
 ability-flourish,ability-player,Flourish,abilities-player.json,no,P3,sage/lifebinder Healing
 ability-natures-grace,ability-player,Nature's Grace,abilities-player.json,no,P3,sage/lifebinder Passive
-ability-code-freeze,ability-player,Bulwark Banner,abilities-player.json,no,P3,warrior/guardian Buff
-ability-rollback-plan,ability-player,Sacred Bastion,abilities-player.json,no,P3,paladin/crusader Buff
-ability-zen-mode,ability-player,Unmoving Mountain,abilities-player.json,no,P3,sage/mystic Utility
-ability-hotfix-deploy,ability-player,Light's Salvation,abilities-player.json,no,P3,paladin/cleric Healing
-ability-gradual-rollout,ability-player,Blossoming Tide,abilities-player.json,no,P3,sage/lifebinder Healing
-ability-crunch-time,ability-player,Reckless Frenzy,abilities-player.json,no,P3,warrior/berserker Buff
-ability-ship-it,ability-player,Killing Edge,abilities-player.json,no,P3,rogue/assassin Damage
-ability-standup-hype,ability-player,Rallying Crescendo,abilities-player.json,no,P3,rogue/bard Buff
-ability-prod-incident,ability-player,Emberstorm,abilities-player.json,no,P3,mage/pyromancer Damage
-ability-root-cause-analysis,ability-player,Nullifying Surge,abilities-player.json,no,P3,mage/arcanist Buff
+ability-bulwark-banner,ability-player,Bulwark Banner,abilities-player.json,no,P3,warrior/guardian Buff
+ability-sacred-bastion,ability-player,Sacred Bastion,abilities-player.json,no,P3,paladin/crusader Buff
+ability-unmoving-mountain,ability-player,Unmoving Mountain,abilities-player.json,no,P3,sage/mystic Utility
+ability-lights-salvation,ability-player,Light's Salvation,abilities-player.json,no,P3,paladin/cleric Healing
+ability-blossoming-tide,ability-player,Blossoming Tide,abilities-player.json,no,P3,sage/lifebinder Healing
+ability-reckless-frenzy,ability-player,Reckless Frenzy,abilities-player.json,no,P3,warrior/berserker Buff
+ability-killing-edge,ability-player,Killing Edge,abilities-player.json,no,P3,rogue/assassin Damage
+ability-rallying-crescendo,ability-player,Rallying Crescendo,abilities-player.json,no,P3,rogue/bard Buff
+ability-emberstorm,ability-player,Emberstorm,abilities-player.json,no,P3,mage/pyromancer Damage
+ability-nullifying-surge,ability-player,Nullifying Surge,abilities-player.json,no,P3,mage/arcanist Buff
 ability-grave-detail,ability-enemy,Grave Detail,abilities.json,no,P3,boss mechanic
 ability-preserving-fume,ability-enemy,Preserving Fume,abilities.json,no,P3,boss mechanic
 ability-pooling-sorrow,ability-enemy,Pooling Sorrow,abilities.json,no,P3,boss mechanic
