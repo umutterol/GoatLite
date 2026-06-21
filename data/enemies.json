@@ -33,5 +33,14 @@
 
   { "id": "bog-thrall",     "name": "Bog Thrall",     "kind": "trash", "role": "melee", "band": "front", "baseHp": 13, "baseDamage": 3, "tags": ["weltering", "drowned", "melee"] },
   { "id": "fen-lurker",     "name": "Fen Lurker",     "kind": "trash", "role": "melee", "band": "front", "baseHp": 10, "baseDamage": 3, "tags": ["weltering", "drowned", "melee"] },
-  { "id": "drowned-wretch", "name": "Drowned Wretch", "kind": "trash", "role": "melee", "band": "front", "baseHp": 7,  "baseDamage": 2, "tags": ["weltering", "drowned", "melee"] }
+  { "id": "drowned-wretch", "name": "Drowned Wretch", "kind": "trash", "role": "melee", "band": "front", "baseHp": 7,  "baseDamage": 2, "tags": ["weltering", "drowned", "melee"] },
+
+  { "id": "vergil-grave-iron-warden", "name": "Vergil, the Grave-Iron Warden", "kind": "boss", "stage": 2, "dungeonId": "pyreward-ossuary", "abilityId": "grave-iron-bulwark", "testsTactic": "killorder",   "band": "front", "baseHp": 64, "baseDamage": 9,  "armour": 250, "icon": "tac-killorder",   "flavor": "Iron does not bleed." },
+  { "id": "saltmother-quell",         "name": "Saltmother Quell",            "kind": "boss", "stage": 4, "dungeonId": "pyreward-ossuary", "abilityId": "salt-ward",          "testsTactic": "positioning", "band": "front", "baseHp": 68, "baseDamage": 10, "resist": 250, "icon": "tac-positioning", "flavor": "Salt drinks the spell before it lands." },
+  { "id": "the-annealed-choir",       "name": "The Annealed Choir",          "kind": "boss", "stage": 6, "dungeonId": "pyreward-ossuary", "abilityId": "annealing-pyre",     "testsTactic": "cooldowns",   "band": "back",  "baseHp": 72, "baseDamage": 11, "armour": 250, "icon": "tac-cooldowns",   "flavor": "Tempered in the pyre, cooled in the dark." },
+  { "id": "heretic-pyre-ossuar",      "name": "Heretic-Pyre Ossuar",         "kind": "boss", "stage": 8, "dungeonId": "pyreward-ossuary", "abilityId": "heretic-rite",       "testsTactic": "interrupts",  "band": "back",  "baseHp": 80, "baseDamage": 12, "resist": 250, "icon": "tac-interrupts",  "flavor": "Burn the word from the air." },
+
+  { "id": "grave-iron-thrall", "name": "Grave-Iron Thrall", "kind": "trash", "role": "melee", "band": "front", "baseHp": 14, "baseDamage": 5, "armour": 150, "tags": ["pyreward", "ossuary", "melee"] },
+  { "id": "salt-warden",       "name": "Salt Warden",       "kind": "trash", "role": "melee", "band": "front", "baseHp": 12, "baseDamage": 4, "resist": 150, "tags": ["pyreward", "ossuary", "melee"] },
+  { "id": "ossuary-acolyte",   "name": "Ossuary Acolyte",   "kind": "trash", "role": "melee", "band": "front", "baseHp": 9,  "baseDamage": 3, "tags": ["pyreward", "ossuary", "melee"] }
 ]

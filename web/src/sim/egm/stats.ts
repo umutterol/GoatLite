@@ -176,6 +176,7 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
 export function makeEnemy(opts: {
   name: string; baseHp: number; baseDamage: number; isBoss: boolean
   keyScale: number; affMult: number; band?: "front" | "back"
+  armour?: number; resist?: number   // C.8: damage-school defense (authored base; scaled by keyScale to track gear)
 }): Combatant {
   const hp = opts.baseHp * HP_UNIT * opts.keyScale * opts.affMult
   return {
@@ -186,7 +187,9 @@ export function makeEnemy(opts: {
     attackPower: opts.baseDamage * opts.keyScale * opts.affMult * DMG_UNIT,
     attackInterval: ENEMY_ATTACK_INTERVAL,
     damageType: "Physical",
-    armour: 0, resist: 0,            // Phase 1: party damage to enemies is unmitigated (matches current balance)
+    // C.8: armour mitigates the party's Physical, resist their Magic (ratio formula). Default 0 = unmitigated
+    // (Ashveil unchanged). Scaled by keyScale so the mitigation fraction roughly tracks gear-appropriate hit sizes.
+    armour: (opts.armour ?? 0) * opts.keyScale, resist: (opts.resist ?? 0) * opts.keyScale,
     critChance: 0, critMult: 1, dodgeChance: 0, damageTakenPct: 0,
     mana: 0, maxMana: 0, healCost: 0, manaRegen: 0, hps: 0,
     nextActionAt: 0, downedUntil: -1, dmgDone: 0, healDone: 0, deaths: 0, isBoss: opts.isBoss,

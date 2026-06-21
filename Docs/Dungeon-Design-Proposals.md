@@ -89,7 +89,7 @@ These are the mechanical ideas a dungeon can be wrapped around. ✅ = pure data 
 | Anti-yolo aggression tax | Avoidable/Spiteful/Bursting intake scales ~2× with Yolo; dial down | Aggression posture | ✅ |
 | Soft-enrage DPS race | Beat the 90s enrage by output or eat ramping damage | Output + Cooldowns | ✅ |
 | Spiteful "weakest link" | Ghosts hunt your lowest-**power** member → don't field a passenger | Roster floor + any peel spec | ✅ |
-| **Damage school (Phys/Magic)** ⭐ | Boss eats one school → field mixed-school DPS | phys: zerk/sin/mystic/guardian/crusader/bard · magic: pyro/arcanist/cleric | 🔧 |
+| **Damage school (Phys/Magic)** | Boss eats one school → field mixed-school DPS (soft ~1–2 keys) | phys: zerk/sin/mystic/bard · magic: pyro/arcanist/cleric | 🔧→✅ C.8 |
 | "The Tolling" affix | Second interrupt-stress layer (periodic catch-chance penalty) | Interrupts slider | 🔧 |
 | Hard-CC lockdown | Deny fast-hitting mobs their swings via stun/freeze/silence | Mystic/Arcanist/Pyromancer | 🚧 *(verify wiring first)* |
 | Dispel / cleanse pressure | Remove a stacking enemy debuff before it snowballs | Cleric / Bard | 🚧 *(no enemy applies statuses)* |
@@ -257,38 +257,41 @@ Bursting layer is added. Gate behind the affix-pool fix.
 
 ---
 
-### 4.5 The Pyreward Ossuary ⭐ — *damage school (Physical vs Magic)*
+### 4.5 The Pyreward Ossuary — *damage school (Physical vs Magic)*
 
-> *A bone-vault of grave-iron and warding-salt — half resist the blade, half resist the spell.* **Signature:** the
-> season's comp-literacy gate. **Difficulty:** the capstone (a knowledge-wall, not a numbers-wall). **Build:**
-> **needs the small engine change** (per-enemy armour/resist). **The flagship — the only dungeon with real comp pressure.**
+> *A bone-vault of grave-iron and warding-salt — half the dead blunt the blade, half drink the spell.* **Signature:**
+> alternating grave-iron (eats Physical) and salt-ward (eats Magic). **Difficulty:** the comp-literacy capstone.
+> **Build:** the **C.8** engine change (per-enemy armour/resist), shipped. **Healer/comp preference is SOFT** (§2).
 
-**The puzzle.** Boss HP isn't the problem — your damage **school** is. Grave-Iron bosses eat **Physical**; Ward-woven
-bosses eat **Magic**; they alternate, so **no single-school DPS core clears all four**. You must field at least one
-magic dealer **and** one physical dealer. The trash "half the pack survives your AoE" beat teaches it cheaply (and
-sidesteps the single-target auto-focus problem).
+**The puzzle.** Grave-Iron bosses (armour) eat **Physical**; salt-warded bosses (resist) eat **Magic**; they alternate.
+A comp with **both** schools always has un-mitigated damage on every boss; an all-one-school core has half its damage
+eaten on half the bosses → slower kills → loses ~1–2 key levels of ceiling. Per the "player not class" rule (§2) this
+is a **soft** preference: any reasonable comp (the strong DPS split 2 Physical / 2 Magic, so balance is natural) clears
+the low/mid keys; tunnel-visioning one school just caps a couple keys lower.
 
-**Comp answer (real roster pressure — the point of the dungeon).** magic = Pyromancer/Arcanist/Cleric ·
-physical = Berserker/Assassin/Mystic/Guardian/Crusader/Bard. **No dial touches school mitigation.** Tune for a **slow
-kill** (~75–85% mitigation — loses the soft-enrage race) not a 90% brick wall, so the bar still moves and the failure
-reads as *"half your damage was eaten,"* not "immune."
+**Comp answer (soft).** physical = Assassin/Berserker (+ Bard/Mystic) · magic = Pyromancer/Arcanist (+ Cleric). Bring
+at least one of each (easy — the roster only has 2 strong DPS per school, so a balanced core is the default). It's a
+**kill-speed/timer** check (school mitigation slows the wrong dealers), not survival.
 
 | Stage | Boss | Defends | Shape→Tactic | Flavor |
 |---|---|---|---|---|
-| 2 | Vergil, the Grave-Iron Warden | high **armour** (eats Physical) | summon→killorder | "Iron does not bleed." |
-| 4 | Saltmother Quell | high **resist** (eats Magic) | ground→positioning | "Salt drinks the spell before it lands." |
-| 6 | The Annealed Choir | high **armour** | phase→cooldowns | "Tempered in the pyre, cooled in the dark." |
-| 8 | Heretic-Pyre Ossuar | high **resist** (finale) | cast→interrupts | "Burn the word from the air." |
+| 2 | Vergil, the Grave-Iron Warden | **armour** (eats Physical) | summon→killorder | "Iron does not bleed." |
+| 4 | Saltmother Quell | **resist** (eats Magic) | ground→positioning | "Salt drinks the spell before it lands." |
+| 6 | The Annealed Choir | **armour** | phase→cooldowns | "Tempered in the pyre, cooled in the dark." |
+| 8 | Heretic-Pyre Ossuar | **resist** (finale) | cast→interrupts | "Burn the word from the air." |
 
-*(Bosses get **distinct** `testsTactic` so the school wall layers over varied tactic tests instead of four
-cooldowns-clones.)*
+*(Bosses get **distinct** `testsTactic` so the school wall layers over varied tactic tests.)*
 
-**Engine change required (small).** Add optional `armour`/`resist` number fields to `EnemySchema` (default `0`, so
-Ashveil stays byte-identical) and replace the hard-coded `armour:0 / resist:0` in `makeEnemy` (`stats.ts`) with
-`opts.armour / opts.resist`. Decide armour-vs-hit-size scaling (multiply by `keyScale` **and** party power so the wall
-holds as gear climbs). `pipeline.resolveHit` already routes Physical→armour, Magic→resist at the 90% cap — **no new
-branch.** **Reward hook:** plain spec-targeted weapons (defer proc-based "school-flex" trinkets until a proc system
-exists). **Don't** claim "fails at ANY ilvl" — the mitigation ratio is hit-size dependent; scale it or reframe honestly.
+**Build status (2026-06-21): C.8 shipped + the Ossuary tuned to the soft-gap spec.** `EnemySchema.armour/resist`
+(default 0 → Ashveil byte-identical), wired through `makeEnemy` (scaled by `keyScale`), routed by the existing
+`pipeline.resolveHit`. Boss armour/resist `250`, trash `150`. Verified via `pyreward-ceiling.mjs` (mixed vs
+all-physical core, with **Ashveil as the no-armour control** to subtract spec-power confound): mixed caps ~+13 (like the
+other dungeons); the **school-specific tax is ~1–2 keys**. **Two findings baked in:** (1) the `resolveHit` ratio formula
+is *sticky* (small hits stay ~15–20% mitigated across a wide armour range), so the value is coarse — don't expect fine
+control. (2) **Trash must be front-melee** — caster-heavy trash made it an *AoE* check (pyro/arcanist shred back-liners),
+confounding "have magic" with "have AoE"; front-melee trash isolates the school wall. **Reward hook:** spec-targeted
+weapons. **Loot = placeholder.** **Note:** a single-school core also pays a spec-power penalty (only 2 strong DPS per
+school), so its *raw* ceiling drop looks bigger than the ~1–2 *school* keys — that confound is roster-wide, not the wall.
 
 ---
 
@@ -315,7 +318,7 @@ and the exact curves:
 | Item | Unlocks | Effort |
 |---|---|---|
 | ~~**Burst + rot boss variants**~~ — ✅ **DONE (C.10)**: opt-in `spikeProfile:"burst"\|"rot"`, soft ~1–2-key healer levers (burst→Cleric, rot→Lifebinder) | **Stillhour Abbey** (burst) + **The Weltering Mire** (rot) | medium |
-| **Per-enemy `armour`/`resist`** — schema fields + un-hardcode `makeEnemy`; decide hit-size scaling | **The Pyreward Ossuary** (the chosen flagship) | **small** |
+| ~~**Per-enemy `armour`/`resist`**~~ — ✅ **DONE (C.8)**: `EnemySchema.armour/resist` (default 0), `makeEnemy` scales by keyScale, routed by existing `resolveHit` | **The Pyreward Ossuary** (soft ~1–2-key school preference) | small |
 | **"The Tolling" affix** — new hard-coded branch perturbing the interrupt catch term | Bellreach v2 difficulty layer | small |
 | **Per-encounter mechanic cadence/coefficients in data** — so same-tactic bosses differ mechanically | breaks "same spike, bigger numbers" across Bellreach/Hour/Stillhour/Mire | medium |
 | **Real interrupt capability + enemy cast-bar/telegraph** — makes "bring a kicker" a genuine solve | Bellreach's *promised* Arcanist/Mystic roster pressure | large |

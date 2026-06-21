@@ -87,5 +87,27 @@
       "legplates-of-the-barrow-march", "cuirass-of-interred-kings", "treads-of-quiet-rest",
       "vial-of-crypt-dust", "icon-of-pale-mercy"
     ]
+  },
+  {
+    "id": "pyreward-ossuary",
+    "name": "The Pyreward Ossuary",
+    "theme": "A bone-vault of grave-iron and warding-salt — half the dead blunt the blade, half drink the spell; your damage SCHOOL is the wall",
+    "timerSeconds": 1500,
+    "signature": "Alternating grave-iron (eats Physical) and salt-ward (eats Magic) — bring mixed-school DPS",
+    "slots": [
+      { "stage": 1, "kind": "trash", "packTags": ["pyreward"] },
+      { "stage": 2, "kind": "boss",  "boss": "vergil-grave-iron-warden" },
+      { "stage": 3, "kind": "trash", "packTags": ["pyreward"] },
+      { "stage": 4, "kind": "boss",  "boss": "saltmother-quell" },
+      { "stage": 5, "kind": "trash", "packTags": ["pyreward"] },
+      { "stage": 6, "kind": "boss",  "boss": "the-annealed-choir" },
+      { "stage": 7, "kind": "trash", "packTags": ["pyreward"] },
+      { "stage": 8, "kind": "boss",  "boss": "heretic-pyre-ossuar" }
+    ],
+    "lootTable": [
+      "ashveil-cleaver", "scepter-of-quiet-rest", "faceguard-of-interred-kings",
+      "pale-mitre-of-ashveil", "cuirass-of-interred-kings", "legplates-of-the-barrow-march",
+      "vial-of-crypt-dust", "icon-of-pale-mercy"
+    ]
   }
 ]

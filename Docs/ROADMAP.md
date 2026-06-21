@@ -38,7 +38,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | A | Engine v1 (old flat-power sim) | ✅ 12/12 — **superseded by A2** |
 | A2 | **Combat engine rebuilt on EGM model** | ✅ 7/7 (live + balanced) |
 | B | **Runtime loop & persistence** | 🟡 13/14 |
-| C | Content scale-up | 🟡 1/10 |
+| C | Content scale-up | 🟡 2/10 |
 | D | Systems depth | ⬜ 0/9 |
 | E | Production (art, audio, polish) | ⬜ 0/7 |
 | F | **Endgame & Identity (operator skills)** | ✅ 6/6 — live + balanced (operator runway ≈ +3 keys; +2 floor holds) |
@@ -124,8 +124,8 @@ memory `combat-model-egm-migration`.*
 
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
-| C.1 | Dungeons 2–6 | content | major | XL | 🟡 | **design ✅** `Dungeon-Design-Proposals.md`. **Bellreach Sanctum ✅ (1/5)** (interrupts; +2 floor times; read log-visible only → C.9). **Stillhour Abbey ✅ (2/5)** + **The Weltering Mire ✅ (3/5)** — the healer pair via **C.10** (burst→Cleric / rot→Lifebinder), tuned to the **"bring the player, not the class"** soft-gap spec: both healers clear low/mid, ideal healer extends the ceiling **~1–2 keys** (sweep `healer-ceiling.mjs`). **Next:** C.8+Pyreward Ossuary → Hour of Bells last. IP rename deferred/off critical path |
-| C.8 | Per-enemy armour/resist (damage-school wall) | engine | minor | S | ⬜ | un-hardcode `makeEnemy` armour:0/resist:0 → optional `EnemySchema` fields (default 0 = Ashveil unchanged); scale by keyScale×power; `pipeline.resolveHit` already routes Phys→armour/Magic→resist. Unblocks **Pyreward Ossuary** — the only dungeon with real comp pressure |
+| C.1 | Dungeons 2–6 | content | major | XL | 🟡 | **design ✅** `Dungeon-Design-Proposals.md`. **Bellreach Sanctum ✅ (1/5)** (interrupts; +2 floor times; read log-visible only → C.9). **Stillhour Abbey ✅ (2/5)** + **The Weltering Mire ✅ (3/5)** — the healer pair via **C.10** (burst→Cleric / rot→Lifebinder), tuned to the **"bring the player, not the class"** soft-gap spec: both clear low/mid, ideal healer extends the ceiling **~1–2 keys** (sweep `healer-ceiling.mjs`). **The Pyreward Ossuary ✅ (4/5)** — damage-school via **C.8**; soft ~1–2-key mixed-school preference (sweep `pyreward-ceiling.mjs`, Ashveil as control). **Next:** Hour of Bells (5/5, pure data). IP rename deferred/off critical path |
+| C.8 | Per-enemy armour/resist (damage-school wall) | engine | minor | S | ✅ | `EnemySchema.armour/resist` (default 0 → Ashveil byte-identical) → `makeEnemy` scales by keyScale; existing `pipeline.resolveHit` routes Phys→armour/Magic→resist. Powers **Pyreward Ossuary**. **Caveats found:** the ratio formula is *sticky* (coarse tuning); trash must be **front-melee** (caster trash makes it an AoE check, not a school check); single-school also pays a spec-power penalty (2 strong DPS/school) so raw gap > the ~1–2 *school* keys. `tsc -b` clean; egm-smoke unchanged |
 | C.2 | Per-spec talent trees | content | major | XL | ⬜ | 10 specs × 5 nodes ≈ 150 options |
 | C.3 | Enemy roster breadth | content | major | XL | ⬜ | ~50–70 total (have 7) |
 | C.4 | Item breadth + secondary pool tuning | content | major | L | ⬜ | ~60–72 items (have 12) |
@@ -344,6 +344,17 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-21** — **C.8 + C.1 The Pyreward Ossuary (4/5): per-enemy damage-school defense, soft-tuned.** Shipped **C.8**:
+  optional `EnemySchema.armour/resist` (default 0 → Ashveil byte-identical), wired through `makeEnemy` (scaled by
+  keyScale) and routed by the existing `pipeline.resolveHit` (Physical→armour, Magic→resist, ratio formula). Authored the
+  **Ossuary** — 4 bosses alternating high-armour (eats Physical) / high-resist (eats Magic), each a distinct `testsTactic`,
+  + front-melee trash; added to the season; placeholder loot. Tuned to the **soft-gap spec** (armour/resist 250 boss /
+  150 trash): a mixed-school core caps ~+13 like the other dungeons, the **school-specific tax is ~1–2 keys** (verified via
+  `pyreward-ceiling.mjs` with Ashveil as the no-armour control to subtract spec-power confound). **Findings:** the
+  `resolveHit` ratio formula is *sticky* (small hits stay ~15–20% mitigated across a wide armour range → coarse tuning);
+  trash **must be front-melee** (caster-heavy trash turned it into an AoE check — pyro/arcanist shred back-liners —
+  confounding "have magic" with "have AoE"); and a single-school core also eats a spec-power penalty (only 2 strong DPS
+  per school), so the raw ceiling gap is wider than the ~1–2 *school* keys. `tsc -b` clean; egm-smoke (Ashveil) unchanged.
 - **2026-06-21** — **C.1 The Weltering Mire (3/5) + C.10 re-tuned to "bring the player, not the class".** Adopted a design
   principle: tactic dials are the primary solve; spec preference is a *soft* secondary lever — both options clear the
   floor and mid keys, the ideal spec only extends the **ceiling ~1–2 key levels**. Re-tuned **Stillhour's burst from a

@@ -139,6 +139,11 @@ export const EnemySchema = z.object({
   //   "rot"   = a flat tick on each non-tank /3s (soft HoT-favoring lever).
   // Both are tuned so the healer gap is only ~1-2 key levels of ceiling. Absent = the standard testsTactic mechanic.
   spikeProfile: z.enum(["burst", "rot"]).optional(),
+  // C.8: per-enemy damage-school defense (default 0 → unmitigated, Ashveil unchanged). armour mitigates incoming
+  // Physical, resist mitigates Magic (ratio formula in pipeline.resolveHit). The engine scales these by keyScale.
+  // A soft ~1-2-key "bring mixed-school DPS" lever (the Pyreward Ossuary alternates high-armour and high-resist bosses).
+  armour: z.number().optional(),
+  resist: z.number().optional(),
 })
 
 export const PackSchema = z.object({

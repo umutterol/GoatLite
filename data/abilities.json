@@ -17,5 +17,10 @@
   { "id": "mire-swell",    "name": "Mire Swell",    "kind": "enemy", "shape": "rot", "tactic": "cooldowns", "telegraph": 0, "desc": "The fen swells; the rot rises across the party — a flat, ceaseless tick that rolling HoTs outlast and reactive single-target heals fall behind." },
   { "id": "drowning-grip", "name": "Drowning Grip", "kind": "enemy", "shape": "rot", "tactic": "cooldowns", "telegraph": 0, "desc": "The water closes over everyone at once; pre-laid HoTs keep five heads above it where burst triage can't reach them all." },
   { "id": "rising-tide",   "name": "Rising Tide",   "kind": "enemy", "shape": "rot", "tactic": "cooldowns", "telegraph": 0, "desc": "The tide comes in across the whole party; only steady, rolling healing outlasts a long enough rise." },
-  { "id": "the-glut",      "name": "The Glut",      "kind": "enemy", "shape": "rot", "tactic": "cooldowns", "telegraph": 0, "desc": "The fen feasts on the whole party at once; Cooldowns blunts the tick, but it's rolling HoTs that decide the ceiling." }
+  { "id": "the-glut",      "name": "The Glut",      "kind": "enemy", "shape": "rot", "tactic": "cooldowns", "telegraph": 0, "desc": "The fen feasts on the whole party at once; Cooldowns blunts the tick, but it's rolling HoTs that decide the ceiling." },
+
+  { "id": "grave-iron-bulwark", "name": "Grave-Iron Bulwark", "kind": "enemy", "shape": "summon", "tactic": "killorder", "telegraph": 0, "desc": "Iron-bound and blade-blunting — bring Magic to the grave-iron, or watch your physical dealers chip a wall." },
+  { "id": "salt-ward",          "name": "Salt Ward",          "kind": "enemy", "shape": "ground", "tactic": "positioning", "telegraph": 1.5, "desc": "Warding-salt drinks the spell before it lands — bring the blade to the salt-warded, not the bolt." },
+  { "id": "annealing-pyre",     "name": "Annealing Pyre",     "kind": "enemy", "shape": "phase",  "tactic": "cooldowns", "telegraph": 3, "desc": "Tempered iron, cooled in the dark; a spike phase that wants Magic dealers to actually move the bar." },
+  { "id": "heretic-rite",       "name": "Heretic Rite",       "kind": "enemy", "shape": "cast",   "tactic": "interrupts", "telegraph": 2.5, "desc": "A salt-warded finale: burn the word from the air, and bring the blade since the spell just rolls off." }
 ]

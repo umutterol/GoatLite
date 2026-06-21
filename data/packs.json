@@ -6,5 +6,7 @@
   { "id": "stillhour-pack-a", "name": "Drowned Congregation", "tags": ["stillhour", "drowned"], "mobs": [ { "enemyId": "pew-verger", "count": 1 }, { "enemyId": "censing-acolyte", "count": 1 }, { "enemyId": "choirling", "count": 1 } ] },
   { "id": "stillhour-pack-b", "name": "Evensong Procession", "tags": ["stillhour", "drowned"], "mobs": [ { "enemyId": "pew-verger", "count": 1 }, { "enemyId": "choirling", "count": 2 } ] },
   { "id": "weltering-pack-a", "name": "Bog Procession", "tags": ["weltering", "drowned"], "mobs": [ { "enemyId": "bog-thrall", "count": 1 }, { "enemyId": "fen-lurker", "count": 1 }, { "enemyId": "drowned-wretch", "count": 1 } ] },
-  { "id": "weltering-pack-b", "name": "Sodden Tide", "tags": ["weltering", "drowned"], "mobs": [ { "enemyId": "fen-lurker", "count": 2 }, { "enemyId": "drowned-wretch", "count": 1 } ] }
+  { "id": "weltering-pack-b", "name": "Sodden Tide", "tags": ["weltering", "drowned"], "mobs": [ { "enemyId": "fen-lurker", "count": 2 }, { "enemyId": "drowned-wretch", "count": 1 } ] },
+  { "id": "pyreward-pack-a", "name": "Reliquary Guard", "tags": ["pyreward", "ossuary"], "mobs": [ { "enemyId": "grave-iron-thrall", "count": 2 }, { "enemyId": "salt-warden", "count": 2 } ] },
+  { "id": "pyreward-pack-b", "name": "Ossuary Procession", "tags": ["pyreward", "ossuary"], "mobs": [ { "enemyId": "grave-iron-thrall", "count": 1 }, { "enemyId": "salt-warden", "count": 1 }, { "enemyId": "ossuary-acolyte", "count": 2 } ] }
 ]

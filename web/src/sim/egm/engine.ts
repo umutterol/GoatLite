@@ -112,7 +112,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
       stageName = b.name
       bossAbil = content.abilities.get(b.abilityId ?? "")?.name ?? "its mechanic"
       bossSpike = b.spikeProfile ?? ""
-      mobs.push(makeEnemy({ name: b.name, baseHp: b.baseHp, baseDamage: b.baseDamage, isBoss: true, keyScale, affMult, band: b.band }))
+      mobs.push(makeEnemy({ name: b.name, baseHp: b.baseHp, baseDamage: b.baseDamage, isBoss: true, keyScale, affMult, band: b.band, armour: b.armour, resist: b.resist }))
       const tested = content.tactics.get(bossTest)?.name
       emit("good", `${b.name} engages. ${bossAbil} incoming${tested ? ` — tests ${tested}` : ""}.`)
     } else {
@@ -120,7 +120,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
       stageName = pack.name
       for (const m of pack.mobs) {
         const e = content.enemies.get(m.enemyId)!
-        for (let i = 0; i < m.count; i++) mobs.push(makeEnemy({ name: e.name, baseHp: e.baseHp, baseDamage: e.baseDamage, isBoss: false, keyScale, affMult, band: e.band }))
+        for (let i = 0; i < m.count; i++) mobs.push(makeEnemy({ name: e.name, baseHp: e.baseHp, baseDamage: e.baseDamage, isBoss: false, keyScale, affMult, band: e.band, armour: e.armour, resist: e.resist }))
       }
     }
 
