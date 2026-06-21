@@ -30,17 +30,11 @@ affix-raging,affix,Raging,affixes.json,yes,P2,"Mobs below 30% HP enrage, gaining
 cur-gold,currency,Gold,currencies.json,yes,P2,
 cur-emblem,currency,Emblems of Heroism,currencies.json,yes,P2,
 cur-shard,currency,Shards,currencies.json,yes,P2,
-stat-ilvl,stat,Item Level,stats.json / secondary-stats.json,yes,P2,
-stat-crit,stat,Crit,stats.json / secondary-stats.json,yes,P2,
-stat-haste,stat,Haste,stats.json / secondary-stats.json,yes,P2,
-stat-mastery,stat,Mastery,stats.json / secondary-stats.json,yes,P2,
-stat-versatility,stat,Versatility,stats.json / secondary-stats.json,yes,P2,
 class-warrior,class,Warrior,classes.json,no,P2,
 class-paladin,class,Paladin,classes.json,no,P2,
 class-rogue,class,Rogue,classes.json,no,P2,
 class-mage,class,Mage,classes.json,no,P2,
 class-sage,class,Sage,classes.json,no,P2,
-dungeon-ashveil-crypts,dungeon,Ashveil Crypts,dungeons.json,no,P2,Undead catacombs beneath a fallen city
 trait-jenkins,trait,Jenkins,traits.json,no,P2,start / Common
 trait-boomer,trait,Boomer,traits.json,no,P2,start / Common
 trait-prog-andy,trait,Prog Andy,traits.json,no,P2,start / Common
