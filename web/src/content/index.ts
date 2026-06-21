@@ -20,6 +20,7 @@ import itemsJson from "@data/items.json"
 import currenciesJson from "@data/currencies.json"
 import buildingsJson from "@data/buildings.json"
 import moraleEventsJson from "@data/morale-events.json"
+import barksJson from "@data/barks.json"
 import tuningJson from "@data/tuning.json"
 import talentsJson from "@data/talents.json"
 import lootTablesJson from "@data/loot-tables.json"
@@ -72,6 +73,7 @@ const tierSets = index(S.TierSetSchema, tierSetsJson, "tier-sets")
 const crafting = index(S.CraftingOpSchema, craftingJson, "crafting")
 const seasons = index(S.SeasonSchema, seasonsJson, "season")
 const logTemplates = index(S.LogTemplateSchema, logTemplatesJson, "log-templates")
+const barks = S.BarksSchema.parse(barksJson)
 const tuning = S.TuningSchema.parse(tuningJson)
 const recruitment = S.RecruitmentSchema.parse(recruitmentJson)
 const save = S.SaveSchema.parse(saveJson)
@@ -175,7 +177,7 @@ if (errors.length) throw new Error(`[content] ${errors.length} broken reference(
 export const content = {
   classes, specs, skills, stats, tactics, profiles, potentials, operatorSkills, affixes, traits,
   abilities, enemies, packs, dungeons, itemSlots, items, currencies, buildings,
-  moraleEvents, talents, lootTables, secondaryStats, tierSets, crafting,
+  moraleEvents, barks, talents, lootTables, secondaryStats, tierSets, crafting,
   seasons, logTemplates, playerAbilities, statuses, tuning, recruitment, save,
 }
 

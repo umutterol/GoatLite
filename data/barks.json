@@ -1,0 +1,87 @@
+{
+  "_doc": "M.4 voice packs. events → archetype → templates. Voice attaches to PERSONALITY, never identity. Tokens: {self} {item} {winner} {dungeon} {key} {margin}. Two-layer rule: item/dungeon names are earnest grim fantasy; ALL satire lives in the reaction. Author the flavorful archetypes; `default` is the fallback for any not listed.",
+  "events": {
+    "loot-snub-loser": {
+      "Selfish": [
+        "are you serious. {item} was MINE — i had the bigger upgrade and you hand it to {winner}?",
+        "cool. give {winner} my {item}. i'll just keep carrying undergeared.",
+        "i called {item} three runs ago. screenshot this conversation.",
+        "{winner} barely plays the spec and they get {item}. unreal."
+      ],
+      "Wildcard": [
+        "WELP. there goes {item} lmao. cool cool cool totally fine.",
+        "no yeah give {winner} the {item}, i LOVE suffering.",
+        "i'm so normal about loot. i'm so normal about lo—"
+      ],
+      "Specialist": [
+        "{item} was a bigger upgrade on my sheet but sure, feelycraft it to {winner}.",
+        "that's a measurable throughput loss handing {item} to {winner}, but noted.",
+        "i had the higher delta on {item}. we're leaving parse on the table."
+      ],
+      "Enabler": [
+        "gg {winner}, enjoy the {item}! ...it was my bigger upgrade but team first, honestly.",
+        "happy for {winner}! (i kind of needed {item} more but we win together)"
+      ],
+      "Leader": [
+        "{winner} over me on {item}? bold call. i'll allow it. once.",
+        "fine. {winner} takes {item}. i'll carry the deficit. understood."
+      ],
+      "default": [
+        "{winner} got {item}? i had the bigger upgrade there, but alright.",
+        "ah. {item} goes to {winner}. noted."
+      ]
+    },
+    "wipe": {
+      "Selfish": ["not my fault — i was carrying {dungeon}. that wipe was everyone else.", "i did my job. the rest of +{key} did not."],
+      "Wildcard": ["LMAO we wiped in {dungeon} AGAIN. i'm so done with +{key}.", "it's so over. (it's never over) {dungeon} run it back"],
+      "Specialist": ["sloppy wipe on +{key}. we bled cooldowns early. run it back, tighter.", "that was a positioning death, not a gear check. fixable."],
+      "Enabler": ["okay team, shake it off — {dungeon} was rough. we go again.", "no blame, that pull was nasty. regroup, we got this."],
+      "Leader": ["regroup. {dungeon} dies next pull. i mean it.", "unacceptable wipe. reset, +{key}, now."],
+      "default": ["wiped in {dungeon} +{key}. brutal.", "that one hurt. {dungeon} again."]
+    },
+    "timed-clutch": {
+      "Selfish": ["timed it with {margin} to spare. you're welcome, obviously.", "carried that {margin} finish. as usual."],
+      "Wildcard": ["{margin} ON THE CLOCK. MY HEART. i'm so back.", "we had {margin} left i could throw up let's GO"],
+      "Specialist": ["{margin} margin on +{key}. tight. we shave more next pull.", "barely timed — {margin} buffer. clean it up and it's free."],
+      "Enabler": ["WE GOT IT! {margin} left — gg team, that was beautiful.", "{margin} to spare, what a run! so proud of us."],
+      "Leader": ["timed, {margin} left. good work. now we do it cleaner.", "in the door with {margin}. that'll do. push it."],
+      "default": ["timed {dungeon} +{key} with {margin} left. close one."]
+    },
+    "depleted": {
+      "Selfish": ["depleted? not on me. someone else dropped the {key}.", "i hit my marks. the timer's not my problem."],
+      "Wildcard": ["over the timer in {dungeon} lol. it's so over. (it's never over)", "we depleted +{key}? incredible. love that for us."],
+      "Specialist": ["missed the +{key} timer — we lost it on trash routing. fixable.", "depleted by seconds. that's a pull-order problem, not a damage one."],
+      "Enabler": ["so close, team — {dungeon} almost fell. next time.", "we'll get +{key}, that was nearly there."],
+      "Leader": ["depleted. that's not our standard. {key} again.", "over time. tighten up. we run it back."],
+      "default": ["didn't make the timer on {dungeon} +{key}."]
+    },
+    "morale-crater": {
+      "Selfish": ["honestly? weighing my options. other guilds keep messaging me.", "i'm not feeling valued here. just saying."],
+      "Wildcard": ["i'm fine. i'm FINE. everything is completely fine. (it is not)", "running on vibes and spite at this point."],
+      "Specialist": ["morale's in the dirt. hard to parse when you're this checked out.", "burnt out. the numbers don't lie and neither do i."],
+      "Enabler": ["...rough stretch. i could really use a win, team.", "trying to stay positive but it's getting heavy."],
+      "Leader": ["i'm running on fumes. i need this guild to step up with me.", "low right now. carrying morale and the key is a lot."],
+      "default": ["not feeling great about things lately."]
+    },
+    "keystone-push": {
+      "Selfish": ["+{key} now. obviously. i've been hard-carrying us up here.", "{dungeon} +{key}. you're welcome for the rating."],
+      "Wildcard": ["WE PUSHED TO +{key} LETS GOOOO {dungeon} fears us now", "+{key}?? on {dungeon}?? i'm built different (i'm not)"],
+      "Specialist": ["clean enough for the triple-chest — +{key} on {dungeon}. trending up.", "+{key}. numbers say we keep climbing. don't get cocky."],
+      "Enabler": ["+{key}! look at us go, team. so proud of this group.", "{dungeon} +{key} together — gg everyone!"],
+      "Leader": ["+{key}. that's the standard now. we hold it.", "pushed to +{key}. good. eyes up, keep climbing."],
+      "default": ["pushed the key to +{key} on {dungeon}."]
+    },
+    "timed": {
+      "Selfish": ["ez. {dungeon} was free. i barely tried.", "{dungeon} +{key} down. did i carry? i carried."],
+      "Wildcard": ["{dungeon} +{key} down, gg, i did nothing wrong for ONCE.", "clean {dungeon} run, no notes, chaos averted today"],
+      "Specialist": ["clean {dungeon} +{key}. nominal run, no notes.", "timed +{key}, textbook. that's the baseline."],
+      "Enabler": ["nice and smooth, team. gg {dungeon}!", "{dungeon} +{key}, that felt good — well played all."],
+      "Leader": ["timed, clean. that's how it should look.", "{dungeon} +{key}, no drama. exactly right."],
+      "default": ["timed {dungeon} +{key}."]
+    }
+  },
+  "moods": {
+    "low": ["ugh.", "whatever.", "of course.", "cool.", "sigh.", "naturally."],
+    "high": ["lol.", "ezpz.", "let's GO.", "yesss.", "called it.", "ok we're cooking."]
+  }
+}

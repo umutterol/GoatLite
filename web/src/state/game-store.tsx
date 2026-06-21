@@ -8,6 +8,8 @@ import {
   corOf, potentialStars, applyGrowth, xpFromRun, GEAR_CAP_ILVL, GEAR_CAP_KEY, ABOVE_CAP_SKILL_XP,
   type SkillMap, type RevealMap, type OperatorProfile,
 } from "@/data/operator"
+import { generateBarks, type BarkMoment } from "./barks"
+import { Rng } from "@/sim/rng"
 
 const SAVE_KEY = "goatlite.save"
 const SAVE_VERSION = 5 // bumped: per-member operator skills + ceilings + Potentials profile (Phase F)
@@ -40,12 +42,13 @@ export interface KeystoneChange {
 
 /* ---- guild feed (Phase M.1): the always-visible meta-layer notification stream ----
    System notifications only here (neutral game-voice, zero comedy). In-character barks land in M.3/M.4. */
-export type FeedKind = "system" | "run" | "loot" | "keystone" | "operator" | "morale" | "recruit"
+export type FeedKind = "system" | "run" | "loot" | "keystone" | "operator" | "morale" | "recruit" | "bark"
 export type FeedTone = "neutral" | "good" | "bad" | "warn"
 export interface FeedEntry {
   id: string; week: number; kind: FeedKind; tone: FeedTone; text: string
   memberId?: string                       // click → that member's character sheet
   icon?: { kind: string; id: string }     // optional GameIcon (kind is an IconKind; kept loose to avoid a UI import here)
+  speaker?: string                        // M.3: for kind "bark" — the member's name, rendered in their spec colour
 }
 type FeedPartial = Omit<FeedEntry, "id" | "week">
 
@@ -186,6 +189,7 @@ interface PersistState {
   history: RunTicket[]   // replayable record of past runs, newest first (cap 50)
   feed: FeedEntry[]      // M.1: guild-feed notification stream, oldest→newest (cap 200)
   feedSeq: number        // monotonic id counter for feed entries (stable React keys)
+  barkLog: string[]      // M.3: recently-used bark template keys (no-repeat window, cap ~16)
 }
 interface RunConfig { tactics: Record<string, number>; aggression: Aggression }
 /** A replayable record of one run: enough to deterministically re-simulate it + a summary for the list. */
@@ -227,6 +231,7 @@ function freshState(): GameState {
     history: [],
     feed: [],
     feedSeq: 0,
+    barkLog: [],
     ...TRANSIENT,
   }
 }
@@ -247,9 +252,10 @@ function loadState(): GameState {
         // history changed shape (string[] → RunTicket[]) — drop any legacy/malformed entries so replay can't crash
         merged.history = ((merged.history as unknown[]) ?? []).filter((t): t is RunTicket =>
           !!t && typeof t === "object" && typeof (t as RunTicket).seed === "number" && Array.isArray((t as RunTicket).party) && typeof (t as RunTicket).aggression === "string")
-        // M.1: guild feed is additive (no SAVE_VERSION bump) — pre-M saves load with an empty feed
+        // M.1/M.3: guild feed + bark window are additive (no SAVE_VERSION bump) — pre-M saves load with empties
         merged.feed = Array.isArray(merged.feed) ? merged.feed : []
         merged.feedSeq = typeof merged.feedSeq === "number" ? merged.feedSeq : 0
+        merged.barkLog = Array.isArray(merged.barkLog) ? merged.barkLog : []
         return merged
       }
       // version mismatch → reset (full stepwise migrator goes here later)
@@ -346,6 +352,8 @@ export const LOOT_SCRAP_MIN = 8   // scrapping an item that was ≥ this big an 
 const CHILL_TRAITS = new Set(["boomer", "casual-andy"])   // these shrug a snub off (not an archetype — explicit ids)
 const isSelfish = (traitIds: string[]) => traitIds.some((t) => content.traits.get(t)?.archetype === "Selfish")
 const isChill = (traitIds: string[]) => traitIds.some((t) => CHILL_TRAITS.has(t))
+/** M.3: a member's bark voice = their first trait's archetype (tone), else the neutral default bank. */
+const archetypeOf = (m: RawMember): string => content.traits.get(m.traitIds[0])?.archetype ?? "default"
 /** Morale hit a member takes for being snubbed, scaled by personality. Base = the dormant `lost-loot` event (−5). */
 function lootLossMorale(traitIds: string[]): number {
   const base = content.moraleEvents.get("lost-loot")?.delta ?? -5   // wires the previously-dormant event
@@ -470,6 +478,8 @@ function reducer(state: GameState, action: Action): GameState {
       const drops = state.pendingLoot ?? []
       const feed: FeedPartial[] = []   // M.1: collected as we resolve loot/morale/keystone/growth below
       const lootLossByMember: Record<string, number> = {}   // M.2: snub morale penalties (folded into the morale pass below)
+      const barkSnubs: { loserId: string; winnerName: string; item: string }[] = []   // M.3: flagship bark moments
+      const moraleCratered: string[] = []                    // M.3: members who crossed into low morale this run
       let roster = state.roster.map((m) => ({ ...m, gear: { ...m.gear } }))
       const stash = [...state.stash]
       let shardsGained = 0
@@ -503,7 +513,7 @@ function reducer(state: GameState, action: Action): GameState {
             const gap = u.delta - winnerDelta
             if (gap < LOOT_SNUB_GAP) continue   // a smaller/equal claim is a fair call — no drama
             const lm = roster.find((x) => x.id === u.memberId)
-            if (lm) snub(lm, gap >= LOOT_BIG_GAP ? -2 : 0, `Loot snub — ${member.name} took ${d.name} over ${lm.name}'s bigger claim (+${u.delta} vs +${winnerDelta}).`)
+            if (lm) { snub(lm, gap >= LOOT_BIG_GAP ? -2 : 0, `Loot snub — ${member.name} took ${d.name} over ${lm.name}'s bigger claim (+${u.delta} vs +${winnerDelta}).`); barkSnubs.push({ loserId: lm.id, winnerName: member.name, item: d.name }) }
           }
         } else {
           stash.push({ uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity })   // wrong spec → vaulted, not a choice → no snub
@@ -516,7 +526,7 @@ function reducer(state: GameState, action: Action): GameState {
         // M.2: a contested-loot snub stacks on top of the outcome morale delta (personality-gated above)
         const nm = clamp(m.morale + MORALE_DELTA[r.outcome] + (lootLossByMember[m.id] ?? 0), 0, 100)
         // M.1: warn only when a member CROSSES below the low-morale line this run (no spam while they sit low)
-        if (m.morale >= LOW_MORALE && nm < LOW_MORALE) feed.push({ kind: "morale", tone: "warn", memberId: m.id, icon: specIcon(m.specId), text: `${m.name}'s morale fell to ${nm}. At risk of leaving the guild.` })
+        if (m.morale >= LOW_MORALE && nm < LOW_MORALE) { feed.push({ kind: "morale", tone: "warn", memberId: m.id, icon: specIcon(m.specId), text: `${m.name}'s morale fell to ${nm}. At risk of leaving the guild.` }); moraleCratered.push(m.id) }
         return { ...m, morale: nm }
       })
 
@@ -565,10 +575,33 @@ function reducer(state: GameState, action: Action): GameState {
         outcome: r.outcome, underBy: Math.round(r.timerSec - r.durationSec), upgrade,
         level: newLevel, dungeon: dungeon.name, dungeonShort: dShort(dungeon.name), timer: mmss(dungeon.timerSeconds), affixes,
       }
+
+      // M.3: in-character barks — collect the run's emotional moments, then let the (seeded) bark engine pick ~1–2
+      const byId = (id: string | null) => roster.find((m) => m.id === id)
+      const partyMembers = roster.filter((m) => partySet.has(m.id))
+      const mkMoment = (m: RawMember, event: string, priority: number, slots: Record<string, string>): BarkMoment =>
+        ({ event, speakerId: m.id, speakerName: m.name, specId: m.specId, archetype: archetypeOf(m), morale: m.morale, priority, slots })
+      const barkMoments: BarkMoment[] = []
+      const base = { dungeon: dungeon.name, key: String(oldLevel) }
+      for (const s of barkSnubs) { const lm = byId(s.loserId); if (lm) barkMoments.push(mkMoment(lm, "loot-snub-loser", 100, { item: s.item, winner: s.winnerName, self: lm.name })) }
+      for (const id of moraleCratered) { const m = byId(id); if (m) barkMoments.push(mkMoment(m, "morale-crater", 70, { self: m.name })) }
+      if (partyMembers.length) {
+        const speaker = new Rng((r.seed ^ 0x9e3779b9) >>> 0).pick(partyMembers)   // one seeded voice reacts to the run
+        const margin = r.timerSec - r.durationSec
+        if (r.outcome === "wipe") barkMoments.push(mkMoment(speaker, "wipe", 90, base))
+        else if (r.outcome === "depleted") barkMoments.push(mkMoment(speaker, "depleted", 45, base))
+        else if (margin > 0 && margin < 90) barkMoments.push(mkMoment(speaker, "timed-clutch", 80, { ...base, margin: mmss(margin) }))
+        else barkMoments.push(mkMoment(speaker, "timed", 20, base))
+      }
+      if (upgrade === 3) { const o = byId(ownerId); if (o) barkMoments.push(mkMoment(o, "keystone-push", 50, { key: String(newLevel), dungeon: dungeon.name })) }
+      const barks = generateBarks(barkMoments, r.seed >>> 0, state.barkLog)
+      for (const b of barks) feed.push({ kind: "bark", tone: "neutral", memberId: b.speakerId, icon: specIcon(b.specId), speaker: b.speakerName, text: b.text })
+      const barkLog = barks.length ? [...state.barkLog, ...barks.map((b) => b.key)].slice(-16) : state.barkLog
+
       return {
         ...state, roster, stash,
         wallet: { ...state.wallet, emblem, gold, shard: state.wallet.shard + shardsGained },
-        weekNumber,
+        weekNumber, barkLog,
         lastResult: null, pendingLoot: null, lastLoot: lootSummary, lastKeystoneChange: change,
         ...pushFeed(state, ...feed),
       }

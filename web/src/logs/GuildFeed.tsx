@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react"
 import { useGame } from "@/state/game-store"
 import { GameIcon, type IconKind } from "./components"
+import { mc } from "./analytics"
 import type { GoChar } from "./LogsApp"
 
 export function GuildFeed({ goChar }: { goChar: GoChar }) {
@@ -30,7 +31,7 @@ export function GuildFeed({ goChar }: { goChar: GoChar }) {
             return (
               <div
                 key={e.id}
-                className={`feed-item tone-${e.tone}${clickable ? " clickable" : ""}`}
+                className={`feed-item tone-${e.tone}${e.kind === "bark" ? " bark" : ""}${clickable ? " clickable" : ""}`}
                 onClick={clickable ? () => goChar(e.memberId!) : undefined}
                 role={clickable ? "button" : undefined}
                 tabIndex={clickable ? 0 : undefined}
@@ -39,7 +40,11 @@ export function GuildFeed({ goChar }: { goChar: GoChar }) {
                 <span className="feed-ico">
                   {e.icon ? <GameIcon kind={e.icon.kind as IconKind} id={e.icon.id} size={14} noTip /> : <span className="feed-dot" />}
                 </span>
-                <span className="feed-text">{e.text}</span>
+                <span className="feed-text">
+                  {e.kind === "bark" && e.speaker
+                    ? <><span className="feed-bark-name" style={{ color: mc(e.icon?.id ?? "").color }}>{e.speaker}</span> <span className="feed-bark-text">{e.text}</span></>
+                    : e.text}
+                </span>
               </div>
             )
           })

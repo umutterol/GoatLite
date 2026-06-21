@@ -49,7 +49,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | K | **Combat AI rework (v2)** | ✅ 6/6 — shared priority-rules brain (players + enemies), data-driven profiles, tactics-as-orders, 20-agent adversarial review (3 fixes) |
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
 | L | **Roster expansion — Marksman + Necromancer** | ⬜ 0/7 — **design ✅** (`MMO-Nostalgia-Reference.md` §6) |
-| M | **Guild Feed & Loot Drama (social meta-layer)** | 🟡 2/5 (+1 v2) — M.1 (feed + notifications) + M.2 (loot-drama mechanic) done, live-verified; barks (M.3/M.4) + bark-in-feed (M.5) next |
+| M | **Guild Feed & Loot Drama (social meta-layer)** | ✅ 5/5 (+1 v2) — feed + system notifications (M.1), loot-drama snub (M.2), deterministic bark engine (M.3) + voice packs (M.4) + snub-in-feed (M.5), all live-verified. M.6 (exchange beats + Rival) = v2 💤 |
 | N | **Intake balance (`enemyDmgMult`) + sim-dump tooling** | ✅ 2/2 — enemy damage is now an **isolated** intake lever (=2.0); survival binds below the timer wall; +2 floor + operator runway (+3) hold; new config/CLI `sim-dump` harness |
 
 ---
@@ -282,7 +282,7 @@ nostalgia 10); (2) add a 6th class, **Necromancer**, the pet/summoner class, who
 
 ---
 
-## Phase M — Guild Feed & Loot Drama (always-visible social meta-layer) 🟡 (2/5 — design ✅)
+## Phase M — Guild Feed & Loot Drama (always-visible social meta-layer) ✅ (5/5 — v1 done; M.6 = v2 💤)
 
 *An **always-visible** guild-chat panel in the Logs UI, **meta-layer only** (no in-run combat log). Two voices:
 **system notifications** (the game, neutral/factual — the notification-center backbone with complete coverage) and
@@ -295,9 +295,9 @@ random member inherits a voice pack for free. Loot drama is the feed's flagship 
 |---|---|---|---|---|---|---|
 | M.1 | Always-visible feed panel + **system-notification** layer | ux/engine | major | M | ✅ | persistent right-rail `GuildFeed.tsx` (visible only in the `playing` phase) reading a new persisted `feed: FeedEntry[]` + `feedSeq` on `PersistState`; notifications **emitted from the reducer** (all data in scope) in neutral game-voice, **zero comedy**: guild founded (`CREATE_GUILD`), member joined (`CONFIRM_RECRUITS`), run filed w/ outcome+time+deaths + loot-dropped (`RAN_KEY`), loot equipped + keystone raised/depleted + operator level-up + morale **at-risk crossing** (all `CONFIRM_LOOT`). Member-tagged lines click → character sheet. **No SAVE_VERSION bump** (additive field + defensive load guard → pre-M saves load with an empty feed); feed capped at 200. **Deferred (no engine yet):** trait-earned (D.1) + departure-warning (D.2) lines. Verified: `tsc -b` clean, `egm-smoke` goldens **byte-identical** (914/884/1182/1367 — no engine touched), Playwright `m-live.mjs` 9/9 + 0 console errors. |
 | M.2 | **Loot-drama mechanic** (contested-item resolution) | engine/ux | major | M | ✅ | A **SNUB** that fires only on a real player CHOICE — never on shared loot (the original "every 2+ award" trigger drained morale every run; reworked). Two snub paths in `CONFIRM_LOOT`: **(A)** you award to a member while a **skipped member had a materially bigger ilvl claim** (gap ≥ `LOOT_SNUB_GAP`=5; extra sting if ≥ `LOOT_BIG_GAP`=12), or **(B)** you **scrap an item that was a significant upgrade** (≥ `LOOT_SCRAP_MIN`=8) for a member. Awarding the **best fit** (or one-click **Auto best-fit**) costs nothing → **drama is opt-in**. The snub fires the now-wired **`lost-loot` morale event**, magnitude **personality-scaled** (Selfish −8 / Boomer·Casual-Andy −2 / else −5), stacking on the outcome morale, + a marquee **`Loot snub …` feed line** (M.1). **Winner +5% buff dropped** (was an always-on power creep) → loot drama is **purely social, zero balance impact** (sim threading reverted; `egm-smoke` byte-identical). **No `SAVE_VERSION` bump**. **UI** (`LootPage`): a **BEST FIT** tag on the no-drama choice, a `Wanted ×N` info chip, a live **⚠ warning** when the current pick would snub someone, + Auto best-fit. **Verified:** `tsc -b` clean; `egm-smoke` **byte-identical** (914/884/1182/1367); `op-verify` +2 floor + determinism; `m2-live.mjs` — snub on a bad pick (incl. morale Δ) AND **no snub on a best-fit award** — **0 console errors**. (Barks on top = M.5.) |
-| M.3 | **Bark engine** (procedural, deterministic) | engine | major | L | ⬜ | voice packs keyed by personality; template+slot grammar **grounded in real state** (item / key / name / rival / morale); per-member **no-repeat window**; **rarity budget**; **~1–2 barks/run** rate limit; seeded → replay-deterministic. Works for **random characters by construction**. Voice = trait(tone) × spec(vocabulary) × morale(mood) × per-character style seed. **No runtime LLM** (offline/deterministic/free). |
-| M.4 | **Personality voice-pack content** (tiered) | content | major | L | ⬜ | author per-personality bark banks for the highest-frequency events first (loot win/loss, wipe, clutch timed, trait earned, morale crater, farming-boredom); a plain functional line for everything else. Start ~**40 templates**, grow on observed repetition; Claude-assisted drafting, curate keepers. **Two-layer voice:** earnest grim item names, all satire in the reaction. |
-| M.5 | Loot drama **in the feed** (flagship integration) | ux | major | S | ⬜ | wire M.2 through M.1+M.3 so the contested decision + aftermath produce the marquee system-line + bark moments ("*i called that three runs ago*") — the shareable-screenshot content. |
+| M.3 | **Bark engine** (procedural, deterministic) | engine | major | L | ✅ | `web/src/state/barks.ts` `generateBarks(moments, seed, recent)` — a **pure, seeded** (`Rng` mulberry32, no `Math.random`) selector: collects the run's emotional moments in `CONFIRM_LOOT` (loot snub=100 / wipe=90 / clutch=80 / morale-crater=70 / push=50 / depleted=45 / timed=20), sorts by priority, applies a **rarity budget** (high-emotion ~always barks, low-stakes ~40%, a 2nd bark gated) for **~1–2 barks/run**, one per speaker. Voice = **archetype(tone)** routing to the bank × **morale(mood)** banded-interjection prefix × a **per-character seed** for individuation; **state-grounded** slot fills (`{item}{winner}{dungeon}{key}{margin}`); **no-repeat window** (`barkLog` last 16 template keys, persisted). Works for **random members by construction** (voice = personality, not identity). Barks append to the same feed as `kind:"bark"` (speaker name in spec colour + italic). Verified `m3-bark.mjs` (determinism / variety / routing / no-repeat / rate-limit / mood). |
+| M.4 | **Personality voice-pack content** (tiered) | content | major | L | ✅ | `data/barks.json` (new Zod-validated content domain `BarksSchema` → `content.barks`): 7 events × 5 archetypes (Selfish / Wildcard / Specialist / Enabler / Leader) + a `default` fallback + a `moods` bank — **~90 templates**. **Two-layer voice** holds: earnest grim item/dungeon names, ALL satire in the reaction (e.g. *"Treads of Quiet Rest was a bigger upgrade on my sheet but sure, feelycraft it to Bramblewen."*). Loot-snub is the richest bank (the flagship). Grows on observed repetition. |
+| M.5 | Loot drama **in the feed** (flagship integration) | ux | major | S | ✅ | falls out of M.2+M.3: a contested **snub** now emits BOTH the marquee **system line** (`Loot snub — X took {item} over Y's bigger claim`) **and** an in-character **bark** from the snubbed member (priority-100 moment → `loot-snub-loser` bank), side by side in the feed — the shareable-screenshot moment. The deeper rival-callback ("*i called that three runs ago*") + repeat-snub Rival escalation stay **M.6 (v2)**. Verified live (`m3-live.mjs`: the snub produces a bark from the snubbed member). |
 | M.6 | *(v2)* Multi-character **exchange beats** + **Rival** escalation | content/engine | major | L | 💤 | whole-beat authored exchanges (two members talking **to each other**, cast from real roster + facts → coherent because authored as a unit); repeated loot snubs to the same rival **earn the Rival trait** (+10% output, −15% morale if that teammate dies — already in GDD). Deferred until v1 voice packs prove out. |
 
 ---
@@ -341,6 +341,26 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-21** — **M.3 + M.4 + M.5 shipped: the bark engine + voice packs + loot-drama-in-the-feed — Phase M complete (v1).**
+  Roster members now react in their **own personality voice** in the guild feed, on top of the neutral M.1 notifications.
+  **M.3 (engine):** `web/src/state/barks.ts` `generateBarks` — a **pure, seeded** (`Rng` mulberry32, **no `Math.random`** →
+  deterministic + replay-safe) selector. `CONFIRM_LOOT` collects the run's emotional moments (loot snub=100 / wipe=90 /
+  clutch=80 / morale-crater=70 / keystone-push=50 / depleted=45 / comfortable-timed=20), sorts by priority, and a **rarity
+  budget** keeps the cadence to **~1–2 barks/run** (high-emotion ~always, low-stakes ~40%, a 2nd bark gated; one per
+  speaker). Voice = **archetype(tone)** bank routing × **morale(mood)** banded-interjection prefix × a **per-character
+  seed** (individuation) — **state-grounded** via slot fills (`{item}{winner}{dungeon}{key}{margin}`), with a **no-repeat
+  window** (`barkLog`, last 16 keys, persisted; additive, no `SAVE_VERSION` bump). Because voice attaches to **personality,
+  not identity**, procedurally-generated members get a voice for free. **M.4 (content):** `data/barks.json` — a new
+  Zod-validated content domain (`BarksSchema` → `content.barks`): 7 events × 5 archetypes (Selfish / Wildcard / Specialist
+  / Enabler / Leader) + `default` + a `moods` bank ≈ **90 templates**, holding the **two-layer rule** (earnest grim item
+  names, ALL satire in the reaction). **M.5 (integration, fell out for free):** a loot **snub** now emits BOTH the marquee
+  system line AND an in-character bark from the snubbed member, side by side — the shareable moment (e.g. *"Treads of Quiet
+  Rest was a bigger upgrade on my sheet but sure, feelycraft it to Bramblewen."*). Barks render in `GuildFeed.tsx` as
+  `kind:"bark"` (speaker name in spec colour + italic, dashed accent). **Verified:** `tsc -b` clean; `egm-smoke` goldens
+  **byte-identical** (914/884/1182/1367 — barks live in the reducer, not the sim) + `op-verify` green (content still loads);
+  new `m3-bark.mjs` (determinism / state-grounding / variety / archetype routing / no-repeat / rate-limit / mood — 7/7) and
+  `m3-live.mjs` (a snub yields a bark from the snubbed member, speaker-attributed + italic — 5/5, **0 console errors**).
+  **Phase M v1 complete**; M.6 (multi-character exchange beats + Rival escalation) stays **v2 💤**. Memory: `goatlite-guild-feed`.
 - **2026-06-21** — **Signature-major ids de-metaed: internal ids now match the in-world spell name.** The 10 Phase-H
   per-spec majors still carried their pre-H.1 **QA/dev codenames** as their `id` (`code-freeze`, `hotfix-deploy`,
   `prod-incident`, `zen-mode`, …) while their display `name` had been renamed to fantasy MMO spells — so the

@@ -134,6 +134,11 @@ a { color: var(--link); text-decoration: none; }
 .feed-item.tone-bad { border-left-color: var(--danger); }
 .feed-item.tone-warn { border-left-color: var(--amber); }
 .feed-item.tone-neutral { border-left-color: var(--line); }
+/* barks: a roster member talking — distinct from the factual system lines */
+.feed-item.bark { background: var(--panel-3); border-left-color: var(--accent); border-style: dashed; }
+.feed-item.bark .feed-text { color: var(--muted); }
+.feed-bark-name { font-weight: 700; }
+.feed-bark-text { font-style: italic; }
 
 /* ---------- generic panel ---------- */
 .panel {

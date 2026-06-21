@@ -158,6 +158,12 @@ export const CurrencySchema = z.object({ id: z.string(), name: z.string(), icon:
 export const BuildingSchema = z.object({ id: z.string(), name: z.string(), icon: z.string(), effect: z.string() })
 export const MoraleEventSchema = z.object({ id: z.string(), label: z.string(), delta: z.number() })
 
+/* M.4 guild-feed barks: event → archetype → templates (voice attaches to personality). `_doc` passthrough allowed. */
+export const BarksSchema = z.object({
+  events: z.record(z.string(), z.record(z.string(), z.array(z.string()))),
+  moods: z.object({ low: z.array(z.string()), high: z.array(z.string()) }).optional(),
+}).passthrough()
+
 /* ---- previously-scaffolded domains, now filled ---- */
 export const LogKind = z.enum(["normal", "crit", "dodge", "death", "mechanic", "heal", "flavor", "good"])
 
