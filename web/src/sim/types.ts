@@ -13,7 +13,6 @@ export interface SimPartyMember {
   talents?: Record<string, string>   // nodeId → chosen optionId (absent → balanced defaults)
   skills?: Record<string, number>    // Phase F: operator-skill id → current value (1..20); absent → engine uses baseline
   profile?: string
-  lootBuffPct?: number               // M.2: transient "+N% output next run" from winning contested loot (absent/0 → no-op)
 }
 
 export interface RunInput {

@@ -170,7 +170,6 @@ interface RawMember {
   skillXp: SkillMap
   revealed: RevealMap
   potentialProfile: OperatorProfile // hidden tag-weights (set the ceilings; bias earned-trait rolls in D.1)
-  lootBuffPct: number               // M.2: "+N% output next run" from winning contested loot (consumed after the run)
 }
 interface PersistState {
   version: number
@@ -244,7 +243,6 @@ function loadState(): GameState {
           ...m, key: m.key ?? freshKey(), talents: m.talents ?? {},
           skills: m.skills ?? freshOperatorSkills(), ceilings: m.ceilings ?? freshOperatorSkills(),
           skillXp: m.skillXp ?? zeroSkillMap(), revealed: m.revealed ?? falseRevealMap(), potentialProfile: m.potentialProfile ?? {},
-          lootBuffPct: m.lootBuffPct ?? 0,   // M.2: additive field, sanitized on load (no SAVE_VERSION bump → no roster wipe)
         }))
         // history changed shape (string[] → RunTicket[]) — drop any legacy/malformed entries so replay can't crash
         merged.history = ((merged.history as unknown[]) ?? []).filter((t): t is RunTicket =>
@@ -340,15 +338,18 @@ function pushFeed(s: PersistState, ...entries: FeedPartial[]): { feed: FeedEntry
   return { feed: [...s.feed, ...made].slice(-FEED_CAP), feedSeq: seq }
 }
 
-/* ---- loot drama (M.2): personality-gated contested-item consequences ---- */
-const LOOT_WIN_BUFF = 5    // winner: +5% output next run (GDD canon)
+/* ---- loot drama (M.2): a SNUB costs the loser morale — fires only on a real player CHOICE, never on shared loot ----
+   Awarding to the best-fit member (or one-click Auto best-fit) costs nothing; morale only moves when you deny a claim. */
+export const LOOT_SNUB_GAP = 5    // a skipped member is snubbed only if their ilvl claim was ≥ this much bigger than the winner's
+const LOOT_BIG_GAP = 12           // a much-bigger denied claim stings extra
+export const LOOT_SCRAP_MIN = 8   // scrapping an item that was ≥ this big an upgrade for a member snubs them ("you DE'd my BiS")
 const CHILL_TRAITS = new Set(["boomer", "casual-andy"])   // these shrug a snub off (not an archetype — explicit ids)
 const isSelfish = (traitIds: string[]) => traitIds.some((t) => content.traits.get(t)?.archetype === "Selfish")
 const isChill = (traitIds: string[]) => traitIds.some((t) => CHILL_TRAITS.has(t))
-/** Morale hit a member takes for losing a contested roll, gated by personality. Base = the dormant `lost-loot` event (−5). */
+/** Morale hit a member takes for being snubbed, scaled by personality. Base = the dormant `lost-loot` event (−5). */
 function lootLossMorale(traitIds: string[]): number {
   const base = content.moraleEvents.get("lost-loot")?.delta ?? -5   // wires the previously-dormant event
-  if (isSelfish(traitIds)) return base - 3   // Loot Goblin / Solo Player / Cocky / Rival contest loudly + lose more (−8)
+  if (isSelfish(traitIds)) return base - 3   // Loot Goblin / Solo Player / Cocky / Rival take it hardest (−8)
   if (isChill(traitIds)) return Math.ceil(base / 2)   // Boomer / Casual Andy shrug (−2)
   return base   // everyone else: the canon −5
 }
@@ -379,7 +380,6 @@ function reducer(state: GameState, action: Action): GameState {
         // Phase F: carry over the scouted operator skills/ceilings; XP starts empty and grows with play
         skills: rec.skills, ceilings: rec.ceilings, skillXp: zeroSkillMap(),
         revealed: rec.revealed, potentialProfile: rec.potentialProfile,
-        lootBuffPct: 0,
       }))
       const roster = [...state.roster, ...newMembers]
       // fill the party up to 5 (keeps existing party, adds the new signs)
@@ -469,38 +469,44 @@ function reducer(state: GameState, action: Action): GameState {
       if (!r) return state
       const drops = state.pendingLoot ?? []
       const feed: FeedPartial[] = []   // M.1: collected as we resolve loot/morale/keystone/growth below
-      const lootLossByMember: Record<string, number> = {}   // M.2: contested-roll morale penalties (folded into morale below)
-      const lootWinners = new Set<string>()                  // M.2: members who won a contested item → +5% output next run
+      const lootLossByMember: Record<string, number> = {}   // M.2: snub morale penalties (folded into the morale pass below)
       let roster = state.roster.map((m) => ({ ...m, gear: { ...m.gear } }))
       const stash = [...state.stash]
       let shardsGained = 0
+      const snub = (lm: RawMember, extra: number, text: string) => {   // a snub = personality-scaled morale hit + a feed line
+        lootLossByMember[lm.id] = (lootLossByMember[lm.id] ?? 0) + lootLossMorale(lm.traitIds) + extra
+        feed.push({ kind: "loot", tone: "warn", memberId: lm.id, icon: specIcon(lm.specId), text })
+      }
       for (const d of drops) {
         const a = action.assignments[d.uid]
-        if (!a || a === "scrap") { shardsGained += SHARDS_PER_SCRAP; continue }
+        const upgraders = d.upgrades.filter((u) => u.delta > 0)   // members this drop would actually upgrade
+        if (!a || a === "scrap") {
+          shardsGained += SHARDS_PER_SCRAP
+          // (B) scrapping an item that was a SIGNIFICANT upgrade for a member snubs them ("you DE'd my BiS")
+          for (const u of upgraders) {
+            if (u.delta < LOOT_SCRAP_MIN) continue
+            const lm = roster.find((x) => x.id === u.memberId)
+            if (lm) snub(lm, 0, `${lm.name}'s upgrade was scrapped — ${d.name} (+${u.delta}).`)
+          }
+          continue
+        }
         const member = roster.find((m) => m.id === a)
         if (member && d.specs.includes(member.specId)) {
           const old = member.gear[d.slot]
           member.gear[d.slot] = { uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity }
           if (old && old.baseId !== "beta-standard-issue") stash.push(old)
-          // M.2 loot drama: contested when 2+ party members would upgrade AND the winner is one of them
-          const upgraders = d.upgrades.filter((u) => u.delta > 0)
-          const contested = upgraders.length >= 2 && upgraders.some((u) => u.memberId === member.id)
-          if (contested) {
-            lootWinners.add(member.id)   // winner → +5% next run (applied below; consumed after the next run)
-            const loserNames: string[] = []
-            for (const u of upgraders) {
-              if (u.memberId === member.id) continue
-              const lm = roster.find((x) => x.id === u.memberId)
-              if (!lm) continue
-              lootLossByMember[lm.id] = (lootLossByMember[lm.id] ?? 0) + lootLossMorale(lm.traitIds)   // personality-gated snub
-              loserNames.push(lm.name)
-            }
-            feed.push({ kind: "loot", tone: "warn", memberId: member.id, icon: specIcon(member.specId), text: `Contested: ${member.name} took ${d.name} over ${loserNames.join(", ")} (+${LOOT_WIN_BUFF}% next run).` })
-          } else {
-            feed.push({ kind: "loot", tone: "good", memberId: member.id, icon: specIcon(member.specId), text: `${member.name} equipped ${d.name} (ilvl ${d.ilvl}).` })
+          feed.push({ kind: "loot", tone: "good", memberId: member.id, icon: specIcon(member.specId), text: `${member.name} equipped ${d.name} (ilvl ${d.ilvl}).` })
+          // (A) a SNUB fires only when a skipped member had a MATERIALLY bigger claim than the one you chose
+          const winnerDelta = upgraders.find((u) => u.memberId === member.id)?.delta ?? 0   // 0 if you gifted it to a non-upgrader
+          for (const u of upgraders) {
+            if (u.memberId === member.id) continue
+            const gap = u.delta - winnerDelta
+            if (gap < LOOT_SNUB_GAP) continue   // a smaller/equal claim is a fair call — no drama
+            const lm = roster.find((x) => x.id === u.memberId)
+            if (lm) snub(lm, gap >= LOOT_BIG_GAP ? -2 : 0, `Loot snub — ${member.name} took ${d.name} over ${lm.name}'s bigger claim (+${u.delta} vs +${winnerDelta}).`)
           }
         } else {
-          stash.push({ uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity })
+          stash.push({ uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity })   // wrong spec → vaulted, not a choice → no snub
         }
       }
       // morale
@@ -546,14 +552,6 @@ function reducer(state: GameState, action: Action): GameState {
             feed.push({ kind: "operator", tone: "good", memberId: m.id, icon: specIcon(m.specId), text: `${m.name}'s ${content.operatorSkills.get(k)?.name ?? k} rose to ${Math.floor(g.skills[k])}.` })
         }
         return { ...m, skills: g.skills, skillXp: g.skillXp }
-      })
-
-      // M.2: the loot-win buff is a ONE-run boost — clear it for everyone who just ran (consumed), then set it on this run's winners
-      roster = roster.map((m) => {
-        if (!partySet.has(m.id)) return m
-        const won = lootWinners.has(m.id)
-        if (!won && m.lootBuffPct === 0) return m
-        return { ...m, lootBuffPct: won ? LOOT_WIN_BUFF : 0 }
       })
 
       const emblem = state.wallet.emblem + (r.outcome === "timed" ? 5 : r.outcome === "depleted" ? 2 : 0)
@@ -618,7 +616,7 @@ function shapeMember(m: RawMember): Member {
   return {
     id: m.id, name: m.name, title: m.title, spec: m.specId, ilvl: memberIlvl(m.gear), morale: m.morale,
     portrait: `/warcraftcn/${m.portrait}.webp`, note: m.note, key: m.key ? shapeKey(m.key) : undefined, talents: m.talents ?? {},
-    skills: m.skills, ceilings: m.ceilings, revealed: m.revealed, skillXp: m.skillXp, traitIds: m.traitIds, lootBuffPct: m.lootBuffPct ?? 0,
+    skills: m.skills, ceilings: m.ceilings, revealed: m.revealed, skillXp: m.skillXp, traitIds: m.traitIds,
     traits: m.traitIds.map((tid) => {
       const t = content.traits.get(tid)
       if (!t) return { name: tid, rarity: "Common", kind: "Start", effect: "" } as Trait
@@ -691,7 +689,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const party: SimPartyMember[] = state.partyIds
         .map((id) => state.roster.find((m) => m.id === id))
         .filter(Boolean)
-        .map((m) => ({ id: m!.id, name: m!.name, specId: m!.specId, ilvl: memberIlvl(m!.gear), morale: m!.morale, traitIds: m!.traitIds, talents: m!.talents, skills: m!.skills, lootBuffPct: m!.lootBuffPct }))
+        .map((m) => ({ id: m!.id, name: m!.name, specId: m!.specId, ilvl: memberIlvl(m!.gear), morale: m!.morale, traitIds: m!.traitIds, talents: m!.talents, skills: m!.skills }))
       const seed = Math.floor(Math.random() * 0xffffffff)
       const result = runDungeon({ dungeonId: runKeyState.dungeonId, keyLevel: runKeyState.level, affixIds: affIds, party, tactics: cfg.tactics, aggression: cfg.aggression, seed })
       const dgn = content.dungeons.get(runKeyState.dungeonId)

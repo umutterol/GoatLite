@@ -1,7 +1,7 @@
 /* Step 5 — Loot Distribution: master-loot the real drops, or scrap for shards. */
 import { useState } from "react"
 import { content } from "@/content"
-import { useGame } from "@/state/game-store"
+import { useGame, LOOT_SNUB_GAP, LOOT_SCRAP_MIN } from "@/state/game-store"
 import { mc, qualityColor } from "../analytics"
 import type { Go } from "../LogsApp"
 
@@ -57,8 +57,13 @@ export function LootPage({ go }: { go: Go }) {
             const eligible = party.filter((p) => it.specs.includes(p.spec))
             const upgraders = it.upgrades.filter((u) => u.delta > 0)          // M.2: who would this actually upgrade
             const contested = upgraders.length >= 2
-            const awardIsContested = contested && !!assignedMember && upgraders.some((u) => u.memberId === assignedMember.id)
-            const passedOver = assignedMember ? upgraders.filter((u) => u.memberId !== assignedMember.id).length : 0
+            const bestFit = upgraders.reduce((b, u) => (!b || u.delta > b.delta ? u : b), null as (typeof upgraders)[number] | null)
+            // the SNUB the current choice would cause (passed-over bigger claim, or a scrapped real upgrade) — drama only here
+            const winnerDelta = assignedMember ? (upgraders.find((u) => u.memberId === assignedMember.id)?.delta ?? 0) : 0
+            const snubbed = choice === "scrap"
+              ? upgraders.filter((u) => u.delta >= LOOT_SCRAP_MIN)
+              : assignedMember ? upgraders.filter((u) => u.memberId !== assignedMember.id && u.delta - winnerDelta >= LOOT_SNUB_GAP) : []
+            const snubNames = snubbed.map((u) => party.find((p) => p.id === u.memberId)?.name).filter(Boolean).join(", ")
             return (
               <div key={it.uid} className="panel" style={{ padding: 0, overflow: "hidden", borderColor: choice ? (choice === "scrap" ? "var(--line)" : "var(--accent)") : "var(--line)", opacity: choice === "scrap" ? .7 : 1 }}>
                 <div style={{ display: "flex", alignItems: "stretch" }}>
@@ -70,7 +75,7 @@ export function LootPage({ go }: { go: Go }) {
                       <div style={{ display: "flex", gap: 8, marginTop: 6, alignItems: "center" }}>
                         <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: qColor }}>ilvl {it.ilvl}</span>
                         <span className="chip" style={{ fontSize: 10.5 }}>{it.rarity}</span>
-                        {contested ? <span className="chip" style={{ fontSize: 10.5, color: "var(--amber)", borderColor: "var(--amber)" }}>⚔ Contested</span> : null}
+                        {contested ? <span className="chip" style={{ fontSize: 10.5 }} title="More than one member can use this — awarding to the best fit costs nothing.">Wanted ×{upgraders.length}</span> : null}
                       </div>
                     </div>
                   </div>
@@ -81,7 +86,8 @@ export function LootPage({ go }: { go: Go }) {
                         <div style={{ fontSize: 14 }}>
                           {choice === "scrap"
                             ? <span style={{ color: "var(--faint)" }}>Scrapped for <b style={{ color: "var(--accent)" }}>{SHARDS_PER_SCRAP} shards</b>.</span>
-                            : assignedMember ? <span>Awarded to <b style={{ color: mc(assignedMember.spec).color }}>{assignedMember.name}</b>.{awardIsContested ? <span style={{ color: "var(--amber)" }}> Contested — +5% output next run; {passedOver} passed over (−morale).</span> : null}</span> : null}
+                            : assignedMember ? <span>Awarded to <b style={{ color: mc(assignedMember.spec).color }}>{assignedMember.name}</b>.</span> : null}
+                          {snubbed.length ? <span style={{ color: "var(--amber)" }}> ⚠ {snubNames} lose{snubbed.length === 1 ? "s" : ""} morale — {choice === "scrap" ? "a real upgrade was scrapped" : "passed over for a bigger upgrade"}.</span> : null}
                         </div>
                         <button className="btn btn-sm btn-ghost" onClick={() => setAssign((a) => { const n = { ...a }; delete n[it.uid]; return n })}>Undo</button>
                       </div>
@@ -95,11 +101,13 @@ export function LootPage({ go }: { go: Go }) {
                             const u = it.upgrades.find((x) => x.memberId === p.id)
                             const delta = u?.delta ?? 0
                             const isUp = delta > 0
+                            const isBest = contested && bestFit?.memberId === p.id   // the no-drama choice
                             return (
                               <button key={p.id} className="btn btn-sm" onClick={() => setAssign((a) => ({ ...a, [it.uid]: p.id }))}
                                 style={{ flexDirection: "column", alignItems: "flex-start", gap: 1, borderColor: isUp ? "var(--good)" : "var(--line)", padding: "6px 11px" }}>
                                 <span style={{ color: mc(p.spec).color, fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
                                   {p.name}{isUp ? <span style={{ color: "var(--good)" }}>▲</span> : null}
+                                  {isBest ? <span style={{ color: "var(--faint)", fontWeight: 700, fontSize: 9, letterSpacing: ".06em", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "0 4px" }}>BEST FIT</span> : null}
                                 </span>
                                 <span className="mono" style={{ fontSize: 10.5, color: isUp ? "var(--good)" : "var(--faint)" }}>
                                   {u?.currentIlvl ?? "—"} → {it.ilvl}{delta !== 0 ? ` (${delta > 0 ? "+" : ""}${delta})` : ""}
@@ -110,9 +118,9 @@ export function LootPage({ go }: { go: Go }) {
                           <span style={{ width: 1, background: "var(--line)", margin: "0 2px" }} />
                           <button className="btn btn-sm btn-ghost" onClick={() => setAssign((a) => ({ ...a, [it.uid]: "scrap" }))} style={{ color: "var(--faint)" }}>Scrap ◈</button>
                         </div>
-                        {contested ? (
-                          <div style={{ marginTop: 9, fontSize: 11.5, color: "var(--amber)" }}>
-                            ⚔ Contested — {upgraders.length} members want this. The winner gains <b>+5% output next run</b>; the others lose morale (selfish types take it harder).
+                        {contested && bestFit ? (
+                          <div style={{ marginTop: 9, fontSize: 11.5, color: "var(--faint)" }}>
+                            {upgraders.length} can use this — <b style={{ color: "var(--good)" }}>best fit {party.find((p) => p.id === bestFit.memberId)?.name} (+{bestFit.delta})</b>. Awarding the best fit costs nothing; passing them over (or scrapping a real upgrade) upsets the snubbed member.
                           </div>
                         ) : null}
                       </>
