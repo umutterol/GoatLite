@@ -37,6 +37,7 @@ function iconTip(kind: IconKind, id: string, label?: string): ReactNode {
   else if (kind === "tactic") { const t = content.tactics.get(id); if (t) return <TipBody title={t.name} desc={t.perPoint} /> }
   else if (kind === "affix") { const a = content.affixes.get(id); if (a) return <TipBody title={a.name} desc={a.effect} /> }
   else if (kind === "skill") { const k = content.operatorSkills.get(id); if (k) return <TipBody title={k.name} desc={k.effect} /> }
+  else if (kind === "ability") { const sk = content.skills.get(id); if (sk) return <TipBody title={sk.name} desc={sk.description} /> }
   else if (kind === "role") return <TipBody title={id.charAt(0).toUpperCase() + id.slice(1)} desc="Party role" />
   return label ? <TipBody title={label} /> : null
 }
@@ -58,47 +59,29 @@ export function Icon({ name, size = 15, color = "currentColor" }: { name: string
   return <svg width={size} height={size} viewBox="0 0 16 16" style={{ display: "block", flex: "none" }}>{draw ? draw(color) : null}</svg>
 }
 
-/* ---- G.2: typed asset-icon registry (the /public/icons/*.svg masks) ----
-   <GameIcon kind id/> resolves to /icons/{prefix}-{id}.svg, tinted via CSS mask (follows `color`). Assets that
-   don't exist yet (skill/class/talent/trait/item/dungeon — G.4 art) degrade to a LABELLED placeholder instead of an
-   empty box. Every icon carries an aria-label. Add new art = drop the file + add its id to ICON_ASSETS below. */
+/* ---- G.4: full-colour raster icon registry (/public/icons/{prefix}-{id}.png) ----
+   <GameIcon kind id/> renders the painted PNG art at /icons/{prefix}-{id}.png. A missing file degrades (via onError)
+   to a default image: `affix-default.png` for affixes, `icon-default.png` for everything else — so dropping a new PNG
+   in is all it takes to wire it. The `color` prop is accepted but ignored (raster art carries its own colour). */
 const ICON_PREFIX = {
   role: "role", spec: "spec", stat: "stat", tactic: "tac", affix: "affix", currency: "cur", ui: "ico",
-  skill: "skill", class: "class", talent: "talent", trait: "trait", item: "item", dungeon: "dungeon",
+  skill: "skill", ability: "ability", class: "class", talent: "talent", trait: "trait", item: "item", dungeon: "dungeon",
 } as const
 export type IconKind = keyof typeof ICON_PREFIX
-const ICON_ASSETS: Partial<Record<IconKind, Set<string>>> = {
-  role: new Set(["tank", "healer", "dps"]),
-  spec: new Set(["arcanist", "assassin", "bard", "berserker", "cleric", "crusader", "guardian", "lifebinder", "mystic", "pyromancer"]),
-  stat: new Set(["crit", "haste", "ilvl", "mastery", "versatility"]),
-  tactic: new Set(["cooldowns", "interrupts", "killorder", "positioning"]),
-  affix: new Set(["bolstering", "bursting", "fortified", "raging", "sanguine", "spiteful", "tyrannical", "volcanic"]),
-  currency: new Set(["emblem", "gold", "shard"]),
-  ui: new Set(["key", "morale", "skull", "timer", "trait", "vault"]),
-  // skill / class / talent / trait / item / dungeon: no assets yet → placeholder until G.4 art lands
-}
-export function GameIcon({ kind, id, size = 16, color = "currentColor", label, style, noTip = false }: {
+export function GameIcon({ kind, id, size = 16, label, style, noTip = false }: {
   kind: IconKind; id: string; size?: number; color?: string; label?: string; style?: CSSProperties; noTip?: boolean
 }) {
   const aria = label ?? `${id} ${kind}`
-  const has = ICON_ASSETS[kind]?.has(id)
-  const inner = has ? (
-    <span role="img" aria-label={aria} style={{
-      width: size, height: size, flex: "none", display: "inline-block", background: color,
-      WebkitMaskImage: `url(/icons/${ICON_PREFIX[kind]}-${id}.svg)`, maskImage: `url(/icons/${ICON_PREFIX[kind]}-${id}.svg)`,
-      WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat",
-      WebkitMaskSize: "contain", maskSize: "contain", WebkitMaskPosition: "center", maskPosition: "center", ...style,
-    }} />
-  ) : (
-    <span role="img" aria-label={aria} style={{
-      width: size, height: size, flex: "none", display: "inline-flex", alignItems: "center", justifyContent: "center",
-      borderRadius: "var(--radius)", border: "1px solid var(--line)", background: "var(--panel-2)", lineHeight: 1,
-      fontSize: Math.round(size * 0.56), fontWeight: 700, textTransform: "uppercase",
-      color: color === "currentColor" ? "var(--faint)" : color, ...style,
-    }}>{(id[0] ?? "?")}</span>
+  const fallback = kind === "affix" ? "/icons/affix-default.png" : "/icons/icon-default.png"
+  const img = (
+    <img
+      role="img" aria-label={aria} alt={aria} src={`/icons/${ICON_PREFIX[kind]}-${id}.png`} width={size} height={size}
+      onError={(e) => { const t = e.currentTarget; if (!t.src.endsWith(fallback)) t.src = fallback }}
+      style={{ width: size, height: size, flex: "none", objectFit: "cover", borderRadius: "var(--radius)", display: "inline-block", verticalAlign: "middle", ...style }}
+    />
   )
-  if (noTip) return inner
-  return <Tip tip={iconTip(kind, id, label)}>{inner}</Tip>
+  if (noTip) return img
+  return <Tip tip={iconTip(kind, id, label)}>{img}</Tip>
 }
 
 export function Panel({ title, right, children, className = "", style = {}, bodyStyle = {}, bodyClass = "" }: {
@@ -160,7 +143,9 @@ export function SpellTip({ skillId, name }: { skillId?: string; name?: string })
   const title = sk?.name ?? name ?? "Ability"
   return (
     <div style={{ minWidth: 190, maxWidth: 280 }}>
-      <div style={{ fontWeight: 700, fontSize: 14, color: "#fff" }}>{title}</div>
+      <div style={{ fontWeight: 700, fontSize: 14, color: "#fff", display: "flex", alignItems: "center", gap: 7 }}>
+        {skillId ? <GameIcon kind="ability" id={skillId} size={20} noTip /> : null}{title}
+      </div>
       {sk ? (
         <>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginTop: 2, color: "var(--muted)", fontSize: 11.5 }}>
@@ -186,6 +171,7 @@ export function LogSpell({ name, skillId, color }: { name: string; skillId?: str
   }
   return (
     <>
+      {skillId ? <GameIcon kind="ability" id={skillId} size={13} noTip style={{ marginRight: 4, verticalAlign: "-2px" }} /> : null}
       <span className="log-spell" onMouseEnter={(e) => { move(e); setShow(true) }} onMouseMove={move} onMouseLeave={() => setShow(false)}
         style={{ fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 2, cursor: "help", color: color ?? "inherit" }}>{name}</span>
       {show ? createPortal(

@@ -38,11 +38,11 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | A | Engine v1 (old flat-power sim) | ✅ 12/12 — **superseded by A2** |
 | A2 | **Combat engine rebuilt on EGM model** | ✅ 7/7 (live + balanced) |
 | B | **Runtime loop & persistence** | 🟡 13/14 |
-| C | Content scale-up | ⬜ 0/7 |
+| C | Content scale-up | ⬜ 0/8 |
 | D | Systems depth | ⬜ 0/9 |
 | E | Production (art, audio, polish) | ⬜ 0/7 |
 | F | **Endgame & Identity (operator skills)** | ✅ 6/6 — live + balanced (operator runway ≈ +3 keys; +2 floor holds) |
-| G | **Visual pass (icons + squared corners)** | 🟡 3/4 — G.1–G.3 done (`--radius` token, `<GameIcon>` registry, role/spec/tactic icons wired); G.4 = new art |
+| G | **Visual pass (icons + squared corners)** | 🟡 3/4 — G.1–G.3 done; G.4 **in progress** (raster PNG pipeline live + 89 user icons wired incl. the new `ability` kind; remainder = the missing art listed in G.4) |
 | H | **Combat depth (per-spec majors + talents)** | ✅ 4/4 — 10 majors live + talents 3–5 wired + rebalanced |
 | I | **2D replay (abstract packs)** | 🟡 3/4 — I.1–I.3 done (engine `ReplayTimeline` + SVG canvas + replay-led report layout); I.4 partial (floats/flashes/death-anim in; status pips deferred) |
 | J | **Feedback & polish batch (10 user reports)** | ✅ 10/10 — shipped + live-verified (`Post-F-Clusters-Plan.md` Cluster J) |
@@ -124,7 +124,8 @@ memory `combat-model-egm-migration`.*
 
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
-| C.1 | Dungeons 2–6 | content | major | XL | ⬜ | each: bosses, packs, enemies, loot table, items, signature mechanic |
+| C.1 | Dungeons 2–6 | content | major | XL | ⬜ | **design ✅** `Dungeon-Design-Proposals.md` — Ashveil + 5, each a distinct "solve": Bellreach (interrupts) / Stillhour (burst-heal) / Weltering Mire (HoT) / Hour of Bells (cooldowns) all **pure data**; Pyreward Ossuary (damage-school) needs **C.8**. Prereqs: IP affix rename (※ row) + confirm `tacticsPoints` |
+| C.8 | Per-enemy armour/resist (damage-school wall) | engine | minor | S | ⬜ | un-hardcode `makeEnemy` armour:0/resist:0 → optional `EnemySchema` fields (default 0 = Ashveil unchanged); scale by keyScale×power; `pipeline.resolveHit` already routes Phys→armour/Magic→resist. Unblocks **Pyreward Ossuary** — the only dungeon with real comp pressure |
 | C.2 | Per-spec talent trees | content | major | XL | ⬜ | 10 specs × 5 nodes ≈ 150 options |
 | C.3 | Enemy roster breadth | content | major | XL | ⬜ | ~50–70 total (have 7) |
 | C.4 | Item breadth + secondary pool tuning | content | major | L | ⬜ | ~60–72 items (have 12) |
@@ -186,7 +187,7 @@ they feed Phase F's recruit list/detail UI so it's built squared + iconned once.
 | G.1 | Radius token: one `--radius` (~2px), replace the ~30 scattered values across 3 systems | ux | minor | S | ✅ | `--radius: 2px` in `logs.css`; all rectangular `border-radius` → `var(--radius)` (true circles exempt); `Stat`/F.5 use it. (A few onboarding-only inline radii, e.g. GuildCreate, remain — cosmetic follow-up) |
 | G.2 | Typed `<Icon>` registry + missing-asset placeholder + `aria-label` convention | ux | minor | S | ✅ | `<GameIcon kind id/>` in `components.tsx` — mask-tinted assets with a **labelled placeholder** (initial-in-a-box) for not-yet-drawn art (skill/class/talent/trait/item/dungeon); every icon has `aria-label`. `ICON_ASSETS` manifest = drop file + add id |
 | G.3 | Wire the **18 already-existing-but-unused** icons (spec/role/stat/tactic) into the live pages | ux | minor | M | ✅ | role icons in `RolePill` (→ recruit/roster/setup/character), tactic icons on New-Run dials, spec icons in roster + recruit board + char. Stat icons await secondary-stat displays (C.4/D.8) |
-| G.4 | New-art seams (gated on user-supplied assets) — see manifest: dungeon banners, ability/talent/trait/item icons, 3 operator-skill icons, 8 re-cut affix icons | assets/ux | major | L | ⬜ | biggest lift = ~70 ability icons |
+| G.4 | New-art seams (gated on user-supplied assets) — dungeon banners, ability/talent/trait/item icons, operator-skill icons, affix icons | assets/ux | major | L | 🟡 | **Pipeline switched to full-colour raster** (`GameIcon` renders `/icons/{prefix}-{id}.png`; the SVG-mask path retired; a missing file degrades via `onError` → `affix-default.png` for affixes, `icon-default.png` (the bear) otherwise — drop a PNG in = wired). New **`ability` kind** added + surfaced inline in the event-log spell names, the spell-tooltip header, and the Character-sheet **Signature** card. **89 user PNGs wired** (`Docs/Icons/` → `web/public/icons/`, 10 typo-renames): **53/70 abilities**, all 10 specs, 3 roles, 3 operator skills, 3 currencies, 5 ui, 4 tactics, 4 stats, 2 affixes. **Still missing art** (→ bear/affix-default for now): **17 abilities** (shadow-step · 6 Bard [deferred to L] · 10 majors), **6 affixes** (bursting/bolstering/volcanic/sanguine/spiteful/raging — currently blank), **stat-ilvl**, **ui-trait**, and **items / talents / traits / dungeon banners** (none provided). UI-only → `egm-smoke` byte-identical. Verified `tsc` + `g4-live.mjs` (icons render, raster, tooltip, no broken images, 0 console errors). |
 
 ## Phase H — Combat depth (per-spec majors + finish talents) ⬜ (design ✅)
 
@@ -341,6 +342,30 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-21** — **G.4 in progress: full-colour raster icon pipeline + 89 user icons wired (abilities now have art).**
+  Umut dropped a folder of painted PNGs (`Docs/Icons/`). Switched `GameIcon` from the CSS-mask SVG path to a **full-colour
+  raster** render: `<img src=/icons/{prefix}-{id}.png>`, and a missing file degrades via `onError` to a default —
+  `affix-default.png` for affixes, `icon-default.png` (the bear) for everything else — so wiring a new icon is just
+  dropping the PNG in (no manifest to maintain). Added a new **`ability` kind** and surfaced ability art **inline in the
+  event-log spell names**, the **spell-tooltip header**, and the Character-sheet **Signature** card (was a generic bolt).
+  Copied **89 PNGs** into `web/public/icons/` with **10 typo-renames** (`abilitiy-`/`abilitt-`/`challange`/`eviscreate`/
+  `groces`/`dispell`/`assasin`/`postioning`/`tack-`); skipped 3 spares (`bladestorm2`, the 2 `status-*` — no status UI).
+  **Wired:** 53/70 abilities, all 10 specs, 3 roles, 3 operator skills (were placeholders!), 3 currencies, 5 ui, 4 tactics,
+  4 stats, 2 affixes. **Still missing → bear/affix-default** (the art to make next): **17 abilities** (shadow-step, the 6
+  Bard skills [deferred to L], the 10 majors), **6 affixes** (bursting/bolstering/volcanic/sanguine/spiteful/raging — these
+  show **blank** until drawn), **stat-ilvl**, **ui-trait**, and **items / talents / traits / dungeon banners** (none
+  supplied). Per Umut's call: full-raster-only + default-image-everywhere. **UI/asset-only → `egm-smoke` byte-identical.**
+  Verified: `tsc -b` clean; `g4-live.mjs` — ability icons inline + raster (no mask spans) + tooltip icon + spec/role icons
+  + character sheet + **no broken images** (missing resolves to default), **0 console errors**.
+- **2026-06-21** — **C.1 dungeon roster designed → `Dungeon-Design-Proposals.md`.** Multi-agent design pass (engine-mapped
+  + adversarially critiqued) settled the **new-dungeon roster: Ashveil + 5**, each a distinct player "solve": Bellreach
+  Sanctum (interrupts), Stillhour Abbey (burst-triage heal), The Weltering Mire (sustained-HoT heal + kill-order), The
+  Hour of Bells (cooldowns gauntlet) — **all pure data** — and **The Pyreward Ossuary** (Physical-vs-Magic damage school),
+  the only dungeon with **real comp pressure**, gated on new ticket **C.8** (un-hardcode `makeEnemy` armour/resist, "small").
+  Key engine truth recorded: a dungeon's solve = the 4 tactic **dials** (comp does **not** feed them; "bring a kicker" is
+  fiction until a large interrupt-capability ticket); damage-school is the lone comp lever. New affix proposed (**The
+  Tolling**) + the verbatim-WoW affix **IP rename** (Bursting→Plaguebloom, Spiteful→Restless Shade, Tyrannical→Crowned in
+  Ash, Raging→Death-Frenzy) flagged as a build-now prereq. No code/data shipped yet — design only.
 - **2026-06-21** — **M.3 + M.4 + M.5 shipped: the bark engine + voice packs + loot-drama-in-the-feed — Phase M complete (v1).**
   Roster members now react in their **own personality voice** in the guild feed, on top of the neutral M.1 notifications.
   **M.3 (engine):** `web/src/state/barks.ts` `generateBarks` — a **pure, seeded** (`Rng` mulberry32, **no `Math.random`** →

@@ -4,7 +4,7 @@ import { useGame, roleOf, SLOTS, type GearItem } from "@/state/game-store"
 import type { Member } from "@/data/game"
 import { corOf, potentialStars, roleKeyOf } from "@/data/operator"
 import { mc, memberScore, scoreColor, qualityColor, bestRunsFor } from "../analytics"
-import { Icon, Panel, RolePill, Upgrade, Tip, TipBody, SpellTip } from "../components"
+import { Icon, Panel, RolePill, Upgrade, Tip, TipBody, SpellTip, GameIcon } from "../components"
 import { SkillBars, Stars, corColor, traitCombatSummary } from "../OperatorPanel"
 import type { Go, GoChar } from "../LogsApp"
 
@@ -112,9 +112,8 @@ function SignatureCard({ specId, color }: { specId: string; color: string }) {
     <Panel title="Signature" right={<span className="mono" style={{ fontSize: 11, color: "var(--faint)" }}>~60s CD</span>} bodyStyle={{ padding: 14 }}>
       <Tip tip={<SpellTip skillId={major.id} name={major.name} />} style={{ width: "100%" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 11, width: "100%", cursor: "help" }}>
-          <span style={{ width: 36, height: 36, flex: "none", borderRadius: "var(--radius)", border: `1px solid ${color}55`, background: `${color}14`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Icon name="bolt" size={18} color={color} />
-          </span>
+          <GameIcon kind="ability" id={major.id} size={36} noTip style={{ border: `1px solid ${color}55` }} />
+
           <div style={{ minWidth: 0 }}>
             <div style={{ fontWeight: 700, color, fontSize: 14 }}>{major.name}</div>
             <div className="flux" style={{ fontSize: 11.5, lineHeight: 1.4 }}>{(sk?.description ?? "Signature cooldown.").replace(/^MAJOR\.\s*/, "")}</div>
