@@ -6,5 +6,14 @@
 
   { "id": "bone-acolyte",  "name": "Bone Acolyte",  "kind": "trash", "role": "caster", "band": "back",  "baseHp": 10, "baseDamage": 4, "tags": ["ashveil", "undead", "caster"] },
   { "id": "crypt-horror",  "name": "Crypt Horror",  "kind": "trash", "role": "melee",  "band": "front", "baseHp": 16, "baseDamage": 6, "tags": ["ashveil", "undead", "melee"] },
-  { "id": "grave-digger",  "name": "Grave Digger",  "kind": "trash", "role": "add",    "band": "back",  "baseHp": 8,  "baseDamage": 3, "tags": ["ashveil", "undead", "add"] }
+  { "id": "grave-digger",  "name": "Grave Digger",  "kind": "trash", "role": "add",    "band": "back",  "baseHp": 8,  "baseDamage": 3, "tags": ["ashveil", "undead", "add"] },
+
+  { "id": "cantor-brivael",    "name": "Cantor Brivael",    "kind": "boss", "stage": 2, "dungeonId": "bellreach-sanctum", "abilityId": "antiphon",       "testsTactic": "interrupts", "band": "back",  "baseHp": 62, "baseDamage": 9,  "icon": "tac-interrupts", "flavor": "The choir's first voice; he keeps the liturgy though the cathedral has long since drowned." },
+  { "id": "the-drowned-choir", "name": "The Drowned Choir", "kind": "boss", "stage": 4, "dungeonId": "bellreach-sanctum", "abilityId": "drowning-psalm", "testsTactic": "interrupts", "band": "back",  "baseHp": 68, "baseDamage": 10, "icon": "tac-interrupts", "flavor": "Many throats and one hymn — quiet one and another takes the breath." },
+  { "id": "verger-mottram",    "name": "Verger Mottram",    "kind": "boss", "stage": 6, "dungeonId": "bellreach-sanctum", "abilityId": "toll-the-hours", "testsTactic": "cooldowns",  "band": "front", "baseHp": 70, "baseDamage": 11, "icon": "tac-cooldowns",  "flavor": "He rings the hours for a congregation that never left." },
+  { "id": "the-unrung-bell",   "name": "The Unrung Bell",   "kind": "boss", "stage": 8, "dungeonId": "bellreach-sanctum", "abilityId": "final-peal",     "testsTactic": "interrupts", "band": "back",  "baseHp": 80, "baseDamage": 12, "icon": "tac-interrupts", "flavor": "No one ever rang it to end the service. So the service never ends." },
+
+  { "id": "drowned-chorister", "name": "Drowned Chorister", "kind": "trash", "role": "caster", "band": "back",  "baseHp": 11, "baseDamage": 4, "tags": ["bellreach", "drowned", "caster"] },
+  { "id": "sunken-acolyte",    "name": "Sunken Acolyte",    "kind": "trash", "role": "caster", "band": "back",  "baseHp": 9,  "baseDamage": 4, "tags": ["bellreach", "drowned", "caster"] },
+  { "id": "cathedral-warden",  "name": "Cathedral Warden",  "kind": "trash", "role": "melee",  "band": "front", "baseHp": 16, "baseDamage": 6, "tags": ["bellreach", "drowned", "melee"] }
 ]

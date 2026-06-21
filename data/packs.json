@@ -1,4 +1,6 @@
 [
   { "id": "ashveil-pack-a", "name": "Ossuary Wardens", "tags": ["ashveil", "undead"], "mobs": [ { "enemyId": "bone-acolyte", "count": 2 }, { "enemyId": "crypt-horror", "count": 3 } ] },
-  { "id": "ashveil-pack-b", "name": "Barrow Procession", "tags": ["ashveil", "undead"], "mobs": [ { "enemyId": "crypt-horror", "count": 4 }, { "enemyId": "bone-acolyte", "count": 1 } ] }
+  { "id": "ashveil-pack-b", "name": "Barrow Procession", "tags": ["ashveil", "undead"], "mobs": [ { "enemyId": "crypt-horror", "count": 4 }, { "enemyId": "bone-acolyte", "count": 1 } ] },
+  { "id": "bellreach-pack-a", "name": "Drowned Choir", "tags": ["bellreach", "drowned"], "mobs": [ { "enemyId": "drowned-chorister", "count": 3 }, { "enemyId": "cathedral-warden", "count": 1 }, { "enemyId": "sunken-acolyte", "count": 1 } ] },
+  { "id": "bellreach-pack-b", "name": "Sunken Procession", "tags": ["bellreach", "drowned"], "mobs": [ { "enemyId": "drowned-chorister", "count": 2 }, { "enemyId": "sunken-acolyte", "count": 2 }, { "enemyId": "cathedral-warden", "count": 1 } ] }
 ]

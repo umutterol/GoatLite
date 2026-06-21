@@ -21,5 +21,27 @@
       "shroudweave-vestments", "legplates-of-the-barrow-march", "shroudweave-leggings",
       "treads-of-quiet-rest", "vial-of-crypt-dust", "icon-of-pale-mercy"
     ]
+  },
+  {
+    "id": "bellreach-sanctum",
+    "name": "Bellreach Sanctum",
+    "theme": "A drowned cathedral whose choir never stopped; the dead keep the liturgy because no one ever rang the bell to end the service",
+    "timerSeconds": 1500,
+    "signature": "Relentless dangerous-cast density, Interrupts-punishing",
+    "slots": [
+      { "stage": 1, "kind": "trash", "packTags": ["bellreach"] },
+      { "stage": 2, "kind": "boss",  "boss": "cantor-brivael" },
+      { "stage": 3, "kind": "trash", "packTags": ["bellreach"] },
+      { "stage": 4, "kind": "boss",  "boss": "the-drowned-choir" },
+      { "stage": 5, "kind": "trash", "packTags": ["bellreach"] },
+      { "stage": 6, "kind": "boss",  "boss": "verger-mottram" },
+      { "stage": 7, "kind": "trash", "packTags": ["bellreach"] },
+      { "stage": 8, "kind": "boss",  "boss": "the-unrung-bell" }
+    ],
+    "lootTable": [
+      "bastion-of-the-barrow-march", "scepter-of-quiet-rest", "ashveil-cleaver",
+      "faceguard-of-interred-kings", "pale-mitre-of-ashveil", "shroudweave-vestments",
+      "treads-of-quiet-rest", "icon-of-pale-mercy"
+    ]
   }
 ]

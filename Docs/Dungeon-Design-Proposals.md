@@ -143,10 +143,20 @@ recruit-pressure becomes real the day the interrupt-as-capability gap closes (§
 | 8 | The Unrung Bell | cast→interrupts | capstone wall; one uninterrupted peal into soft-enrage ends the run | "No one ever rang me. So the service never ends." |
 
 **Fixes folded in:** one boss per stage (the engine can't do simultaneous casters); **stagger coefficients 12/16/20**
-to soften the binary cliff; this key's tactic budget must allow *pin Interrupts AND bank Cooldowns* (budget ≥ 4, or
-drop to two interrupt bosses + one breather). **Reward hook:** interrupt/utility-flavored gear that sets up the
+to soften the binary cliff. Tactic budget is **6 total / max 3 per dial** (`tuning.tacticsPoints`, confirmed), so
+*pin Interrupts to 3 AND bank 3 into Cooldowns* is exactly affordable — the intended spend. **Reward hook:** interrupt/utility-flavored gear that sets up the
 cooldown-heavy Hour of Bells. **The Tolling** (v2 affix): periodic penalty to interrupt catch-chance — a second stress
 layer on the same dial (hard-coded branch).
+
+**Build status (2026-06-21): authored + verified (mechanics-first).** Pure data (`dungeons`/`enemies`/`abilities`/
+`packs`/`season`), placeholder loot reuses Ashveil items, plus probe `web/scripts/bellreach-live.mjs`. Verified: content
+validates, `tsc -b` clean, Ashveil run unaffected, **+2 floor times**, and the Interrupts dial controls the mechanic
+(Interrupts-3 → **0** casts through; Interrupts-0 → **~19–26** casts through; Yolo widens the gap). **Honest limit:** at
+gear-appropriate ilvl the read is *log-visible* (casts-through + a duration delta) but does **not** flip timed↔wipe —
+the per-cast tax is too soft at the floor, and high-key wipes (+12/+16) come from general scaling + Bursting/kill-order
+(they hit before the interrupt bosses), not the interrupt content. Sharpening it into a real win/lose wall needs a
+**global cast-coefficient tune** (also affects Ashveil's Vesk) or the **per-encounter-weighting** engine gap — a balance
+follow-up, not a data fix.
 
 ---
 
@@ -279,8 +289,11 @@ exists). **Don't** claim "fails at ANY ilvl" — the mitigation ratio is hit-siz
 
 ## 5. New affixes (IP rename + one new branch)
 
-The verbatim-WoW affix names are a **hard pre-launch IP gate** (see `MMO-Nostalgia-Reference.md` and the roadmap
-"Affix swap" row). Rename the **noun only** — keep `id`/`icon`/`punishes` and the exact curves:
+The verbatim-WoW affix names are a **pre-launch IP gate** (see `MMO-Nostalgia-Reference.md` and the roadmap
+"Affix swap" row) — but it is **deferred / low priority** (done way down the line as one global cosmetic pass). It is
+**not on the content critical path**: dungeons reference affixes by **`id`**, so they inherit the rename automatically
+whenever it lands. Author the dungeons against the existing ids now. Rename the **noun only** — keep `id`/`icon`/`punishes`
+and the exact curves:
 
 | New name | Renames (verbatim WoW) | Effect (unchanged curve) | Punishes |
 |---|---|---|---|
@@ -306,14 +319,23 @@ The verbatim-WoW affix names are a **hard pre-launch IP gate** (see `MMO-Nostalg
 
 ## 7. Build-now sequencing
 
-1. **IP affix rename** (Bursting→Plaguebloom, Spiteful→Restless Shade, Tyrannical→Crowned in Ash, Raging→Death-Frenzy)
-   as one clean commit — the Mire and Hour of Bells depend on the renamed nouns matching their earnest register.
-2. **Confirm `tuning.tacticsPoints`** (3 vs 4) — Bellreach et al. assume you can *pin one dial AND bank leftovers*.
-3. **Author the Fortified/Bursting-compatible trio first** — **Bellreach → Stillhour → Weltering Mire** (pure data:
-   dungeons/enemies/abilities/packs/items/loot-tables/season). Run `node scripts/egm-smoke.mjs` to confirm the +2 floor
-   still times and each dungeon's failure actually reads.
-4. **Land the small armour/resist engine change**, then author **The Pyreward Ossuary** as the marquee.
-5. **Unlock Tyrannical/Raging** (or build a Fortified variant) and author **The Hour of Bells**.
+Target is the **6-dungeon roster** (not chasing 8 — see §8). The **IP affix rename is deferred** and off the critical
+path (dungeons reference affix `id`s; §5). Tactic budget is **confirmed 6 / max 3 per dial**.
+
+Each dungeon is staged **mechanics-first** (playable + the puzzle verifiably reads via `egm-smoke`), with loot/items/
+tier-set as a follow-up polish pass — so we don't block a playable dungeon on its full loot table.
+
+1. **Author the pure-data trio** (no engine work, no affix dependency), mechanics-first, in this order:
+   **Bellreach** (interrupts) → **Stillhour** (burst-heal) → **Weltering Mire** (HoT, references the Bursting `id`).
+   Per dungeon: `dungeons.json` entry + `enemies.json` bosses/trash + `abilities.json` boss abilities + `packs.json`,
+   add to `season.json` rotation, then `node scripts/egm-smoke.mjs` to confirm the +2 floor still times **and** the
+   intended failure actually reads (wrong dial/healer → visible loss).
+2. **Land C.8** (the small armour/resist engine change), then author **The Pyreward Ossuary** as the marquee — the only
+   dungeon with real comp pressure.
+3. **The Hour of Bells** last — it needs Tyrannical+Raging, outside the MVP Fortified+Bursting pool, so it's gated on
+   the affix-pool decision (lift the restriction, or build a Fortified variant of its spike pressure).
+4. **Loot/items/tier-set polish pass** across the new dungeons (`items.json` + `loot-tables.json` + `tier-sets.json`).
+5. *(Way down the line, low prio)* the global **IP affix rename** — one cosmetic pass; dungeons inherit it via `id`.
 
 **Progression order & lesson:** Ashveil (the dials exist) → Bellreach (commit a dial) → Stillhour (read the spike) →
 Weltering Mire (read the rot — completes the healer-choice tutorial) → Hour of Bells (master the deepest dial under
@@ -323,12 +345,22 @@ enrage) → Pyreward Ossuary (the one lesson no dial fixes: bring the right scho
 
 ## 8. Open decisions
 
-1. **Tactic-point budget: 3 or 4?** Several designs assume "pin one dial to 3 AND bank leftovers" — impossible at 3.
-2. **Stillhour's healer split is a *soft* preference** (both healers viable). Compelling enough as a diagnose-the-profile
+**✅ Resolved**
+- **Tactic-point budget** — `tuning.tacticsPoints` = **6 total / max 3 per dial**. "Pin one dial to 3 AND bank 3" is
+  affordable; Bellreach et al. stand as designed.
+- **Roster size** — staying at **6 (Ashveil + 5)**; not funding the 🚧 levers to chase 8 for now (CC / dispel / reach /
+  real-interrupt remain a future-wave menu in §6, each buying one more distinct dungeon if we ever want them).
+- **IP affix rename** — **deferred, low priority**; off the content critical path (dungeons reference affix `id`s).
+
+**⬜ Still open**
+1. **Stillhour's healer split is a *soft* preference** (both healers viable). Compelling enough as a diagnose-the-profile
    lesson, or add a Bursting layer to harden it into a real wall?
-3. **Hour of Bells needs Tyrannical+Raging** (outside MVP pool). Lift the affix-pool restriction, or design a
-   Fortified+Bursting variant of its spike pressure?
-4. **Per-encounter mechanic cadence** (medium effort) would end "same spike, bigger numbers" monotony across the four
-   spike dungeons. Worth it for v1, or accept thematic-only differentiation?
-5. **Reaching a true 8:** which 🚧 engine lever(s) to fund (CC / dispel / reach / real-interrupt), each buying one more
-   genuinely-distinct dungeon?
+2. **Hour of Bells needs Tyrannical+Raging** (outside MVP pool). Lift the affix-pool restriction, or design a
+   Fortified+Bursting variant of its spike pressure? *(Deferred to when we author Hour of Bells — it ships last.)*
+3. **Per-encounter mechanic cadence** (medium effort) would end "same spike, bigger numbers" monotony across the spike
+   dungeons. Worth it for v1, or accept thematic-only differentiation?
+4. **Bellreach's interrupt read doesn't flip the outcome yet** (verified 2026-06-21 — log-visible casts-through + a
+   duration delta, but timed↔wipe is unchanged at the floor). Tune the **global** interrupt cast coefficient (also
+   hits Ashveil's Vesk), or land **per-encounter weighting**, so Interrupts-0 actually wipes where Interrupts-3 times?
+   Separately: a 6-point budget can't fund interrupts+cooldowns **and** kill-order, so +12-ish wipes on trash under
+   Bursting — intended tension, or does Bellreach want lighter trash / a higher key-band entry?

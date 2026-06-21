@@ -2,5 +2,10 @@
   { "id": "grave-detail",     "name": "Grave Detail",     "kind": "enemy", "shape": "summon", "tactic": "killorder",   "telegraph": 0,   "desc": "Summons digger adds throughout the fight; every add death feeds Bursting." },
   { "id": "preserving-fume",  "name": "Preserving Fume",  "kind": "enemy", "shape": "cast",   "tactic": "interrupts",  "telegraph": 2.5, "desc": "A party-wide damage-over-time cast that must be interrupted." },
   { "id": "pooling-sorrow",   "name": "Pooling Sorrow",   "kind": "enemy", "shape": "ground", "tactic": "positioning", "telegraph": 1.5, "desc": "Avoidable pools under characters; standing in them is avoidable damage." },
-  { "id": "final-coronation", "name": "Final Coronation", "kind": "enemy", "shape": "phase",  "tactic": "cooldowns",   "telegraph": 3,   "desc": "A timed damage-spike phase with burn windows between." }
+  { "id": "final-coronation", "name": "Final Coronation", "kind": "enemy", "shape": "phase",  "tactic": "cooldowns",   "telegraph": 3,   "desc": "A timed damage-spike phase with burn windows between." },
+
+  { "id": "antiphon",       "name": "Antiphon",       "kind": "enemy", "shape": "cast",  "tactic": "interrupts", "telegraph": 2.5, "desc": "A party-wide liturgical nuke sung every ~12s; uninterrupted, the whole party craters together." },
+  { "id": "drowning-psalm", "name": "Drowning Psalm", "kind": "enemy", "shape": "cast",  "tactic": "interrupts", "telegraph": 2,   "desc": "The fused chorus sings the same party-wide nuke faster — too many throats for a careless interrupt budget." },
+  { "id": "toll-the-hours", "name": "Toll the Hours", "kind": "enemy", "shape": "phase", "tactic": "cooldowns",  "telegraph": 3,   "desc": "The one breather: a timed party-wide spike with burn windows between — rewards the points banked into Cooldowns." },
+  { "id": "final-peal",     "name": "Final Peal",     "kind": "enemy", "shape": "cast",  "tactic": "interrupts", "telegraph": 2.5, "desc": "The capstone cast: one uninterrupted peal into soft-enrage ends the run." }
 ]

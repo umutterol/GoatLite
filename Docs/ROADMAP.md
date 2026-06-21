@@ -124,7 +124,7 @@ memory `combat-model-egm-migration`.*
 
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
-| C.1 | Dungeons 2–6 | content | major | XL | ⬜ | **design ✅** `Dungeon-Design-Proposals.md` — Ashveil + 5, each a distinct "solve": Bellreach (interrupts) / Stillhour (burst-heal) / Weltering Mire (HoT) / Hour of Bells (cooldowns) all **pure data**; Pyreward Ossuary (damage-school) needs **C.8**. Prereqs: IP affix rename (※ row) + confirm `tacticsPoints` |
+| C.1 | Dungeons 2–6 | content | major | XL | 🟡 | **design ✅** `Dungeon-Design-Proposals.md`. **Bellreach Sanctum ✅ (1/5)** — interrupts dungeon authored mechanics-first + placeholder loot + probe `bellreach-live.mjs`; validates, `tsc -b` clean, +2 floor times, dial controls casts-through (0 vs ~20). *Known limit:* read is log-visible but doesn't flip timed↔wipe yet → balance follow-up (global cast-coeff or per-encounter weighting), see proposals §8.4. **Next:** Stillhour → Weltering Mire (pure data) → C.8+Pyreward Ossuary → Hour of Bells last. IP rename deferred/off critical path |
 | C.8 | Per-enemy armour/resist (damage-school wall) | engine | minor | S | ⬜ | un-hardcode `makeEnemy` armour:0/resist:0 → optional `EnemySchema` fields (default 0 = Ashveil unchanged); scale by keyScale×power; `pipeline.resolveHit` already routes Phys→armour/Magic→resist. Unblocks **Pyreward Ossuary** — the only dungeon with real comp pressure |
 | C.2 | Per-spec talent trees | content | major | XL | ⬜ | 10 specs × 5 nodes ≈ 150 options |
 | C.3 | Enemy roster breadth | content | major | XL | ⬜ | ~50–70 total (have 7) |
@@ -342,6 +342,15 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-21** — **C.1 Bellreach Sanctum authored (1/5 new dungeons) — the interrupts dungeon, mechanics-first.**
+  Pure data: `dungeons.json` (8-slot dungeon, placeholder loot reusing Ashveil items), `enemies.json` (4 bosses —
+  Cantor Brivael / The Drowned Choir / Verger Mottram[breather, cooldowns] / The Unrung Bell — + 3 caster-heavy trash),
+  `abilities.json` (antiphon/drowning-psalm/toll-the-hours/final-peal), `packs.json` (2 back-band packs),
+  `season.json` (added to rotation). New probe `web/scripts/bellreach-live.mjs`. **Verified:** content validates,
+  `tsc -b` clean, egm-smoke (Ashveil) unaffected, **+2 floor times**, and the Interrupts dial controls the cast mechanic
+  (Interrupts-3 → 0 casts through; Interrupts-0 → ~19–26). **Known limit (logged, not a blocker):** the interrupt read
+  is log-visible but does **not** flip timed↔wipe at gear-appropriate ilvl — sharpening it needs a global cast-coefficient
+  tune or per-encounter weighting (balance follow-up, proposals §8.4). Loot/items/tier-set = later polish pass.
 - **2026-06-21** — **G.4 in progress: full-colour raster icon pipeline + 89 user icons wired (abilities now have art).**
   Umut dropped a folder of painted PNGs (`Docs/Icons/`). Switched `GameIcon` from the CSS-mask SVG path to a **full-colour
   raster** render: `<img src=/icons/{prefix}-{id}.png>`, and a missing file degrades via `onError` to a default —
