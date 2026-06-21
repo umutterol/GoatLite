@@ -133,7 +133,8 @@ memory `combat-model-egm-migration`.*
 | C.6 | Full affix calendar / season content | content | minor | S | ⬜ | season.json calendar exists; expand + finalize |
 | C.7 | Earned-trait event pools (full trigger detail) | content | major | M | ⬜ | 4 pools designed; firm up trigger thresholds |
 | C.9 | Tactic-mechanic lethality pass (make the reads *bite*) | balance | major | M | ⬜ | The abstract boss-mechanic coefficients (interrupt cast 16·/ positioning 18·/ cooldowns-party 14·) are too soft at gear-appropriate ilvl — the tactic read is **log-visible but doesn't flip timed↔wipe** (proven on Bellreach, proposals §8.3). Tune the **global** coefficients (and/or land **per-encounter weighting**) so a starved dial actually wipes where the right dial times. **Affects Ashveil's Vesk + Bellreach** (the burst-variant Stillhour is already a hard read via **C.10**). Do it **once** after the pure-data dungeons are authored — not per-dungeon. Re-verify the +2 floor still times afterward |
-| C.10 | Burst/rot boss-mechanic variants (soft healer levers) | engine | major | M | ✅ | Opt-in `spikeProfile:"burst"\|"rot"` (EnemySchema; both `testsTactic:cooldowns` so the dial mitigates; Ashveil untouched). **burst** = single hit on the lowest-HP non-tank /6s (`BURST_FRAC` 0.06) → soft Cleric edge. **rot** = flat tick on each non-tank /3s (`ROT_FRAC` 0.06) → soft Lifebinder edge. Tuned to **"player not class"**: both healers clear low/mid, ideal one extends the ceiling **~1–2 keys** (Stillhour Cleric ~+13 vs HoT +12; Mire Lifebinder ~+9–10 vs Cleric ~+8). `engine.ts`+`schema.ts`; `tsc -b` clean; egm-smoke unchanged; sweep `healer-ceiling.mjs` |
+| C.10 | Burst/rot boss-mechanic variants (soft healer levers) | engine | major | M | ✅ | Opt-in `spikeProfile:"burst"\|"rot"` (EnemySchema; both `testsTactic:cooldowns` so the dial mitigates; Ashveil untouched). **burst** = single hit on the lowest-HP non-tank /6s (`BURST_FRAC` 0.06) → soft Cleric edge. **rot** = flat tick on each non-tank /3s (`ROT_FRAC` 0.06) → soft Lifebinder edge. Tuned to **"player not class"**: both healers clear low/mid, ideal one extends the ceiling **~1–2 keys** (Stillhour Cleric ~+13 vs HoT +12; Mire Lifebinder ~+9–10 vs Cleric ~+8). `engine.ts`+`schema.ts`; `tsc -b` clean; egm-smoke unchanged; sweep `healer-ceiling.mjs`. ⚠️ **See C.11** — these reads turned out to be survival-dominance artifacts |
+| C.11 | **Comp-balance / survival-dominance pass** (the big one) | balance | **major** | **XL** | 🔴 | **Audit (2026-06-21, `balance-sweep.mjs`, 10 comps × 6 dungeons):** comp ceilings spread **7–12 keys** (vs intended ~1–2). Root = **survival-bound regime** (2-healer caps *above* 3-DPS). Drivers: spec-utility inequality (Crusader party-shields ≫ Guardian; a support-DPS Arcanist/Bard = +6 keys over selfish; Crusader Divine Shield bug = `scale 1.0×maxHp` full-HP shield) + **back-band bosses diving squishies** (correctness bug — bosses should tank-and-spank). **Decisive lever:** lowering `enemyDmgMult` 2.0→1.5 → timer-bound → Ashveil spread 3, Pyreward 6. **CRITICAL FINDING:** fixing the boss-dive bug **erases the C.10 healer + C.8 school reads** — they were survival-dominance artifacts, not the burst/rot/armour mechanics. DIAL reads (cooldowns) are real and survive. So **balance vs class-reads conflict** — needs a directional decision (regime-shift + re-tune reads via stronger mechanics, vs keep current reads + spread). **Blocks meaningful loot/ilvl calibration.** Tooling: `balance-sweep.mjs` (full), `balance-probe.mjs` (fast) |
 
 ## Phase D — Systems depth ⬜
 
@@ -344,6 +345,16 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-21** — **Balance audit (C.11 opened) — comp spread is 7–12 keys, and the class-reads are survival artifacts.**
+  Ran `balance-sweep.mjs` (10 comps × 6 dungeons). Found comp ceilings spread **7–12 keys** (vs intended ~1–2), driven by
+  a **survival-bound regime** (2-healer caps above 3-DPS; party-mitigation specs dominate). Root causes: spec-utility
+  inequality (Crusader party-shields ≫ Guardian; a support-DPS = +6 keys; Crusader **Divine Shield bug** = full-HP
+  shield), and **back-band bosses diving squishies** (correctness bug). The decisive compression lever is global intake
+  (`enemyDmgMult`). **Critical:** fixing the boss-dive bug **erases the C.10 healer + C.8 school reads** — they were
+  survival-dominance artifacts, not the burst/rot/armour mechanics (the **dial** reads are real and survive). So balance
+  and the class-reads conflict → directional decision pending (regime-shift + re-tune reads, vs keep reads + spread).
+  Committed the audit tooling (`balance-sweep.mjs`, `balance-probe.mjs`); no balance values changed yet (exploration
+  reverted to keep the repo stable). Blocks loot/ilvl calibration until resolved.
 - **2026-06-21** — **C.1 DONE — The Hour of Bells (5/5); the 6-dungeon season is complete.** Authored the final dungeon
   as **pure data** (no engine work): a boss-dense gauntlet of **5 cooldowns-spike bosses** + 3 trash, added to the
   season, placeholder loot. Verified via `hour-of-bells-live.mjs`: **+2 floor times** (600s/1500s), and the **Cooldowns
