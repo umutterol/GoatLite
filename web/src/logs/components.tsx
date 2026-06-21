@@ -72,10 +72,12 @@ export function GameIcon({ kind, id, size = 16, label, style, noTip = false }: {
   kind: IconKind; id: string; size?: number; color?: string; label?: string; style?: CSSProperties; noTip?: boolean
 }) {
   const aria = label ?? `${id} ${kind}`
-  const fallback = kind === "affix" ? "/icons/affix-default.png" : "/icons/icon-default.png"
+  // every dungeon uses the keystone icon (no per-dungeon art); affixes fall back to affix-default; else the bear
+  const fallback = kind === "affix" ? "/icons/affix-default.png" : kind === "dungeon" ? "/icons/ico-key.png" : "/icons/icon-default.png"
+  const src = kind === "dungeon" ? "/icons/ico-key.png" : `/icons/${ICON_PREFIX[kind]}-${id}.png`
   const img = (
     <img
-      role="img" aria-label={aria} alt={aria} src={`/icons/${ICON_PREFIX[kind]}-${id}.png`} width={size} height={size}
+      role="img" aria-label={aria} alt={aria} src={src} width={size} height={size}
       onError={(e) => { const t = e.currentTarget; if (!t.src.endsWith(fallback)) t.src = fallback }}
       style={{ width: size, height: size, flex: "none", objectFit: "cover", borderRadius: "var(--radius)", display: "inline-block", verticalAlign: "middle", ...style }}
     />
