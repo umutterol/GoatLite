@@ -22,5 +22,11 @@
   { "id": "grave-iron-bulwark", "name": "Grave-Iron Bulwark", "kind": "enemy", "shape": "summon", "tactic": "killorder", "telegraph": 0, "desc": "Iron-bound and blade-blunting — bring Magic to the grave-iron, or watch your physical dealers chip a wall." },
   { "id": "salt-ward",          "name": "Salt Ward",          "kind": "enemy", "shape": "ground", "tactic": "positioning", "telegraph": 1.5, "desc": "Warding-salt drinks the spell before it lands — bring the blade to the salt-warded, not the bolt." },
   { "id": "annealing-pyre",     "name": "Annealing Pyre",     "kind": "enemy", "shape": "phase",  "tactic": "cooldowns", "telegraph": 3, "desc": "Tempered iron, cooled in the dark; a spike phase that wants Magic dealers to actually move the bar." },
-  { "id": "heretic-rite",       "name": "Heretic Rite",       "kind": "enemy", "shape": "cast",   "tactic": "interrupts", "telegraph": 2.5, "desc": "A salt-warded finale: burn the word from the air, and bring the blade since the spell just rolls off." }
+  { "id": "heretic-rite",       "name": "Heretic Rite",       "kind": "enemy", "shape": "cast",   "tactic": "interrupts", "telegraph": 2.5, "desc": "A salt-warded finale: burn the word from the air, and bring the blade since the spell just rolls off." },
+
+  { "id": "keep-the-hour",  "name": "Keep the Hour",  "kind": "enemy", "shape": "phase", "tactic": "cooldowns", "telegraph": 3, "desc": "The first toll of the gauntlet — a party-wide spike on the hour. Bank Cooldowns for the windows; the clock is the real boss." },
+  { "id": "leaden-toll",    "name": "Leaden Toll",    "kind": "enemy", "shape": "phase", "tactic": "cooldowns", "telegraph": 3, "desc": "Heavier than the last; every spike you under-mitigate is time off the clock." },
+  { "id": "matins-knell",   "name": "Matins Knell",   "kind": "enemy", "shape": "phase", "tactic": "cooldowns", "telegraph": 3, "desc": "The bells never stop; pace your majors across the gauntlet or run out before the last peal." },
+  { "id": "vespers-dark",   "name": "Vespers Dark",   "kind": "enemy", "shape": "phase", "tactic": "cooldowns", "telegraph": 3, "desc": "The dark hour — the spike bites hardest into soft-enrage if you've over-pulled the clock." },
+  { "id": "last-peal",      "name": "The Last Peal",  "kind": "enemy", "shape": "phase", "tactic": "cooldowns", "telegraph": 3, "desc": "Pop everything now or pop nothing and be tolled — the capstone spike under the dying clock." }
 ]

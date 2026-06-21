@@ -38,7 +38,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | A | Engine v1 (old flat-power sim) | ✅ 12/12 — **superseded by A2** |
 | A2 | **Combat engine rebuilt on EGM model** | ✅ 7/7 (live + balanced) |
 | B | **Runtime loop & persistence** | 🟡 13/14 |
-| C | Content scale-up | 🟡 2/10 |
+| C | Content scale-up | 🟡 3/10 |
 | D | Systems depth | ⬜ 0/9 |
 | E | Production (art, audio, polish) | ⬜ 0/7 |
 | F | **Endgame & Identity (operator skills)** | ✅ 6/6 — live + balanced (operator runway ≈ +3 keys; +2 floor holds) |
@@ -124,7 +124,7 @@ memory `combat-model-egm-migration`.*
 
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
-| C.1 | Dungeons 2–6 | content | major | XL | 🟡 | **design ✅** `Dungeon-Design-Proposals.md`. **Bellreach Sanctum ✅ (1/5)** (interrupts; +2 floor times; read log-visible only → C.9). **Stillhour Abbey ✅ (2/5)** + **The Weltering Mire ✅ (3/5)** — the healer pair via **C.10** (burst→Cleric / rot→Lifebinder), tuned to the **"bring the player, not the class"** soft-gap spec: both clear low/mid, ideal healer extends the ceiling **~1–2 keys** (sweep `healer-ceiling.mjs`). **The Pyreward Ossuary ✅ (4/5)** — damage-school via **C.8**; soft ~1–2-key mixed-school preference (sweep `pyreward-ceiling.mjs`, Ashveil as control). **Next:** Hour of Bells (5/5, pure data). IP rename deferred/off critical path |
+| C.1 | Dungeons 2–6 | content | major | XL | ✅ | **All 5 new dungeons authored + verified** (`Dungeon-Design-Proposals.md`): **Bellreach** (interrupts; read log-visible → C.9), **Stillhour** (burst-heal→Cleric) + **Weltering Mire** (rot-heal→Lifebinder) the C.10 healer pair (soft ~1–2-key, "player not class"), **Pyreward Ossuary** (damage-school via C.8; soft ~1–2 school keys), **Hour of Bells** (cooldowns gauntlet; Cooldowns dial ~4-key swing — a *dial* read, allowed to bite). 6-dungeon season complete. Probes: `*-live.mjs`, `healer-ceiling.mjs`, `pyreward-ceiling.mjs`. Mechanics-first + placeholder loot (real loot/tier-sets = C.4/C.5). Open polish: C.9 (sharpen the soft dial reads), per-encounter cadence, IP rename |
 | C.8 | Per-enemy armour/resist (damage-school wall) | engine | minor | S | ✅ | `EnemySchema.armour/resist` (default 0 → Ashveil byte-identical) → `makeEnemy` scales by keyScale; existing `pipeline.resolveHit` routes Phys→armour/Magic→resist. Powers **Pyreward Ossuary**. **Caveats found:** the ratio formula is *sticky* (coarse tuning); trash must be **front-melee** (caster trash makes it an AoE check, not a school check); single-school also pays a spec-power penalty (2 strong DPS/school) so raw gap > the ~1–2 *school* keys. `tsc -b` clean; egm-smoke unchanged |
 | C.2 | Per-spec talent trees | content | major | XL | ⬜ | 10 specs × 5 nodes ≈ 150 options |
 | C.3 | Enemy roster breadth | content | major | XL | ⬜ | ~50–70 total (have 7) |
@@ -344,6 +344,15 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-21** — **C.1 DONE — The Hour of Bells (5/5); the 6-dungeon season is complete.** Authored the final dungeon
+  as **pure data** (no engine work): a boss-dense gauntlet of **5 cooldowns-spike bosses** + 3 trash, added to the
+  season, placeholder loot. Verified via `hour-of-bells-live.mjs`: **+2 floor times** (600s/1500s), and the **Cooldowns
+  dial swings the ceiling ~4 keys** (Cooldowns-3 caps ~+9 vs Cooldowns-0 ~+5) — the −12%/pt spike mitigation compounds
+  across 5 bosses, making it the **clearest dial read** of the set. That's a *tactic-dial* read (a player decision), so
+  it's allowed to bite hard — distinct from the soft ~1–2-key rule that governs *class* preferences. Ships under the
+  standard Fortified+Bursting pool (Tyrannical+Raging enhance, don't gate). `tsc -b` clean; egm-smoke unchanged.
+  **C.1 complete: Ashveil + Bellreach + Stillhour + Weltering Mire + Pyreward Ossuary + Hour of Bells**, each a distinct
+  solve (interrupts / burst-heal / rot-heal / damage-school / cooldowns), mechanics-first with placeholder loot.
 - **2026-06-21** — **C.8 + C.1 The Pyreward Ossuary (4/5): per-enemy damage-school defense, soft-tuned.** Shipped **C.8**:
   optional `EnemySchema.armour/resist` (default 0 → Ashveil byte-identical), wired through `makeEnemy` (scaled by
   keyScale) and routed by the existing `pipeline.resolveHit` (Physical→armour, Magic→resist, ratio formula). Authored the

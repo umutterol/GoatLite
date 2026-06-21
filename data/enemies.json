@@ -42,5 +42,15 @@
 
   { "id": "grave-iron-thrall", "name": "Grave-Iron Thrall", "kind": "trash", "role": "melee", "band": "front", "baseHp": 14, "baseDamage": 5, "armour": 150, "tags": ["pyreward", "ossuary", "melee"] },
   { "id": "salt-warden",       "name": "Salt Warden",       "kind": "trash", "role": "melee", "band": "front", "baseHp": 12, "baseDamage": 4, "resist": 150, "tags": ["pyreward", "ossuary", "melee"] },
-  { "id": "ossuary-acolyte",   "name": "Ossuary Acolyte",   "kind": "trash", "role": "melee", "band": "front", "baseHp": 9,  "baseDamage": 3, "tags": ["pyreward", "ossuary", "melee"] }
+  { "id": "ossuary-acolyte",   "name": "Ossuary Acolyte",   "kind": "trash", "role": "melee", "band": "front", "baseHp": 9,  "baseDamage": 3, "tags": ["pyreward", "ossuary", "melee"] },
+
+  { "id": "verger-mauthe",      "name": "Verger Mauthe, Who Keeps the Hour", "kind": "boss", "stage": 2, "dungeonId": "hour-of-bells", "abilityId": "keep-the-hour", "testsTactic": "cooldowns", "band": "front", "baseHp": 54, "baseDamage": 9,  "icon": "tac-cooldowns", "flavor": "Mind the hour. It does not mind you." },
+  { "id": "the-leaden-carillon","name": "The Leaden Carillon",              "kind": "boss", "stage": 3, "dungeonId": "hour-of-bells", "abilityId": "leaden-toll",   "testsTactic": "cooldowns", "band": "back",  "baseHp": 58, "baseDamage": 9,  "icon": "tac-cooldowns", "flavor": "Every bell heavier than the last." },
+  { "id": "matins-bell",        "name": "The Matins Bell",                  "kind": "boss", "stage": 5, "dungeonId": "hour-of-bells", "abilityId": "matins-knell",  "testsTactic": "cooldowns", "band": "front", "baseHp": 62, "baseDamage": 10, "icon": "tac-cooldowns", "flavor": "Rung at the dead hour, for no one living." },
+  { "id": "the-tolling-dark",   "name": "The Tolling Dark",                 "kind": "boss", "stage": 6, "dungeonId": "hour-of-bells", "abilityId": "vespers-dark",  "testsTactic": "cooldowns", "band": "back",  "baseHp": 66, "baseDamage": 11, "icon": "tac-cooldowns", "flavor": "The hour the candles gutter." },
+  { "id": "lord-abbot-crell",   "name": "Lord-Abbot Crell, the Final Peal", "kind": "boss", "stage": 8, "dungeonId": "hour-of-bells", "abilityId": "last-peal",     "testsTactic": "cooldowns", "band": "front", "baseHp": 76, "baseDamage": 12, "icon": "tac-cooldowns", "flavor": "Pop everything now, child — or pop nothing, and be tolled." },
+
+  { "id": "abbey-sentinel", "name": "Abbey Sentinel", "kind": "trash", "role": "melee",  "band": "front", "baseHp": 15, "baseDamage": 5, "tags": ["hourbells", "abbey", "melee"] },
+  { "id": "cloister-shade", "name": "Cloister Shade", "kind": "trash", "role": "caster", "band": "back",  "baseHp": 11, "baseDamage": 4, "tags": ["hourbells", "abbey", "caster"] },
+  { "id": "bell-thrall",    "name": "Bell Thrall",    "kind": "trash", "role": "melee",  "band": "front", "baseHp": 13, "baseDamage": 4, "tags": ["hourbells", "abbey", "melee"] }
 ]

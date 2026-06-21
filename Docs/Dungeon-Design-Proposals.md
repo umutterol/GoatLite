@@ -232,28 +232,35 @@ tick late," not OOM. **Reward hook:** sustained-throughput healer gear.
 
 ### 4.4 The Hour of Bells — *cooldowns (the deepest dial, boss-gauntlet)*
 
-> *A black-stone abbey run on a lethal timetable.* **Signature:** boss-dense, spike-punishing under enrage co-stress.
-> **Difficulty:** the difficulty step-up. **Build:** pure data, but **designed around Tyrannical+Raging** (outside the
-> MVP Fortified+Bursting pool) — ship post-MVP or build a Fortified variant.
+> *A black-stone abbey run on a lethal timetable; the bells never stop, and neither does the clock.* **Signature:**
+> boss-dense gauntlet of party-wide tolls. **Difficulty:** the difficulty step-up. **Build:** pure data; ships under the
+> standard pool, **enhanced** (not gated) by Tyrannical+Raging weeks. **This is a DIAL dungeon** — the solve is a player
+> tactical decision (the Cooldowns slider), so its read is *allowed* to bite hard (the soft ~1–2-key rule, §2, is for
+> *class* preferences, not dials).
 
-**The puzzle.** A boss-dense run where most encounters fire the 12s party-wide spike. **Cooldowns is a three-in-one
-dial:** −12%/pt spike, +4%/pt boss DPS (so the gauntlet dies inside the timer), and on **trash** it lowers the brain's
-defensive-major gate. Cap Cooldowns first, then bank Positioning for the one ground boss.
+**The puzzle.** Five of the run's encounters are bosses, each firing the 12s party-wide spike. **Cooldowns is a
+three-in-one dial:** −12%/pt spike, +4%/pt boss DPS (so the gauntlet dies inside the timer), and on **trash** it lowers
+the brain's defensive-major gate. Cap Cooldowns; the rest into Kill Order for the trash. The clock — not any one boss —
+is the real opponent: under-mitigated tolls cost deaths, deaths cost timer, and the last peal lands in soft-enrage.
 
-**Comp answer (honest).** Cap the **Cooldowns slider** (not a recruit). Soft nudge toward a defensive-major spec
-(Guardian/Crusader/Cleric/Arcanist) whose majors the dial pre-times **on trash**. Be honest: on **boss** stages
-`holdForWindow` pops majors on cooldown regardless of the dial — the boss-stage benefit is just −12% spike / +4% DPS.
+**Comp answer.** Cap the **Cooldowns slider** (a decision, not a recruit). A defensive-major spec
+(Guardian/Crusader/Cleric/Arcanist) helps on trash where the dial pre-times its majors. On **boss** stages
+`holdForWindow` pops majors on cooldown regardless of the dial — there the dial's benefit is just −12% spike / +4% DPS.
 
-| Stage | Boss | Shape→Tactic | Role | Flavor |
-|---|---|---|---|---|
-| 2 | Verger Mauthe, Who Keeps the Hour | phase→cooldowns | the teacher spike | "Mind the hour. It does not mind you." |
-| 4–6 | The Leaden Carillon | phase→cooldowns | escalation under Death-Frenzy (Raging) trash | "Every bell heavier than the last." |
-| 8 | Lord-Abbot Crell, the Final Peal | phase→cooldowns | capstone | "Pop everything now, child — or pop nothing, and be tolled." |
+| Stage | Boss | Shape→Tactic | Flavor |
+|---|---|---|---|
+| 2 | Verger Mauthe, Who Keeps the Hour | phase→cooldowns | "Mind the hour. It does not mind you." |
+| 3 | The Leaden Carillon | phase→cooldowns | "Every bell heavier than the last." |
+| 5 | The Matins Bell | phase→cooldowns | "Rung at the dead hour, for no one living." |
+| 6 | The Tolling Dark | phase→cooldowns | "The hour the candles gutter." |
+| 8 | Lord-Abbot Crell, the Final Peal | phase→cooldowns | "Pop everything now, child — or pop nothing, and be tolled." |
 
-**Fixes folded in:** **sim-sweep boss `baseHp`/`baseDamage` so cd=0 wipes AND cd=3 reliably times** (the central
-balance task — the floor as-authored does *not* wipe; lethality must be tuned in). Fix the `tactics.json` tooltip
-(−10% vs engine −12%). Don't claim "Cleric > Lifebinder" (a slow 12s spike is exactly what HoTs cover) unless a
-Bursting layer is added. Gate behind the affix-pool fix.
+**Build status (2026-06-21): authored + verified (pure data, no engine work).** 5 cooldowns bosses + 3 trash; added to
+the season; placeholder loot. Verified via `hour-of-bells-live.mjs`: **+2 floor times** (600s/1500s, 0 deaths), and the
+**Cooldowns dial strongly moves the ceiling — Cooldowns-3 caps ~+9 vs Cooldowns-0 ~+5 (~4-key swing)**, because the
+−12%/pt mitigation compounds across 5 spike bosses. This is the **clearest dial read** of the set (vs Bellreach's
+log-visible-only interrupts) — and correctly so, since it's a player decision. `tsc -b` clean; egm-smoke unchanged.
+Some seed variance around the ceiling (a tuning-pass smoothing item). **Reward hook:** Cooldown/defensive gear.
 
 ---
 
@@ -363,13 +370,16 @@ enrage) → Pyreward Ossuary (the one lesson no dial fixes: bring the right scho
 - **Healer-choice pair (Stillhour + Mire)** — **resolved by the C.10 burst/rot patterns**, tuned to the "bring the
   player, not the class" spec (§2): both healers clear low/mid keys; the ideal healer extends the ceiling ~1–2 keys
   (Cleric on Stillhour's burst, Lifebinder on the Mire's rot). Verified via `healer-ceiling.mjs`.
+- **Hour of Bells affix pool** — **resolved: ships under the standard Fortified+Bursting pool** (no variant needed); the
+  5-cooldowns-boss gauntlet makes the Cooldowns dial bite on its own (~4-key ceiling swing). Tyrannical+Raging weeks
+  *enhance* it but don't gate it.
+- **Damage-school wall (Ossuary)** — **resolved by C.8**, soft-tuned to ~1–2 *school* keys (§4.5). Findings logged: ratio
+  formula is coarse; trash must be front-melee to avoid an AoE confound; single-school also pays a roster spec-power tax.
 
 **⬜ Still open**
-1. **Hour of Bells needs Tyrannical+Raging** (outside MVP pool). Lift the affix-pool restriction, or design a
-   Fortified+Bursting variant of its spike pressure? *(Deferred to when we author Hour of Bells — it ships last.)*
-2. **Per-encounter mechanic cadence** (medium effort) would end "same spike, bigger numbers" monotony across the spike
+1. **Per-encounter mechanic cadence** (medium effort) would end "same spike, bigger numbers" monotony across the spike
    dungeons. Worth it for v1, or accept thematic-only differentiation?
-3. **Bellreach's interrupt read doesn't flip the outcome yet** (verified 2026-06-21 — log-visible casts-through + a
+2. **Bellreach's interrupt read doesn't flip the outcome yet** (verified 2026-06-21 — log-visible casts-through + a
    duration delta, but timed↔wipe is unchanged at the floor). Tune the **global** interrupt cast coefficient (also
    hits Ashveil's Vesk), or land **per-encounter weighting**, so Interrupts-0 actually wipes where Interrupts-3 times?
    Separately: a 6-point budget can't fund interrupts+cooldowns **and** kill-order, so +12-ish wipes on trash under

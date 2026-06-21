@@ -109,5 +109,27 @@
       "pale-mitre-of-ashveil", "cuirass-of-interred-kings", "legplates-of-the-barrow-march",
       "vial-of-crypt-dust", "icon-of-pale-mercy"
     ]
+  },
+  {
+    "id": "hour-of-bells",
+    "name": "The Hour of Bells",
+    "theme": "A black-stone abbey run on a lethal timetable; the bells never stop, and neither does the clock",
+    "timerSeconds": 1500,
+    "signature": "Boss-dense gauntlet of party-wide tolls — a Cooldowns-dial and clock-economy crucible",
+    "slots": [
+      { "stage": 1, "kind": "trash", "packTags": ["hourbells"] },
+      { "stage": 2, "kind": "boss",  "boss": "verger-mauthe" },
+      { "stage": 3, "kind": "boss",  "boss": "the-leaden-carillon" },
+      { "stage": 4, "kind": "trash", "packTags": ["hourbells"] },
+      { "stage": 5, "kind": "boss",  "boss": "matins-bell" },
+      { "stage": 6, "kind": "boss",  "boss": "the-tolling-dark" },
+      { "stage": 7, "kind": "trash", "packTags": ["hourbells"] },
+      { "stage": 8, "kind": "boss",  "boss": "lord-abbot-crell" }
+    ],
+    "lootTable": [
+      "bastion-of-the-barrow-march", "ashveil-cleaver", "faceguard-of-interred-kings",
+      "pale-mitre-of-ashveil", "legplates-of-the-barrow-march", "treads-of-quiet-rest",
+      "vial-of-crypt-dust", "icon-of-pale-mercy"
+    ]
   }
 ]
