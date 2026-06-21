@@ -146,6 +146,8 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
     const attackInterval = ATTACK_INTERVAL_BASE / (1 + haste / 100)
     const tal = resolveTalents(p.talents)
     const op = resolveOperator(p.skills, p.traitIds)   // Phase F: operator skills + trait combat → multipliers
+    // M.2: a contested-loot win grants this member +N% output for one run — folds into the same static output channel
+    const lootBuff = 1 + (p.lootBuffPct ?? 0) / 100
     // H.3: talent intakePct folds into the operator (uniform) intake channel
     const intakeStatic = Math.max(0.2, Math.min(2, op.intakeStatic * (1 + tal.intakePct / 100)))
     const maxHp = c.hpPerIlvl * p.ilvl * tal.hpMult * op.hpMult
@@ -167,7 +169,7 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
       nextActionAt: 0, downedUntil: -1, dmgDone: 0, healDone: 0, deaths: 0, isBoss: false,
       abilities, passive, cooldowns: {}, statuses: [], resources: {}, hitSinceAction: false, lastActionAt: 0,
       emergencyHealed: false, guards: {}, talents: tal.dmg,
-      intakeMult: intakeStatic, opOutputMult: op.outputMult, opClutchOutMult: op.clutchOutMult,
+      intakeMult: intakeStatic, opOutputMult: op.outputMult * lootBuff, opClutchOutMult: op.clutchOutMult,
       opIntakeStatic: intakeStatic, opClutchIntakeMult: op.clutchIntakeMult,
     }
   })

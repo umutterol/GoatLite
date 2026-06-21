@@ -170,6 +170,7 @@ interface RawMember {
   skillXp: SkillMap
   revealed: RevealMap
   potentialProfile: OperatorProfile // hidden tag-weights (set the ceilings; bias earned-trait rolls in D.1)
+  lootBuffPct: number               // M.2: "+N% output next run" from winning contested loot (consumed after the run)
 }
 interface PersistState {
   version: number
@@ -243,6 +244,7 @@ function loadState(): GameState {
           ...m, key: m.key ?? freshKey(), talents: m.talents ?? {},
           skills: m.skills ?? freshOperatorSkills(), ceilings: m.ceilings ?? freshOperatorSkills(),
           skillXp: m.skillXp ?? zeroSkillMap(), revealed: m.revealed ?? falseRevealMap(), potentialProfile: m.potentialProfile ?? {},
+          lootBuffPct: m.lootBuffPct ?? 0,   // M.2: additive field, sanitized on load (no SAVE_VERSION bump → no roster wipe)
         }))
         // history changed shape (string[] → RunTicket[]) — drop any legacy/malformed entries so replay can't crash
         merged.history = ((merged.history as unknown[]) ?? []).filter((t): t is RunTicket =>
@@ -338,6 +340,19 @@ function pushFeed(s: PersistState, ...entries: FeedPartial[]): { feed: FeedEntry
   return { feed: [...s.feed, ...made].slice(-FEED_CAP), feedSeq: seq }
 }
 
+/* ---- loot drama (M.2): personality-gated contested-item consequences ---- */
+const LOOT_WIN_BUFF = 5    // winner: +5% output next run (GDD canon)
+const CHILL_TRAITS = new Set(["boomer", "casual-andy"])   // these shrug a snub off (not an archetype — explicit ids)
+const isSelfish = (traitIds: string[]) => traitIds.some((t) => content.traits.get(t)?.archetype === "Selfish")
+const isChill = (traitIds: string[]) => traitIds.some((t) => CHILL_TRAITS.has(t))
+/** Morale hit a member takes for losing a contested roll, gated by personality. Base = the dormant `lost-loot` event (−5). */
+function lootLossMorale(traitIds: string[]): number {
+  const base = content.moraleEvents.get("lost-loot")?.delta ?? -5   // wires the previously-dormant event
+  if (isSelfish(traitIds)) return base - 3   // Loot Goblin / Solo Player / Cocky / Rival contest loudly + lose more (−8)
+  if (isChill(traitIds)) return Math.ceil(base / 2)   // Boomer / Casual Andy shrug (−2)
+  return base   // everyone else: the canon −5
+}
+
 function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
     case "CREATE_GUILD": {
@@ -364,6 +379,7 @@ function reducer(state: GameState, action: Action): GameState {
         // Phase F: carry over the scouted operator skills/ceilings; XP starts empty and grows with play
         skills: rec.skills, ceilings: rec.ceilings, skillXp: zeroSkillMap(),
         revealed: rec.revealed, potentialProfile: rec.potentialProfile,
+        lootBuffPct: 0,
       }))
       const roster = [...state.roster, ...newMembers]
       // fill the party up to 5 (keeps existing party, adds the new signs)
@@ -453,6 +469,8 @@ function reducer(state: GameState, action: Action): GameState {
       if (!r) return state
       const drops = state.pendingLoot ?? []
       const feed: FeedPartial[] = []   // M.1: collected as we resolve loot/morale/keystone/growth below
+      const lootLossByMember: Record<string, number> = {}   // M.2: contested-roll morale penalties (folded into morale below)
+      const lootWinners = new Set<string>()                  // M.2: members who won a contested item → +5% output next run
       let roster = state.roster.map((m) => ({ ...m, gear: { ...m.gear } }))
       const stash = [...state.stash]
       let shardsGained = 0
@@ -464,7 +482,23 @@ function reducer(state: GameState, action: Action): GameState {
           const old = member.gear[d.slot]
           member.gear[d.slot] = { uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity }
           if (old && old.baseId !== "beta-standard-issue") stash.push(old)
-          feed.push({ kind: "loot", tone: "good", memberId: member.id, icon: specIcon(member.specId), text: `${member.name} equipped ${d.name} (ilvl ${d.ilvl}).` })
+          // M.2 loot drama: contested when 2+ party members would upgrade AND the winner is one of them
+          const upgraders = d.upgrades.filter((u) => u.delta > 0)
+          const contested = upgraders.length >= 2 && upgraders.some((u) => u.memberId === member.id)
+          if (contested) {
+            lootWinners.add(member.id)   // winner → +5% next run (applied below; consumed after the next run)
+            const loserNames: string[] = []
+            for (const u of upgraders) {
+              if (u.memberId === member.id) continue
+              const lm = roster.find((x) => x.id === u.memberId)
+              if (!lm) continue
+              lootLossByMember[lm.id] = (lootLossByMember[lm.id] ?? 0) + lootLossMorale(lm.traitIds)   // personality-gated snub
+              loserNames.push(lm.name)
+            }
+            feed.push({ kind: "loot", tone: "warn", memberId: member.id, icon: specIcon(member.specId), text: `Contested: ${member.name} took ${d.name} over ${loserNames.join(", ")} (+${LOOT_WIN_BUFF}% next run).` })
+          } else {
+            feed.push({ kind: "loot", tone: "good", memberId: member.id, icon: specIcon(member.specId), text: `${member.name} equipped ${d.name} (ilvl ${d.ilvl}).` })
+          }
         } else {
           stash.push({ uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity })
         }
@@ -473,7 +507,8 @@ function reducer(state: GameState, action: Action): GameState {
       const partySet = new Set(state.partyIds)
       roster = roster.map((m) => {
         if (!partySet.has(m.id)) return m
-        const nm = clamp(m.morale + MORALE_DELTA[r.outcome], 0, 100)
+        // M.2: a contested-loot snub stacks on top of the outcome morale delta (personality-gated above)
+        const nm = clamp(m.morale + MORALE_DELTA[r.outcome] + (lootLossByMember[m.id] ?? 0), 0, 100)
         // M.1: warn only when a member CROSSES below the low-morale line this run (no spam while they sit low)
         if (m.morale >= LOW_MORALE && nm < LOW_MORALE) feed.push({ kind: "morale", tone: "warn", memberId: m.id, icon: specIcon(m.specId), text: `${m.name}'s morale fell to ${nm}. At risk of leaving the guild.` })
         return { ...m, morale: nm }
@@ -511,6 +546,14 @@ function reducer(state: GameState, action: Action): GameState {
             feed.push({ kind: "operator", tone: "good", memberId: m.id, icon: specIcon(m.specId), text: `${m.name}'s ${content.operatorSkills.get(k)?.name ?? k} rose to ${Math.floor(g.skills[k])}.` })
         }
         return { ...m, skills: g.skills, skillXp: g.skillXp }
+      })
+
+      // M.2: the loot-win buff is a ONE-run boost — clear it for everyone who just ran (consumed), then set it on this run's winners
+      roster = roster.map((m) => {
+        if (!partySet.has(m.id)) return m
+        const won = lootWinners.has(m.id)
+        if (!won && m.lootBuffPct === 0) return m
+        return { ...m, lootBuffPct: won ? LOOT_WIN_BUFF : 0 }
       })
 
       const emblem = state.wallet.emblem + (r.outcome === "timed" ? 5 : r.outcome === "depleted" ? 2 : 0)
@@ -575,7 +618,7 @@ function shapeMember(m: RawMember): Member {
   return {
     id: m.id, name: m.name, title: m.title, spec: m.specId, ilvl: memberIlvl(m.gear), morale: m.morale,
     portrait: `/warcraftcn/${m.portrait}.webp`, note: m.note, key: m.key ? shapeKey(m.key) : undefined, talents: m.talents ?? {},
-    skills: m.skills, ceilings: m.ceilings, revealed: m.revealed, skillXp: m.skillXp, traitIds: m.traitIds,
+    skills: m.skills, ceilings: m.ceilings, revealed: m.revealed, skillXp: m.skillXp, traitIds: m.traitIds, lootBuffPct: m.lootBuffPct ?? 0,
     traits: m.traitIds.map((tid) => {
       const t = content.traits.get(tid)
       if (!t) return { name: tid, rarity: "Common", kind: "Start", effect: "" } as Trait
@@ -648,7 +691,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const party: SimPartyMember[] = state.partyIds
         .map((id) => state.roster.find((m) => m.id === id))
         .filter(Boolean)
-        .map((m) => ({ id: m!.id, name: m!.name, specId: m!.specId, ilvl: memberIlvl(m!.gear), morale: m!.morale, traitIds: m!.traitIds, talents: m!.talents, skills: m!.skills }))
+        .map((m) => ({ id: m!.id, name: m!.name, specId: m!.specId, ilvl: memberIlvl(m!.gear), morale: m!.morale, traitIds: m!.traitIds, talents: m!.talents, skills: m!.skills, lootBuffPct: m!.lootBuffPct }))
       const seed = Math.floor(Math.random() * 0xffffffff)
       const result = runDungeon({ dungeonId: runKeyState.dungeonId, keyLevel: runKeyState.level, affixIds: affIds, party, tactics: cfg.tactics, aggression: cfg.aggression, seed })
       const dgn = content.dungeons.get(runKeyState.dungeonId)

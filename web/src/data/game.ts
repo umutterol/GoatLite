@@ -21,6 +21,7 @@ export interface Member {
   // Phase F operator layer (skillId → value); ceilings revealed per `revealed` (hidden-but-active)
   skills?: Record<string, number>; ceilings?: Record<string, number>
   revealed?: Record<string, boolean>; skillXp?: Record<string, number>; traitIds?: string[]
+  lootBuffPct?: number   // M.2: pending "+N% output next run" from winning contested loot (0 → none)
 }
 export interface Boss { n: number; name: string; ability: string; tests: string; icon: string }
 export interface TacticCat { id: string; name: string; icon: string; starved: string }

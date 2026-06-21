@@ -37,7 +37,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | 0 | Foundation (design, data, UI mockup) | ✅ 4/4 |
 | A | Engine v1 (old flat-power sim) | ✅ 12/12 — **superseded by A2** |
 | A2 | **Combat engine rebuilt on EGM model** | ✅ 7/7 (live + balanced) |
-| B | **Runtime loop & persistence** | 🟡 12/14 |
+| B | **Runtime loop & persistence** | 🟡 13/14 |
 | C | Content scale-up | ⬜ 0/7 |
 | D | Systems depth | ⬜ 0/9 |
 | E | Production (art, audio, polish) | ⬜ 0/7 |
@@ -49,7 +49,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | K | **Combat AI rework (v2)** | ✅ 6/6 — shared priority-rules brain (players + enemies), data-driven profiles, tactics-as-orders, 20-agent adversarial review (3 fixes) |
 | ※ | **Affix swap (original season, IP scrub)** | ⬜ 0/1 — **design ✅** (ready to apply) |
 | L | **Roster expansion — Marksman + Necromancer** | ⬜ 0/7 — **design ✅** (`MMO-Nostalgia-Reference.md` §6) |
-| M | **Guild Feed & Loot Drama (social meta-layer)** | 🟡 1/5 (+1 v2) — M.1 done (always-visible feed rail + system-notification stream, live-verified); barks (M.3/M.4) + loot drama (M.2/M.5) next |
+| M | **Guild Feed & Loot Drama (social meta-layer)** | 🟡 2/5 (+1 v2) — M.1 (feed + notifications) + M.2 (loot-drama mechanic) done, live-verified; barks (M.3/M.4) + bark-in-feed (M.5) next |
 | N | **Intake balance (`enemyDmgMult`) + sim-dump tooling** | ✅ 2/2 — enemy damage is now an **isolated** intake lever (=2.0); survival binds below the timer wall; +2 floor + operator runway (+3) hold; new config/CLI `sim-dump` harness |
 
 ---
@@ -101,7 +101,7 @@ memory `combat-model-egm-migration`.*
 | A2.5a | Affixes / tactics / boss mechanics reconnected | ✅ | all 8 affixes (bursting/bolstering/spiteful/raging/volcanic/sanguine + tyrannical/fortified), 4 boss mechanics gated by audited tactic, tactics drive output (`outgoingMult`) + mitigate intake. Tactics measurably swing outcomes. |
 | A2.5b | UI cutover + balance retune | ✅ | app `@/sim` now runs `runDungeonEGM` (legacy kept for rollback). Calibrated so the **standard 1T/1H/3D comp** at gear-appropriate ilvl hits the GDD timer table: +2 floor 16/16 timed → +8 comfortable → +15 a geared-1H squeak; drops scale with key (`112+4·key`); deaths cost 15s; combat-rez charges (1 + 1/5min, all-down = wipe). Verified live (Playwright) + headless sweeps. |
 
-## Phase B — Runtime loop & persistence 🟡 (12/14)
+## Phase B — Runtime loop & persistence 🟡 (13/14)
 
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
@@ -109,7 +109,7 @@ memory `combat-model-egm-migration`.*
 | B.2 | JSON save/load + versioned migrator | engine | blocker | M | ✅ | localStorage JSON + version field (now v4); reset-on-mismatch; **plus sanitize-on-load** (backfills any member missing `.key`, drops legacy non-ticket history) — added after a shape-change crash. Full stepwise migrator still later. |
 | B.3 | Keystone progression + week/affix advance | engine | blocker | M | ✅ | **margin-based** (timed +1/+2/+3 by timer margin, deplete/wipe −1, floor 2); week affixes from the season calendar. Now **per-member** (see B.12) — each key levels independently on its owner's run. |
 | B.4 | Full loop wiring | engine | blocker | M | ✅ | party picker → tactics → run → review → File Report applies it → repeat. Verified end-to-end via UI + store |
-| B.5 | Loot generation + assignment + loot drama UI | engine/ux | major | M | 🟡 | generation → real gear items in the stash + equip assignment done (B.8). The **loot-drama** portion (contested-item resolution + consequences + barks) is **expanded and rehomed into Phase M** (M.2 mechanic, M.5 feed integration) — see that phase. |
+| B.5 | Loot generation + assignment + loot drama UI | engine/ux | major | M | ✅ | generation → real gear items in the stash + equip assignment done (B.8); the **loot-drama** mechanic + UI shipped in **M.2** (contested-item resolution, winner +5% / personality-gated loser morale, ⚔ badge + Auto-best-fit on the Loot screen). The **bark** layer on top is M.3/M.4 → M.5. |
 | B.6 | Morale runtime (events, bands) | engine | major | M | ✅ | morale events applied on result (timed +10 / depleted −5 / wipe −20); 3-band output already in the sim |
 | B.7 | Talent picker UI + per-member persistence | ux | major | M | ✅ | **2 MVP nodes** (Survival↔Throughput, Focus↔Spread), 3 choices each, shared by all specs — `data/talents.json` options gained machine-readable `effects` (maxHpPct / dmgPct + `onlyIf` gate). Engine applies them (buildParty maxHp mult + `passiveDamageMult` dmg mods); **interactive picker** in the Character sheet (replaces the old read-only auto-pick); saved per member, captured in the run ticket so replays are faithful. Nodes 3-5 stay prose-only until C.2. |
 | B.8 | Gear / 6-slot inventory + assignment | ux | major | L | ✅ | real gear items (uid/baseId/ilvl/rarity) in a guild stash; per-member 6-slot paper-doll; **char ilvl = slot avg → feeds the sim**; spec-tag-validated equip with upgrade deltas; Character Sheet screen (click a roster card). Verified: equip raises ilvl, runs loot the stash, persists |
@@ -282,7 +282,7 @@ nostalgia 10); (2) add a 6th class, **Necromancer**, the pet/summoner class, who
 
 ---
 
-## Phase M — Guild Feed & Loot Drama (always-visible social meta-layer) 🟡 (1/5 — design ✅)
+## Phase M — Guild Feed & Loot Drama (always-visible social meta-layer) 🟡 (2/5 — design ✅)
 
 *An **always-visible** guild-chat panel in the Logs UI, **meta-layer only** (no in-run combat log). Two voices:
 **system notifications** (the game, neutral/factual — the notification-center backbone with complete coverage) and
@@ -294,7 +294,7 @@ random member inherits a voice pack for free. Loot drama is the feed's flagship 
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
 | M.1 | Always-visible feed panel + **system-notification** layer | ux/engine | major | M | ✅ | persistent right-rail `GuildFeed.tsx` (visible only in the `playing` phase) reading a new persisted `feed: FeedEntry[]` + `feedSeq` on `PersistState`; notifications **emitted from the reducer** (all data in scope) in neutral game-voice, **zero comedy**: guild founded (`CREATE_GUILD`), member joined (`CONFIRM_RECRUITS`), run filed w/ outcome+time+deaths + loot-dropped (`RAN_KEY`), loot equipped + keystone raised/depleted + operator level-up + morale **at-risk crossing** (all `CONFIRM_LOOT`). Member-tagged lines click → character sheet. **No SAVE_VERSION bump** (additive field + defensive load guard → pre-M saves load with an empty feed); feed capped at 200. **Deferred (no engine yet):** trait-earned (D.1) + departure-warning (D.2) lines. Verified: `tsc -b` clean, `egm-smoke` goldens **byte-identical** (914/884/1182/1367 — no engine touched), Playwright `m-live.mjs` 9/9 + 0 console errors. |
-| M.2 | **Loot-drama mechanic** (contested-item resolution) | engine/ux | major | M | ⬜ | when a drop upgrades **2+ members**, surface the decision; assign; **loser −5 morale** (wire the dormant `lost-loot` event), **winner +5% output next run** (persisted buff → `SAVE_VERSION` bump). **Personality-gated:** Selfish archetypes (Loot Goblin / Solo Player) contest loudly + lose more morale; Boomer / Casual Andy shrug. Rehomes B.5's pending loot-drama UI. |
+| M.2 | **Loot-drama mechanic** (contested-item resolution) | engine/ux | major | M | ✅ | a drop is **contested** when 2+ party members would upgrade it AND the winner is one of them (`CONFIRM_LOOT`, `game-store.tsx`). **Winner** → `lootBuffPct = +5%` output **next run** (new persisted `RawMember.lootBuffPct`, threaded into `SimPartyMember` → folded into `opOutputMult` in `buildParty`, captured in the run ticket so replays stay faithful, **consumed/cleared after that next run**). **Loser(s)** → the now-**wired `lost-loot` morale event** (−5), **personality-gated**: Selfish archetypes (Loot Goblin / Solo Player / Cocky / Rival) lose more (−8); Boomer / Casual Andy shrug (−2); everyone else −5 — stacks on the outcome morale. **No `SAVE_VERSION` bump** (additive field, sanitized on load → no roster wipe, supersedes the design-note bump). **UI** (`LootPage`): ⚔ Contested badge + consequence preview + a one-click **Auto best-fit** so the modal is a decision, not a tax. Emits a marquee **`Contested:` feed line** through M.1 (barks on top = M.5). **Verified:** `tsc -b` clean; `m2-buff.mjs` (buff raises output, no-op at 0 → goldens safe, deterministic); `egm-smoke` **byte-identical**; `op-verify` +2 floor + determinism; `m2-live.mjs` (contested → badge → feed → +5% buff → personality-gated snub) **0 console errors**. |
 | M.3 | **Bark engine** (procedural, deterministic) | engine | major | L | ⬜ | voice packs keyed by personality; template+slot grammar **grounded in real state** (item / key / name / rival / morale); per-member **no-repeat window**; **rarity budget**; **~1–2 barks/run** rate limit; seeded → replay-deterministic. Works for **random characters by construction**. Voice = trait(tone) × spec(vocabulary) × morale(mood) × per-character style seed. **No runtime LLM** (offline/deterministic/free). |
 | M.4 | **Personality voice-pack content** (tiered) | content | major | L | ⬜ | author per-personality bark banks for the highest-frequency events first (loot win/loss, wipe, clutch timed, trait earned, morale crater, farming-boredom); a plain functional line for everything else. Start ~**40 templates**, grow on observed repetition; Claude-assisted drafting, curate keepers. **Two-layer voice:** earnest grim item names, all satire in the reaction. |
 | M.5 | Loot drama **in the feed** (flagship integration) | ux | major | S | ⬜ | wire M.2 through M.1+M.3 so the contested decision + aftermath produce the marquee system-line + bark moments ("*i called that three runs ago*") — the shareable-screenshot content. |
@@ -341,6 +341,23 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-21** — **M.2 shipped: the loot-drama mechanic (contested-item resolution) — also closes B.5.** When a drop
+  would upgrade **2+ party members** and the winner is one of them, it's **contested**. **Winner:** a new persisted
+  `RawMember.lootBuffPct` = **+5% output next run**, threaded through `SimPartyMember` and folded into `opOutputMult` in
+  `buildParty` (`stats.ts`) — captured in the run ticket (replay-faithful) and **consumed/cleared after that next run**.
+  **Loser(s):** the previously-**dormant `lost-loot` morale event** (`morale-events.json`) is now wired and applied,
+  **personality-gated** — Selfish archetypes (Loot Goblin / Solo Player / Cocky / Rival) lose more (−8), Boomer /
+  Casual Andy shrug (−2), everyone else the canon −5; it **stacks** on the outcome morale delta. **No `SAVE_VERSION`
+  bump** — `lootBuffPct` is additive and sanitized on load (default 0), so existing rosters survive (supersedes the
+  design-note "bump"). **Feed:** `CONFIRM_LOOT` emits a marquee `Contested: {winner} took {item} over {losers}` line
+  through M.1 (the bark layer is M.3/M.4 → M.5). **UI** (`LootPage`): a ⚔ Contested badge, a consequence preview
+  (winner +5% / losers −morale), and a one-click **Auto best-fit** so resolution is opt-in — a decision, not a tax.
+  Also surfaced `lootBuffPct` on the shaped `Member`. **Verified:** `tsc -b` clean; new `m2-buff.mjs` proves the buff
+  raises output, is a **no-op at 0** (so goldens are safe) and stays deterministic; `egm-smoke` goldens **byte-identical**
+  (914/884/1182/1367); `op-verify` +2 floor + determinism green; new `m2-live.mjs` drives a guardian+berserker comp to a
+  real contested drop and asserts the ⚔ badge, the `Contested:` feed line, the winner's +5% buff, and the personality-
+  gated snub (a Boomer loser took only −2) — **0 console errors**. Roadmap B.5 → ✅ (loot-drama UI delivered here);
+  Phase B 13/14, Phase M 2/5. Memory: `goatlite-guild-feed`.
 - **2026-06-21** — **M.1 shipped: the always-visible Guild Feed + system-notification stream (Phase M started).** Built
   the meta-layer notification center first (zero comedy — barks land in M.3/M.4). **State:** added a persisted
   `feed: FeedEntry[]` + monotonic `feedSeq` to `PersistState` (`game-store.tsx`) — **no `SAVE_VERSION` bump** (additive

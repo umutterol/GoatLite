@@ -40,7 +40,9 @@ export function LootPage({ go }: { go: Go }) {
             <div style={{ fontSize: 26, fontWeight: 700, marginTop: 5 }}>Distribute Loot</div>
             <div className="flux" style={{ fontSize: 14, marginTop: 4 }}>{(g.lastRunKey ?? g.keystone).dungeon} +{(g.lastRunKey ?? g.keystone).level} · {outcome.toUpperCase()}. Assign each drop to a member, or scrap it for shards.</div>
           </div>
-          <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <button className="btn btn-sm btn-ghost" title="Assign every drop to its best-fit upgrade (then reconsider any contested ones)"
+              onClick={() => setAssign(Object.fromEntries(drops.map((d) => [d.uid, d.upgradeFor ?? "scrap"])))}>Auto best-fit</button>
             <div className="tile" style={{ textAlign: "center", minWidth: 96 }}><div className="lbl">Emblems</div><div className="val mono" style={{ color: "var(--amber)" }}>+{emblems}</div></div>
             <div className="tile" style={{ textAlign: "center", minWidth: 96 }}><div className="lbl">Shards</div><div className="val mono" style={{ color: shardsGained ? "var(--accent)" : "var(--faint)" }}>+{shardsGained}</div></div>
           </div>
@@ -53,6 +55,10 @@ export function LootPage({ go }: { go: Go }) {
             const choice = assign[it.uid]
             const assignedMember = choice && choice !== "scrap" ? party.find((p) => p.id === choice) : null
             const eligible = party.filter((p) => it.specs.includes(p.spec))
+            const upgraders = it.upgrades.filter((u) => u.delta > 0)          // M.2: who would this actually upgrade
+            const contested = upgraders.length >= 2
+            const awardIsContested = contested && !!assignedMember && upgraders.some((u) => u.memberId === assignedMember.id)
+            const passedOver = assignedMember ? upgraders.filter((u) => u.memberId !== assignedMember.id).length : 0
             return (
               <div key={it.uid} className="panel" style={{ padding: 0, overflow: "hidden", borderColor: choice ? (choice === "scrap" ? "var(--line)" : "var(--accent)") : "var(--line)", opacity: choice === "scrap" ? .7 : 1 }}>
                 <div style={{ display: "flex", alignItems: "stretch" }}>
@@ -64,6 +70,7 @@ export function LootPage({ go }: { go: Go }) {
                       <div style={{ display: "flex", gap: 8, marginTop: 6, alignItems: "center" }}>
                         <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: qColor }}>ilvl {it.ilvl}</span>
                         <span className="chip" style={{ fontSize: 10.5 }}>{it.rarity}</span>
+                        {contested ? <span className="chip" style={{ fontSize: 10.5, color: "var(--amber)", borderColor: "var(--amber)" }}>⚔ Contested</span> : null}
                       </div>
                     </div>
                   </div>
@@ -74,7 +81,7 @@ export function LootPage({ go }: { go: Go }) {
                         <div style={{ fontSize: 14 }}>
                           {choice === "scrap"
                             ? <span style={{ color: "var(--faint)" }}>Scrapped for <b style={{ color: "var(--accent)" }}>{SHARDS_PER_SCRAP} shards</b>.</span>
-                            : assignedMember ? <span>Awarded to <b style={{ color: mc(assignedMember.spec).color }}>{assignedMember.name}</b>.</span> : null}
+                            : assignedMember ? <span>Awarded to <b style={{ color: mc(assignedMember.spec).color }}>{assignedMember.name}</b>.{awardIsContested ? <span style={{ color: "var(--amber)" }}> Contested — +5% output next run; {passedOver} passed over (−morale).</span> : null}</span> : null}
                         </div>
                         <button className="btn btn-sm btn-ghost" onClick={() => setAssign((a) => { const n = { ...a }; delete n[it.uid]; return n })}>Undo</button>
                       </div>
@@ -103,6 +110,11 @@ export function LootPage({ go }: { go: Go }) {
                           <span style={{ width: 1, background: "var(--line)", margin: "0 2px" }} />
                           <button className="btn btn-sm btn-ghost" onClick={() => setAssign((a) => ({ ...a, [it.uid]: "scrap" }))} style={{ color: "var(--faint)" }}>Scrap ◈</button>
                         </div>
+                        {contested ? (
+                          <div style={{ marginTop: 9, fontSize: 11.5, color: "var(--amber)" }}>
+                            ⚔ Contested — {upgraders.length} members want this. The winner gains <b>+5% output next run</b>; the others lose morale (selfish types take it harder).
+                          </div>
+                        ) : null}
                       </>
                     )}
                   </div>
