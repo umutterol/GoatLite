@@ -65,5 +65,27 @@
       "legplates-of-the-barrow-march", "shroudweave-leggings", "treads-of-quiet-rest",
       "vial-of-crypt-dust", "icon-of-pale-mercy"
     ]
+  },
+  {
+    "id": "weltering-mire",
+    "name": "The Weltering Mire",
+    "theme": "A drowned barrow-fen where the water never stops rising; the dead don't spike, they pull you under by inches",
+    "timerSeconds": 1500,
+    "signature": "Relentless sustained rot — a healer-attrition crucible",
+    "slots": [
+      { "stage": 1, "kind": "trash", "packTags": ["weltering"] },
+      { "stage": 2, "kind": "boss",  "boss": "the-sodden-verger" },
+      { "stage": 3, "kind": "trash", "packTags": ["weltering"] },
+      { "stage": 4, "kind": "boss",  "boss": "mireborn-the-unsurfaced" },
+      { "stage": 5, "kind": "trash", "packTags": ["weltering"] },
+      { "stage": 6, "kind": "boss",  "boss": "the-tidemother" },
+      { "stage": 7, "kind": "trash", "packTags": ["weltering"] },
+      { "stage": 8, "kind": "boss",  "boss": "the-glut-drowned-choir" }
+    ],
+    "lootTable": [
+      "bastion-of-the-barrow-march", "shroudweave-vestments", "shroudweave-leggings",
+      "legplates-of-the-barrow-march", "cuirass-of-interred-kings", "treads-of-quiet-rest",
+      "vial-of-crypt-dust", "icon-of-pale-mercy"
+    ]
   }
 ]

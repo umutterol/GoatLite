@@ -134,9 +134,11 @@ export const EnemySchema = z.object({
   icon: z.string().optional(), flavor: z.string().optional(), tags: z.array(z.string()).optional(),
   role: z.string().optional(), stage: z.number().optional(), dungeonId: z.string().optional(),
   abilityId: z.string().optional(), testsTactic: z.string().optional(),
-  // C.10: opt-in boss-mechanic variant. "burst" = a tight-cadence single-target toll on the lowest-HP
-  // non-tank (rewards instant triage/absorb over slow HoTs). Absent = the standard testsTactic mechanic.
-  spikeProfile: z.enum(["burst"]).optional(),
+  // C.10: opt-in boss-mechanic variant (both stay testsTactic:"cooldowns" so the dial mitigates).
+  //   "burst" = a single hit on the lowest-HP non-tank /6s (soft Cleric-favoring lever).
+  //   "rot"   = a flat tick on each non-tank /3s (soft HoT-favoring lever).
+  // Both are tuned so the healer gap is only ~1-2 key levels of ceiling. Absent = the standard testsTactic mechanic.
+  spikeProfile: z.enum(["burst", "rot"]).optional(),
 })
 
 export const PackSchema = z.object({

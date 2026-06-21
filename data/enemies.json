@@ -24,5 +24,14 @@
 
   { "id": "pew-verger",      "name": "Pew Verger",      "kind": "trash", "role": "melee",  "band": "front", "baseHp": 13, "baseDamage": 4, "tags": ["stillhour", "drowned", "melee"] },
   { "id": "censing-acolyte", "name": "Censing Acolyte", "kind": "trash", "role": "caster", "band": "back",  "baseHp": 10, "baseDamage": 4, "tags": ["stillhour", "drowned", "caster"] },
-  { "id": "choirling",       "name": "Choirling",       "kind": "trash", "role": "add",    "band": "back",  "baseHp": 7,  "baseDamage": 3, "tags": ["stillhour", "drowned", "add"] }
+  { "id": "choirling",       "name": "Choirling",       "kind": "trash", "role": "add",    "band": "back",  "baseHp": 7,  "baseDamage": 3, "tags": ["stillhour", "drowned", "add"] },
+
+  { "id": "the-sodden-verger",      "name": "The Sodden Verger",      "kind": "boss", "stage": 2, "dungeonId": "weltering-mire", "abilityId": "mire-swell",    "testsTactic": "cooldowns", "spikeProfile": "rot", "band": "front", "baseHp": 60, "baseDamage": 5, "icon": "tac-cooldowns", "flavor": "The fen keeps what it takes." },
+  { "id": "mireborn-the-unsurfaced","name": "Mireborn the Unsurfaced","kind": "boss", "stage": 4, "dungeonId": "weltering-mire", "abilityId": "drowning-grip", "testsTactic": "cooldowns", "spikeProfile": "rot", "band": "front", "baseHp": 66, "baseDamage": 6, "icon": "tac-cooldowns", "flavor": "I rose once. I can wait for you to sink." },
+  { "id": "the-tidemother",         "name": "The Tidemother",         "kind": "boss", "stage": 6, "dungeonId": "weltering-mire", "abilityId": "rising-tide",   "testsTactic": "cooldowns", "spikeProfile": "rot", "band": "back",  "baseHp": 72, "baseDamage": 7, "icon": "tac-cooldowns", "flavor": "Every drowned thing was once someone's child." },
+  { "id": "the-glut-drowned-choir", "name": "The Glut-Drowned Choir", "kind": "boss", "stage": 8, "dungeonId": "weltering-mire", "abilityId": "the-glut",     "testsTactic": "cooldowns", "spikeProfile": "rot", "band": "back",  "baseHp": 80, "baseDamage": 8, "icon": "tac-cooldowns", "flavor": "Sing, drowned ones. Sing until the water is full." },
+
+  { "id": "bog-thrall",     "name": "Bog Thrall",     "kind": "trash", "role": "melee", "band": "front", "baseHp": 13, "baseDamage": 3, "tags": ["weltering", "drowned", "melee"] },
+  { "id": "fen-lurker",     "name": "Fen Lurker",     "kind": "trash", "role": "melee", "band": "front", "baseHp": 10, "baseDamage": 3, "tags": ["weltering", "drowned", "melee"] },
+  { "id": "drowned-wretch", "name": "Drowned Wretch", "kind": "trash", "role": "melee", "band": "front", "baseHp": 7,  "baseDamage": 2, "tags": ["weltering", "drowned", "melee"] }
 ]

@@ -14,6 +14,10 @@ import { DANGER_HP_FRAC, RECENT_DEATH_SEC } from "./operator"
 
 const DT = 0.25                       // inner timestep (seconds) for the continuous timeline
 const MAX_ACTIONS_PER_STEP = 8        // safety against degenerate (near-zero) attack intervals
+// C.10 spike-profile knobs (soft "bring the ideal healer" levers — tuned so the gap is only ~1-2 key levels of ceiling,
+// invisible below it). burst (single-target lowest non-tank /6s) favors the Cleric; rot (each non-tank /3s) favors the HoT.
+const BURST_FRAC = 0.06               // per-hit fraction of the victim's maxHp
+const ROT_FRAC = 0.06                 // per-tick fraction of each non-tank's maxHp
 
 export function runDungeonEGM(input: RunInput): RunResult {
   const rng = new Rng(input.seed)
@@ -254,16 +258,25 @@ export function runDungeonEGM(input: RunInput): RunResult {
           const bn = bossName, abil = bossAbil
           const m = (target: string, result: string): LogMeta => ({ sourceName: bn, ability: abil, target, result })
           if (bossSpike === "burst") {
-            // C.10: a TRUE burst — a single hard hit on whoever is flagging, on a tight 6s cadence. A rolling HoT can't
-            // recover a focused target before the next toll; an instant burst heal or a pre-applied absorb (shield) can.
-            // This is the one pattern that rewards a triage Cleric over a HoT Lifebinder. testsTactic stays "cooldowns",
-            // so the Cooldowns dial still blunts it; opt-in (enemy.spikeProfile) so Ashveil's cooldowns boss is untouched.
+            // C.10: a SOFT "bring the triage healer" lever ("player not class" — small by design). A single hit on the
+            // lowest-HP non-tank every 6s. Gentle enough that both healers clear low/mid keys cleanly; near the ceiling
+            // (where general intake has eaten the healer's spare throughput) the Cleric's instant recovery / pre-applied
+            // absorb extends the timed ceiling ~1-2 keys over a slow HoT. testsTactic stays "cooldowns" so the dial
+            // mitigates; opt-in (enemy.spikeProfile) so Ashveil's cooldowns boss is untouched. (BURST_FRAC tunes the gap.)
             if (since % 6 === 0) {
               const v = aliveParty().filter((pp) => pp.role !== "tank").sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0] ?? aliveParty()[0]
               if (v) {
-                dealDamage(v, 0.35 * v.maxHp * aggroIntake * (1 - 0.12 * (tac.cooldowns ?? 0)))
-                emit("mechanic", `${bn}'s ${abil} falls on ${v.name} — top them fast or lose them. Cooldowns ${tac.cooldowns ?? 0}.`, m(v.name, "Burst spike"))
+                dealDamage(v, BURST_FRAC * v.maxHp * aggroIntake * (1 - 0.12 * (tac.cooldowns ?? 0)))
+                emit("mechanic", `${bn}'s ${abil} falls on ${v.name} — top them fast. Cooldowns ${tac.cooldowns ?? 0}.`, m(v.name, "Burst spike"))
               }
+            }
+          } else if (bossSpike === "rot") {
+            // C.10 inverse: a SOFT "bring the rolling-HoT healer" lever. A flat tick on each non-tank every 3s. Gentle
+            // enough that both healers clear low/mid keys cleanly; near the ceiling the all-ally HoT (covering many
+            // targets at once) extends the timed ceiling ~1-2 keys over a single-target burst healer. (ROT_FRAC tunes it.)
+            if (since % 3 === 0) {
+              for (const pp of aliveParty()) if (pp.role !== "tank") dealDamage(pp, ROT_FRAC * pp.maxHp * aggroIntake * (1 - 0.12 * (tac.cooldowns ?? 0)))
+              emit("mechanic", `${bn}'s ${abil} — the rot rises across the party. Cooldowns ${tac.cooldowns ?? 0}.`, m("party", "Rot tick"))
             }
           } else if (since % 12 === 0) {
             if (bossTest === "interrupts") {

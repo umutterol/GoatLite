@@ -124,7 +124,7 @@ memory `combat-model-egm-migration`.*
 
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
-| C.1 | Dungeons 2–6 | content | major | XL | 🟡 | **design ✅** `Dungeon-Design-Proposals.md`. **Bellreach Sanctum ✅ (1/5)** (interrupts; probe `bellreach-live.mjs`; +2 floor times; read log-visible only → C.9). **Stillhour Abbey ✅ (2/5)** (burst-triage; needed **C.10**; probe `stillhour-live.mjs`; verified across 5 seeds — Cleric times the +2 floor, HoT Lifebinder wipes 4/5). **Next:** Weltering Mire (pure data, native HoT inverse) → C.8+Pyreward Ossuary → Hour of Bells last. IP rename deferred/off critical path |
+| C.1 | Dungeons 2–6 | content | major | XL | 🟡 | **design ✅** `Dungeon-Design-Proposals.md`. **Bellreach Sanctum ✅ (1/5)** (interrupts; +2 floor times; read log-visible only → C.9). **Stillhour Abbey ✅ (2/5)** + **The Weltering Mire ✅ (3/5)** — the healer pair via **C.10** (burst→Cleric / rot→Lifebinder), tuned to the **"bring the player, not the class"** soft-gap spec: both healers clear low/mid, ideal healer extends the ceiling **~1–2 keys** (sweep `healer-ceiling.mjs`). **Next:** C.8+Pyreward Ossuary → Hour of Bells last. IP rename deferred/off critical path |
 | C.8 | Per-enemy armour/resist (damage-school wall) | engine | minor | S | ⬜ | un-hardcode `makeEnemy` armour:0/resist:0 → optional `EnemySchema` fields (default 0 = Ashveil unchanged); scale by keyScale×power; `pipeline.resolveHit` already routes Phys→armour/Magic→resist. Unblocks **Pyreward Ossuary** — the only dungeon with real comp pressure |
 | C.2 | Per-spec talent trees | content | major | XL | ⬜ | 10 specs × 5 nodes ≈ 150 options |
 | C.3 | Enemy roster breadth | content | major | XL | ⬜ | ~50–70 total (have 7) |
@@ -133,7 +133,7 @@ memory `combat-model-egm-migration`.*
 | C.6 | Full affix calendar / season content | content | minor | S | ⬜ | season.json calendar exists; expand + finalize |
 | C.7 | Earned-trait event pools (full trigger detail) | content | major | M | ⬜ | 4 pools designed; firm up trigger thresholds |
 | C.9 | Tactic-mechanic lethality pass (make the reads *bite*) | balance | major | M | ⬜ | The abstract boss-mechanic coefficients (interrupt cast 16·/ positioning 18·/ cooldowns-party 14·) are too soft at gear-appropriate ilvl — the tactic read is **log-visible but doesn't flip timed↔wipe** (proven on Bellreach, proposals §8.3). Tune the **global** coefficients (and/or land **per-encounter weighting**) so a starved dial actually wipes where the right dial times. **Affects Ashveil's Vesk + Bellreach** (the burst-variant Stillhour is already a hard read via **C.10**). Do it **once** after the pure-data dungeons are authored — not per-dungeon. Re-verify the +2 floor still times afterward |
-| C.10 | Burst-spike boss-mechanic variant | engine | major | M | ✅ | Opt-in `spikeProfile:"burst"` (EnemySchema) → a single hard toll on the **lowest-HP non-tank every 6s** (`0.35·maxHp`, still `testsTactic:cooldowns` so the dial mitigates). The one pattern that rewards instant burst heals/absorbs (Cleric) over slow HoTs (Lifebinder) — without it the HoT Lifebinder wins everything. `engine.ts` + `schema.ts`; Ashveil untouched (opt-in). **Verified:** Stillhour's Cleric times the +2 floor across 5 seeds, HoT Lifebinder wipes 4/5; `tsc -b` clean; egm-smoke unchanged |
+| C.10 | Burst/rot boss-mechanic variants (soft healer levers) | engine | major | M | ✅ | Opt-in `spikeProfile:"burst"\|"rot"` (EnemySchema; both `testsTactic:cooldowns` so the dial mitigates; Ashveil untouched). **burst** = single hit on the lowest-HP non-tank /6s (`BURST_FRAC` 0.06) → soft Cleric edge. **rot** = flat tick on each non-tank /3s (`ROT_FRAC` 0.06) → soft Lifebinder edge. Tuned to **"player not class"**: both healers clear low/mid, ideal one extends the ceiling **~1–2 keys** (Stillhour Cleric ~+13 vs HoT +12; Mire Lifebinder ~+9–10 vs Cleric ~+8). `engine.ts`+`schema.ts`; `tsc -b` clean; egm-smoke unchanged; sweep `healer-ceiling.mjs` |
 
 ## Phase D — Systems depth ⬜
 
@@ -344,6 +344,16 @@ the investigation (and all future ones) is config-driven and saved to files.*
 
 ## Changelog
 
+- **2026-06-21** — **C.1 The Weltering Mire (3/5) + C.10 re-tuned to "bring the player, not the class".** Adopted a design
+  principle: tactic dials are the primary solve; spec preference is a *soft* secondary lever — both options clear the
+  floor and mid keys, the ideal spec only extends the **ceiling ~1–2 key levels**. Re-tuned **Stillhour's burst from a
+  hard floor-wall (`0.35·maxHp`) down to a soft `0.06`** (both healers now clean to +12; Cleric ~+13–14, HoT caps +12).
+  Added the symmetric **`rot` spikeProfile** (flat tick on each non-tank /3s, `ROT_FRAC` 0.06) and authored **The
+  Weltering Mire** around it (4 rot bosses, low auto-attack + thin front-melee trash so the party-wide rot — not tank
+  survival — decides the ceiling): both healers clean to ~+6, **Lifebinder ~+9–10 vs Cleric ~+8**. New sweep harness
+  `healer-ceiling.mjs` (per-healer timed-ceiling per key). `tsc -b` clean; egm-smoke (Ashveil) unchanged; opt-in so
+  Ashveil/the +2 floor are untouched. (The pure-data Mire inverted — back-band casters concentrate damage, the Cleric's
+  strength — which is why the symmetric engine pattern was needed.) Placeholder loot; polish pass later.
 - **2026-06-21** — **C.10 + C.1 Stillhour Abbey (2/5): a burst-spike engine pattern, and the dungeon that uses it.**
   Verifying Stillhour exposed its burst-Cleric read as **inverted** in the engine (the HoT Lifebinder out-healed the
   burst Cleric on the soft party-wide toll) — and it was **not data-fixable**. **C.10 (engine):** opt-in

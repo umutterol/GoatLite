@@ -30,6 +30,13 @@ MVP affix pool (Fortified+Bursting) — ship it post-MVP or give it a Fortified 
 
 ## 2. The engine reality — what a "solve" can mechanically be
 
+> ### Design principle: bring the player, not the class
+> The **tactic dials (player decisions) are the primary solve.** Class/spec-required solutions are a *minor secondary*
+> factor: where a dungeon favors a spec, the gap must be **small — only ~1–2 key levels of ceiling at the very top**,
+> and **invisible below it** (both options clear the floor and mid keys cleanly). A spec preference should let you push
+> a little higher, never gate the content. The C.10 healer levers (burst→Cleric on Stillhour, rot→Lifebinder on the
+> Mire) are tuned to exactly this: same outcome at low/mid keys, ~1–2 key ceiling difference when you're pushing.
+
 **This section is the brief.** Everything else is downstream of it.
 
 A dungeon's puzzle today is expressed almost entirely through the **four tactic dials**
@@ -77,8 +84,8 @@ These are the mechanical ideas a dungeon can be wrapped around. ✅ = pure data 
 | Cooldown discipline | Boss spike phases; the dial is 3-in-1 (−12% spike / +4% boss DPS / trash defensive-timing) | Cooldowns slider + defensive-major specs | ✅ |
 | Positioning / floor-is-lava | Avoidable ground damage dominates; raise Positioning, drop aggression | Positioning slider + Safe aggression | ✅ |
 | Kill-order / triage queue | Sequence casters & priority adds or Bursting/Bolstering snowball | Kill Order slider | ✅ |
-| Sustained-HoT read | Continuous chip, no spikes → roll HoTs that pre-tick the carpet | Lifebinder | ✅ |
-| Burst-triage read | A single hard toll on the flagging one → instant top-ups + absorbs (a HoT can't) | Cleric (Mystic/Lifebinder partial) | 🔧→✅ C.10 |
+| Sustained-HoT read | A flat tick on every squishy → all-ally HoTs cover them; single-target can't (soft, ~1–2 keys) | Lifebinder | 🔧→✅ C.10 rot |
+| Burst-triage read | A single toll on the flagging one → instant top-ups + absorbs (a HoT can't; soft, ~1–2 keys) | Cleric (Mystic/Lifebinder partial) | 🔧→✅ C.10 burst |
 | Anti-yolo aggression tax | Avoidable/Spiteful/Bursting intake scales ~2× with Yolo; dial down | Aggression posture | ✅ |
 | Soft-enrage DPS race | Beat the 90s enrage by output or eat ramping damage | Output + Cooldowns | ✅ |
 | Spiteful "weakest link" | Ghosts hunt your lowest-**power** member → don't field a passenger | Roster floor + any peel spec | ✅ |
@@ -163,67 +170,63 @@ follow-up, not a data fix.
 ### 4.2 Stillhour Abbey — *burst-triage healing (the Cleric read)*
 
 > *A drowned monastery where the bells still toll the hours; between each toll the air is dead-calm, and on the hour
-> the silence breaks all at once.* **Signature:** low trash density, spike-punishing. **Difficulty:** mid-band; the
-> clock is easy, the difficulty is entirely the healer read. **Build:** needed the **C.10 burst-spike** engine pattern (now shipped + verified).
+> the silence breaks all at once.* **Signature:** low trash density, spike-punishing. **Difficulty:** mid-band.
+> **Build:** the **C.10 burst-spike** engine pattern (shipped + verified). **Healer preference is SOFT** — see the principle in §2.
 
-**The puzzle.** Long calm windows, then a discrete spike on the :00 beat that a HoT **cannot retroactively un-do**.
-Read *"big infrequent hits, not constant chip"* → bring the **triage Cleric** (Flash Heal instant top-ups, sub-30%
-Greater Heal, Light's Salvation pre-absorb) over the rolling-HoT Lifebinder, and raise **Cooldowns** to shave the
-party-wide toll (−12%/pt). The deliberate **inverse twin** of the Weltering Mire.
+**The puzzle.** Both healers clear Stillhour comfortably at the floor and through the mid keys — this is a *soft*
+preference, not a wall. Near your **ceiling**, the burst toll (which lands on whoever's flagging) rewards the **triage
+Cleric**: its instant Flash/Greater Heal (and overheal→shield) tops a focused target before the next 6s toll, where a
+rolling HoT recovers a beat too slow. Net effect: the Cleric pushes **~1–2 key levels higher** than a HoT Lifebinder.
+Raise **Cooldowns** (−12%/toll) + **Positioning** (the stage-2 avoidable).
 
-**Failure mode.** Deaths cluster exactly on the :00 beats; the calm windows show overheal everywhere. The log reads
-"fine, fine, fine, DEAD, fine, fine, DEAD." A Lifebinder's Regrowth ticks a beat behind the spike instead of ahead of
-the next one.
-
-**Comp answer (verified).** Bring the **triage Cleric** — proven in-sim: the burst toll (C.10) reliably **wipes** a
-rolling-HoT **Lifebinder** at the +2 floor while the Cleric **times** it, because a HoT can't recover a focused target
-between 6s tolls but the Cleric's instant Flash/Greater Heal (and overheal→shield) can. Raise **Cooldowns** (−12%/toll)
-and **Positioning** (for the stage-2 avoidable). The inverse twin of the Weltering Mire (the HoT side).
+**The read.** Invisible below the ceiling (both healers breeze low/mid). Pushing your limit, the Lifebinder caps ~1–2
+keys lower — the log shows the flagging target dying to a toll the HoT couldn't top in time.
 
 | Stage | Boss | Shape→Tactic | Mechanic | Flavor |
 |---|---|---|---|---|
-| 2 | Verger Antiphon | ground→positioning | single-victim avoidable toll (18·keyScale) — teaches "a HoT can't pre-load a target it doesn't yet know will be hit" | "The hour is kept. Kneel for it." |
-| 4 | The Sunken Choir | **burst**→cooldowns | **C.10 burst:** every 6s the toll falls on the **lowest-HP non-tank** for `0.35·maxHp` (−12%/pt Cooldowns) — top them fast or lose them | "All voices, on the hour. None after." |
+| 2 | Verger Antiphon | ground→positioning | single-victim avoidable toll — teaches "a HoT can't pre-load a target it doesn't yet know will be hit" | "The hour is kept. Kneel for it." |
+| 4 | The Sunken Choir | **burst**→cooldowns | **C.10 burst:** every 6s the toll falls on the **lowest-HP non-tank** for `0.06·maxHp` (−12%/pt Cooldowns) | "All voices, on the hour. None after." |
 | 6 | Drowned Sacristan | **burst**→cooldowns | the same burst, escalating | "Kneel or stand, the bell counts you the same." |
 | 8 | Bellwarden Mire, Keeper of the Hour | **burst**→cooldowns | the capstone burst | "I ring it whether you are ready or not." |
 
-**Build status (2026-06-21): authored + the C.10 burst pattern shipped & verified.** The original design here was a
-soft party-wide toll — the sim proved it **inverted** (the HoT Lifebinder out-healed the burst Cleric, the opposite of
-the intended lesson). Fixed by **C.10**: an opt-in `spikeProfile:"burst"` boss variant — a single hard hit on the
-**lowest-HP non-tank every 6s** (`0.35·maxHp`, still `testsTactic:cooldowns` so the dial mitigates; Ashveil untouched).
-Verified across 5 seeds at the +2 floor — **Cleric times (1–3 deaths), Lifebinder wipes 4/5**; the gap holds at +7;
-`tsc -b` clean; egm-smoke (Ashveil) unchanged. Keep `baseDamage` low (auto-attack chip only). **Reward hook:** the
-"Stillhour" healer/absorb set. **Loot = placeholder (Ashveil items) pending the polish pass.**
+**Build status (2026-06-21): authored + the C.10 burst pattern shipped & re-tuned to the soft-gap spec.** Opt-in
+`spikeProfile:"burst"` — a hit on the **lowest-HP non-tank every 6s** for `0.06·maxHp` (`testsTactic:cooldowns` so the
+dial mitigates; Ashveil untouched). Verified via the `healer-ceiling.mjs` sweep (3 seeds, gear-appropriate ilvl): **both
+healers clean (3/3) through +12; Cleric extends to ~+13–14, Lifebinder caps +12 → gap ~1–2 keys, clean below.** `tsc -b`
+clean; egm-smoke unchanged. (Earlier the burst was `0.35` — a hard floor-wall; softened per the "player not class"
+principle.) **Reward hook:** the "Stillhour" healer/absorb set. **Loot = placeholder (Ashveil items), polish pass later.**
 
 ---
 
-### 4.3 The Weltering Mire — *sustained-HoT healing (the Lifebinder read) + kill-order*
+### 4.3 The Weltering Mire — *sustained-HoT healing (the Lifebinder read)*
 
-> *A drowned barrow-fen of plague-blossoms — wall-to-wall low-HP trash, no spike, a healer attrition crucible.*
-> **Signature:** relentless sustained chip, rot-punishing. **Difficulty:** mid-band; the inverse of Stillhour.
-> **Build:** pure data (leans on the **Plaguebloom**/Bursting affix → needs the IP rename first).
+> *A drowned barrow-fen where the water never stops rising; the dead don't spike, they pull you under by inches.*
+> **Signature:** relentless sustained rot — a healer-attrition crucible. **Difficulty:** mid-band; the **symmetric
+> inverse of Stillhour**. **Build:** the **C.10 `rot` pattern** (the inverse of burst). **Healer preference is SOFT** (§2).
 
-**The puzzle.** Damage-taken is a flat party-wide **carpet of ticks** (Plaguebloom DoT off dense corpses + chip), zero
-big spikes. Read *"rot, not spike"* → bring the **rolling-HoT Lifebinder** over the burst Cleric (HoTs pre-tick the
-carpet; reactive direct heals arrive a tick late), raise **Kill Order** to throttle Plaguebloom stack-gain, and ease
-aggression (the rot scales by `aggroIntake`).
+**The puzzle.** The mirror of Stillhour: both healers clear the low/mid keys fine. Near the ceiling, the boss **rot** —
+a flat tick on **every non-tank squishy** at once — rewards the **rolling-HoT Lifebinder**: its all-ally HoTs cover four
+ticking targets where the single-target Cleric falls behind. Net: the Lifebinder pushes **~1–2 key levels higher**.
+Raise **Cooldowns** (−12%/tick). Boss/trash auto-attack is deliberately **low** so the party-wide rot — not tank
+survival — is the binding constraint (otherwise the Cleric's big single-target tank heals win, and it inverts).
 
-**Failure mode.** No single death-cause — the whole party grinds down together as Plaguebloom stacks climb faster than
-reactive heals land. The replay's **Bursting stack-count readout** (surface it as first-class) is the smoking gun.
+**The read.** Invisible below the ceiling. Pushing your limit, the Cleric caps ~1–2 keys lower — the whole party grinds
+down together as the rot out-paces reactive single-target healing.
 
-**Comp answer (honest).** Lifebinder is the load-bearing pick — but frame the Cleric gap as **throughput timing**, not
-mana (there is no mana economy). Both healers are peel, so **don't** lean on Spiteful to separate them; lean on HoT
-pre-ticking alone. Tactic: Kill Order for even deaths + low aggression.
-
-| Stage | Boss | Shape→Tactic | Mechanic (≈) | Flavor |
+| Stage | Boss | Shape→Tactic | Mechanic | Flavor |
 |---|---|---|---|---|
-| 2 | The Sodden Verger | summon→killorder | rot-tutor; short DPS-check between rot packs (**bosses don't feed adds** — the attrition lives on trash) | "The fen keeps what it takes." |
-| 5 | Mireborn the Unsurfaced | summon→killorder | escalation; denser rot packs flank it | "I rose once. I can wait for you to sink." |
-| 8 | The Glut-Drowned Choir | summon→killorder | sustained finale; the carpet is thickest here | "Sing, drowned ones. Sing until the water is full." |
+| 2 | The Sodden Verger | **rot**→cooldowns | **C.10 rot:** every 3s a flat tick hits each non-tank for `0.06·maxHp` (−12%/pt Cooldowns) | "The fen keeps what it takes." |
+| 4 | Mireborn the Unsurfaced | **rot**→cooldowns | the same rot, escalating | "I rose once. I can wait for you to sink." |
+| 6 | The Tidemother | **rot**→cooldowns | the rot rises | "Every drowned thing was once someone's child." |
+| 8 | The Glut-Drowned Choir | **rot**→cooldowns | the capstone rot | "Sing, drowned ones. Sing until the water is full." |
 
-**Honesty caveats:** the attrition lives **entirely on trash**; bosses spawn no killable adds — frame them as short
-DPS-checks *between* rot packs. Purge all mana/OOM language. Sim-verify the Cleric actually struggles and the
-Lifebinder clears before shipping. **Reward hook:** sustained-throughput healer gear + Kill-Order-flavored DPS pieces.
+**Build status (2026-06-21): authored + the C.10 `rot` pattern shipped & tuned to the soft-gap spec.** Opt-in
+`spikeProfile:"rot"` — a flat tick on each non-tank every 3s for `0.06·maxHp` (`testsTactic:cooldowns`; Ashveil
+untouched). Boss `baseDamage` lowered (5–8) + thin front-melee trash so the party-wide rot dominates the ceiling.
+Verified via `healer-ceiling.mjs`: **both clean through ~+6; Lifebinder reaches ~+9–10, Cleric caps ~+8 → gap ~1–2,
+Lifebinder favored.** Needed a **second engine pattern** (the symmetric `rot`) — the pure-data version inverted because
+back-band casters concentrate damage on one squishy (Cleric's strength). No mana economy — failure is "reactive heals a
+tick late," not OOM. **Reward hook:** sustained-throughput healer gear.
 
 ---
 
@@ -311,7 +314,7 @@ and the exact curves:
 
 | Item | Unlocks | Effort |
 |---|---|---|
-| ~~**Burst-spike boss variant**~~ — ✅ **DONE (C.10)**: opt-in `spikeProfile:"burst"`, single hard toll on the lowest-HP non-tank every 6s | **Stillhour Abbey** (the burst-heal read; Mire is the native HoT inverse) | small |
+| ~~**Burst + rot boss variants**~~ — ✅ **DONE (C.10)**: opt-in `spikeProfile:"burst"\|"rot"`, soft ~1–2-key healer levers (burst→Cleric, rot→Lifebinder) | **Stillhour Abbey** (burst) + **The Weltering Mire** (rot) | medium |
 | **Per-enemy `armour`/`resist`** — schema fields + un-hardcode `makeEnemy`; decide hit-size scaling | **The Pyreward Ossuary** (the chosen flagship) | **small** |
 | **"The Tolling" affix** — new hard-coded branch perturbing the interrupt catch term | Bellreach v2 difficulty layer | small |
 | **Per-encounter mechanic cadence/coefficients in data** — so same-tactic bosses differ mechanically | breaks "same spike, bigger numbers" across Bellreach/Hour/Stillhour/Mire | medium |
@@ -354,8 +357,9 @@ enrage) → Pyreward Ossuary (the one lesson no dial fixes: bring the right scho
 - **Roster size** — staying at **6 (Ashveil + 5)**; not funding the 🚧 levers to chase 8 for now (CC / dispel / reach /
   real-interrupt remain a future-wave menu in §6, each buying one more distinct dungeon if we ever want them).
 - **IP affix rename** — **deferred, low priority**; off the content critical path (dungeons reference affix `id`s).
-- **Stillhour's healer read** — was a soft/inverted preference; **resolved by the C.10 burst pattern** (verified: Cleric
-  times the +2 floor, HoT Lifebinder wipes). It's now a real read, not a soft preference.
+- **Healer-choice pair (Stillhour + Mire)** — **resolved by the C.10 burst/rot patterns**, tuned to the "bring the
+  player, not the class" spec (§2): both healers clear low/mid keys; the ideal healer extends the ceiling ~1–2 keys
+  (Cleric on Stillhour's burst, Lifebinder on the Mire's rot). Verified via `healer-ceiling.mjs`.
 
 **⬜ Still open**
 1. **Hour of Bells needs Tyrannical+Raging** (outside MVP pool). Lift the affix-pool restriction, or design a

@@ -12,5 +12,10 @@
   { "id": "stillwater-pool", "name": "Stillwater Pool", "kind": "enemy", "shape": "ground", "tactic": "positioning", "telegraph": 1.5, "desc": "On each toll a pool floods under one celebrant — an avoidable single-target spike a rolling HoT can't pre-load." },
   { "id": "evensong",        "name": "Evensong",        "kind": "enemy", "shape": "burst",  "tactic": "cooldowns",   "telegraph": 3,   "desc": "On a tight cadence the toll falls on whoever is already flagging — an instant burst heal or a pre-applied absorb saves them; a rolling HoT recovers too slowly." },
   { "id": "vespers-toll",    "name": "Vespers Toll",    "kind": "enemy", "shape": "burst",  "tactic": "cooldowns",   "telegraph": 3,   "desc": "A heavier toll that hunts the weakest in the party; top them fast or lose them between beats." },
-  { "id": "the-final-hour",  "name": "The Final Hour",  "kind": "enemy", "shape": "burst",  "tactic": "cooldowns",   "telegraph": 3,   "desc": "The loudest toll on the tightest cadence — the flagging one drops every beat unless burst-healed or pre-shielded." }
+  { "id": "the-final-hour",  "name": "The Final Hour",  "kind": "enemy", "shape": "burst",  "tactic": "cooldowns",   "telegraph": 3,   "desc": "The loudest toll on the tightest cadence — the flagging one drops every beat unless burst-healed or pre-shielded." },
+
+  { "id": "mire-swell",    "name": "Mire Swell",    "kind": "enemy", "shape": "rot", "tactic": "cooldowns", "telegraph": 0, "desc": "The fen swells; the rot rises across the party — a flat, ceaseless tick that rolling HoTs outlast and reactive single-target heals fall behind." },
+  { "id": "drowning-grip", "name": "Drowning Grip", "kind": "enemy", "shape": "rot", "tactic": "cooldowns", "telegraph": 0, "desc": "The water closes over everyone at once; pre-laid HoTs keep five heads above it where burst triage can't reach them all." },
+  { "id": "rising-tide",   "name": "Rising Tide",   "kind": "enemy", "shape": "rot", "tactic": "cooldowns", "telegraph": 0, "desc": "The tide comes in across the whole party; only steady, rolling healing outlasts a long enough rise." },
+  { "id": "the-glut",      "name": "The Glut",      "kind": "enemy", "shape": "rot", "tactic": "cooldowns", "telegraph": 0, "desc": "The fen feasts on the whole party at once; Cooldowns blunts the tick, but it's rolling HoTs that decide the ceiling." }
 ]

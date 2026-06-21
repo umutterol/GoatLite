@@ -4,8 +4,8 @@
     "name": "Beta Season I",
     "seasonAffix": null,
     "ratingTarget": 2500,
-    "dungeons": ["ashveil-crypts", "bellreach-sanctum", "stillhour-abbey"],
-    "note": "Full-game content. ratingTarget and the affixCalendar assume the full 6-dungeon, 8-affix season; Ashveil Crypts + Bellreach Sanctum + Stillhour Abbey authored so far (see Dungeon-Design-Proposals.md for the rest), and the MVP restricts PLAY to Fortified + Bursting (GDD MVP scope). Affix rules locked per GDD v1.10: Tier 1 alternates Fortified/Tyrannical weekly; Tier 2 pairs never combine Bursting + Bolstering.",
+    "dungeons": ["ashveil-crypts", "bellreach-sanctum", "stillhour-abbey", "weltering-mire"],
+    "note": "Full-game content. ratingTarget and the affixCalendar assume the full 6-dungeon, 8-affix season; Ashveil Crypts + Bellreach Sanctum + Stillhour Abbey + The Weltering Mire authored so far (see Dungeon-Design-Proposals.md for the rest), and the MVP restricts PLAY to Fortified + Bursting (GDD MVP scope). Affix rules locked per GDD v1.10: Tier 1 alternates Fortified/Tyrannical weekly; Tier 2 pairs never combine Bursting + Bolstering.",
     "affixCalendar": [
       { "week": 1, "tier1": "fortified",  "tier2": ["bursting", "spiteful"] },
       { "week": 2, "tier1": "tyrannical", "tier2": ["volcanic", "raging"] },
