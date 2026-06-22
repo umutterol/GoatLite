@@ -434,7 +434,7 @@
     "specId": "crusader",
     "category": "Buff",
     "trigger": "active",
-    "cooldownTurns": 3,
+    "cooldownTurns": 8,
     "targeting": {
       "side": "ally",
       "pattern": "single"
@@ -443,9 +443,10 @@
       {
         "type": "shield",
         "base": 80,
-        "scale": 1,
+        "scale": 0.4,
         "scaleStat": "maxHp",
-        "durationTurns": 3
+        "durationTurns": 3,
+        "note": "P.5a: was scale 1.0xmaxHp on cd3 (a >100%-maxHp shield kept PERMANENTLY on the tank — the CrusaderTank generic-EHP engine). Now 0.4xmaxHp on cd8 (9s shield / 24s cd ~= 37% uptime): a real cooldown, not a doubled HP bar."
       }
     ]
   },
@@ -1290,10 +1291,11 @@
     "effects": [
       {
         "type": "shield",
-        "base": 100,
-        "scale": 1.5,
+        "base": 50,
+        "scale": 0.6,
         "scaleStat": "power",
-        "durationTurns": 3
+        "durationTurns": 3,
+        "note": "P.5a: party shield halved+ (was 100+1.5xpower → 50+0.6xpower) — keeps the CC-immunity-while-shielded rider + barrier-break, but no longer a big generic-EHP party wall on cd6."
       },
       {
         "type": "special",
@@ -2123,9 +2125,9 @@
   {
     "id": "sacred-bastion", "name": "Sacred Bastion", "classId": "paladin", "specId": "crusader",
     "category": "Buff", "trigger": "active", "cooldownTurns": 20,
-    "targeting": { "side": "ally", "pattern": "all" },
+    "targeting": { "side": "ally", "pattern": "single" },
     "effects": [
-      { "type": "shield", "base": 0, "scale": 0.35, "scaleStat": "maxHp", "durationTurns": 3 }
+      { "type": "shield", "base": 0, "scale": 0.5, "scaleStat": "maxHp", "durationTurns": 3, "note": "P.5a: was a PARTY-WIDE 0.35xmaxHp shield (generic party EHP); now a SINGLE-ally peel (0.5xmaxHp on one ally) per the design's immunity/peel intent — no longer a party shield wall." }
     ],
     "tags": ["major"]
   },
