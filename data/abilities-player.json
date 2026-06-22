@@ -196,7 +196,7 @@
         "type": "damage",
         "damageType": "Physical",
         "base": 40,
-        "scale": 0.6,
+        "scale": 0.85,
         "scaleStat": "power",
         "critable": true
       }
@@ -215,7 +215,7 @@
       "pattern": "self"
     },
     "resourceCost": {
-      "hpPct": 15
+      "hpPct": 5
     },
     "generates": {
       "stacks": 2,
@@ -253,7 +253,7 @@
         "type": "damage",
         "damageType": "Physical",
         "base": 70,
-        "scale": 1,
+        "scale": 1.35,
         "scaleStat": "power",
         "critable": true,
         "modifiers": [
@@ -296,7 +296,7 @@
         "type": "damage",
         "damageType": "Physical",
         "base": 50,
-        "scale": 0.7,
+        "scale": 0.95,
         "scaleStat": "power",
         "critable": true
       },
@@ -332,7 +332,7 @@
         "type": "damage",
         "damageType": "Physical",
         "base": 60,
-        "scale": 0.9,
+        "scale": 1.2,
         "scaleStat": "power",
         "critable": true,
         "modifiers": [
