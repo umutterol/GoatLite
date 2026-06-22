@@ -45,6 +45,20 @@ const isLiveStatus = (statusId: string) => {
   const def = content.statuses.get(statusId)
   return !!def && (def.kind === "dot" || def.kind === "hot" || def.kind === "cc" || (!!def.statMods && def.statMods.length > 0))
 }
+// P.2: a "hard" CC that interrupts a dangerous cast (stun/silence/freeze — NOT daze, which only drops the next action).
+const isHardCc = (statusId: string) => {
+  const d = content.statuses.get(statusId)
+  return d?.kind === "cc" && (d.control === "stun" || d.control === "silence" || d.control === "freeze")
+}
+/** P.2: cancel an enemy's pending dangerous cast (a real interrupt effect or a landed hard-CC). Returns whether one was cancelled. */
+function cancelEnemyCast(enemy: Combatant, by: Combatant, ctx: CombatCtx): boolean {
+  if (!enemy.pendingCast) return false
+  const castName = enemy.pendingCast.name
+  enemy.pendingCast = null
+  ctx.emit("good", `${by.name} interrupts ${enemy.name}'s ${castName}!`,
+    { sourceId: by.id, sourceName: by.name, sourceSpec: by.specId, ability: "Interrupt", target: enemy.name, result: "Interrupted" })
+  return true
+}
 
 function condHolds(cond: Cond, caster: Combatant, target: Combatant | undefined, _ctx: CombatCtx): boolean {
   switch (cond?.type) {
@@ -644,6 +658,7 @@ export function executeAbility(caster: Combatant, ability: PlayerAbility, ctx: C
         if (effect.chancePct != null && !ctx.rng.chance(effect.chancePct / 100)) continue
         applyStatus(tg, effect.status, { perTick, durationSec, stacks: effect.stacks, applierId: caster.id, t: ctx.t })
         applied = true
+        if (tg.team === "enemy" && isHardCc(effect.status)) cancelEnemyCast(tg, caster, ctx)   // P.2: a landed stun/silence/freeze kicks a pending cast
       }
       if (applied && willExtendCc) caster.guards.firstCcExtended = true   // only burn the bonus on a CC that landed
       // Inner Peace: applying a Stun heals the party (once per cast)
@@ -674,8 +689,12 @@ export function executeAbility(caster: Combatant, ability: PlayerAbility, ctx: C
     } else if (effect.type === "cleanse") {
       const n = effect.count ?? 1
       for (const tg of targetsFor("ally", ability.targeting.pattern, ability.targeting.count, caster, ctx)) cleanseStatuses(tg, n)
+    } else if (effect.type === "interrupt") {
+      // P.2: cancel the target enemy's pending dangerous cast (Counterspell / Zen Strike). No-op if nothing is casting.
+      for (const tg of targetsFor(ability.targeting.side, ability.targeting.pattern, ability.targeting.count, caster, ctx, (ability.targeting as any).band))
+        if (cancelEnemyCast(tg, caster, ctx)) logged = true
     }
-    // taunt / interrupt / unimplemented specials: no-op (deferred)
+    // taunt / unimplemented specials: no-op (deferred)
   }
 
   // special mechanics (first batch implemented; the rest are no-ops)
@@ -783,6 +802,9 @@ export function selectAbility(caster: Combatant, ctx: CombatCtx): PlayerAbility 
    profile data. Behaviours are pure functions of state + the seeded RNG (determinism).
    ============================================================ */
 const isMajor = (a: PlayerAbility) => (a.tags ?? []).includes("major")
+// P.2: a dedicated interrupt (Counterspell / Zen Strike) is RESERVED for kicking a dangerous cast — never spent as filler
+// damage in the normal rotation (a real kicker holds its kick), so it's ready when a cast window opens.
+const isInterrupt = (a: PlayerAbility) => (a.effects as Effect[]).some((e) => e.type === "interrupt")
 /** Ready + usable abilities matching a filter, in the engine's priority order (longest CD, then category weight). */
 function readyUsable(caster: Combatant, ctx: CombatCtx, filter: (a: PlayerAbility) => boolean): PlayerAbility[] {
   return caster.abilities
@@ -844,7 +866,15 @@ const ACTION_BEHAVIOURS: Record<string, ActionBehaviour> = {
     return readyUsable(caster, ctx, (a) => !isMajor(a) && (a.effects as Effect[]).some((e) => e.type === "shield" || (e.type === "special" && DEF.has(e.mechanic))))[0] ?? null
   },
   // the spec's normal rotation, EXCLUDING majors (the major is decided by holdForWindow) — the previous longest-CD-first pick
-  dumpRotation: (caster, ctx) => readyUsable(caster, ctx, (a) => !isMajor(a))[0] ?? null,
+  dumpRotation: (caster, ctx) => readyUsable(caster, ctx, (a) => !isMajor(a) && !isInterrupt(a))[0] ?? null,
+  // P.2: when a boss is mid dangerous-cast, a KICKER pre-empts its rotation to fire an interrupt — a dedicated interrupt
+  // effect (Counterspell/Zen Strike) or a hard-CC stun/silence/freeze on an enemy. Returns null for specs without a kick
+  // (and is inert in dungeons with no interruptible cast), so non-kickers just run their normal rotation.
+  interruptPending: (caster, ctx) => {
+    if (!ctx.mobs.some((mm) => mm.pendingCast && mm.hp > 0)) return null
+    return readyUsable(caster, ctx, (a) => a.targeting.side === "enemy" && (a.effects as Effect[]).some((e) =>
+      e.type === "interrupt" || (e.type === "applyStatus" && isHardCc(e.status))))[0] ?? null
+  },
 }
 
 /* ---- K.3: target-selection behaviours (shared — pick one combatant from a candidate pool; stable/deterministic) ---- */
@@ -881,6 +911,8 @@ function brainOf(actor: Combatant): { action: string[]; targetEnemy: string[]; t
 
 /** Brain — which ability the actor casts this turn (null → basic attack). The single action decision point. */
 export function decideAction(actor: Combatant, ctx: CombatCtx): PlayerAbility | null {
+  const kick = ACTION_BEHAVIOURS.interruptPending(actor, ctx)   // P.2: a pending dangerous cast pre-empts everything (kicker specs only; inert otherwise)
+  if (kick) return kick
   for (const id of brainOf(actor).action) { const a = ACTION_BEHAVIOURS[id]?.(actor, ctx); if (a) return a }
   return null
 }

@@ -125,6 +125,9 @@ export const AbilitySchema = z.object({
   id: z.string(), name: z.string(), kind: z.enum(["enemy", "spec"]),
   shape: z.string().optional(), tactic: z.string().optional(),
   telegraph: z.number().optional(), desc: z.string().optional(),
+  // P.2: opt-in to the REAL enemy cast scheduler (a kickable dangerous cast that stacks to a wipe). Only the bosses
+  // flagged here run the scheduler; other interrupt-test bosses keep the abstract dial (Ashveil stays dial-pure).
+  interruptible: z.boolean().optional(),
 })
 
 export const EnemySchema = z.object({

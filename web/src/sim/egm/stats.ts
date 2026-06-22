@@ -83,6 +83,7 @@ export interface Combatant {
   downedUntil: number
   dmgDone: number; healDone: number; deaths: number
   isBoss: boolean
+  pendingCast?: { name: string; fireAt: number } | null   // P.2: a dangerous enemy cast in flight (whole-sec fireAt); null/undefined = not casting. Cleared by an interrupt/CC.
   // Phase 2: ability layer
   abilities: PlayerAbility[]            // active abilities for the rotation (party only)
   passive: PlayerAbility | null         // the spec's passive ability (Phase 3.5)

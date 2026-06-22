@@ -31,6 +31,12 @@ export function runDungeonEGM(input: RunInput): RunResult {
   const DEATH_PENALTY = SIM.deathPenaltySec ?? 5   // timer seconds added per death (GDD default 5; tunable)
   const REZ_REGEN_SEC = SIM.rezRegenSec ?? 300     // a combat-rez charge regenerates every N seconds (5 min)
   const REZ_START = SIM.rezStartCharges ?? 1       // party starts the run with this many rez charges
+  // P.2 — enemy cast scheduler (Bellreach P1 "kick-or-wipe"; only bosses whose ability is flagged interruptible).
+  const CAST_EVERY = SIM.castEverySec ?? 12            // a fresh dangerous cast begins every N whole seconds
+  const CAST_BASE = SIM.castPayloadBase ?? 16          // base party-wide payload (× keyScale × DMG_UNIT × aggroIntake), matches the old interrupt tick
+  const CAST_STACK_GROWTH = SIM.castStackGrowth ?? 0.5 // each UNINTERRUPTED cast amplifies the next by this (stacks → wipe)
+  const CAST_FALLBACK_BASE = SIM.castFallbackBase ?? 0.1   // demoted Interrupts dial: weak auto-kick chance with no real interrupter
+  const CAST_FALLBACK_PER_PT = SIM.castFallbackPerPt ?? 0.1 // ...+ per dial point (capped) — far weaker than a kicker spec
 
   const aggr = (content.tuning.aggression as Record<string, { output: number; avoidableIntake: number }>)[input.aggression]
   const hq = content.tuning.hitQuality as Record<string, unknown>
@@ -103,6 +109,8 @@ export function runDungeonEGM(input: RunInput): RunResult {
     const affMult = isBoss ? (aff.has("tyrannical") ? AFFX : 1) : (aff.has("fortified") ? AFFX : 1)
     const mobs: Combatant[] = []
     let bossTest = "", bossName = "The boss", bossAbil = "its mechanic", bossSpike = ""
+    let bossCastable = false, bossTelegraph = 2.5   // P.2: this boss runs the real cast scheduler + its kick window (whole sec)
+    let castStacks = 0                              // P.2: uninterrupted-cast escalation for this stage (resets per boss)
     let stageName = "Trash"
 
     if (isBoss) {
@@ -110,7 +118,10 @@ export function runDungeonEGM(input: RunInput): RunResult {
       bossTest = b.testsTactic ?? ""
       bossName = b.name
       stageName = b.name
-      bossAbil = content.abilities.get(b.abilityId ?? "")?.name ?? "its mechanic"
+      const bAbil = content.abilities.get(b.abilityId ?? "")
+      bossAbil = bAbil?.name ?? "its mechanic"
+      bossCastable = !!bAbil?.interruptible   // P.2: opt-in real cast (Bellreach only); others keep the abstract dial
+      bossTelegraph = bAbil?.telegraph ?? 2.5
       bossSpike = b.spikeProfile ?? ""
       mobs.push(makeEnemy({ name: b.name, baseHp: b.baseHp, baseDamage: b.baseDamage, isBoss: true, keyScale, affMult, band: b.band, armour: b.armour, resist: b.resist }))
       const tested = content.tactics.get(bossTest)?.name
@@ -277,6 +288,25 @@ export function runDungeonEGM(input: RunInput): RunResult {
             if (since % 3 === 0) {
               for (const pp of aliveParty()) if (pp.role !== "tank") dealDamage(pp, ROT_FRAC * pp.maxHp * aggroIntake * (1 - 0.12 * (tac.cooldowns ?? 0)))
               emit("mechanic", `${bn}'s ${abil} — the rot rises across the party. Cooldowns ${tac.cooldowns ?? 0}.`, m("party", "Rot tick"))
+            }
+          } else if (bossCastable) {
+            // P.2: REAL kick-or-wipe cast. Begins on the cadence; if the telegraph window elapses uninterrupted, a
+            // STACKING party-wide payload lands. A real interrupter spec OR a landed stun/silence/freeze cancels the
+            // pending cast (combat.cancelEnemyCast); the demoted Interrupts dial is only a weak auto-kick backstop.
+            const boss = mobs.find((mm) => mm.isBoss && mm.hp > 0)
+            if (boss && !boss.pendingCast && since % CAST_EVERY === 0) {
+              boss.pendingCast = { name: abil, fireAt: since + Math.max(1, Math.round(bossTelegraph)) }
+              emit("mechanic", `${bn} begins ${abil} — interrupt it!`, m("party", "Cast begins"))
+            } else if (boss && boss.pendingCast && since >= boss.pendingCast.fireAt) {
+              if (rng.chance(Math.min(0.6, CAST_FALLBACK_BASE + CAST_FALLBACK_PER_PT * (tac.interrupts ?? 0)))) {
+                emit("good", `${abil} is interrupted on automation. Interrupts ${tac.interrupts ?? 0}.`, m("party", "Cast interrupted (dial)"))
+              } else {
+                const payload = CAST_BASE * keyScale * DMG_UNIT * aggroIntake * (1 + castStacks * CAST_STACK_GROWTH)
+                for (const pp of aliveParty()) dealDamage(pp, payload)
+                castStacks++
+                emit("mechanic", `${bn}'s ${abil} goes off — the party craters (peal ${castStacks}). Interrupts ${tac.interrupts ?? 0}.`, m("party", "Cast not interrupted"))
+              }
+              boss.pendingCast = null
             }
           } else if (since % 12 === 0) {
             if (bossTest === "interrupts") {
