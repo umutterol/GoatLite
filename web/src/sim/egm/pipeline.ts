@@ -42,8 +42,8 @@ export function mitigationFraction(defenseValue: number, incoming: number): numb
    hit only ~2.4%), so there was no real school check. This taxes a wrong-school core a flat fraction on EVERY hit. 0
    defense → 0, so Ashveil (armour/resist 0) stays byte-identical. K/CAP are tuned in P.1 against the sweep to land the
    off-school tax at +3–5 keys; they start conservative here (structural change only — P.0 doesn't chase magnitudes). */
-export const SCHOOL_WALL_K = 380
-export const SCHOOL_WALL_CAP = 0.5
+export const SCHOOL_WALL_K = 155
+export const SCHOOL_WALL_CAP = 0.65
 export function schoolWallFraction(defenseValue: number): number {
   if (defenseValue <= 0) return 0
   return Math.min(SCHOOL_WALL_CAP, defenseValue / (defenseValue + SCHOOL_WALL_K))

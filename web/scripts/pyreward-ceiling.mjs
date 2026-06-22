@@ -11,15 +11,17 @@ try {
   const mk = (id, name, specId, ilvl) => ({ id, name, specId, ilvl, morale: 60, traitIds: [] })
   const ilvlFor = (k) => 108 + 4 * k
   const base = (ilvl) => [mk("t", "Grymdark", "guardian", ilvl), mk("h", "Bramblewen", "lifebinder", ilvl)]
-  const physDps = (ilvl) => [mk("d1", "Sythe", "assassin", ilvl), mk("d2", "Korga", "berserker", ilvl), mk("d3", "Lyra", "bard", ilvl)]        // 3 Physical
-  const mixedDps = (ilvl) => [mk("d1", "Sythe", "assassin", ilvl), mk("d2", "Emberkin", "pyromancer", ilvl), mk("d3", "Wisp", "arcanist", ilvl)] // 1 Phys + 2 Magic
-  const comp = (which, ilvl) => [...base(ilvl), ...(which === "mixed" ? mixedDps(ilvl) : physDps(ilvl))]
+  const physDps = (ilvl) => [mk("d1", "Sythe", "assassin", ilvl), mk("d2", "Korga", "berserker", ilvl), mk("d3", "Lyra", "bard", ilvl)]            // 3 Physical (mono — WRONG tool)
+  const mixedDps = (ilvl) => [mk("d1", "Sythe", "assassin", ilvl), mk("d2", "Emberkin", "pyromancer", ilvl), mk("d3", "Wisp", "arcanist", ilvl)]   // 1 Phys + 2 Magic (right tool A)
+  const balancedDps = (ilvl) => [mk("d1", "Sythe", "assassin", ilvl), mk("d2", "Korga", "berserker", ilvl), mk("d3", "Emberkin", "pyromancer", ilvl)] // 2 Phys + 1 Magic (right tool B — diversity check)
+  const dpsOf = (which, ilvl) => which === "mixed" ? mixedDps(ilvl) : which === "balanced" ? balancedDps(ilvl) : physDps(ilvl)
+  const comp = (which, ilvl) => [...base(ilvl), ...dpsOf(which, ilvl)]
   const spend = { interrupts: 0, positioning: 3, cooldowns: 3, killorder: 0 }
   const seeds = [7, 13, 42]
   const run = (dungeonId, party, key, seed) => runDungeonEGM({ dungeonId, keyLevel: key, affixIds: ["fortified", "bursting"], party, tactics: spend, aggression: "Balanced", seed })
   const sweep = (dungeonId, which) => {
     const cells = []
-    for (let k = 2; k <= 14; k++) {
+    for (let k = 2; k <= 18; k++) {
       let timed = 0
       for (const s of seeds) if (run(dungeonId, comp(which, ilvlFor(k)), k, s).outcome === "timed") timed++
       cells.push(`+${String(k).padStart(2)}:${timed}`)
@@ -28,7 +30,8 @@ try {
   }
   for (const [dungeon, label] of [["pyreward-ossuary", "OSSUARY (school wall)"], ["ashveil-crypts", "ASHVEIL (control: no armour)"]]) {
     console.log(`\n=== ${dungeon}  — ${label}  — seeds timed / ${seeds.length}, gear-appropriate ilvl ===`)
-    console.log(`  mixed-school : ${sweep(dungeon, "mixed")}`)
+    console.log(`  mixed (1P2M) : ${sweep(dungeon, "mixed")}`)
+    console.log(`  balanced(2P1M): ${sweep(dungeon, "balanced")}`)
     console.log(`  all-physical : ${sweep(dungeon, "phys")}`)
   }
 } finally {

@@ -51,7 +51,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | L | **Roster expansion — Marksman + Necromancer** | ⬜ 0/7 — **design ✅** (`MMO-Nostalgia-Reference.md` §6) |
 | M | **Guild Feed & Loot Drama (social meta-layer)** | ✅ 5/5 (+1 v2) — feed + system notifications (M.1), loot-drama snub (M.2), deterministic bark engine (M.3) + voice packs (M.4) + snub-in-feed (M.5), all live-verified. M.6 (exchange beats + Rival) = v2 💤 |
 | N | **Intake balance (`enemyDmgMult`) + sim-dump tooling** | ✅ 2/2 — enemy damage is now an **isolated** intake lever (=2.0); survival binds below the timer wall; +2 floor + operator runway (+3) hold; new config/CLI `sim-dump` harness |
-| **P** | **Class-Tools System** (classes bring different tools to solve different problems) | 🟡 1/6 — **design ✅** (`Class-Tools-System.md`); **P.0 GATE 0 done** (boss-dive fix proved the C.10/C.8 reads were survival artifacts — Stillhour/Mire collapsed to spread 0); next P.1 school-magnitude + Bard→Archer. generic-EHP compression (shields/2-heal) re-scoped to P.5 + a DPS-check |
+| **P** | **Class-Tools System** (classes bring different tools to solve different problems) | 🟡 1/6 (+P.1a) — **design ✅** (`Class-Tools-System.md`); **P.0 GATE 0 done** (boss-dive fix proved the C.10/C.8 reads were survival artifacts — Stillhour/Mire collapsed to spread 0); **P.1a school re-tune done** (off-school tax net +4 keys); next **P.1b Bard→Archer**. generic-EHP compression (shields/2-heal) re-scoped to P.5 + a DPS-check |
 
 ---
 
@@ -330,7 +330,7 @@ execute later.*
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
 | P.0 | **GATE 0** — fix boss-dive bug + global intake-floor (40% / cap-60% stacked) + steepen `resolveHit` school curves; **bump SAVE_VERSION** | engine/balance | major | M | ✅ | **DONE + verified** (2026-06-22). Boss-dive fix (`stats.ts` `makeEnemy`: bosses → `melee`/focusTank, dives stay on trash casters + spikeProfile); hit-size-INDEPENDENT school wall for enemy defenders (`pipeline.schoolWallFraction`, K=380/cap-0.5, armour/resist no longer keyScale-scaled); percentage-only intake floor `intakeFloorFrac=0.40` in `dealDamage` (shields/HoTs excluded per decision); `SAVE_VERSION 5→6`. `tsc -b` clean. **Sweep (before→after spread): Stillhour 3→0, Mire 7→0** = the C.10 burst/rot reads **were survival artifacts, now collapsed** (decisively settles C.11); Pyreward 12→6, Hour 6→1. **egm-smoke shifted 884/914/1182/1367 → 894/953/1190/1380** (intake floor caps the gear-cap tank's armour; determinism + **+2 floor hold**). **⚠️ Ashveil spread 8→9 — the `<2` target was NOT met:** Ashveil is front-boss/no-armour so P.0's 3 levers don't touch it, and `CrusaderTank` still wins all 6 (avg 15.0) via **shields + 2nd-healer throughput** — neither touched here. → generic-EHP compression re-scoped to **P.5** (shield recost + Divine Shield bug) + the new **DPS-check** lever (see P.5 note) |
-| P.1 | **Pyreward school re-tune (works-now) + Bard→Archer recut** | balance/content | major | M | ⬜ | Steepen the off-school tax to **+3–5 keys** (mixed-school core tops, single-school falls); add all-melee/all-magic comps to the sweep. Re-validate Stillhour (P5) / Mire (P6) burst/rot as real *shape* reads post-GATE-0. Remake Bard→**Archer** (ranged physical; drop lust+dispel). *Cheapest proof — no new engine system* |
+| P.1 | **Pyreward school re-tune (works-now) + Bard→Archer recut** | balance/content | major | M | 🟡 | **P.1a school re-tune DONE** (2026-06-22): `schoolWallFraction` K 380→**155** (cap 0.65, not binding for Pyreward's 250/150 values — K is the lever). **Off-school tax = net +4 keys** (all-physical core +5 vs mixed +14 on Pyreward, minus the +5 Ashveil spec-power control — `pyreward-ceiling.mjs`, now sweeping 2–18 + a balanced-2P1M diversity comp). Full sweep: AllPhysDPS Pyreward **14→10**, other 5 dungeons byte-identical to P.0; egm-smoke unchanged (894/953/1190/1380); +2 floor holds; `tsc -b` clean. **Caveats:** the read leans near-binary "bring 2 magic" (only 2 magic DPS specs exist; cleric-smite as the 3rd magic source untested here → P.5 full sweep); generic-EHP comps (Crusader/Mystic) still top Pyreward regardless of school (P.5); the magnitude is **provisional pending P.1b** (Bard→Archer removes the bard-heal inflating the all-phys control). **P.1b Bard→Archer recut: ⬜ pending** (ranged physical; drop lust+dispel — needs the recut-proposal + IP check) |
 | P.2 | **Enemy cast scheduler + real interrupt** → Bellreach = P1 | engine | **major** | **L** | ⬜ | Pending-cast state (windup/telegraph/payload from `abilities.json`); wire interrupt (`combat.ts:675`)+landed-CC to cancel; demote interrupts dial to fallback. Verify: a no-kicker comp wipes Bellreach where Arcanist/Mystic/Pyromancer times. **The flagship** — also unlocks P8/P11 |
 | P.3 | **Dispel typing + enemy→party status** → Weltering Mire = P6+**P4** | engine/content | major | M | ⬜ | Magic/Curse vs Nature/Poison status field; spreading rot-curse on the Mire; Cleric (Magic) vs Lifebinder (Nature). Verify the wrong-type healer fails. (DPS don't dispel) |
 | P.4 | **Reach primitive + real adds + avoidable-immunity** → P11/P8/P7 | engine/content | major | M | ⬜ | Back-band reach penalty + Assassin dive + Guardian grip (P11); CC-able/castable adds (P8); immunity/relocate on the eruption (P7). Verify all-melee can't reach the sheltered caster; an add demands lock-or-kill |
@@ -364,6 +364,18 @@ execute later.*
 
 ## Changelog
 
+- **2026-06-22** — **P.1a Pyreward school re-tune SHIPPED (the works-now class axis).** Tuned `pipeline.schoolWallFraction`
+  K 380→**155** (cap 0.65 is a safety ceiling — not binding for Pyreward's armour/resist 250/150, so K is the only active
+  lever). Iterated against `pyreward-ceiling.mjs` (extended to keys 2–18 + a balanced-2P1M diversity comp): the **off-school
+  tax now lands at net +4 keys** — an all-physical (mono-school) core caps **+5** on Pyreward vs a mixed core's **+14**,
+  minus the **+5 Ashveil spec-power control**, so +4 is the school-attributable tax (centered in the +3–5 band). Discovered
+  the wall only differentiates once it's steep enough that a fully-walled boss trips **soft-enrage** (an evenly-alternating
+  armour/resist layout is otherwise mirror-symmetric — both mono cores eat equal average tax). Full `balance-sweep`:
+  AllPhysDPS Pyreward 14→10, **other 5 dungeons byte-identical to P.0**; egm-smoke unchanged (Ashveil armour 0 → wall inert);
+  **+2 floor holds**; `tsc -b` clean. **Caveats (honest):** the read leans near-binary "bring 2 magic" (only 2 magic DPS
+  specs; cleric-smite as a 3rd magic source is untested → P.5 full sweep); generic-EHP comps (Crusader/Mystic shields +
+  sustain) still top Pyreward regardless of school (P.5); and the magnitude is **provisional pending P.1b** (Bard→Archer
+  removes the bard party-heal that inflates the all-physical control comp). Next: **P.1b Bard→Archer**.
 - **2026-06-22** — **P.0 GATE 0 SHIPPED — and it settled the C.11 conflict.** Implemented the three GATE-0 levers + a clean
   `SAVE_VERSION` bump (5→6): (1) **boss-dive fix** — `makeEnemy` now gives bosses the `melee`/focusTank profile (the old
   `band==="back" → caster` rule made 10 back-band bosses auto-attack the squishy back-line; intentional dives still run via
