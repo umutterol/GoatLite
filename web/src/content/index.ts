@@ -129,6 +129,8 @@ for (const e of enemies.values()) {
   if (e.abilityId) ref(abilities.has(e.abilityId), `enemy '${e.id}' → unknown abilityId '${e.abilityId}'`)
   if (e.testsTactic) ref(tactics.has(e.testsTactic), `enemy '${e.id}' → unknown testsTactic '${e.testsTactic}'`)
   if (e.dungeonId) ref(dungeons.has(e.dungeonId), `enemy '${e.id}' → unknown dungeonId '${e.dungeonId}'`)
+  if (e.summonsId) ref(enemies.has(e.summonsId), `enemy '${e.id}' → summonsId references unknown enemy '${e.summonsId}'`)   // P.4
+  if (e.guarding && e.shielded) ref(false, `enemy '${e.id}' → cannot be both guarding AND shielded (it would ward itself into an unkillable soft-lock)`)   // P.4
 }
 for (const p of packs.values())
   for (const m of p.mobs) ref(enemies.has(m.enemyId), `pack '${p.id}' → unknown enemyId '${m.enemyId}'`)

@@ -25,7 +25,7 @@
   { "id": "heretic-rite",       "name": "Heretic Rite",       "kind": "enemy", "shape": "cast",   "tactic": "interrupts", "telegraph": 2.5, "desc": "A salt-warded finale: burn the word from the air, and bring the blade since the spell just rolls off." },
 
   { "id": "keep-the-hour",  "name": "Keep the Hour",  "kind": "enemy", "shape": "phase", "tactic": "cooldowns", "telegraph": 3, "desc": "The first toll of the gauntlet — a party-wide spike on the hour. Bank Cooldowns for the windows; the clock is the real boss." },
-  { "id": "leaden-toll",    "name": "Leaden Toll",    "kind": "enemy", "shape": "phase", "tactic": "cooldowns", "telegraph": 3, "desc": "Heavier than the last; every spike you under-mitigate is time off the clock." },
+  { "id": "leaden-toll",    "name": "Leaden Toll",    "kind": "enemy", "shape": "summon", "tactic": "killorder", "telegraph": 0, "desc": "The bell tolls leaden wardens up to ward it — cut a warden down to land a blow on the Carillon, or beat on its ward for nothing." },
   { "id": "matins-knell",   "name": "Matins Knell",   "kind": "enemy", "shape": "phase", "tactic": "cooldowns", "telegraph": 3, "desc": "The bells never stop; pace your majors across the gauntlet or run out before the last peal." },
   { "id": "vespers-dark",   "name": "Vespers Dark",   "kind": "enemy", "shape": "phase", "tactic": "cooldowns", "telegraph": 3, "desc": "The dark hour — the spike bites hardest into soft-enrage if you've over-pulled the clock." },
   { "id": "last-peal",      "name": "The Last Peal",  "kind": "enemy", "shape": "phase", "tactic": "cooldowns", "telegraph": 3, "desc": "Pop everything now or pop nothing and be tolled — the capstone spike under the dying clock." }

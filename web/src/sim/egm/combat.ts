@@ -940,6 +940,15 @@ export function decideAction(actor: Combatant, ctx: CombatCtx): PlayerAbility | 
 /** Brain — a party member's chosen ENEMY focus among `candidates` (the band-narrowed living mobs). Drives single-target picks. */
 export function decidePartyFocus(actor: Combatant, candidates: Combatant[], ctx: CombatCtx): Combatant | undefined {
   if (!candidates.length) return undefined
+  // P.4: a "shielded" enemy is near-immune while its "guarding" ally lives. With the KILL ORDER dial invested the party
+  // focuses the GUARD first to drop the ward (kill-priority order, mirrors how Kill Order gates focusByPriority in K.4);
+  // starve Kill Order and caster-focus comps tunnel the warded boss futilely while it keeps re-summoning its guard. The
+  // overall read is still a BURST check: a summoned guard respawns on a cadence, so a high-DPS comp cuts each guard down
+  // fast and banks boss-exposure windows, while a slow comp can't and depletes. Inert with no guard / no shielded in range.
+  if ((ctx.tactics?.killorder ?? 0) >= 1) {
+    const guard = candidates.find((m) => m.guarding && m.hp > 0)
+    if (guard && candidates.some((m) => m.shielded && m.hp > 0)) return guard
+  }
   for (const id of brainOf(actor).targetEnemy) { const t = TARGET_BEHAVIOURS[id]?.(candidates, actor, ctx); if (t) return t }
   return candidates[0]
 }

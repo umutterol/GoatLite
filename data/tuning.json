@@ -17,6 +17,8 @@
     "castFallbackPerPt": 0.1,
     "burstFrac": 0.06,
     "rotFrac": 0.04,
+    "shieldGuardReductionPct": 99,
+    "summonEverySec": 18,
     "curseEverySec": 8,
     "curseBase": 0.06,
     "curseDurationSec": 30,

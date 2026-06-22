@@ -83,6 +83,8 @@ export interface Combatant {
   downedUntil: number
   dmgDone: number; healDone: number; deaths: number
   isBoss: boolean
+  guarding?: boolean          // P.4: this enemy shields its `shielded` allies while it lives (kill it first)
+  shielded?: boolean          // P.4: near-immune (damageTakenPct set by the engine) while a `guarding` ally lives
   pendingCast?: { name: string; fireAt: number } | null   // P.2: a dangerous enemy cast in flight (whole-sec fireAt); null/undefined = not casting. Cleared by an interrupt/CC.
   // Phase 2: ability layer
   abilities: PlayerAbility[]            // active abilities for the rotation (party only)
@@ -182,6 +184,7 @@ export function makeEnemy(opts: {
   name: string; baseHp: number; baseDamage: number; isBoss: boolean
   keyScale: number; affMult: number; band?: "front" | "back"
   armour?: number; resist?: number   // C.8: damage-school defense (authored base; scaled by keyScale to track gear)
+  guarding?: boolean; shielded?: boolean   // P.4: bodyguard / guarded kill-priority pair
 }): Combatant {
   const hp = opts.baseHp * HP_UNIT * opts.keyScale * opts.affMult
   return {
@@ -202,6 +205,7 @@ export function makeEnemy(opts: {
     critChance: 0, critMult: 1, dodgeChance: 0, damageTakenPct: 0,
     mana: 0, maxMana: 0, healCost: 0, manaRegen: 0, hps: 0,
     nextActionAt: 0, downedUntil: -1, dmgDone: 0, healDone: 0, deaths: 0, isBoss: opts.isBoss,
+    guarding: opts.guarding, shielded: opts.shielded,
     abilities: [], passive: null, cooldowns: {}, statuses: [], resources: {}, hitSinceAction: false, lastActionAt: 0,
     emergencyHealed: false, guards: {}, talents: [],
     intakeMult: 1, opOutputMult: 1, opClutchOutMult: 1, opIntakeStatic: 1, opClutchIntakeMult: 1,   // enemies: neutral operator layer
@@ -244,7 +248,9 @@ export function eff(c: Combatant): EffStats {
     critMult: c.critMult * (1 + critmult / 100),
     attackInterval: c.attackInterval / (1 + haste / 100), // +haste shortens, Chill (−haste) lengthens
     dodgeChance: Math.min(0.6, Math.max(0, c.dodgeChance + vers / 100)),
-    damageTakenPct: dtaken,
+    // P.4: include the base field (always 0 for party/normal enemies → byte-identical) so the engine can set a flat
+    // damage-taken delta directly on a combatant (the guarded enemy's near-immunity) without authoring a status.
+    damageTakenPct: dtaken + c.damageTakenPct,
   }
 }
 

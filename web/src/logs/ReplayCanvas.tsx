@@ -145,7 +145,10 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
     const ax = clamp(t.x, 0.03, 0.97), ay = clamp(t.y, 0.06, 0.94)
     return { ...d, frac, dead: frac <= 0.001, px: ax * W, py: ARENA_TOP + ay * ARENA_H, axPct: ax * 100 }
   }
-  const dots = [...partyDots.map(place), ...enemyDots.map(place)]
+  // P.4: a summoned add (e.g. a guard) spawns mid-stage, so hide its dot until its spawn second — otherwise every add the
+  // boss WILL summon would crowd the arena at full HP from t=0. Normal mobs spawn at stage start → always shown (unchanged).
+  const spawnedNow = (d: Dot) => { if (d.team !== "enemy") return true; const m = stageMobs.find((mm) => "e:" + mm.id === d.key); return !m || sec >= m.spawnSec }
+  const dots = [...partyDots.map(place), ...enemyDots.map(place)].filter(spawnedNow)
   type D = typeof dots[number]
   const partyById = new Map<string, D>(), partyByName = new Map<string, D>(), enemyById = new Map<string, D>()
   const enemyByName = new Map<string, D[]>()

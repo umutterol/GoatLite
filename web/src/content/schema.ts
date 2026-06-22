@@ -153,6 +153,12 @@ export const EnemySchema = z.object({
   // A soft ~1-2-key "bring mixed-school DPS" lever (the Pyreward Ossuary alternates high-armour and high-resist bosses).
   armour: z.number().optional(),
   resist: z.number().optional(),
+  // P.4 (P11 recut): kill-priority "bodyguard" mechanic. A `shielded` enemy takes near-zero damage (sim.shieldGuardReductionPct)
+  // while ANY `guarding` ally in its stage is alive — so you must kill the guard FIRST to expose it. Absent = normal enemy.
+  guarding: z.boolean().optional(),
+  shielded: z.boolean().optional(),
+  // P.4 (P8 unify): a `shielded` boss SUMMONS this guard enemy (id) on a cadence whenever none is alive (a real mid-fight add).
+  summonsId: z.string().optional(),
 })
 
 export const PackSchema = z.object({

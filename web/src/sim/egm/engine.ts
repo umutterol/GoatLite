@@ -43,6 +43,11 @@ export function runDungeonEGM(input: RunInput): RunResult {
   const CURSE_EVERY = SIM.curseEverySec ?? 6           // the boss adds a curse stack every N whole seconds
   const CURSE_BASE = SIM.curseBase ?? 0.3              // per-stack per-second curse tick (× keyScale × DMG_UNIT × aggroIntake) — keyScale-scaled like the other mechanics so it's mild at the +2 floor but ramps at high keys (long fights → more stacks AND bigger ticks)
   const CURSE_DURATION = SIM.curseDurationSec ?? 30    // curse persistence (refreshed each application; long enough not to self-expire between stacks)
+  // P.4 (P11 recut) — the bodyguard "shield" reduction: a `shielded` enemy's damageTakenPct while a `guarding` ally lives.
+  const SHIELD_GUARD_DR = -(SIM.shieldGuardReductionPct ?? 99)   // -99 → ×0.01 incoming (kill the guard to drop it)
+  // P.4 (P8 unify) — a `shielded` boss SUMMONS a real `guarding` add on this cadence whenever none is alive; while the
+  // guard lives the boss is near-immune (above), so the party must burst/focus the guard each spawn or the boss re-shields.
+  const SUMMON_EVERY = SIM.summonEverySec ?? 8
 
   const aggr = (content.tuning.aggression as Record<string, { output: number; avoidableIntake: number }>)[input.aggression]
   const hq = content.tuning.hitQuality as Record<string, unknown>
@@ -119,6 +124,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
     let castStacks = 0                              // P.2: uninterrupted-cast escalation for this stage (resets per boss)
     let bossCurse = ""                              // P.3: dispel type the boss applies as a spreading curse ("" = none)
     let curseStatusId = ""                          // P.3: the actual status id for that curse type (data-driven, not hardcoded)
+    let bossSummonsId = ""                          // P.4: enemy id of the guard this (shielded) boss summons ("" = none)
     let stageName = "Trash"
 
     if (isBoss) {
@@ -135,7 +141,8 @@ export function runDungeonEGM(input: RunInput): RunResult {
       // a future `curse:"Magic"` would auto-wire its own status (or no-op safely) rather than misfiring the Nature one.
       curseStatusId = bossCurse ? ([...content.statuses.values()].find((s) => s.dispel === bossCurse && s.kind === "dot")?.id ?? "") : ""
       bossSpike = b.spikeProfile ?? ""
-      mobs.push(makeEnemy({ name: b.name, baseHp: b.baseHp, baseDamage: b.baseDamage, isBoss: true, keyScale, affMult, band: b.band, armour: b.armour, resist: b.resist }))
+      bossSummonsId = b.summonsId ?? ""        // P.4: opt-in summon-shield boss (the guard it calls)
+      mobs.push(makeEnemy({ name: b.name, baseHp: b.baseHp, baseDamage: b.baseDamage, isBoss: true, keyScale, affMult, band: b.band, armour: b.armour, resist: b.resist, guarding: b.guarding, shielded: b.shielded }))
       const tested = content.tactics.get(bossTest)?.name
       emit("good", `${b.name} engages. ${bossAbil} incoming${tested ? ` — tests ${tested}` : ""}.`)
     } else {
@@ -143,7 +150,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
       stageName = pack.name
       for (const m of pack.mobs) {
         const e = content.enemies.get(m.enemyId)!
-        for (let i = 0; i < m.count; i++) mobs.push(makeEnemy({ name: e.name, baseHp: e.baseHp, baseDamage: e.baseDamage, isBoss: false, keyScale, affMult, band: e.band, armour: e.armour, resist: e.resist }))
+        for (let i = 0; i < m.count; i++) mobs.push(makeEnemy({ name: e.name, baseHp: e.baseHp, baseDamage: e.baseDamage, isBoss: false, keyScale, affMult, band: e.band, armour: e.armour, resist: e.resist, guarding: e.guarding, shielded: e.shielded }))
       }
     }
 
@@ -151,6 +158,21 @@ export function runDungeonEGM(input: RunInput): RunResult {
     // P.3: also clear any enemy-applied curse (any dispel-typed status) so it doesn't compound dungeon-wide — fresh ramp per boss.
     for (const p of party) { p.nextActionAt = t; p.shield = 0; p.emergencyHealed = false; p.guards = {}; p.statuses = p.statuses.filter((s) => !content.statuses.get(s.id)?.dispel) }
     for (const m of mobs) m.nextActionAt = t
+
+    // P.4: a `shielded` enemy is near-immune while a `guarding` ally lives — refresh that DR (and announce the ward
+    // breaking when the last guard falls). Inert in stages with no guarding/shielded mobs. Set once now so the ward is
+    // up from t=0, then re-checked every step below.
+    const refreshGuardShields = () => {
+      for (const mm of mobs) {
+        if (!mm.shielded || mm.hp <= 0) continue
+        // exclude self: a mob authored with BOTH guarding+shielded must not ward itself into an unkillable soft-lock
+        const guardUp = mobs.some((g) => g.guarding && g.hp > 0 && g !== mm)
+        const was = mm.damageTakenPct
+        mm.damageTakenPct = guardUp ? SHIELD_GUARD_DR : 0
+        if (was === SHIELD_GUARD_DR && !guardUp) emit("good", `${mm.name}'s guard has fallen — its ward collapses. Strike it now!`)
+      }
+    }
+    refreshGuardShields()
 
     const stageStartT = t
     // I.1: open a replay stage record + per-mob trackers (deterministic; pure recording)
@@ -163,6 +185,27 @@ export function runDungeonEGM(input: RunInput): RunResult {
     replayStages.push(stageRec)
     for (const sm of stageMobs) replayMobs.push(sm.rec)
     activeStage = { rec: stageRec, mobs: stageMobs }
+
+    // P.4 (P8 unify): the summon-shield boss calls a real `guarding` add mid-fight. Spawns into the live `mobs` array AND
+    // mirrors a ReplayMob (stable id, spawn-second-relative HP) so the 2D replay shows the add appear/fight/die; then
+    // re-shields the boss now that a guard is up. The party must cut the guard down (focus + burst) to expose the boss.
+    const summonGuard = () => {
+      const st = activeStage; if (!st) return
+      const g = content.enemies.get(bossSummonsId); if (!g) return
+      const guard = makeEnemy({ name: g.name, baseHp: g.baseHp, baseDamage: g.baseDamage, isBoss: false, keyScale, affMult, band: g.band, armour: g.armour, resist: g.resist, guarding: g.guarding, shielded: g.shielded })
+      guard.nextActionAt = t
+      mobs.push(guard)
+      const rec: ReplayMob = { id: `s${stageIdx}m${st.mobs.length}`, name: guard.name, band: guard.position === "Back" ? "back" : "front", isBoss: false, stageIdx, spawnSec: Math.floor(t), deathSec: null, hp: [hpFrac(guard)] }
+      st.rec.mobIds.push(rec.id)
+      st.mobs.push({ c: guard, rec })
+      replayMobs.push(rec)
+      refreshGuardShields()   // a guard is up now → re-ward the boss this instant
+      emit("mechanic", `${bossName} calls a ${guard.name} to ward it — cut the guard down to strike ${bossName}.`, { sourceName: bossName, ability: bossAbil, target: guard.name, result: "Guard summoned" })
+    }
+    // P.4: ward the boss from t=0 (summon its first guard immediately) so the kill-priority mechanic is unskippable —
+    // otherwise the boss is exposed until the first cadence summon (~SUMMON_EVERY s) and a wildly over-geared burst comp
+    // could delete it before any guard appears, skipping the mechanic entirely.
+    if (bossSummonsId) summonGuard()
     let lastEnemyEmitSec = -1
     let lastEventSec = Math.floor(t)   // absolute whole-second cursor (one affix tick per real second)
     let stageSec = 0                   // whole seconds elapsed since stage start (exact cadence, no fractional drift)
@@ -200,6 +243,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
       const inDanger = aliveParty().some((p) => p.hp / p.maxHp < DANGER_HP_FRAC) || (t - lastDeathT < RECENT_DEATH_SEC)
       ctx.partyInDanger = inDanger
       for (const p of party) p.intakeMult = p.opIntakeStatic * (inDanger ? p.opClutchIntakeMult : 1)
+      refreshGuardShields()   // P.4: keep the guarded enemy's ward in sync with whether its guard still lives
 
       // --- party actions: cast the best ready ability, else a basic attack (gated by crowd control) ---
       ctx.t = t
@@ -292,6 +336,9 @@ export function runDungeonEGM(input: RunInput): RunResult {
               emit("mechanic", `${bn}'s ${abil} — the rot-curse creeps deeper (${stk} stack${stk === 1 ? "" : "s"}; dispel ${bossCurse}).`, m("party", "Curse stack"))
             }
           }
+          // P.4 (P8 unify): summon a fresh guard on the cadence whenever none is alive (re-shields the boss). Independent
+          // of the mechanic chain below — a summoner boss does ONLY summon+shield (its abstract dial mechanic is suppressed).
+          if (bossSummonsId && since % SUMMON_EVERY === 0 && !mobs.some((mm) => mm.guarding && mm.hp > 0)) summonGuard()
           if (bossSpike === "burst") {
             // C.10: a SOFT "bring the triage healer" lever ("player not class" — small by design). A single hit on the
             // lowest-HP non-tank every 6s. Gentle enough that both healers clear low/mid keys cleanly; near the ceiling
@@ -332,7 +379,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
               }
               boss.pendingCast = null
             }
-          } else if (since % 12 === 0) {
+          } else if (since % 12 === 0 && !bossSummonsId) {   // P.4: a summon-shield boss runs ONLY its summon (above), not the abstract dial mechanic
             if (bossTest === "interrupts") {
               if (!rng.chance(Math.min(0.95, 0.2 + 0.25 * (tac.interrupts ?? 0)))) {
                 for (const pp of aliveParty()) dealDamage(pp, 16 * keyScale * DMG_UNIT * aggroIntake)

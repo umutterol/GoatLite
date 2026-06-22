@@ -132,6 +132,10 @@ export function tickStatuses(c: Combatant, dt: number, t: number, resolve: (id: 
     if (!s.perTick || (s.kind !== "dot" && s.kind !== "hot")) continue
     let amt = s.perTick * s.stacks * dt
     if (s.kind === "dot") {
+      // P.4: DoT ticks go through dealDamage, bypassing resolveHit's damageTakenPct — so a guarded `shielded` enemy's ward
+      // (negative damageTakenPct set by the engine) must be applied here too, or bleeds/poison leak through the ward.
+      // Gated to the guard ward (negative) on a shielded enemy so Mark (+%) and all party/normal-enemy DoTs are unchanged.
+      if (c.shielded && c.damageTakenPct < 0) amt *= 1 + c.damageTakenPct / 100
       dealDamage(c, amt)
       const src = resolve(s.applierId); if (src) src.dmgDone += amt
       dots.push({ status: s, amount: amt })
