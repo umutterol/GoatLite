@@ -54,6 +54,10 @@ export const ENEMY_DMG_MULT = SIM.enemyDmgMult ?? 1
 export const DMG_UNIT = (SIM.dmgUnit ?? 4) * ENEMY_DMG_MULT
 export const ATTACK_INTERVAL_BASE = SIM.attackIntervalBase ?? 2.0   // seconds between auto-attacks at 0 haste
 export const ENEMY_ATTACK_INTERVAL = SIM.enemyAttackInterval ?? 1.0
+// P.0 (Phase P) GATE 0 — the anti-generic-EHP floor. Stacked PERCENTAGE mitigation (party armour × Awareness intake ×
+// DR buffs) can never cut a hit below this fraction of its pre-mitigation size (i.e. mitigation caps at a 60% reduction).
+// Shields (a finite pool) and HoTs (separate healing) are deliberately NOT clamped here — they're recost in P.5.
+export const INTAKE_FLOOR_FRAC = SIM.intakeFloorFrac ?? 0.4
 
 export type Role = "tank" | "healer" | "dps"
 const ROLE: Record<string, Role> = { Tank: "tank", Healer: "healer", DPS: "dps" }
@@ -181,15 +185,19 @@ export function makeEnemy(opts: {
   const hp = opts.baseHp * HP_UNIT * opts.keyScale * opts.affMult
   return {
     id: "", name: opts.name, specId: "", team: "enemy",
-    role: "dps", position: opts.band === "back" ? "Back" : "Front", profile: opts.band === "back" ? "caster" : "melee",
+    // P.0: bosses tank-and-spank (focusTank), never dive — the dive (focusSquishy) is for back-band TRASH casters only.
+    // (The old `band===back ? caster` rule made 10 back-band bosses auto-attack the squishy back-line — a correctness bug
+    // the C.11 audit blamed for the survival-dominance regime; intentional dives still go through spikeProfile/abilities.)
+    role: "dps", position: opts.band === "back" ? "Back" : "Front", profile: opts.isBoss ? "melee" : (opts.band === "back" ? "caster" : "melee"),
     maxHp: hp, hp, shield: 0, shieldExpiresAt: 0,
     power: 0,
     attackPower: opts.baseDamage * opts.keyScale * opts.affMult * DMG_UNIT,
     attackInterval: ENEMY_ATTACK_INTERVAL,
     damageType: "Physical",
-    // C.8: armour mitigates the party's Physical, resist their Magic (ratio formula). Default 0 = unmitigated
-    // (Ashveil unchanged). Scaled by keyScale so the mitigation fraction roughly tracks gear-appropriate hit sizes.
-    armour: (opts.armour ?? 0) * opts.keyScale, resist: (opts.resist ?? 0) * opts.keyScale,
+    // C.8/P.0: armour mitigates the party's Physical, resist their Magic (school wall). Default 0 = unmitigated (Ashveil
+    // unchanged). NOT scaled by keyScale anymore — the wall is hit-size-independent (see pipeline.schoolWallFraction), so a
+    // flat base gives a STABLE off-school tax % across keys (the old keyScale coupling drifted the tax up with key level).
+    armour: opts.armour ?? 0, resist: opts.resist ?? 0,
     critChance: 0, critMult: 1, dodgeChance: 0, damageTakenPct: 0,
     mana: 0, maxMana: 0, healCost: 0, manaRegen: 0, hps: 0,
     nextActionAt: 0, downedUntil: -1, dmgDone: 0, healDone: 0, deaths: 0, isBoss: opts.isBoss,
@@ -241,9 +249,16 @@ export function eff(c: Combatant): EffStats {
 
 /** Apply damage to a combatant — Phase F operator intake (party only) reduces it first, then shield soaks, then life.
     `bypassIntake` skips the operator multiplier for SELF-INFLICTED costs (ability HP costs aren't "incoming damage"). */
-export function dealDamage(target: Combatant, amount: number, opts?: { bypassIntake?: boolean }): void {
+export function dealDamage(target: Combatant, amount: number, opts?: { bypassIntake?: boolean; preMitigation?: number }): void {
   // Uniform Awareness/Composure intake: applies to ALL external incoming (auto-attacks, affix ticks, mechanics, redirects).
-  let amt = target.team === "party" && !opts?.bypassIntake ? amount * target.intakeMult : amount
+  const external = target.team === "party" && !opts?.bypassIntake
+  let amt = external ? amount * target.intakeMult : amount
+  // P.0 GATE 0: floor the COMBINED percentage reduction (armour/resist mitigation already folded into `amount` + the
+  // intake mult applied just above) at INTAKE_FLOOR_FRAC of the pre-mitigation hit. `preMitigation` is the raw pre-armour
+  // swing for auto-attacks; for affix/boss ticks it defaults to `amount` (their only reduction is the intake mult). The
+  // clamp is a MIN, so amplified hits (Mark/damageTaken+) are untouched — it only catches over-stacked mitigation. Then
+  // shields (a finite pool, intentionally NOT floored) soak what's left.
+  if (external) amt = Math.max(amt, INTAKE_FLOOR_FRAC * (opts?.preMitigation ?? amount))
   if (target.shield > 0) { const soak = Math.min(target.shield, amt); target.shield -= soak; amt -= soak }
   target.hp -= amt
 }

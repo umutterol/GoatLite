@@ -37,7 +37,8 @@ const injuredAllies = (ctx: CombatCtx) =>
 
 const defenderOf = (c: Combatant): Defender => {
   const e = eff(c)
-  return { armour: e.armour, resist: e.resist, dodgeChance: e.dodgeChance, damageTakenPct: e.damageTakenPct }
+  // P.0: enemies use the hit-size-independent school wall (off-school tax); party armour keeps the ratio formula.
+  return { armour: e.armour, resist: e.resist, dodgeChance: e.dodgeChance, damageTakenPct: e.damageTakenPct, wall: c.team === "enemy" }
 }
 const isHot = (statusId: string) => content.statuses.get(statusId)?.kind === "hot"
 const isLiveStatus = (statusId: string) => {
@@ -217,14 +218,16 @@ export function resolveEnemyAttack(attacker: Combatant, victim: Combatant, hit: 
     if (prot && prot !== victim && prot.downedUntil < 0) {
       const moved = dealt * (g.redirect.redirectPct / 100) * (1 - g.redirect.reductionPct / 100)
       const stay = dealt * (1 - g.redirect.redirectPct / 100)
+      // P.0 intake floor: the victim's retained share is floored against its pre-mitigation portion of the swing; the
+      // protector's redirected share keeps the redirect's reduction (the peel's value — only its own intake is floored).
       if (moved > 0) dealDamage(prot, moved)
-      if (stay > 0) dealDamage(victim, stay)
+      if (stay > 0) dealDamage(victim, stay, { preMitigation: hit.amount * (1 - g.redirect.redirectPct / 100) })
       thornsReflect(victim, attacker, ctx)
       return { dealt: stay, outcome: "Redirected" }   // log reflects what the victim actually took (protector's share is separate)
     }
   }
 
-  dealDamage(victim, dealt)
+  dealDamage(victim, dealt, { preMitigation: hit.amount })   // P.0: floor the stacked armour×intake reduction at intakeFloorFrac of the raw swing
   thornsReflect(victim, attacker, ctx)
   return { dealt, outcome: res.isCrit ? "Crit" : "Hit" }
 }

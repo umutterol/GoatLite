@@ -12,7 +12,7 @@ import { generateBarks, type BarkMoment } from "./barks"
 import { Rng } from "@/sim/rng"
 
 const SAVE_KEY = "goatlite.save"
-const SAVE_VERSION = 5 // bumped: per-member operator skills + ceilings + Potentials profile (Phase F)
+const SAVE_VERSION = 6 // bumped: Phase P GATE 0 (boss-dive fix + intake floor + school wall) changes deterministic run results → clean reset
 export const SLOTS = [...content.itemSlots.keys()] // weapon, helm, chest, legs, boots, trinket
 
 export type RoleKey = "tank" | "healer" | "dps"

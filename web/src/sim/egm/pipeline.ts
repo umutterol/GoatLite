@@ -6,10 +6,11 @@ import { Rng } from "../rng"
 export type DamageType = "Physical" | "Magic"
 
 export interface Defender {
-  armour: number          // mitigates Physical (ratio formula)
-  resist: number          // mitigates Magic (ratio formula)
+  armour: number          // mitigates Physical (ratio formula for party; school wall for enemies)
+  resist: number          // mitigates Magic (ratio formula for party; school wall for enemies)
   dodgeChance: number     // 0..1
   damageTakenPct: number  // additive %, from Mark etc. (Phase 3); 0 by default
+  wall?: boolean          // P.0: enemy defenders use the hit-size-INDEPENDENT school wall (a flat off-school tax); party armour keeps the ratio formula
 }
 
 export interface Hit {
@@ -28,11 +29,24 @@ export interface HitResult {
   damageType: DamageType
 }
 
-/** Ratio mitigation — the same shape the current tank model uses: big hits punch through, chip is absorbed, cap 90%. */
+/** Ratio mitigation — the same shape the current tank model uses: big hits punch through, chip is absorbed, cap 90%.
+    Used for PARTY armour (enemy→party). 0 defense → 0 (Ashveil byte-identical). */
 export function mitigationFraction(defenseValue: number, incoming: number): number {
   if (defenseValue <= 0 || incoming <= 0) return 0
   const ratio = defenseValue / incoming
   return Math.min(0.9, ratio / (ratio + 10))
+}
+
+/* P.0 (Phase P) — the damage-SCHOOL wall for ENEMY defenders (party→enemy). Hit-size-INDEPENDENT, unlike the ratio
+   formula above: the ratio's `incoming` denominator made big core hits sail through (armour 250 mitigated a 1000-dmg
+   hit only ~2.4%), so there was no real school check. This taxes a wrong-school core a flat fraction on EVERY hit. 0
+   defense → 0, so Ashveil (armour/resist 0) stays byte-identical. K/CAP are tuned in P.1 against the sweep to land the
+   off-school tax at +3–5 keys; they start conservative here (structural change only — P.0 doesn't chase magnitudes). */
+export const SCHOOL_WALL_K = 380
+export const SCHOOL_WALL_CAP = 0.5
+export function schoolWallFraction(defenseValue: number): number {
+  if (defenseValue <= 0) return 0
+  return Math.min(SCHOOL_WALL_CAP, defenseValue / (defenseValue + SCHOOL_WALL_K))
 }
 
 export function resolveHit(hit: Hit, def: Defender, rng: Rng): HitResult {
@@ -45,7 +59,7 @@ export function resolveHit(hit: Hit, def: Defender, rng: Rng): HitResult {
 
   const pre = dmg
   const defense = hit.damageType === "Physical" ? def.armour : def.resist
-  dmg *= 1 - mitigationFraction(defense, pre)
+  dmg *= 1 - (def.wall ? schoolWallFraction(defense) : mitigationFraction(defense, pre))
   if (def.damageTakenPct) dmg *= 1 + def.damageTakenPct / 100
 
   return { dealt: dmg, isCrit, isDodge: false, mitigated: pre - dmg, damageType: hit.damageType }
