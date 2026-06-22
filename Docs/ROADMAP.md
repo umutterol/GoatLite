@@ -366,6 +366,15 @@ execute later.*
 
 ## Changelog
 
+- **2026-06-22** — **Roadmap visualization board added (`Docs/roadmap-board.html`).** A self-contained, dependency-free
+  interactive HTML view of this tracker (double-click to open): **Kanban board** (Todo/In-Progress/Blocked/Done/Deferred,
+  phase-tagged cards with effort/severity/★-leverage badges), **wave Gantt** (phases sequenced by dependency order with a
+  NOW marker, not calendar dates), **dependency map** (critical build chains + the Open-Design-Decisions-that-gate-tasks
+  table), and a **quick-wins quadrant** (effort × impact: quick-wins / big-rocks / fill-ins / money-pits). Generated +
+  Playwright-verified (`web/scripts/roadmap-board-check.mjs`, 0 console errors), and its embedded data was adversarially
+  audited against this file (5-auditor workflow → all statuses/efforts/severities CLEAN, no missing/extra tasks; 3
+  decision→blocked-task link completeness fixes applied). **Tooling/docs only — no game code, sim, or balance touched.**
+  Regenerate/re-verify whenever the roadmap changes.
 - **2026-06-22** — **P.2 enemy cast scheduler + real interrupt SHIPPED — the flagship "kick-or-wipe" (Bellreach = P1).**
   Built a real enemy cast scheduler in `engine.ts`, gated to abilities flagged `interruptible:true` (only Bellreach's
   antiphon/drowning-psalm/final-peal — reusing their existing `shape:"cast"`+`telegraph` data, so Ashveil's Vesk and

@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GOAT Lite — Roadmap Board</title>
+<style>
+  :root{
+    --bg:#0d1117; --bg2:#161b22; --bg3:#1c2330; --line:#2b3444; --line2:#3a4658;
+    --ink:#e6edf3; --ink2:#9aa7b4; --ink3:#6b7888;
+    --done:#22c55e; --wip:#f59e0b; --todo:#7d8590; --blocked:#ef4444; --deferred:#475569; --superseded:#39414e;
+    --gold:#d4a72c; --accent:#d946ef;
+    --radius:6px;
+    --shadow:0 1px 0 rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent)}
+  h1,h2,h3{margin:0; font-weight:650}
+  .wrap{max-width:1500px; margin:0 auto; padding:18px 22px 80px}
+
+  /* ---- header ---- */
+  header.top{display:flex; align-items:flex-end; gap:18px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:14px}
+  .title h1{font-size:22px; letter-spacing:.3px}
+  .title .sub{color:var(--ink2); font-size:12px; margin-top:3px}
+  .title .now{color:var(--gold); font-weight:600}
+  .kpis{display:flex; gap:10px; margin-left:auto; flex-wrap:wrap}
+  .kpi{background:var(--bg2); border:1px solid var(--line); border-radius:var(--radius); padding:8px 12px; min-width:74px; text-align:center}
+  .kpi b{display:block; font-size:20px; line-height:1.1}
+  .kpi span{font-size:10px; color:var(--ink2); text-transform:uppercase; letter-spacing:.6px}
+  .kpi.done b{color:var(--done)} .kpi.wip b{color:var(--wip)} .kpi.todo b{color:var(--todo)}
+  .kpi.blocked b{color:var(--blocked)} .kpi.pct b{color:var(--gold)}
+
+  /* overall progress bar */
+  .overall{margin:10px 0 0; height:10px; background:var(--bg3); border:1px solid var(--line); border-radius:20px; overflow:hidden; display:flex}
+  .overall i{display:block; height:100%}
+
+  /* ---- controls ---- */
+  .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:16px 0 12px}
+  .tabs{display:flex; gap:4px; background:var(--bg2); border:1px solid var(--line); border-radius:var(--radius); padding:3px}
+  .tab{padding:6px 14px; border-radius:4px; cursor:pointer; color:var(--ink2); font-weight:600; font-size:12.5px; user-select:none; border:1px solid transparent}
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:var(--bg3); color:var(--ink); border-color:var(--line2); box-shadow:var(--shadow)}
+  .spacer{flex:1}
+  .toggle{display:flex; align-items:center; gap:6px; color:var(--ink2); cursor:pointer; user-select:none; font-size:12px}
+  .toggle input{accent-color:var(--accent)}
+  #search{background:var(--bg2); border:1px solid var(--line); color:var(--ink); border-radius:var(--radius); padding:6px 10px; width:190px; font-size:12px}
+  #search:focus{outline:none; border-color:var(--accent)}
+
+  /* phase filter chips */
+  .phasefilter{display:flex; gap:5px; flex-wrap:wrap; margin-bottom:14px}
+  .pchip{font-size:10.5px; padding:3px 9px; border-radius:20px; cursor:pointer; user-select:none; border:1px solid var(--line2); color:var(--ink2); background:var(--bg2); display:flex; align-items:center; gap:5px}
+  .pchip .dot{width:8px;height:8px;border-radius:50%}
+  .pchip.off{opacity:.32; filter:grayscale(.6)}
+  .pchip .mini{color:var(--ink3); font-size:9.5px}
+  .pchip.allbtn{border-style:dashed}
+
+  /* ---- badges ---- */
+  .badge{display:inline-flex; align-items:center; gap:3px; font-size:9.5px; font-weight:700; padding:1px 6px; border-radius:4px; letter-spacing:.4px; text-transform:uppercase}
+  .eff{border:1px solid var(--line2)}
+  .eff.S{color:#7ee787; border-color:#2ea04366} .eff.M{color:#79c0ff; border-color:#1f6feb55}
+  .eff.L{color:#ffa657; border-color:#bb800966} .eff.XL{color:#ff7b72; border-color:#da363355}
+  .eff.dash{color:var(--ink3)}
+  .sev.blocker{color:#ff7b72} .sev.major{color:#e3b341} .sev.minor{color:var(--ink3)}
+  .lev{color:var(--gold); font-weight:700; font-size:10px}
+
+  /* ---- board (kanban) ---- */
+  .board{display:grid; grid-template-columns:repeat(5,1fr); gap:12px; align-items:start}
+  .col{background:var(--bg2); border:1px solid var(--line); border-radius:var(--radius); min-height:60px}
+  .col h3{font-size:12px; padding:9px 11px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:7px; position:sticky; top:0; background:var(--bg2); z-index:2; border-radius:var(--radius) var(--radius) 0 0}
+  .col h3 .n{margin-left:auto; color:var(--ink3); font-size:11px; background:var(--bg3); border-radius:20px; padding:1px 8px}
+  .col h3 .sdot{width:9px;height:9px;border-radius:50%}
+  .col .body{padding:8px; display:flex; flex-direction:column; gap:7px}
+  .card{background:var(--bg3); border:1px solid var(--line); border-left-width:3px; border-radius:5px; padding:7px 9px; cursor:default}
+  .card:hover{border-color:var(--line2)}
+  .card .r1{display:flex; align-items:center; gap:6px; margin-bottom:3px}
+  .card .pid{font-weight:700; font-size:11px; color:var(--ink)}
+  .card .ptag{font-size:9px; padding:1px 6px; border-radius:3px; color:#0d1117; font-weight:700}
+  .card .badges{margin-left:auto; display:flex; gap:4px; align-items:center}
+  .card .t{font-size:12px; color:var(--ink); line-height:1.35}
+  .card .meta{margin-top:4px; font-size:10px; color:var(--ink3); display:flex; gap:8px; flex-wrap:wrap}
+  .card.hidden{display:none}
+  .colempty{color:var(--ink3); font-size:11px; padding:14px; text-align:center; font-style:italic}
+
+  /* ---- gantt / timeline ---- */
+  .gantt{background:var(--bg2); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+  .gantt .head{display:grid; grid-template-columns:130px repeat(6,1fr); border-bottom:1px solid var(--line2)}
+  .gantt .head div{padding:9px 8px; font-size:10.5px; font-weight:700; color:var(--ink2); text-transform:uppercase; letter-spacing:.5px; border-left:1px solid var(--line)}
+  .gantt .head div:first-child{border-left:none}
+  .gantt .head .nowcol{color:var(--gold)}
+  .grow{display:grid; grid-template-columns:130px repeat(6,1fr); border-top:1px solid var(--line); position:relative}
+  .grow:hover{background:#ffffff05}
+  .glabel{padding:7px 10px; font-size:11.5px; display:flex; align-items:center; gap:7px; border-right:1px solid var(--line)}
+  .glabel .dot{width:9px;height:9px;border-radius:2px; flex:none}
+  .glabel b{font-weight:650}
+  .glabel .ph{color:var(--ink3); font-size:10px}
+  .gcell{border-left:1px solid var(--line); position:relative; padding:6px 7px}
+  .bar{height:24px; border-radius:4px; position:relative; overflow:hidden; display:flex; align-items:center; box-shadow:var(--shadow)}
+  .bar .fill{position:absolute; left:0; top:0; bottom:0; background:linear-gradient(90deg,#22c55e,#16a34a); opacity:.9}
+  .bar .lab{position:relative; z-index:2; font-size:10.5px; font-weight:700; padding:0 8px; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.6); white-space:nowrap}
+  .bar.s-todo .fill{background:linear-gradient(90deg,#5b6470,#414b58)}
+  .bar.s-superseded{opacity:.45}
+  .nowline{position:absolute; top:0; bottom:0; width:2px; background:var(--gold); z-index:5; box-shadow:0 0 8px var(--gold)}
+  .nowflag{position:absolute; top:-1px; transform:translateX(-50%); background:var(--gold); color:#1a1300; font-size:9px; font-weight:800; padding:1px 6px; border-radius:0 0 4px 4px; z-index:6; letter-spacing:.5px}
+  .gantt .legendrow{padding:9px 12px; color:var(--ink3); font-size:10.5px; border-top:1px solid var(--line); background:var(--bg2)}
+
+  /* ---- dependencies ---- */
+  .deps{display:flex; flex-direction:column; gap:18px}
+  .depsec{background:var(--bg2); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px}
+  .depsec h3{font-size:13px; margin-bottom:3px}
+  .depsec .hint{color:var(--ink3); font-size:11px; margin-bottom:12px}
+  .chain{display:flex; align-items:center; flex-wrap:wrap; gap:0; margin:7px 0}
+  .node{display:inline-flex; flex-direction:column; gap:2px; background:var(--bg3); border:1px solid var(--line2); border-left-width:3px; border-radius:5px; padding:5px 9px; min-width:90px}
+  .node .nid{font-weight:700; font-size:11px}
+  .node .nt{font-size:10px; color:var(--ink2); max-width:150px}
+  .node.s-done{border-color:var(--done)} .node.s-wip{border-color:var(--wip)}
+  .node.s-todo{border-color:var(--line2)} .node.s-blocked{border-color:var(--blocked)}
+  .arrow{color:var(--ink3); font-size:16px; padding:0 8px; flex:none; align-self:center}
+  .arrow.soft{color:var(--line2)}
+  .branchwrap{display:flex; align-items:center; gap:0}
+  .branches{display:flex; flex-direction:column; gap:6px}
+  .decgrid{display:grid; grid-template-columns:1fr; gap:8px}
+  .decrow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px 10px; background:var(--bg3); border:1px solid var(--line); border-radius:5px}
+  .dstat{font-size:9.5px; font-weight:800; text-transform:uppercase; padding:2px 8px; border-radius:20px; letter-spacing:.4px; flex:none}
+  .dstat.open{background:#da36331f; color:#ff7b72; border:1px solid #da363355}
+  .dstat.partial{background:#bb80091f; color:#e3b341; border:1px solid #bb800955}
+  .dstat.resolved{background:#2ea0431f; color:#7ee787; border:1px solid #2ea04355}
+  .dstat.deferred{background:#3a44581f; color:#9aa7b4; border:1px solid #3a4658}
+  .declabel{font-weight:600; min-width:230px; flex:1}
+  .blocks{display:flex; gap:5px; align-items:center; flex-wrap:wrap; color:var(--ink3); font-size:11px}
+  .tchip{font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; border:1px solid var(--line2); background:var(--bg2)}
+  .tchip.s-todo{color:var(--ink2)} .tchip.s-done{color:var(--done); border-color:#2ea04355}
+  .tchip.s-blocked{color:var(--blocked); border-color:#da363355} .tchip.s-wip{color:var(--wip); border-color:#bb800955}
+
+  /* ---- quadrant ---- */
+  .quadwrap{display:grid; grid-template-columns:1fr 270px; gap:16px; align-items:start}
+  .quad{position:relative; background:var(--bg2); border:1px solid var(--line); border-radius:var(--radius); height:560px}
+  .quad .zone{position:absolute; opacity:.10}
+  .quad .zlabel{position:absolute; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; opacity:.55; pointer-events:none}
+  .quad .axisx, .quad .axisy{position:absolute; color:var(--ink3); font-size:10px}
+  .quad .gridline{position:absolute; background:var(--line); opacity:.5}
+  .dotnode{position:absolute; transform:translate(-50%,-50%); width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:#0d1117; cursor:default; border:2px solid #0d1117; box-shadow:var(--shadow); transition:transform .1s}
+  .dotnode:hover{transform:translate(-50%,-50%) scale(1.35); z-index:20}
+  .dotnode .tip{position:absolute; bottom:120%; left:50%; transform:translateX(-50%); background:#000; border:1px solid var(--line2); color:var(--ink); font-size:10.5px; font-weight:500; padding:6px 9px; border-radius:5px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s; z-index:30; box-shadow:0 4px 14px #000}
+  .dotnode:hover .tip{opacity:1}
+  .qlegend{background:var(--bg2); border:1px solid var(--line); border-radius:var(--radius); padding:14px}
+  .qlegend h3{font-size:13px; margin-bottom:8px}
+  .qlegend p{color:var(--ink2); font-size:11.5px; margin:0 0 10px}
+  .qlist{display:flex; flex-direction:column; gap:5px; margin-top:6px}
+  .qli{display:flex; gap:7px; align-items:baseline; font-size:11.5px}
+  .qli b{color:var(--gold)}
+  .swatch{width:11px; height:11px; border-radius:3px; flex:none; margin-top:2px}
+
+  .foot{margin-top:26px; color:var(--ink3); font-size:11px; border-top:1px solid var(--line); padding-top:12px}
+  .hideview{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="title">
+      <h1>GOAT Lite — Production Roadmap</h1>
+      <div class="sub">Visual board generated from <code>Docs/ROADMAP.md</code> · snapshot 2026-06-22 ·
+        <span class="now">▶ NOW: Phase P (Class-Tools) — P.3 dispel typing next</span></div>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </header>
+  <div class="overall" id="overall"></div>
+
+  <div class="controls">
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-view="board">🗂 Board</div>
+      <div class="tab" data-view="gantt">📊 Timeline</div>
+      <div class="tab" data-view="deps">🔗 Dependencies</div>
+      <div class="tab" data-view="quad">⚡ Quick Wins</div>
+    </div>
+    <div class="spacer"></div>
+    <input id="search" placeholder="Search id / title…" autocomplete="off">
+    <label class="toggle"><input type="checkbox" id="hideDone"> hide done</label>
+    <label class="toggle"><input type="checkbox" id="showSup"> show superseded</label>
+  </div>
+
+  <div class="phasefilter" id="phasefilter"></div>
+
+  <section id="view-board"></section>
+  <section id="view-gantt" class="hideview"></section>
+  <section id="view-deps" class="hideview"></section>
+  <section id="view-quad" class="hideview"></section>
+
+  <div class="foot">
+    Effort: <b>S</b> small · <b>M</b> medium · <b>L</b> large · <b>XL</b> extra-large &nbsp;|&nbsp;
+    Severity: blocker / major / minor &nbsp;|&nbsp; ★ = unblocks downstream work (leverage) &nbsp;|&nbsp;
+    Source of truth remains <code>Docs/ROADMAP.md</code> — regenerate this board when it changes.
+  </div>
+</div>
+
+<script>
+/* ====================== DATA MODEL (mirrors Docs/ROADMAP.md, snapshot 2026-06-22) ====================== */
+const PHASES = {
+  "0":{name:"Foundation",                 color:"#6b7280", wave:0},
+  "A":{name:"Engine v1 (flat-power)",     color:"#4b5563", wave:0, sup:true},
+  "A2":{name:"Combat engine on EGM model",color:"#8b5cf6", wave:0},
+  "B":{name:"Runtime loop & persistence", color:"#3b82f6", wave:1},
+  "F":{name:"Endgame & Identity (operator)",color:"#10b981", wave:1},
+  "G":{name:"Visual pass (icons/corners)",color:"#14b8a6", wave:1},
+  "H":{name:"Combat depth (majors/talents)",color:"#f97316", wave:1},
+  "I":{name:"2D replay (abstract packs)", color:"#06b6d4", wave:1},
+  "J":{name:"Feedback & polish batch",    color:"#84cc16", wave:1},
+  "K":{name:"Combat AI rework (v2)",      color:"#a855f7", wave:1},
+  "M":{name:"Guild Feed & Loot Drama",    color:"#0ea5e9", wave:1},
+  "N":{name:"Intake balance + tooling",   color:"#64748b", wave:1},
+  "P":{name:"Class-Tools System",         color:"#d946ef", wave:2},
+  "C":{name:"Content scale-up",           color:"#f59e0b", wave:3},
+  "Affix":{name:"Affix swap (IP scrub)",  color:"#eab308", wave:3},
+  "L":{name:"Roster expansion (Mark+Necro)",color:"#22c55e", wave:3},
+  "D":{name:"Systems depth",              color:"#ec4899", wave:4},
+  "E":{name:"Production (art/audio)",      color:"#ef4444", wave:5},
+};
+const WAVES = ["Foundation","Core systems & polish","▶ NOW — Class-Tools","Content & Roster","Systems depth","Production / Launch"];
+
+// status: done | wip | todo | blocked | deferred | superseded
+const T = (id,ph,s,e,v,t,ax)=>({id,ph,s,e,v,t,ax});
+const TASKS = [
+  // Phase 0
+  T("0.1","0","done","-","-","Design spec (GDD v1.10, locked)","design"),
+  T("0.2","0","done","-","-","Content data layer (26 domains, Zod)","data"),
+  T("0.3","0","done","-","-","UI mockup + theme + assets","ux"),
+  T("0.4","0","done","-","-","EGM reference + gap analysis","design"),
+  // Phase A (superseded)
+  T("A.1","A","superseded","S","blocker","Seeded PRNG + deterministic harness","engine"),
+  T("A.2","A","superseded","S","blocker","Role-model character math","engine"),
+  T("A.3","A","superseded","L","blocker","Tick loop over 8 stages → RunResult","engine"),
+  T("A.4","A","superseded","L","blocker","Damage pipeline + Hit Quality","engine"),
+  T("A.5","A","superseded","M","blocker","Tactics-point resolution","engine"),
+  T("A.6","A","superseded","M","blocker","Affix mechanics (8)","engine"),
+  T("A.7","A","superseded","S","blocker","Healer mana/OOM + death/wipe","engine"),
+  T("A.8","A","superseded","S","major","Timer, Calling the Run, soft-enrage","engine"),
+  T("A.9","A","superseded","M","major","Behavior-profile target AI","engine"),
+  T("A.10","A","superseded","L","major","Event-log + RunResult generation","engine"),
+  T("A.11","A","superseded","M","blocker","Wire CombatReplay to real sim","ux"),
+  T("A.12","A","superseded","M","major","Validate vs dungeon-timer test","engine"),
+  // Phase A2
+  T("A2.0","A2","done","-","-","Data formats (abilities/statuses)","data"),
+  T("A2.1","A2","done","-","-","Stat-driven engine + damage pipeline","engine"),
+  T("A2.2-3","A2","done","-","-","Abilities + statuses + buffs/CC/shields","engine"),
+  T("A2.3.5","A2","done","-","-","Passives + ~all special mechanics","engine"),
+  T("A2.4","A2","done","-","-","Enemy front/back bands","engine"),
+  T("A2.5a","A2","done","-","-","Affixes / tactics / boss mechanics","engine"),
+  T("A2.5b","A2","done","-","-","UI cutover + balance retune","ux"),
+  // Phase B
+  T("B.1","B","done","L","blocker","GameState runtime model","engine"),
+  T("B.2","B","done","M","blocker","JSON save/load + versioned migrator","engine"),
+  T("B.3","B","done","M","blocker","Keystone progression + week/affix","engine"),
+  T("B.4","B","done","M","blocker","Full loop wiring","engine"),
+  T("B.5","B","done","M","major","Loot generation + assignment + drama UI","engine/ux"),
+  T("B.6","B","done","M","major","Morale runtime (events, bands)","engine"),
+  T("B.7","B","done","M","major","Talent picker UI + per-member persistence","ux"),
+  T("B.8","B","done","L","major","Gear / 6-slot inventory + assignment","ux"),
+  T("B.9","B","done","L","major","Recruitment runtime + Initial Draft UI","ux"),
+  T("B.10","B","done","L","major","Remaining core screens","ux"),
+  T("B.11","B","todo","M","minor","Mid-run state persistence (save/resume)","data"),
+  T("B.12","B","done","M","major","Per-member keystones","engine/ux"),
+  T("B.13","B","done","S","minor","Editable New-Run party","ux"),
+  T("B.14","B","done","M","major","Reports history (replayable tickets)","ux"),
+  // Phase C
+  T("C.1","C","done","XL","major","Dungeons 2–6 (6-dungeon season)","content"),
+  T("C.2","C","todo","XL","major","Per-spec talent trees (~150 nodes)","content"),
+  T("C.3","C","todo","XL","major","Enemy roster breadth (~50–70)","content"),
+  T("C.4","C","todo","L","major","Item breadth + secondary pool tuning","content"),
+  T("C.5","C","todo","M","minor","Tier-set content (10 sets, 2pc/4pc)","content"),
+  T("C.6","C","todo","S","minor","Full affix calendar / season content","content"),
+  T("C.7","C","todo","M","major","Earned-trait event pools (triggers)","content"),
+  T("C.8","C","done","S","minor","Per-enemy armour/resist (school wall)","engine"),
+  T("C.9","C","todo","M","major","Tactic-mechanic lethality pass","balance"),
+  T("C.10","C","done","M","major","Burst/rot boss-mechanic variants","engine"),
+  T("C.11","C","blocked","XL","major","Comp-balance / survival-dominance pass","balance"),
+  // Phase D
+  T("D.1","D","todo","L","major","Earned-trait triggers + unlock","engine"),
+  T("D.2","D","todo","M","major","Morale departure (flip) + absorption","engine"),
+  T("D.3","D","todo","M","major","Crafting runtime + economy","engine"),
+  T("D.4","D","todo","M","major","Gold sinks + building costs/unlocks","design/engine"),
+  T("D.5","D","todo","M","major","Potentials reveal runtime","engine"),
+  T("D.6","D","todo","XL","major","Leaderboard + accounts + server re-sim","design/engine"),
+  T("D.7","D","todo","L","minor","Trait↔sim reconciliation + budget tune","data"),
+  T("D.8","D","todo","M","minor","Haste/Mastery sim hooks","data"),
+  T("D.9","D","deferred","XL","minor","Capture→rescue + scar-count ramp","content"),
+  T("D.10","D","todo","M","major","Telemetry / run-analytics pipeline","engine/infra"),
+  // Phase E
+  T("E.1","E","todo","XL","blocker","Original character portraits","assets"),
+  T("E.2","E","todo","XL","blocker","Monster / boss art","assets"),
+  T("E.3","E","todo","XL","major","Dungeon / environment art","assets"),
+  T("E.4","E","todo","XL","major","Audio (music + SFX)","assets"),
+  T("E.5","E","todo","M","major","Ability/affix iconography + item art","assets"),
+  T("E.6","E","todo","S","minor","Branding / title / favicon","assets"),
+  T("E.7","E","todo","M","minor","Mobile, accessibility, settings/hotkeys","ux"),
+  // Phase F
+  T("F.1","F","done","M","major","Operator data + types + SAVE→5","data/engine"),
+  T("F.2","F","done","M","major","Sim wiring: operator + trait effects","engine"),
+  T("F.3","F","done","M","major","Growth toward ceiling + hard gear cap","engine"),
+  T("F.4","F","done","M","major","Recruitment generation (ceilings/fuzzy)","engine"),
+  T("F.5","F","done","L","major","UI: scouting board + char operator panel","ux"),
+  T("F.6","F","done","M","major","Balance pass (per-point % vs curve)","engine"),
+  // Phase G
+  T("G.1","G","done","S","minor","Radius token (one --radius)","ux"),
+  T("G.2","G","done","S","minor","Typed <Icon> registry + placeholder","ux"),
+  T("G.3","G","done","M","minor","Wire existing-but-unused icons","ux"),
+  T("G.4","G","wip","L","major","New-art seams (raster PNG pipeline)","assets/ux"),
+  // Phase H
+  T("H.1","H","done","M","major","Author 10 per-spec majors","content"),
+  T("H.2","H","done","S","minor","UI: surface major (signature card)","ux"),
+  T("H.3","H","done","M","major","Finish talent nodes 3–5","content"),
+  T("H.4","H","done","M","major","Balance pass (major windows)","engine"),
+  // Phase I
+  T("I.1","I","done","L","major","Engine emits ReplayTimeline","engine"),
+  T("I.2","I","done","L","major","Replay canvas (faked-spatial arena)","ux"),
+  T("I.3","I","done","M","major","Scrubber + transport synced to log","ux"),
+  T("I.4","I","wip","M","minor","Polish: death anim/flashes/pips","ux"),
+  // Phase J
+  T("J.1","J","done","S","minor","Remove Horde/Alliance + realm","ux"),
+  T("J.2","J","done","S","minor","Replay stops at the wipe","ux"),
+  T("J.3","J","done","S","minor","Replay speed vs log reveal cadence","ux"),
+  T("J.4","J","done","S","minor","Combat log shows enemy attacker","ux"),
+  T("J.5","J","done","M","major","Healing meter wired to real heals","engine/ux"),
+  T("J.6","J","done","M","minor","Loot upgrade arrows + current item","ux"),
+  T("J.7","J","done","S","major","Soften backline gate to a bonus","balance"),
+  T("J.8","J","done","M","minor","Remove glow effects","ux"),
+  T("J.9","J","done","S","minor","Battle-Res count + timer on report","engine/ux"),
+  T("J.10","J","done","M","major","Tooltips everywhere","ux"),
+  // Phase K
+  T("K.1","K","done","L","major","Brain scaffold + primitives + schema","engine"),
+  T("K.2","K","done","M","major","Player rotation behaviours","engine"),
+  T("K.3","K","done","M","major","Player + enemy target selection","engine"),
+  T("K.4","K","done","M","major","Tactics-as-orders","engine"),
+  T("K.5","K","done","M","major","Spec overlays (data-driven profiles)","engine"),
+  T("K.6","K","done","M","major","Balance + verification pass (20-agent)","engine"),
+  // Affix
+  T("Affix.1","Affix","todo","M","minor","Swap affixes.json + rename ids (IP)","engine/data"),
+  // Phase L
+  T("L.1","L","todo","M","major","Bard → Marksman rework","content/ux"),
+  T("L.2","L","todo","S","major","Necromancer — 6th class","content"),
+  T("L.3","L","todo","L","major","Bonecaller spec (Necro DPS)","content"),
+  T("L.4","L","todo","L","major","Pallbinder spec (Necro Healer)","content"),
+  T("L.5","L","todo","L","major","Pet/minion engine mechanic (net-new)","engine"),
+  T("L.6","L","todo","XL","major","New-spec content (abilities/talents/loot)","content"),
+  T("L.7","L","todo","M","major","Save migration for roster change","engine"),
+  // Phase M
+  T("M.1","M","done","M","major","Feed panel + system notifications","ux/engine"),
+  T("M.2","M","done","M","major","Loot-drama mechanic (snub)","engine/ux"),
+  T("M.3","M","done","L","major","Bark engine (deterministic)","engine"),
+  T("M.4","M","done","L","major","Personality voice-pack content","content"),
+  T("M.5","M","done","S","major","Loot drama in the feed","ux"),
+  T("M.6","M","deferred","L","major","Exchange beats + Rival (v2)","content/engine"),
+  // Phase N
+  T("N.1","N","done","M","major","sim-dump harness (config/CLI runner)","tooling"),
+  T("N.2","N","done","S","major","enemyDmgMult intake lever","engine/balance"),
+  // Phase P
+  T("P.0","P","done","M","major","GATE 0 — boss-dive fix + intake floor + school wall","engine/balance"),
+  T("P.1","P","done","M","major","Pyreward school re-tune + Bard→Archer recut","balance/content"),
+  T("P.2","P","done","L","major","Enemy cast scheduler + real interrupt (Bellreach)","engine"),
+  T("P.3","P","todo","M","major","Dispel typing + enemy→party status (Mire)","engine/content"),
+  T("P.4","P","todo","M","major","Reach primitive + real adds + immunity","engine/content"),
+  T("P.5","P","todo","L","major","Anti-heal/purge + generic-EHP kill + kit recut","engine/balance"),
+];
+
+// task → task precedence (from "blocks" / sequence / notes)
+const EDGES = [
+  ["P.0","P.1"],["P.1","P.2"],["P.2","P.3"],["P.3","P.4"],["P.4","P.5"],
+  ["L.5","L.3"],["L.5","L.4"],["L.1","L.6"],["L.2","L.6"],["L.3","L.6"],["L.4","L.6"],["L.5","L.6"],
+  ["L.6","L.7"],["L.1","L.7"],["L.5","L.7"],
+  ["L.6","C.2"],["L.6","C.4"],["L.6","C.5"],
+  ["P.5","C.11"],["P.5","D.10"],["D.10","C.11"],["C.1","C.9"],
+];
+
+// Open Design Decisions that gate tasks
+const DECISIONS = [
+  {label:"Client-only vs isomorphic sim", st:"open",     blocks:["A.1","D.6","D.10"]},
+  {label:"Telemetry stack + consent model", st:"open",   blocks:["D.10"]},
+  {label:"Leaderboard integrity / accounts", st:"open",  blocks:["D.6"]},
+  {label:"Gold sinks / economy balance", st:"open",      blocks:["D.4"]},
+  {label:"Dungeon Rescue trigger + absorption", st:"open",blocks:["D.2"]},
+  {label:"Affix calendar: fixed cycle vs weekly roll", st:"open", blocks:["C.6"]},
+  {label:"Per-spec morale bonuses", st:"open",           blocks:["B.6"]},
+  {label:"Haste & Mastery effects", st:"partial",        blocks:["D.8"]},
+  {label:"Tick rate / timeline model", st:"resolved",    blocks:["A.3","A2.1"]},
+  {label:"Potentials: draft-bias vs power lever", st:"resolved", blocks:["F.1","F.2","F.3","F.4","D.5"]},
+  {label:"Recruitment 'guild progression' metric", st:"resolved", blocks:["B.9","D.6","F.4"]},
+  {label:"Keystone targeting / ownership", st:"resolved",blocks:["B.3","B.12"]},
+  {label:"Loot drama: depth + who contests", st:"resolved", blocks:["B.5","M.2"]},
+  {label:"Guild feed: form factor + v1 scope", st:"resolved", blocks:["M.1","M.2","M.3","M.4","M.5"]},
+  {label:"Capture→rescue + scar ramp scope", st:"deferred", blocks:["D.9"]},
+];
+
+/* ====================== DERIVED ====================== */
+const BYID = Object.fromEntries(TASKS.map(t=>[t.id,t]));
+const SUCC = {}; // out-degree of NOT-DONE successors (leverage)
+EDGES.forEach(([a,b])=>{ (SUCC[a]=SUCC[a]||[]).push(b); });
+function leverage(id){ const s=SUCC[id]||[]; return s.filter(x=>BYID[x]&&BYID[x].s!=="done").length; }
+
+const STATUS = {
+  todo:{label:"Todo", color:"var(--todo)"},
+  wip:{label:"In Progress", color:"var(--wip)"},
+  blocked:{label:"Blocked", color:"var(--blocked)"},
+  done:{label:"Done", color:"var(--done)"},
+  deferred:{label:"Deferred", color:"var(--deferred)"},
+  superseded:{label:"Superseded", color:"var(--superseded)"},
+};
+const EFF_W = {S:1,M:2,L:3,XL:4,"-":0};
+const SEV_W = {blocker:3,major:2,minor:1,"-":1};
+
+/* ====================== STATE + FILTERS ====================== */
+const state = { view:"board", phases:new Set(Object.keys(PHASES)), hideDone:false, showSup:false, q:"" };
+state.phases.delete("A"); // superseded off by default
+
+function active(t){
+  if(t.s==="superseded" && !state.showSup) return false;
+  if(!state.phases.has(t.ph)) return false;
+  if(state.hideDone && t.s==="done") return false;
+  if(state.q){ const q=state.q.toLowerCase(); if(!(t.id.toLowerCase().includes(q)||t.t.toLowerCase().includes(q))) return false; }
+  return true;
+}
+
+/* ====================== HELPERS ====================== */
+const el=(h)=>{const d=document.createElement("div"); d.innerHTML=h.trim(); return d.firstElementChild;};
+function effBadge(e){ if(!e||e==="-") return `<span class="badge eff dash">—</span>`; return `<span class="badge eff ${e}">${e}</span>`; }
+function sevBadge(v){ if(!v||v==="-") return ""; return `<span class="badge sev ${v}">${v[0].toUpperCase()}</span>`; }
+function levStar(id){ const l=leverage(id); return l>0?`<span class="lev" title="unblocks ${l} downstream task(s)">★${l}</span>`:""; }
+function pcolor(ph){ return PHASES[ph].color; }
+
+/* ====================== KPIs + OVERALL ====================== */
+function renderKpis(){
+  const a=TASKS.filter(t=>t.s!=="superseded");
+  const c=(s)=>a.filter(t=>t.s===s).length;
+  const done=c("done"), wip=c("wip"), todo=c("todo"), blk=c("blocked"), def=c("deferred");
+  const actionable=done+wip+todo+blk;
+  const pct=Math.round(done/actionable*100);
+  document.getElementById("kpis").innerHTML=`
+    <div class="kpi pct"><b>${pct}%</b><span>complete</span></div>
+    <div class="kpi done"><b>${done}</b><span>done</span></div>
+    <div class="kpi wip"><b>${wip}</b><span>in progress</span></div>
+    <div class="kpi todo"><b>${todo}</b><span>todo</span></div>
+    <div class="kpi blocked"><b>${blk}</b><span>blocked</span></div>`;
+  const tot=done+wip+todo+blk+def;
+  const seg=(n,col)=>n?`<i style="width:${n/tot*100}%;background:${col}"></i>`:"";
+  document.getElementById("overall").innerHTML=
+    seg(done,"var(--done)")+seg(wip,"var(--wip)")+seg(blk,"var(--blocked)")+seg(todo,"var(--todo)")+seg(def,"var(--deferred)");
+}
+
+/* ====================== PHASE FILTER CHIPS ====================== */
+function renderPhaseFilter(){
+  const box=document.getElementById("phasefilter");
+  let html=`<div class="pchip allbtn" data-all="1">all phases</div>`;
+  for(const [k,p] of Object.entries(PHASES)){
+    if(k==="A" && !state.showSup) continue;
+    const tot=TASKS.filter(t=>t.ph===k).length;
+    const done=TASKS.filter(t=>t.ph===k&&t.s==="done").length;
+    const off=state.phases.has(k)?"":"off";
+    html+=`<div class="pchip ${off}" data-ph="${k}"><span class="dot" style="background:${p.color}"></span>${k} · ${p.name} <span class="mini">${done}/${tot}</span></div>`;
+  }
+  box.innerHTML=html;
+  box.querySelectorAll(".pchip").forEach(c=>c.onclick=()=>{
+    if(c.dataset.all){ const allOn=Object.keys(PHASES).every(k=>k==="A"||state.phases.has(k));
+      Object.keys(PHASES).forEach(k=>{ if(k!=="A") state.phases.add(k); }); if(!state.showSup) state.phases.delete("A");
+      renderAll(); return; }
+    const k=c.dataset.ph; state.phases.has(k)?state.phases.delete(k):state.phases.add(k); renderAll();
+  });
+}
+
+/* ====================== BOARD (KANBAN) ====================== */
+function renderBoard(){
+  const order=["todo","wip","blocked","done","deferred"];
+  const sec=document.getElementById("view-board");
+  const board=el(`<div class="board"></div>`);
+  for(const st of order){
+    const items=TASKS.filter(t=>t.s===st && active(t))
+      .sort((a,b)=>(PHASES[a.ph].wave-PHASES[b.ph].wave)||a.ph.localeCompare(b.ph)||a.id.localeCompare(b.id,undefined,{numeric:true}));
+    const col=el(`<div class="col"></div>`);
+    col.innerHTML=`<h3><span class="sdot" style="background:${STATUS[st].color}"></span>${STATUS[st].label}<span class="n">${items.length}</span></h3>`;
+    const body=el(`<div class="body"></div>`);
+    if(!items.length) body.appendChild(el(`<div class="colempty">—</div>`));
+    for(const t of items){
+      const card=el(`<div class="card" style="border-left-color:${pcolor(t.ph)}"></div>`);
+      card.innerHTML=`
+        <div class="r1">
+          <span class="ptag" style="background:${pcolor(t.ph)}">${t.ph}</span>
+          <span class="pid">${t.id}</span>
+          <span class="badges">${levStar(t.id)}${sevBadge(t.v)}${effBadge(t.e)}</span>
+        </div>
+        <div class="t">${t.t}</div>
+        <div class="meta"><span>${t.ax}</span></div>`;
+      body.appendChild(card);
+    }
+    col.appendChild(body); board.appendChild(col);
+  }
+  sec.innerHTML=""; sec.appendChild(board);
+}
+
+/* ====================== GANTT / TIMELINE ====================== */
+function renderGantt(){
+  const sec=document.getElementById("view-gantt");
+  const g=el(`<div class="gantt"></div>`);
+  let head=`<div class="head"><div>Phase</div>`;
+  WAVES.forEach((w,i)=>head+=`<div class="${i===2?'nowcol':''}">${w}</div>`);
+  head+=`</div>`;
+  g.innerHTML=head;
+
+  const phaseList=Object.entries(PHASES)
+    .filter(([k])=> (k!=="A"||state.showSup) && state.phases.has(k))
+    .sort((a,b)=>(a[1].wave-b[1].wave)||a[0].localeCompare(b[0]));
+
+  for(const [k,p] of phaseList){
+    const tasks=TASKS.filter(t=>t.ph===k);
+    const total=tasks.filter(t=>t.s!=="deferred"&&t.s!=="superseded").length || tasks.length;
+    const done=tasks.filter(t=>t.s==="done").length;
+    const pct = p.sup?100:Math.round(done/(total||1)*100);
+    const anyBlocked=tasks.some(t=>t.s==="blocked");
+    const stClass = p.sup?"s-superseded":(pct===0?"s-todo":"");
+    const row=el(`<div class="grow"></div>`);
+    row.appendChild(el(`<div class="glabel"><span class="dot" style="background:${p.color}"></span><div><b>${k}</b> <span class="ph">${p.name}</span></div></div>`));
+    for(let w=0;w<6;w++){
+      const cell=el(`<div class="gcell"></div>`);
+      if(w===p.wave){
+        const lab = p.sup?"superseded":`${done}/${total} · ${pct}%${anyBlocked?" ⚠":""}`;
+        cell.innerHTML=`<div class="bar ${stClass}" title="${k} — ${p.name}">
+          <div class="fill" style="width:${pct}%"></div><div class="lab">${lab}</div></div>`;
+      }
+      row.appendChild(cell);
+    }
+    g.appendChild(row);
+  }
+  // NOW marker between wave 2 (index 2) — columns: 130px + 6 equal frs. left = 130 + (2.0/6)*(100%-130px)
+  const nowflag=el(`<div class="nowflag">NOW</div>`);
+  const nowline=el(`<div class="nowline"></div>`);
+  g.appendChild(el(`<div class="legendrow">Columns are <b>build waves</b> (logical sequence &amp; dependency order), not calendar dates — the project has no fixed schedule. Bars fill by % of non-deferred tasks done; ⚠ marks a blocked task in the phase.</div>`));
+  sec.innerHTML=""; sec.appendChild(g);
+  // position NOW marker after render (needs layout)
+  requestAnimationFrame(()=>{
+    const head=g.querySelector(".head"); const cells=head.children; // [Phase, w0..w5]
+    const startCol=cells[3]; // wave index 2 column = 3rd child (0:Phase,1:w0,2:w1,3:w2)
+    const gr=g.getBoundingClientRect(); const cr=startCol.getBoundingClientRect();
+    const x=cr.left-gr.left;
+    nowline.style.left=x+"px"; nowflag.style.left=x+"px";
+    g.style.position="relative"; g.appendChild(nowline); g.appendChild(nowflag);
+  });
+}
+
+/* ====================== DEPENDENCIES ====================== */
+function nodeHTML(id){
+  const t=BYID[id]; if(!t) return `<span class="node">${id}</span>`;
+  return `<div class="node s-${t.s}" style="border-left-color:${pcolor(t.ph)}">
+    <span class="nid">${id} ${levStar(id)}</span><span class="nt">${t.t}</span></div>`;
+}
+function chain(ids,soft){
+  let h=`<div class="chain">`;
+  ids.forEach((id,i)=>{ if(i) h+=`<span class="arrow ${soft?'soft':''}">➜</span>`; h+=nodeHTML(id); });
+  return h+`</div>`;
+}
+function renderDeps(){
+  const sec=document.getElementById("view-deps");
+  let h=`<div class="deps">`;
+
+  // 1. critical sequence chains
+  h+=`<div class="depsec"><h3>Critical sequences (must build in order)</h3>
+    <div class="hint">Each arrow = "finish the left before the right is meaningful." ★ = how many downstream tasks the item unblocks.</div>`;
+  h+=`<div style="color:var(--ink2);font-size:11px;margin:10px 0 2px">▶ Phase P — Class-Tools (the live spine; P.0→P.2 shipped)</div>`;
+  h+=chain(["P.0","P.1","P.2","P.3","P.4","P.5"]);
+  h+=`<div style="color:var(--ink2);font-size:11px;margin:14px 0 2px">Phase L — Roster expansion (pet engine gates the Necro specs)</div>`;
+  h+=`<div class="branchwrap">${nodeHTML("L.5")}<span class="arrow">➜</span>
+        <div class="branches">${nodeHTML("L.3")}${nodeHTML("L.4")}</div>
+        <span class="arrow">➜</span>${nodeHTML("L.6")}<span class="arrow">➜</span>${nodeHTML("L.7")}</div>`;
+  h+=`<div style="color:var(--ink2);font-size:11px;margin:14px 0 2px">Cross-phase: balance settles before analytics &amp; the big comp-balance pass</div>`;
+  h+=`<div class="branchwrap">${nodeHTML("P.5")}<span class="arrow">➜</span>
+        <div class="branches">${nodeHTML("D.10")}${nodeHTML("C.11")}</div></div>`;
+  h+=`<div class="hint" style="margin-top:6px">D.10 also feeds C.11 (real-player pick/win-rate data). L.6 expands C.2 / C.4 / C.5 (12-spec roster).</div>`;
+  h+=`</div>`;
+
+  // 2. open decisions gating tasks
+  h+=`<div class="depsec"><h3>Open design decisions gating future work</h3>
+    <div class="hint">Resolve the decision before (or while) building the tasks it blocks. Resolved ones are shown for traceability.</div>
+    <div class="decgrid">`;
+  const ord={open:0,partial:1,deferred:2,resolved:3};
+  DECISIONS.slice().sort((a,b)=>ord[a.st]-ord[b.st]).forEach(d=>{
+    const chips=d.blocks.map(id=>{const t=BYID[id]; return `<span class="tchip s-${t?t.s:'todo'}">${id}</span>`;}).join("");
+    h+=`<div class="decrow"><span class="dstat ${d.st}">${d.st}</span>
+      <span class="declabel">${d.label}</span>
+      <span class="blocks">blocks ➜ ${chips}</span></div>`;
+  });
+  h+=`</div></div>`;
+  h+=`</div>`;
+  sec.innerHTML=h;
+}
+
+/* ====================== QUICK-WINS QUADRANT ====================== */
+function renderQuad(){
+  const sec=document.getElementById("view-quad");
+  const items=TASKS.filter(t=>(t.s==="todo"||t.s==="wip"||t.s==="blocked") && active(t) && t.e!=="-");
+  const W=100, H=100; // percentage space
+  // x: effort 1..4 → 12..88 ; y: impact (sev + leverage) → bottom..top
+  const xOf=e=> 12 + (EFF_W[e]-1)/3 * 76;
+  const impact=t=> SEV_W[t.v] + Math.min(leverage(t.id),3)*0.6 + (t.s==="blocked"?0.4:0);
+  const imin=1, imax=4.4;
+  const yOf=t=> 90 - (Math.min(impact(t),imax)-imin)/(imax-imin) * 78;
+
+  let dots="";
+  // jitter overlapping dots deterministically
+  const seen={};
+  items.forEach(t=>{
+    const key=Math.round(xOf(t.e))+"_"+Math.round(yOf(t));
+    const n=(seen[key]=(seen[key]||0)+1);
+    const jx=((n-1)%3)*3.0 - 3.0, jy=Math.floor((n-1)/3)*4.2;
+    const x=xOf(t.e)+ (n>1?jx:0), y=yOf(t)+ (n>1?jy:0);
+    const lev=leverage(t.id);
+    const ring = t.s==="blocked" ? "#ef4444" : (lev>0?"#d4a72c":"#0d1117");
+    dots+=`<div class="dotnode" style="left:${x}%; top:${y}%; background:${pcolor(t.ph)}; border-color:${ring}">${t.id.replace(/^[A-Za-z]+\.?/,m=>m).replace('Affix.','A')}
+      <span class="tip"><b>${t.id}</b> · ${t.t}<br>${t.ph} · ${t.v} · effort ${t.e}${lev>0?` · ★ unblocks ${lev}`:""}${t.s==="blocked"?" · BLOCKED":""}</span></div>`;
+  });
+
+  const quad=`
+  <div class="quadwrap">
+    <div class="quad" id="quadbox">
+      <div class="zone" style="left:0;top:0;width:50%;height:55%;background:#22c55e"></div>
+      <div class="zone" style="left:50%;top:0;width:50%;height:55%;background:#f59e0b"></div>
+      <div class="zone" style="left:0;top:55%;width:50%;height:45%;background:#3b82f6"></div>
+      <div class="zone" style="left:50%;top:55%;width:50%;height:45%;background:#475569"></div>
+      <div class="zlabel" style="left:3%;top:3%;color:#7ee787">⚡ Quick wins</div>
+      <div class="zlabel" style="right:3%;top:3%;color:#ffa657">🏔 Big rocks</div>
+      <div class="zlabel" style="left:3%;bottom:3%;color:#79c0ff">Fill-ins</div>
+      <div class="zlabel" style="right:3%;bottom:3%;color:#9aa7b4">Money pits</div>
+      <div class="gridline" style="left:50%;top:0;bottom:0;width:1px"></div>
+      <div class="gridline" style="top:55%;left:0;right:0;height:1px"></div>
+      <div class="axisy" style="left:6px;top:6px;writing-mode:vertical-rl;transform:rotate(180deg)">◀ higher impact / leverage</div>
+      <div class="axisx" style="right:8px;bottom:6px">larger effort ▶</div>
+      ${dots}
+    </div>
+    <div class="qlegend">
+      <h3>How to read it</h3>
+      <p><b>X</b> = effort (S→XL). <b>Y</b> = impact = severity + leverage (how many tasks it unblocks). Only <b>unfinished</b> tasks in the visible phases are plotted.</p>
+      <div class="qli"><span class="swatch" style="background:#22c55e"></span><div><b>Quick wins</b> — low effort, high impact. Do these first.</div></div>
+      <div class="qli"><span class="swatch" style="background:#f59e0b"></span><div><b>Big rocks</b> — high impact but expensive; plan & sequence.</div></div>
+      <div class="qli"><span class="swatch" style="background:#3b82f6"></span><div><b>Fill-ins</b> — cheap & low-stakes; batch when convenient.</div></div>
+      <div class="qli"><span class="swatch" style="background:#475569"></span><div><b>Money pits</b> — expensive, low leverage; defer / justify.</div></div>
+      <div style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px">
+        <div class="qli"><span class="swatch" style="border-radius:50%;background:#888;border:2px solid #d4a72c"></span><div>gold ring = unblocks downstream work (★)</div></div>
+        <div class="qli"><span class="swatch" style="border-radius:50%;background:#888;border:2px solid #ef4444"></span><div>red ring = currently blocked</div></div>
+        <div class="qli"><span class="swatch" style="background:transparent"></span><div>dot colour = phase</div></div>
+      </div>
+    </div>
+  </div>`;
+  sec.innerHTML=quad;
+}
+
+/* ====================== ROUTER ====================== */
+function renderAll(){
+  renderKpis(); renderPhaseFilter();
+  if(state.view==="board") renderBoard();
+  if(state.view==="gantt") renderGantt();
+  if(state.view==="deps")  renderDeps();
+  if(state.view==="quad")  renderQuad();
+  for(const v of ["board","gantt","deps","quad"])
+    document.getElementById("view-"+v).classList.toggle("hideview", v!==state.view);
+}
+document.getElementById("tabs").querySelectorAll(".tab").forEach(tab=>tab.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  tab.classList.add("active"); state.view=tab.dataset.view; renderAll();
+});
+document.getElementById("hideDone").onchange=e=>{state.hideDone=e.target.checked; renderAll();};
+document.getElementById("showSup").onchange=e=>{
+  state.showSup=e.target.checked; if(state.showSup) state.phases.add("A"); else state.phases.delete("A"); renderAll();
+};
+document.getElementById("search").oninput=e=>{state.q=e.target.value.trim(); renderAll();};
+
+renderAll();
+</script>
+</body>
+</html>
