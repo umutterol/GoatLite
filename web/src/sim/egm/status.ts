@@ -102,12 +102,19 @@ export function controlState(c: Combatant): { blocked: boolean; silenced: boolea
 export function consumeDaze(c: Combatant): void {
   if (c.statuses.some((s) => s.control === "daze")) c.statuses = c.statuses.filter((s) => s.control !== "daze")
 }
-/** Remove up to n debuffs/DoTs/CC from a combatant (Cleanse / Mass Dispel). */
-export function cleanseStatuses(c: Combatant, n: number): number {
+/** Remove up to n debuffs/DoTs/CC from a combatant (Cleanse / Mass Dispel / Unbinding Word).
+    P.3: if `types` is given, only strip statuses whose dispel TYPE matches (Cleric=Magic/Curse, Lifebinder=Nature/Poison)
+    — a typed dispel can't blanket-answer. Untyped cleanse (no `types`) strips any removable status, as before. */
+export function cleanseStatuses(c: Combatant, n: number, types?: string[]): number {
   let removed = 0
   c.statuses = c.statuses.filter((s) => {
-    if (removed < n && (s.kind === "debuff" || s.kind === "dot" || s.kind === "cc")) { removed++; return false }
-    return true
+    if (removed >= n) return true
+    if (s.kind !== "debuff" && s.kind !== "dot" && s.kind !== "cc") return true
+    if (types && types.length) {
+      const d = content.statuses.get(s.id)?.dispel
+      if (!d || !types.includes(d)) return true   // typed dispel: skip non-matching (and untyped) statuses
+    }
+    removed++; return false
   })
   return removed
 }

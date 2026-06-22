@@ -82,6 +82,7 @@ const save = S.SaveSchema.parse(saveJson)
 const errors: string[] = []
 const ref = (ok: boolean, msg: string) => { if (!ok) errors.push(msg) }
 const AFFIX_PUNISH_SPECIAL = new Set(["output", "behavior"])
+const DISPEL_TYPES = new Set(["Magic", "Curse", "Nature", "Poison"])   // P.3: valid dispel/curse types (mirrors the schema enums)
 
 for (const s of specs.values()) {
   ref(classes.has(s.classId), `spec '${s.id}' → unknown classId '${s.classId}'`)
@@ -100,8 +101,14 @@ for (const ab of playerAbilities.values()) {
     const e = eff as Record<string, unknown>
     if (e.type === "applyStatus" && typeof e.status === "string")
       ref(statuses.has(e.status), `player-ability '${ab.id}' → unknown status '${e.status}'`)
+    // P.3: a typed cleanse's dispelTypes is loose passthrough — guard the join key so a typo can't silently disable a dispel.
+    if (e.type === "cleanse" && Array.isArray(e.dispelTypes))
+      for (const dt of e.dispelTypes) ref(DISPEL_TYPES.has(dt as string), `player-ability '${ab.id}' → cleanse dispelType '${dt}' not one of ${[...DISPEL_TYPES].join("/")}`)
   }
 }
+// P.3: a boss `curse:"<type>"` must resolve to a dot status whose `dispel` matches, or the engine's curse scheduler no-ops.
+for (const ab of abilities.values())
+  if (ab.curse) ref([...statuses.values()].some((s) => s.dispel === ab.curse && s.kind === "dot"), `enemy ability '${ab.id}' → curse type '${ab.curse}' has no matching dot status (dispel:'${ab.curse}')`)
 for (const a of affixes.values())
   ref(tactics.has(a.punishes) || AFFIX_PUNISH_SPECIAL.has(a.punishes), `affix '${a.id}' → unknown punishes '${a.punishes}'`)
 for (const ab of abilities.values())

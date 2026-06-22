@@ -8,16 +8,12 @@ import { Rng } from "../rng"
 import type { RunInput, RunResult, LogLine, LogKind, LogMeta, ParseRow, DeathReport, ReplayStage, ReplayMob, ReplayTimeline } from "../types"
 import { buildParty, makeEnemy, eff, dealDamage, type Combatant } from "./stats"
 import { decideAction, decideEnemyTarget, executeAbility, basicAttack, applyPassiveAuras, onStatusEvents, emergencyHeals, resolveEnemyAttack, tickGuards, type CombatCtx } from "./combat"
-import { tickStatuses, controlState, consumeDaze } from "./status"
+import { tickStatuses, controlState, consumeDaze, applyStatus } from "./status"
 import { activeAffixIds } from "../affixes"
 import { DANGER_HP_FRAC, RECENT_DEATH_SEC } from "./operator"
 
 const DT = 0.25                       // inner timestep (seconds) for the continuous timeline
 const MAX_ACTIONS_PER_STEP = 8        // safety against degenerate (near-zero) attack intervals
-// C.10 spike-profile knobs (soft "bring the ideal healer" levers — tuned so the gap is only ~1-2 key levels of ceiling,
-// invisible below it). burst (single-target lowest non-tank /6s) favors the Cleric; rot (each non-tank /3s) favors the HoT.
-const BURST_FRAC = 0.06               // per-hit fraction of the victim's maxHp
-const ROT_FRAC = 0.06                 // per-tick fraction of each non-tank's maxHp
 
 export function runDungeonEGM(input: RunInput): RunResult {
   const rng = new Rng(input.seed)
@@ -37,6 +33,16 @@ export function runDungeonEGM(input: RunInput): RunResult {
   const CAST_STACK_GROWTH = SIM.castStackGrowth ?? 0.5 // each UNINTERRUPTED cast amplifies the next by this (stacks → wipe)
   const CAST_FALLBACK_BASE = SIM.castFallbackBase ?? 0.1   // demoted Interrupts dial: weak auto-kick chance with no real interrupter
   const CAST_FALLBACK_PER_PT = SIM.castFallbackPerPt ?? 0.1 // ...+ per dial point (capped) — far weaker than a kicker spec
+  // C.10 spike-profile knobs (soft "bring the ideal healer" shape levers). burst (single lowest non-tank /6s) favors the
+  // Cleric; rot (each non-tank /3s) favors the HoT. P.3 moved these into tuning so the Mire rot can be softened to a true
+  // secondary spice (its post-P.0 edge ran hot) while the curse below carries the real typed-dispel read.
+  const BURST_FRAC = SIM.burstFrac ?? 0.06             // per-hit fraction of the victim's maxHp (Stillhour)
+  const ROT_FRAC = SIM.rotFrac ?? 0.06                 // per-tick fraction of each non-tank's maxHp (Mire)
+  // P.3 — spreading curse (Mire P4; only bosses whose ability is flagged `curse:"<type>"`). THIS is the Mire's real read:
+  // a stacking Nature curse that ticks per stack (escalates past flat HPS) and ONLY a Nature dispel (Lifebinder) resets.
+  const CURSE_EVERY = SIM.curseEverySec ?? 6           // the boss adds a curse stack every N whole seconds
+  const CURSE_BASE = SIM.curseBase ?? 0.3              // per-stack per-second curse tick (× keyScale × DMG_UNIT × aggroIntake) — keyScale-scaled like the other mechanics so it's mild at the +2 floor but ramps at high keys (long fights → more stacks AND bigger ticks)
+  const CURSE_DURATION = SIM.curseDurationSec ?? 30    // curse persistence (refreshed each application; long enough not to self-expire between stacks)
 
   const aggr = (content.tuning.aggression as Record<string, { output: number; avoidableIntake: number }>)[input.aggression]
   const hq = content.tuning.hitQuality as Record<string, unknown>
@@ -111,6 +117,8 @@ export function runDungeonEGM(input: RunInput): RunResult {
     let bossTest = "", bossName = "The boss", bossAbil = "its mechanic", bossSpike = ""
     let bossCastable = false, bossTelegraph = 2.5   // P.2: this boss runs the real cast scheduler + its kick window (whole sec)
     let castStacks = 0                              // P.2: uninterrupted-cast escalation for this stage (resets per boss)
+    let bossCurse = ""                              // P.3: dispel type the boss applies as a spreading curse ("" = none)
+    let curseStatusId = ""                          // P.3: the actual status id for that curse type (data-driven, not hardcoded)
     let stageName = "Trash"
 
     if (isBoss) {
@@ -122,6 +130,10 @@ export function runDungeonEGM(input: RunInput): RunResult {
       bossAbil = bAbil?.name ?? "its mechanic"
       bossCastable = !!bAbil?.interruptible   // P.2: opt-in real cast (Bellreach only); others keep the abstract dial
       bossTelegraph = bAbil?.telegraph ?? 2.5
+      bossCurse = bAbil?.curse ?? ""          // P.3: opt-in spreading curse (Mire only)
+      // Resolve the curse status from its TYPE (the dot whose dispel matches) — so `curse:"Nature"` finds creeping-rot and
+      // a future `curse:"Magic"` would auto-wire its own status (or no-op safely) rather than misfiring the Nature one.
+      curseStatusId = bossCurse ? ([...content.statuses.values()].find((s) => s.dispel === bossCurse && s.kind === "dot")?.id ?? "") : ""
       bossSpike = b.spikeProfile ?? ""
       mobs.push(makeEnemy({ name: b.name, baseHp: b.baseHp, baseDamage: b.baseDamage, isBoss: true, keyScale, affMult, band: b.band, armour: b.armour, resist: b.resist }))
       const tested = content.tactics.get(bossTest)?.name
@@ -136,7 +148,8 @@ export function runDungeonEGM(input: RunInput): RunResult {
     }
 
     // reset action clocks to "now" so attack cadence is per-stage; clear carried-over shields & per-encounter flags
-    for (const p of party) { p.nextActionAt = t; p.shield = 0; p.emergencyHealed = false; p.guards = {} }
+    // P.3: also clear any enemy-applied curse (any dispel-typed status) so it doesn't compound dungeon-wide — fresh ramp per boss.
+    for (const p of party) { p.nextActionAt = t; p.shield = 0; p.emergencyHealed = false; p.guards = {}; p.statuses = p.statuses.filter((s) => !content.statuses.get(s.id)?.dispel) }
     for (const m of mobs) m.nextActionAt = t
 
     const stageStartT = t
@@ -268,6 +281,17 @@ export function runDungeonEGM(input: RunInput): RunResult {
         if (isBoss && mobs.some((m) => m.isBoss && m.hp > 0)) {   // boss signature (skip if boss already dead this step)
           const bn = bossName, abil = bossAbil
           const m = (target: string, result: string): LogMeta => ({ sourceName: bn, ability: abil, target, result })
+          // P.3: spreading curse (Mire P4) — independent of the rot/cast branch. Adds a stack to the whole party on its
+          // cadence; the DoT ticks per stack (escalates past flat HPS), and ONLY a matching-type dispel (Nature →
+          // Lifebinder's Unbinding Word) resets it. Cleric's Magic/Curse dispel can't, so a no-Lifebinder comp drowns.
+          if (curseStatusId && since % CURSE_EVERY === 0) {
+            const cb = mobs.find((mm) => mm.isBoss && mm.hp > 0)
+            if (cb) {
+              for (const pp of aliveParty()) applyStatus(pp, curseStatusId, { stacks: 1, perTick: CURSE_BASE * keyScale * DMG_UNIT * aggroIntake, durationSec: CURSE_DURATION, applierId: cb.id, t })
+              const stk = aliveParty()[0]?.statuses.find((s) => s.id === curseStatusId)?.stacks ?? 0
+              emit("mechanic", `${bn}'s ${abil} — the rot-curse creeps deeper (${stk} stack${stk === 1 ? "" : "s"}; dispel ${bossCurse}).`, m("party", "Curse stack"))
+            }
+          }
           if (bossSpike === "burst") {
             // C.10: a SOFT "bring the triage healer" lever ("player not class" — small by design). A single hit on the
             // lowest-HP non-tank every 6s. Gentle enough that both healers clear low/mid keys cleanly; near the ceiling

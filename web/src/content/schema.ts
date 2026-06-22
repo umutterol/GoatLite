@@ -56,6 +56,9 @@ export const StatusDefSchema = z.object({
   id: z.string(), name: z.string(),
   kind: z.enum(["dot", "hot", "cc", "debuff", "buff", "shield", "resource"]),
   damageType: z.enum(["Physical", "Magic"]).optional(),
+  // P.3: dispel TYPE (distinct from damageType school). A typed cleanse removes only matching statuses — Cleric strips
+  // Magic/Curse, Lifebinder strips Nature/Poison — so the curse's type decides WHICH healer can answer it.
+  dispel: z.enum(["Magic", "Curse", "Nature", "Poison"]).optional(),
   maxStacks: z.number().int().positive(),
   refresh: z.enum(["stack", "refresh", "replace", "strongest"]),
   perTick: z.boolean().optional(),
@@ -128,6 +131,9 @@ export const AbilitySchema = z.object({
   // P.2: opt-in to the REAL enemy cast scheduler (a kickable dangerous cast that stacks to a wipe). Only the bosses
   // flagged here run the scheduler; other interrupt-test bosses keep the abstract dial (Ashveil stays dial-pure).
   interruptible: z.boolean().optional(),
+  // P.3: opt-in to the spreading-curse mechanic — the dispel TYPE (e.g. "Nature") the boss applies as a stacking
+  // party debuff that only the matching healer dispel resets. Flagged on the Mire's rot abilities.
+  curse: z.enum(["Magic", "Curse", "Nature", "Poison"]).optional(),
 })
 
 export const EnemySchema = z.object({

@@ -705,7 +705,8 @@
     "effects": [
       {
         "type": "cleanse",
-        "count": 2
+        "count": 2,
+        "dispelTypes": ["Magic", "Curse"]
       },
       {
         "type": "buff",
@@ -1912,6 +1913,27 @@
         "magnitudeBase": 20,
         "magnitudeScale": 0.3,
         "magnitudeStat": "power"
+      }
+    ]
+  },
+  {
+    "id": "unbinding-word",
+    "name": "Unbinding Word",
+    "classId": "sage",
+    "specId": "lifebinder",
+    "category": "Utility",
+    "trigger": "active",
+    "cooldownTurns": 3,
+    "targeting": {
+      "side": "ally",
+      "pattern": "all"
+    },
+    "effects": [
+      {
+        "type": "cleanse",
+        "count": 2,
+        "dispelTypes": ["Nature", "Poison"],
+        "note": "P.3: the Lifebinder's typed dispel — strips Nature/Poison from the whole party (the Mire's Creeping Rot curse). A pure cleanse, so the brain HOLDS it and fires it reactively when the party is cursed."
       }
     ]
   },

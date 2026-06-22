@@ -688,7 +688,7 @@ export function executeAbility(caster: Combatant, ability: PlayerAbility, ctx: C
       }
     } else if (effect.type === "cleanse") {
       const n = effect.count ?? 1
-      for (const tg of targetsFor("ally", ability.targeting.pattern, ability.targeting.count, caster, ctx)) cleanseStatuses(tg, n)
+      for (const tg of targetsFor("ally", ability.targeting.pattern, ability.targeting.count, caster, ctx)) cleanseStatuses(tg, n, effect.dispelTypes)   // P.3: typed dispel (Cleric Magic/Curse vs Lifebinder Nature/Poison)
     } else if (effect.type === "interrupt") {
       // P.2: cancel the target enemy's pending dangerous cast (Counterspell / Zen Strike). No-op if nothing is casting.
       for (const tg of targetsFor(ability.targeting.side, ability.targeting.pattern, ability.targeting.count, caster, ctx, (ability.targeting as any).band))
@@ -805,6 +805,9 @@ const isMajor = (a: PlayerAbility) => (a.tags ?? []).includes("major")
 // P.2: a dedicated interrupt (Counterspell / Zen Strike) is RESERVED for kicking a dangerous cast — never spent as filler
 // damage in the normal rotation (a real kicker holds its kick), so it's ready when a cast window opens.
 const isInterrupt = (a: PlayerAbility) => (a.effects as Effect[]).some((e) => e.type === "interrupt")
+// P.3: a PURE cleanse (Unbinding Word — only a cleanse effect) is RESERVED for dispelling a curse — held out of the
+// normal rotation so it fires reactively (Mass Dispel is cleanse+buff, so it's NOT pure → stays in rotation).
+const isPureCleanse = (a: PlayerAbility) => (a.effects as Effect[]).length > 0 && (a.effects as Effect[]).every((e) => e.type === "cleanse")
 /** Ready + usable abilities matching a filter, in the engine's priority order (longest CD, then category weight). */
 function readyUsable(caster: Combatant, ctx: CombatCtx, filter: (a: PlayerAbility) => boolean): PlayerAbility[] {
   return caster.abilities
@@ -866,7 +869,22 @@ const ACTION_BEHAVIOURS: Record<string, ActionBehaviour> = {
     return readyUsable(caster, ctx, (a) => !isMajor(a) && (a.effects as Effect[]).some((e) => e.type === "shield" || (e.type === "special" && DEF.has(e.mechanic))))[0] ?? null
   },
   // the spec's normal rotation, EXCLUDING majors (the major is decided by holdForWindow) — the previous longest-CD-first pick
-  dumpRotation: (caster, ctx) => readyUsable(caster, ctx, (a) => !isMajor(a) && !isInterrupt(a))[0] ?? null,
+  dumpRotation: (caster, ctx) => readyUsable(caster, ctx, (a) => !isMajor(a) && !isInterrupt(a) && !isPureCleanse(a))[0] ?? null,
+  // P.3: a healer dispels a removable CURSE on the party with a ready cleanse whose dispel TYPE matches — Cleric strips
+  // Magic/Curse, Lifebinder strips Nature/Poison. Returns null when nothing matching is cursed (inert off the Mire), so
+  // it's a reactive tool, not filler. This is WHY the Mire's Nature curse is a Lifebinder read and a Cleric can't answer it.
+  dispelCurse: (caster, ctx) => {
+    if (caster.role !== "healer") return null
+    const cursed = new Set<string>()
+    // Only count REMOVABLE statuses (debuff/dot/cc — what cleanseStatuses can actually strip), so a hypothetical
+    // dispel-typed buff/hot never makes the healer burn a GCD on a cleanse that would remove nothing.
+    for (const al of aliveAllies(ctx)) for (const s of al.statuses) {
+      if (s.kind !== "debuff" && s.kind !== "dot" && s.kind !== "cc") continue
+      const d = content.statuses.get(s.id)?.dispel; if (d) cursed.add(d)
+    }
+    if (!cursed.size) return null
+    return readyUsable(caster, ctx, (a) => (a.effects as Effect[]).some((e) => e.type === "cleanse" && ((e.dispelTypes as string[] | undefined) ?? []).some((t) => cursed.has(t))))[0] ?? null
+  },
   // P.2: when a boss is mid dangerous-cast, a KICKER pre-empts its rotation to fire an interrupt — a dedicated interrupt
   // effect (Counterspell/Zen Strike) or a hard-CC stun/silence/freeze on an enemy. Returns null for specs without a kick
   // (and is inert in dungeons with no interruptible cast), so non-kickers just run their normal rotation.
@@ -913,6 +931,8 @@ function brainOf(actor: Combatant): { action: string[]; targetEnemy: string[]; t
 export function decideAction(actor: Combatant, ctx: CombatCtx): PlayerAbility | null {
   const kick = ACTION_BEHAVIOURS.interruptPending(actor, ctx)   // P.2: a pending dangerous cast pre-empts everything (kicker specs only; inert otherwise)
   if (kick) return kick
+  const dispel = ACTION_BEHAVIOURS.dispelCurse(actor, ctx)      // P.3: a removable curse pre-empts the healer's rotation (matching-type healer only; inert otherwise)
+  if (dispel) return dispel
   for (const id of brainOf(actor).action) { const a = ACTION_BEHAVIOURS[id]?.(actor, ctx); if (a) return a }
   return null
 }
