@@ -994,8 +994,8 @@
     "tags": []
   },
   {
-    "id": "dissonant-strike",
-    "name": "Dissonant Strike",
+    "id": "barrow-quarrel",
+    "name": "Barrow-Quarrel",
     "classId": "rogue",
     "specId": "bard",
     "category": "Damage",
@@ -1009,8 +1009,8 @@
       {
         "type": "damage",
         "damageType": "Physical",
-        "base": 30,
-        "scale": 0.5,
+        "base": 40,
+        "scale": 0.7,
         "scaleStat": "power",
         "critable": true
       },
@@ -1024,170 +1024,134 @@
     ]
   },
   {
-    "id": "anthem-of-haste",
-    "name": "Anthem of Haste",
+    "id": "marrow-piercer",
+    "name": "Marrow-Piercer",
     "classId": "rogue",
     "specId": "bard",
-    "category": "Buff",
+    "category": "Damage",
     "trigger": "active",
-    "cooldownTurns": 5,
+    "cooldownTurns": 3,
     "targeting": {
-      "side": "ally",
-      "pattern": "all"
-    },
-    "effects": [
-      {
-        "type": "buff",
-        "stat": "haste",
-        "amountPct": 30,
-        "durationTurns": 2,
-        "note": "Reworked from the original turn-order override (allies act before enemies) into a pure tempo buff — our continuous-seconds engine has no turn order; haste already means 'acts faster/more often'."
-      }
-    ],
-    "tags": [
-      "song"
-    ]
-  },
-  {
-    "id": "rhythm-reset",
-    "name": "Rhythm Reset",
-    "classId": "rogue",
-    "specId": "bard",
-    "category": "Utility",
-    "trigger": "active",
-    "cooldownTurns": 6,
-    "targeting": {
-      "side": "ally",
+      "side": "enemy",
       "pattern": "single"
     },
     "effects": [
       {
-        "type": "special",
-        "mechanic": "cooldown-reduction",
-        "params": {
-          "reduceTurns": 2,
-          "target": "ally",
-          "note": "Reduces all of the target ally's active cooldowns by 2 turns."
-        }
-      },
-      {
-        "type": "buff",
-        "stat": "power",
-        "amountPct": 15,
-        "durationTurns": 1
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 70,
+        "scale": 1.1,
+        "scaleStat": "power",
+        "critable": true,
+        "modifiers": [
+          { "when": { "type": "targetHpBelowPct", "value": 35 }, "multiplyDamage": 1.5 }
+        ]
       }
     ]
   },
   {
-    "id": "soothing-ballad",
-    "name": "Soothing Ballad",
+    "id": "over-the-barrow",
+    "name": "Over the Barrow",
     "classId": "rogue",
     "specId": "bard",
-    "category": "Healing",
+    "category": "Damage",
     "trigger": "active",
     "cooldownTurns": 4,
     "targeting": {
-      "side": "ally",
+      "side": "enemy",
+      "pattern": "single"
+    },
+    "effects": [
+      {
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 50,
+        "scale": 0.8,
+        "scaleStat": "power",
+        "critable": true,
+        "modifiers": [
+          { "when": { "type": "targetBand", "band": "back" }, "multiplyDamage": 1.3 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "carrion-hail",
+    "name": "Carrion Hail",
+    "classId": "rogue",
+    "specId": "bard",
+    "category": "Damage",
+    "trigger": "active",
+    "cooldownTurns": 5,
+    "targeting": {
+      "side": "enemy",
       "pattern": "all"
     },
     "effects": [
       {
-        "type": "special",
-        "mechanic": "conditional-on-cleanse",
-        "params": {
-          "perAlly": true,
-          "ifCleansed": {
-            "heal": {
-              "base": 25,
-              "scale": 0.4,
-              "scaleStat": "power"
-            }
-          },
-          "ifNoDebuff": {
-            "buff": {
-              "stat": "armour",
-              "amountPct": 10,
-              "durationTurns": 2
-            }
-          },
-          "note": "Per ally: if the preceding cleanse removed a debuff, heal that ally for 25 + 40% power; if the ally had no debuff to remove, instead grant +10% armour for 2 turns. The branch depends on whether a debuff was removed this cast, which cannot be expressed with the doc's plain Condition shapes, so it lives in this special handler."
-        }
+        "type": "damage",
+        "damageType": "Physical",
+        "base": 40,
+        "scale": 0.6,
+        "scaleStat": "power",
+        "critable": true
       }
-    ],
-    "tags": [
-      "song"
     ]
   },
   {
-    "id": "crescendo",
-    "name": "Crescendo",
+    "id": "cold-focus",
+    "name": "Cold Focus",
     "classId": "rogue",
     "specId": "bard",
     "category": "Buff",
     "trigger": "active",
     "cooldownTurns": 7,
     "targeting": {
-      "side": "ally",
-      "pattern": "single"
+      "side": "self",
+      "pattern": "self"
     },
     "effects": [
       {
         "type": "buff",
         "stat": "power",
-        "amountPct": 50,
-        "durationTurns": 1,
-        "note": "Reworked from the original extra-action payoff into a bigger flat burst — the extra action's output is folded into the stronger power/crit buff (no scheduler needed)."
+        "amountPct": 40,
+        "durationTurns": 2,
+        "appliesTo": "self",
+        "note": "Self-only aim window — the bard's old single-ally Overdrive is now the archer steadying their own shot (no party support)."
       },
       {
         "type": "buff",
         "stat": "crit",
-        "amountPct": 30,
-        "durationTurns": 1
+        "amountPct": 25,
+        "durationTurns": 2,
+        "appliesTo": "self"
       }
-    ],
-    "tags": [
-      "song"
     ]
   },
   {
-    "id": "inspiring-presence",
-    "name": "Inspiring Presence",
+    "id": "unerring-eye",
+    "name": "Unerring Eye",
     "classId": "rogue",
     "specId": "bard",
     "category": "Passive",
     "trigger": "passive",
     "cooldownTurns": 0,
     "targeting": {
-      "side": "ally",
-      "pattern": "aura"
+      "side": "self",
+      "pattern": "self"
     },
     "effects": [
       {
         "type": "buff",
         "stat": "crit",
-        "amountPct": 5,
+        "amountPct": 8,
         "durationTurns": 0
       },
       {
         "type": "buff",
         "stat": "power",
-        "amountPct": 5,
+        "amountPct": 8,
         "durationTurns": 0
-      },
-      {
-        "type": "special",
-        "mechanic": "song-heal-on-cast",
-        "params": {
-          "triggerCategory": "song",
-          "side": "ally",
-          "pattern": "all",
-          "heal": {
-            "base": 10,
-            "scale": 0.2,
-            "scaleStat": "power"
-          },
-          "note": "Whenever a song (Bard ally-buff) ability is cast, heal all allies for 10 + 20% power."
-        }
       }
     ]
   },
@@ -2195,14 +2159,13 @@
     "tags": ["major"]
   },
   {
-    "id": "rallying-crescendo", "name": "Rallying Crescendo", "classId": "rogue", "specId": "bard",
-    "category": "Buff", "trigger": "active", "cooldownTurns": 20,
-    "targeting": { "side": "self", "pattern": "self" },
+    "id": "culling-rain", "name": "Culling Rain", "classId": "rogue", "specId": "bard",
+    "category": "Damage", "trigger": "active", "cooldownTurns": 20,
+    "targeting": { "side": "enemy", "pattern": "all" },
     "effects": [
-      { "type": "buff", "stat": "haste", "amountPct": 25, "durationTurns": 3, "appliesTo": "all-allies" },
-      { "type": "buff", "stat": "power", "amountPct": 12, "durationTurns": 3, "appliesTo": "all-allies" }
+      { "type": "damage", "base": 120, "scale": 1.4, "scaleStat": "power", "damageType": "Physical", "critable": true }
     ],
-    "tags": ["major", "song"]
+    "tags": ["major"]
   },
   {
     "id": "emberstorm", "name": "Emberstorm", "classId": "mage", "specId": "pyromancer",

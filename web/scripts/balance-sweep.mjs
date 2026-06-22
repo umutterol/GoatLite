@@ -11,7 +11,7 @@ try {
   const ilvlFor = (k) => 108 + 4 * k
   const m = (specId) => (ilvl) => ({ specId, ilvl })
   // 10 comps (1T/1H/3DPS unless noted). Tanks: guardian/crusader/mystic. Healers: cleric(burst)/lifebinder(HoT).
-  // DPS: assassin(phys ST), berserker(phys cleave), bard(phys support), pyromancer(magic AoE), arcanist(magic CC/AoE).
+  // DPS: assassin(phys ST), berserker(phys cleave), bard→ARCHER(phys ranged ST — P.1b recut, spec id still 'bard'), pyromancer(magic AoE), arcanist(magic CC/AoE).
   const COMPS = {
     "Meta-Cleric    ": ["guardian", "cleric", "assassin", "pyromancer", "berserker"],
     "Meta-Lifebinder": ["guardian", "lifebinder", "assassin", "pyromancer", "berserker"],
@@ -21,7 +21,7 @@ try {
     "TwoHealer      ": ["guardian", "cleric", "lifebinder", "assassin", "pyromancer"],
     "MysticTank     ": ["mystic", "cleric", "assassin", "pyromancer", "berserker"],
     "CrusaderTank   ": ["crusader", "lifebinder", "assassin", "pyromancer", "arcanist"],
-    "BardSupport    ": ["guardian", "cleric", "assassin", "pyromancer", "bard"],
+    "ArcherMix      ": ["guardian", "cleric", "assassin", "pyromancer", "bard"],
     "LifebinderMagic": ["guardian", "lifebinder", "pyromancer", "arcanist", "assassin"],
   }
   const party = (specs, ilvl) => specs.map((s, i) => ({ id: `p${i}`, name: `${s}${i}`, specId: s, ilvl, morale: 60, traitIds: [] }))

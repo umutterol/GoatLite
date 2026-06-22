@@ -39,7 +39,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | A2 | **Combat engine rebuilt on EGM model** | ✅ 7/7 (live + balanced) |
 | B | **Runtime loop & persistence** | 🟡 13/14 |
 | C | Content scale-up | 🟡 3/10 |
-| D | Systems depth | ⬜ 0/9 |
+| D | Systems depth | ⬜ 0/10 |
 | E | Production (art, audio, polish) | ⬜ 0/7 |
 | F | **Endgame & Identity (operator skills)** | ✅ 6/6 — live + balanced (operator runway ≈ +3 keys; +2 floor holds) |
 | G | **Visual pass (icons + squared corners)** | 🟡 3/4 — G.1–G.3 done; G.4 **in progress** (raster PNG pipeline live + 89 user icons wired incl. the new `ability` kind; remainder = the missing art listed in G.4) |
@@ -51,7 +51,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | L | **Roster expansion — Marksman + Necromancer** | ⬜ 0/7 — **design ✅** (`MMO-Nostalgia-Reference.md` §6) |
 | M | **Guild Feed & Loot Drama (social meta-layer)** | ✅ 5/5 (+1 v2) — feed + system notifications (M.1), loot-drama snub (M.2), deterministic bark engine (M.3) + voice packs (M.4) + snub-in-feed (M.5), all live-verified. M.6 (exchange beats + Rival) = v2 💤 |
 | N | **Intake balance (`enemyDmgMult`) + sim-dump tooling** | ✅ 2/2 — enemy damage is now an **isolated** intake lever (=2.0); survival binds below the timer wall; +2 floor + operator runway (+3) hold; new config/CLI `sim-dump` harness |
-| **P** | **Class-Tools System** (classes bring different tools to solve different problems) | 🟡 1/6 (+P.1a) — **design ✅** (`Class-Tools-System.md`); **P.0 GATE 0 done** (boss-dive fix proved the C.10/C.8 reads were survival artifacts — Stillhour/Mire collapsed to spread 0); **P.1a school re-tune done** (off-school tax net +4 keys); next **P.1b Bard→Archer**. generic-EHP compression (shields/2-heal) re-scoped to P.5 + a DPS-check |
+| **P** | **Class-Tools System** (classes bring different tools to solve different problems) | 🟡 2/6 — **design ✅** (`Class-Tools-System.md`); **P.0 GATE 0** done (boss-dive fix proved the C.10/C.8 reads were survival artifacts); **P.1 done** (school tax net +4; Bard→Archer recut to selfish ranged physical — support-DPS confound gone, exposed a magic≫physical spec-power gap → P.5); next **P.2 cast scheduler** (Bellreach flagship). generic-EHP + spec-power + DPS-check → P.5 |
 
 ---
 
@@ -150,6 +150,7 @@ memory `combat-model-egm-migration`.*
 | D.7 | Trait↔sim reconciliation + Net Budget tuning | data | minor | L | ⬜ | audit every trait vs real sim |
 | D.8 | Haste/Mastery sim hooks | data | minor | M | ⬜ | currently undefined |
 | D.9 | Capture→rescue + scar-count death ramp | content | minor | XL | 💤 | deferred; revisit post-Phase-2 (GDD Open Questions) |
+| D.10 | Telemetry / run-analytics pipeline | engine/infra | major | M | ⬜ | **Sequenced AFTER Phase P.** Log the `RunTicket` (comp/specs/talents/gear/tactics/key/affixes + outcome/timer/deaths) + version stamps to **one HTTP sink (Supabase Postgres) from BOTH web & Steam** — Steam-native Stats are NOT an analytics sink (leaderboard only). Determinism ⇒ ship inputs, re-derive damage/log by re-sim (tiny payload, retroactive analyses). PII-strip (drop player-authored char names; anon installId), consent + Steam data disclosure + opt-out; fire-and-forget (never blocks a run). Stamp schema/SAVE/content/buildTarget — **don't pool pre-P vs post-P runs for balance**. Feeds C.11 (spec/talent pick-rate vs win-rate from real players) + retention/refund signal. Module = `telemetry.ts` (`logs/analytics.ts` is the in-app WCL-style meter view). Plumbing can ship with the Vercel friends-test; **trust balance data only after Phase P settles**. |
 
 ## Phase E — Production (art, audio, polish) ⬜
 
@@ -330,7 +331,7 @@ execute later.*
 | # | Task | Axis | Sev | Effort | Status | Notes |
 |---|---|---|---|---|---|---|
 | P.0 | **GATE 0** — fix boss-dive bug + global intake-floor (40% / cap-60% stacked) + steepen `resolveHit` school curves; **bump SAVE_VERSION** | engine/balance | major | M | ✅ | **DONE + verified** (2026-06-22). Boss-dive fix (`stats.ts` `makeEnemy`: bosses → `melee`/focusTank, dives stay on trash casters + spikeProfile); hit-size-INDEPENDENT school wall for enemy defenders (`pipeline.schoolWallFraction`, K=380/cap-0.5, armour/resist no longer keyScale-scaled); percentage-only intake floor `intakeFloorFrac=0.40` in `dealDamage` (shields/HoTs excluded per decision); `SAVE_VERSION 5→6`. `tsc -b` clean. **Sweep (before→after spread): Stillhour 3→0, Mire 7→0** = the C.10 burst/rot reads **were survival artifacts, now collapsed** (decisively settles C.11); Pyreward 12→6, Hour 6→1. **egm-smoke shifted 884/914/1182/1367 → 894/953/1190/1380** (intake floor caps the gear-cap tank's armour; determinism + **+2 floor hold**). **⚠️ Ashveil spread 8→9 — the `<2` target was NOT met:** Ashveil is front-boss/no-armour so P.0's 3 levers don't touch it, and `CrusaderTank` still wins all 6 (avg 15.0) via **shields + 2nd-healer throughput** — neither touched here. → generic-EHP compression re-scoped to **P.5** (shield recost + Divine Shield bug) + the new **DPS-check** lever (see P.5 note) |
-| P.1 | **Pyreward school re-tune (works-now) + Bard→Archer recut** | balance/content | major | M | 🟡 | **P.1a school re-tune DONE** (2026-06-22): `schoolWallFraction` K 380→**155** (cap 0.65, not binding for Pyreward's 250/150 values — K is the lever). **Off-school tax = net +4 keys** (all-physical core +5 vs mixed +14 on Pyreward, minus the +5 Ashveil spec-power control — `pyreward-ceiling.mjs`, now sweeping 2–18 + a balanced-2P1M diversity comp). Full sweep: AllPhysDPS Pyreward **14→10**, other 5 dungeons byte-identical to P.0; egm-smoke unchanged (894/953/1190/1380); +2 floor holds; `tsc -b` clean. **Caveats:** the read leans near-binary "bring 2 magic" (only 2 magic DPS specs exist; cleric-smite as the 3rd magic source untested here → P.5 full sweep); generic-EHP comps (Crusader/Mystic) still top Pyreward regardless of school (P.5); the magnitude is **provisional pending P.1b** (Bard→Archer removes the bard-heal inflating the all-phys control). **P.1b Bard→Archer recut: ⬜ pending** (ranged physical; drop lust+dispel — needs the recut-proposal + IP check) |
+| P.1 | **Pyreward school re-tune (works-now) + Bard→Archer recut** | balance/content | major | M | ✅ | **DONE (2026-06-22).** **P.1a:** `schoolWallFraction` K 380→**155** (cap 0.65 = safety only, not binding for Pyreward's 250/150 — K is the lever); hit-size-independent so a fully-walled boss trips soft-enrage (an evenly-alternating layout is otherwise mirror-symmetric). **Off-school tax = net +4 keys.** **P.1b Bard→Archer:** spec **display→"Archer"** (id stays `bard` for save stability), recut all 6 abilities + the major from support→**selfish ranged physical DPS** (Barrow-Quarrel ST+Mark · Marrow-Piercer focus-nuke+execute · Over the Barrow back-band reach ×1.3 · Carrion Hail AoE · Cold Focus self-window · Unerring Eye selfish passive · Culling Rain offensive major) — **dropped ALL party support** (lust/heal/cleanse/CD-reduction/song-heal); tuned at assassin-parity; names IP-checked (no WoW-verbatim). **Verified:** content validates (Zod), `tsc -b` clean, egm-smoke byte-identical (894/953/1190/1380 — no archer in that party), net school tax **holds at +4** post-recut, +2 floor holds. **Key finding:** removing the bard-heal dropped the all-physical comps (AllPhysDPS avg 12.0→10.0, Ashveil 11→6) — confirming the **support-DPS confound is gone** — and **exposed a pre-existing magic-DPS≫physical-DPS imbalance** (pyro/arcanist out-scale berserker/archer ~9 keys on the no-wall control via AoE trash-clear) → flagged for a **spec-power pass (P.5)**. Diversity guard (≥2 top answers incl. cleric-smite) still → P.5 full sweep |
 | P.2 | **Enemy cast scheduler + real interrupt** → Bellreach = P1 | engine | **major** | **L** | ⬜ | Pending-cast state (windup/telegraph/payload from `abilities.json`); wire interrupt (`combat.ts:675`)+landed-CC to cancel; demote interrupts dial to fallback. Verify: a no-kicker comp wipes Bellreach where Arcanist/Mystic/Pyromancer times. **The flagship** — also unlocks P8/P11 |
 | P.3 | **Dispel typing + enemy→party status** → Weltering Mire = P6+**P4** | engine/content | major | M | ⬜ | Magic/Curse vs Nature/Poison status field; spreading rot-curse on the Mire; Cleric (Magic) vs Lifebinder (Nature). Verify the wrong-type healer fails. (DPS don't dispel) |
 | P.4 | **Reach primitive + real adds + avoidable-immunity** → P11/P8/P7 | engine/content | major | M | ⬜ | Back-band reach penalty + Assassin dive + Guardian grip (P11); CC-able/castable adds (P8); immunity/relocate on the eruption (P7). Verify all-melee can't reach the sheltered caster; an add demands lock-or-kill |
@@ -345,7 +346,7 @@ execute later.*
 | Decision | Blocks | Status | Resolution |
 |---|---|---|---|
 | Tick rate / timeline model | A.3, A2.1 | ✅ Resolved | v1 ran 1s ticks; the **EGM rebuild (A2) runs continuous seconds** (DT=0.25 inner step, attack-speed-driven, mm:ss timeline). `tuning.sim` (hpUnit/dmgUnit/keyScalingPerLevel) calibrated to the GDD timer table for the 1T/1H/3D comp. |
-| Client-only vs isomorphic sim | A.1, D.6 | ⬜ Open | leaderboard re-sim wants shared TS sim |
+| Client-only vs isomorphic sim | A.1, D.6, D.10 | ⬜ Open | leaderboard + telemetry re-sim want a shared/version-pinned TS sim |
 | Gold sinks / economy balance | D.4 | ⬜ Open | gold has no spend yet |
 | Haste & Mastery effects | D.8 | 🟡 Partial | **Haste now wired** in the EGM engine (shortens `attackInterval`; Chill = −haste slows). Mastery still a no-op (per-spec hook unspecified). |
 | Recruitment Board "guild progression" metric | B.9, D.6, F.4 | ✅ Resolved | **Operator-skill Ceilings** are the recruit-quality lever — guild progression unlocks **higher-Ceiling recruit pools** ("access higher potential recruits"). Current rating shown precisely; Potential shown as fuzzy ★. See `Operator-Skills-Design.md`. |
@@ -359,11 +360,39 @@ execute later.*
 | Guild feed: form factor + v1 scope | M.1–M.5 | ✅ Resolved | **Always-visible** meta-layer panel (not a tab you visit); **meta-only** (no in-run combat log). v1 = **system notifications + solo barks**, curated **~1–2 barks/run**; multi-character exchange "beats" deferred to **v2 (M.6)**. |
 | Bark authoring for random characters | M.3, M.4 | ✅ Resolved | **Voice attaches to personality (trait/archetype), never identity** → procedurally-generated members inherit a voice pack for free. Voice = trait(tone) × spec(vocabulary) × morale(mood) × per-character style seed; **templated + state-grounded**, no runtime LLM (deterministic/offline). Coherence for v2 exchanges comes from authoring whole multi-role **beats**, not stitching atomic lines. |
 | Loot drama: depth + who contests | B.5, M.2 | ✅ Resolved | Wire the GDD-canon mechanic (loser −5 morale, winner +5% next run) but **personality-gated**: Selfish archetypes contest loudly + lose more, passive ones shrug. Make it a **decision, not a tax** (give to best-fit vs placate fragile morale) + a default auto-assign policy so the modal is opt-in. Rival-trait escalation from repeat snubs → **v2 (M.6)**. |
+| Telemetry stack + consent model | D.10 | ⬜ Open | Supabase (raw runs + SQL — leaning pick) vs PostHog (funnels/retention UI) vs thin Vercel fn; **opt-in vs opt-out** + privacy policy required for any public/Steam build |
 
 ---
 
 ## Changelog
 
+- **2026-06-22** — **P.1b Bard→Archer recut SHIPPED — P.1 complete.** Repurposed the rogue support spec into a **selfish
+  ranged physical DPS** (the design's "rogue is the physical class: Assassin melee-dive + Archer ranged"). Spec **display
+  name Bard→Archer** (internal id kept `bard` for save/ticket stability — like the H.1 ability-rename precedent; ability ids
+  *are* re-id'd since they aren't persisted). Recut all 6 abilities + the major from support→damage: Barrow-Quarrel (ST +
+  Mark), Marrow-Piercer (cd3 focus-nuke + execute), Over the Barrow (back-band reach ×1.3 — P11 flavour; full primitive =
+  P.4), Carrion Hail (AoE), Cold Focus (self power/crit window), Unerring Eye (selfish passive), Culling Rain (offensive AoE
+  major). **Dropped ALL party support** — lust (Anthem), party-heal/cleanse (Soothing Ballad + Inspiring Presence song-heal),
+  ally CD-reduction (Rhythm Reset), party buffs (Crescendo/Rallying Crescendo). Tuned at assassin-parity; names IP-checked.
+  **Verified:** content validates (Zod), `tsc -b` clean, egm-smoke byte-identical (no archer in that party), the P.1a school
+  tax **holds at net +4** post-recut, +2 floor holds. **Key finding:** removing the bard-heal dropped the all-physical comps
+  (AllPhysDPS avg 12.0→10.0, Ashveil 11→6) — the **support-DPS confound is gone** — which **exposed a pre-existing
+  magic-DPS≫physical-DPS imbalance** (pyro/arcanist out-scale berserker/archer ~9 keys on the no-wall control via AoE
+  trash-clear). Flagged for a **spec-power pass (P.5)**; Archer itself is correctly tuned (assassin-parity, ST-focused by
+  design). Next: **P.2 cast scheduler + real interrupt** (Bellreach flagship "kick-or-wipe").
+- **2026-06-22** — **D.10 added — telemetry / run-analytics pipeline (planned, sequenced after Phase P).** Design
+  decided this session: every key already builds a `RunTicket` (comp/specs/talents/gear/tactics/key/affixes +
+  outcome/timer/deaths) and the sim is deterministic with a working `replayTicket` re-sim — so the analytics record
+  **and** its re-derivation already exist; the only missing piece is shipping the ticket to a sink. Plan: POST the
+  ticket + version stamps to **one HTTP sink (Supabase Postgres) from BOTH the web (Vercel) and Steam builds** —
+  Steam-native Stats are explicitly NOT the analytics sink (Steam-native = leaderboard-only). Log inputs + outcome,
+  re-derive damage/log by re-sim (tiny payload; lets new analyses run retroactively on old runs). Hard requirements
+  baked in: PII-strip (drop player-authored character names; anonymous installId), consent + Steam data disclosure +
+  opt-out, fire-and-forget (never blocks a run), and version stamps (schema/SAVE/content/buildTarget) so pre-P and
+  post-P runs aren't pooled for balance. Powers **C.11** (spec/talent pick-rate vs win-rate from real players) +
+  retention/refund signal. Plumbing may land alongside the Vercel friends-test; trustworthy *balance* data only
+  accrues **after Phase P combat settles**. Open decision logged: stack (Supabase vs PostHog vs thin Vercel fn) +
+  consent model. Module = `telemetry.ts` (not `logs/analytics.ts`, which is the in-app WCL-style meter view).
 - **2026-06-22** — **P.1a Pyreward school re-tune SHIPPED (the works-now class axis).** Tuned `pipeline.schoolWallFraction`
   K 380→**155** (cap 0.65 is a safety ceiling — not binding for Pyreward's armour/resist 250/150, so K is the only active
   lever). Iterated against `pyreward-ceiling.mjs` (extended to keys 2–18 + a balanced-2P1M diversity comp): the **off-school
