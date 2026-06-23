@@ -8,7 +8,7 @@ let fail = 0
 try {
   const { talentIntakeMult, talentCritBonus } = await server.ssrLoadModule("/src/sim/egm/combat.ts")
   const { applyAbilityOverrides, eff } = await server.ssrLoadModule("/src/sim/egm/stats.ts")
-  const { applyEventRider } = await server.ssrLoadModule("/src/sim/egm/combat.ts")
+  const { applyEventRider, atonementTargets } = await server.ssrLoadModule("/src/sim/egm/combat.ts")
 
   const mk = (o = {}) => ({ hp: 100, maxHp: 100, position: "Front", statuses: [], resources: {}, downedUntil: -1, hitSinceAction: false, talentCondIntake: [], talentCondCrit: [], ...o })
   const ctxOf = (mobs = [], party = []) => ({ mobs, party })
@@ -124,6 +124,20 @@ try {
     const c = { ...base, statuses: [{ statMods: [{ stat: "healingReceived", amountPct: -50 }] }] }
     okEq("anti-heal: eff.healingTakenPct = -50", eff(c).healingTakenPct, -50)
     okEq("no debuff: healingTakenPct = 0", eff({ ...base, statuses: [] }).healingTakenPct, 0)
+  }
+
+  // ---- M4 §D: atonement disable / party-swap (atonementTargets is pure) ----
+  {
+    const self = { id: "h", hp: 100, maxHp: 100 }
+    const low = { id: "a1", hp: 20, maxHp: 100 }, mid = { id: "a2", hp: 60, maxHp: 100 }
+    const injured = [low, mid]   // injuredAllies is pre-sorted lowest-first by the engine; mirror that
+    const ids = (xs) => xs.map((x) => x.id).join(",")
+    okEq("atonement default → lowest only", ids(atonementTargets(undefined, "smite", injured, self)), "a1")
+    okEq("atonement disable matching ability → none", ids(atonementTargets({ disableAbilityId: "smite" }, "smite", injured, self)), "")
+    okEq("atonement disable other ability → lowest", ids(atonementTargets({ disableAbilityId: "smite" }, "holy-fire", injured, self)), "a1")
+    okEq("atonement party-swap armed (lowest 20% < 30) → all injured", ids(atonementTargets({ partyWhenLowestAllyBelowPct: 30 }, "smite", injured, self)), "a1,a2")
+    okEq("atonement party-swap not armed (lowest 60% ≥ 30) → lowest", ids(atonementTargets({ partyWhenLowestAllyBelowPct: 30 }, "smite", [mid], self)), "a2")
+    okEq("atonement no injured → self", ids(atonementTargets(undefined, "smite", [], self)), "h")
   }
 
   console.log(`\n${fail === 0 ? "ALL PASS" : `${fail} FAILED`}`)

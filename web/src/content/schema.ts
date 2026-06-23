@@ -258,6 +258,7 @@ export const TalentOptionSchema = z.object({
     }).optional(),
     abilityOverrides: z.array(AbilityOverrideSchema).optional(),   // §B (M2): patch a named ability's params at buildParty time
     eventRiders: z.array(EventRiderSchema).optional(),             // §E (M3a): on hit/crit/kill → applyStatus / adjustCooldown / refundResource / heal
+    atonement: z.object({ disableAbilityId: z.string().optional(), partyWhenLowestAllyBelowPct: z.number().optional() }).strict().optional(),   // §D (M4): atonement disable / party-swap (magnitude → use an M2 `param` override)
   }).optional(),
 })
 export const TalentNodeSchema = z.object({

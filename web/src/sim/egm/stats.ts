@@ -100,6 +100,7 @@ export interface Combatant {
   talentCondIntake: TalentCondMod[]     // §A: onlyIf-gated damage-taken mods (defender; refreshed per step by the engine)
   talentCondCrit: TalentCondMod[]       // §A: onlyIf-gated crit-chance mods (attacker; evaluated per hit)
   talentEventRiders: EventRider[]       // §E (M3a): on hit/crit/kill action riders (applyStatus/adjustCooldown/refundResource/heal)
+  talentAtonement?: { disableAbilityId?: string; partyWhenLowestAllyBelowPct?: number }   // §D (M4): atonement disable / party-swap config
   // Phase F operator layer (party only; enemies carry neutral 1s)
   intakeMult: number          // live damage-taken multiplier — Awareness (static) × Composure clutch; refreshed per step by the engine
   opOutputMult: number        // static party output multiplier (Execution + Awareness output + trait output)
@@ -173,9 +174,10 @@ function applyOneOverride(a: any, ov: AbilityOverride): void {
 
 /** Resolve a member's chosen talents → maxHp mult, damage mods, UNCONDITIONAL intake/crit deltas, AND onlyIf-gated
     conditional intake/crit mods (evaluated at runtime via condHolds). Defaults to the balanced pick. */
-function resolveTalents(chosen: Record<string, string> | undefined): { hpMult: number; dmg: TalentDmg[]; intakePct: number; critPct: number; condIntake: TalentCondMod[]; condCrit: TalentCondMod[]; abilityOverrides: AbilityOverride[]; eventRiders: EventRider[] } {
+function resolveTalents(chosen: Record<string, string> | undefined): { hpMult: number; dmg: TalentDmg[]; intakePct: number; critPct: number; condIntake: TalentCondMod[]; condCrit: TalentCondMod[]; abilityOverrides: AbilityOverride[]; eventRiders: EventRider[]; atonement: { disableAbilityId?: string; partyWhenLowestAllyBelowPct?: number } | undefined } {
   let hpMult = 1, intakePct = 0, critPct = 0
   const dmg: TalentDmg[] = [], condIntake: TalentCondMod[] = [], condCrit: TalentCondMod[] = [], abilityOverrides: AbilityOverride[] = [], eventRiders: EventRider[] = []
+  let atonement: { disableAbilityId?: string; partyWhenLowestAllyBelowPct?: number } | undefined
   for (const node of content.talents.values()) {
     // chosen → default → first option (matches the Character-sheet picker's fallback exactly)
     const opt = (chosen?.[node.id] && node.options.find((o) => o.id === chosen[node.id])) || node.options.find((o) => o.default) || node.options[0]
@@ -188,8 +190,9 @@ function resolveTalents(chosen: Record<string, string> | undefined): { hpMult: n
     if (eff.critPct) { if (eff.onlyIf) condCrit.push({ pct: eff.critPct, onlyIf: eff.onlyIf }); else critPct += eff.critPct }
     if (eff.abilityOverrides) abilityOverrides.push(...(eff.abilityOverrides as AbilityOverride[]))   // §B (M2)
     if (eff.eventRiders) eventRiders.push(...(eff.eventRiders as EventRider[]))   // §E (M3a)
+    if (eff.atonement) atonement = { ...(atonement ?? {}), ...eff.atonement }   // §D (M4): merge across chosen options
   }
-  return { hpMult, dmg, intakePct, critPct, condIntake, condCrit, abilityOverrides, eventRiders }
+  return { hpMult, dmg, intakePct, critPct, condIntake, condCrit, abilityOverrides, eventRiders, atonement }
 }
 
 export function moraleMult(m: number): number {
@@ -241,7 +244,7 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
       manaRegen: c.manaRegenPerSec ?? 0, hps: (c.hpsPerIlvl ?? 0) * p.ilvl,
       nextActionAt: 0, downedUntil: -1, dmgDone: 0, healDone: 0, deaths: 0, isBoss: false,
       abilities, passive, cooldowns: {}, statuses: [], resources: {}, hitSinceAction: false, lastActionAt: 0,
-      emergencyHealed: false, guards: {}, talents: tal.dmg, talentCondIntake: tal.condIntake, talentCondCrit: tal.condCrit, talentEventRiders: tal.eventRiders,
+      emergencyHealed: false, guards: {}, talents: tal.dmg, talentCondIntake: tal.condIntake, talentCondCrit: tal.condCrit, talentEventRiders: tal.eventRiders, talentAtonement: tal.atonement,
       intakeMult: intakeStatic, opOutputMult: op.outputMult, opClutchOutMult: op.clutchOutMult,
       opIntakeStatic: intakeStatic, opClutchIntakeMult: op.clutchIntakeMult,
     }

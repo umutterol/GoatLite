@@ -72,7 +72,9 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 **Risk:** `afterHit` is hot — keep rider checks cheap. Likely **split M3a (status authoring) / M3b (event riders)** if large.
 **Commit:** M3(a/b).
 
-### M4 — §D atonement / healer hooks
+### M4 — §D atonement / healer hooks ✅ SHIPPED 2026-06-23
+> **Done:** `atonement` config (`disableAbilityId` + `partyWhenLowestAllyBelowPct`) reshapes the `afterHit` heal-by-damage path via pure exported `atonementTargets`. Magnitude → M2 `param`. `tsc`/egm-smoke/probe(+6) green. (rotate/exclude-last + atonement-on-dot deferred to when authored.)
+
 **Goal:** per-ability atonement override + disable flag + target-mode (rotate / exclude-last / party-swap gated on lowest-ally HP).
 **Changes:** reuse §B for `healPctOfDamage` overrides; `combat.ts` atonement block (339-346) + atonement-on-dot (148-158) gain a `target` mode + `disableAtonement` flag; the party-swap uses `lowestAllyHpBelowPct` from M1.
 **Verify:** `tsc`; `egm-smoke` byte-identical; Cleric/Lifebinder heal scratch tests.
@@ -144,7 +146,7 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 | M1 §A keystone ✅ | engine condition unification + runtime intake/crit | M | — | ✅ byte-identical (shipped) |
 | M2 §B abilityOverride ✅ | enumerated param patching | S-M | M1 | ✅ byte-identical |
 | M3 §C+§E status + riders ✅ | the bulk of DPS/healer hooks | L | M1 | ✅ byte-identical |
-| M4 §D atonement | healer damage-to-heal extensions | S-M | M1, (M2) | byte-identical |
+| M4 §D atonement ✅ | healer damage-to-heal extensions | S-M | M1, (M2) | ✅ byte-identical |
 | M5 §F tank tools | grip/reflect/redirect/Sentinel's Voice/threat | L | M1 | byte-identical |
 | M6 §H summon | general enemy-add system | M | — | byte-identical |
 | M7 author + picker + seconds | 10 trees content + UI | XL | M1-M6 (per spec) | **rebump** |

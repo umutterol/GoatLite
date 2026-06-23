@@ -160,6 +160,8 @@ for (const t of talents.values())
       if (r.applyStatus) ref(statuses.has(r.applyStatus.statusId), `talent '${t.id}' option '${o.id}' → eventRider unknown status '${r.applyStatus.statusId}'`)
       if (r.adjustCooldown) ref(playerAbilities.has(r.adjustCooldown.abilityId), `talent '${t.id}' option '${o.id}' → eventRider unknown ability '${r.adjustCooldown.abilityId}'`)
     }
+    const atb = o.effects?.atonement?.disableAbilityId   // §D (M4)
+    if (atb) ref(playerAbilities.has(atb), `talent '${t.id}' option '${o.id}' → atonement disable unknown ability '${atb}'`)
   }
 for (const lt of lootTables.values()) {
   ref(dungeons.has(lt.dungeonId), `loot-table '${lt.id}' → unknown dungeon '${lt.dungeonId}'`)

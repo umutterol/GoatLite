@@ -352,6 +352,15 @@ export function talentCritBonus(c: Combatant, target: Combatant | undefined, ctx
   return b
 }
 
+/** §D (M4): which allies an atonement-heal hits — [lowest] normally; [] if a talent disabled it on THIS ability;
+    all injured allies when a talent's party-swap is armed and the lowest ally is critically low. Exported for the M4 probe. */
+export function atonementTargets(at: any, abilityId: string | undefined, injured: Combatant[], self: Combatant): Combatant[] {
+  if (at?.disableAbilityId && abilityId === at.disableAbilityId) return []
+  const lowest = injured[0] ?? self
+  if (at?.partyWhenLowestAllyBelowPct != null && lowest.hp / lowest.maxHp < at.partyWhenLowestAllyBelowPct / 100) return injured.length ? injured : [self]
+  return [lowest]
+}
+
 /** §E (M3a): execute a talent event rider's action(s). Exported for the M3 probe. */
 export function applyEventRider(attacker: Combatant, defender: Combatant, r: any, res: { dealt: number }, ctx: CombatCtx): void {
   if (r.applyStatus) {
@@ -380,13 +389,15 @@ function afterHit(attacker: Combatant, ability: PlayerAbility | null, defender: 
       if (e.mechanic === "lifesteal") {
         healInto(attacker, attacker, (res.dealt * (e.params?.pct ?? 0)) / 100)
       } else if (e.mechanic === "atonement-heal") {
-        const tgt = injuredAllies(ctx)[0] ?? attacker
-        let pct = e.params?.healPctOfDamage ?? 0
-        const amp = passiveSpecial(attacker, "atonement-amp") as any
-        if (amp && tgt.hp / tgt.maxHp < (amp.onlyIf?.value ?? 30) / 100) pct *= 1 + (amp.amountPct ?? 0) / 100
-        const healed = healInto(attacker, tgt, (res.dealt * pct) / 100)
-        if (healed > 0) ctx.emit("heal", `${attacker.name}'s Atonement heals ${tgt.name} for ${Math.round(healed).toLocaleString()}`,
-          { sourceId: attacker.id, sourceName: attacker.name, sourceSpec: attacker.specId, ability: "Atonement", amount: Math.round(healed), target: tgt.name, result: "Heal" })
+        // §D (M4): a talent can disable atonement on a named ability, or spread it party-wide when an ally is critically low.
+        for (const tgt of atonementTargets(attacker.talentAtonement, ability?.id, injuredAllies(ctx), attacker)) {
+          let pct = e.params?.healPctOfDamage ?? 0
+          const amp = passiveSpecial(attacker, "atonement-amp") as any
+          if (amp && tgt.hp / tgt.maxHp < (amp.onlyIf?.value ?? 30) / 100) pct *= 1 + (amp.amountPct ?? 0) / 100
+          const healed = healInto(attacker, tgt, (res.dealt * pct) / 100)
+          if (healed > 0) ctx.emit("heal", `${attacker.name}'s Atonement heals ${tgt.name} for ${Math.round(healed).toLocaleString()}`,
+            { sourceId: attacker.id, sourceName: attacker.name, sourceSpec: attacker.specId, ability: "Atonement", amount: Math.round(healed), target: tgt.name, result: "Heal" })
+        }
       } else if (res.isCrit && e.mechanic === "reset-cooldown-on-crit" && e.params?.ability) {
         attacker.cooldowns[e.params.ability] = ctx.t
       }
