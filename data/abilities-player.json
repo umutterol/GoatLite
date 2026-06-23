@@ -1177,9 +1177,10 @@
         "type": "damage",
         "damageType": "Magic",
         "base": 40,
-        "scale": 0.65,
+        "scale": 0.95,
         "scaleStat": "power",
         "critable": true,
+        "note": "P.5c-M3: scale 0.65→0.95. Arcanist was the broken-LOW DPS in the timer-bound regime (mono +1 trash / +4 boss — its only real damage is this spam; the rest is CC/shield). This is the analog of the P.5b berserker fix: lift the sustained ST so the arcanist (and the pure-magic AoE-Stack comp) reach the band. egm-smoke has no arcanist → byte-identical.",
         "modifiers": [
           {
             "when": {
@@ -1251,9 +1252,10 @@
         "type": "damage",
         "damageType": "Magic",
         "base": 40,
-        "scale": 0.6,
+        "scale": 0.8,
         "scaleStat": "power",
-        "critable": true
+        "critable": true,
+        "note": "P.5c-M3: scale 0.6→0.8 — arcanist's only AoE; lifts its trash-clear (and the AoE-Stack comp) in the timer regime. Keeps the chill/freeze CC riders."
       },
       {
         "type": "applyStatus",
