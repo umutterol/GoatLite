@@ -60,14 +60,26 @@ function cancelEnemyCast(enemy: Combatant, by: Combatant, ctx: CombatCtx): boole
   return true
 }
 
-function condHolds(cond: Cond, caster: Combatant, target: Combatant | undefined, _ctx: CombatCtx): boolean {
+function condHolds(cond: Cond, caster: Combatant, target: Combatant | undefined, ctx: CombatCtx): boolean {
   switch (cond?.type) {
     case "targetHpBelowPct": return !!target && target.hp / target.maxHp < (cond.value ?? 0) / 100
+    case "selfHpBelowPct": return caster.hp / caster.maxHp < (cond.value ?? 0) / 100
     case "selfHitSinceLastAction": return caster.hitSinceAction
     case "targetHasStatus": return !!target && (hasStatus(target, cond.status, cond.minStacks ?? 1) || target.statuses.some((s) => s.kind === cond.status))
     case "selfHasStatus": return hasStatus(caster, cond.status, cond.minStacks ?? 1)
     case "targetBand": return !!target && (cond.band === "back" ? target.position === "Back" : target.position === "Front")
     case "targetHotStacksAtLeast": return !!target && hotStacks(target) >= (cond.value ?? 1)
+    case "enemiesAtLeast": return livingMobs(ctx).length >= (cond.value ?? 1)
+    case "enemiesAtMost": return livingMobs(ctx).length <= (cond.value ?? 1)
+    case "selfStacksAtLeast": return stacksOf(caster, cond.resource ?? "rampage") >= (cond.value ?? 1)
+    case "allyHpBelowPct": return aliveAllies(ctx).some((a) => a.hp / a.maxHp < (cond.value ?? 0) / 100)
+    case "lowestAllyHpBelowPct": {
+      const allies = aliveAllies(ctx)
+      if (!allies.length) return false
+      const lowest = allies.reduce((lo, a) => (a.hp / a.maxHp < lo.hp / lo.maxHp ? a : lo))
+      return lowest.hp / lowest.maxHp < (cond.value ?? 0) / 100
+    }
+    case "selfHoldsHardThreat": return false // M5: wire to the taunt/threat read — stub never gates until then
     case "selfWasCleansed": return false // cleanse-of-self not tracked in Phase 3
     default: return false
   }
@@ -287,7 +299,7 @@ export function tickGuards(dt: number, ctx: CombatCtx): void {
       const amount = scaledBy(caster, bb.base, bb.scale, bb.scaleStat)
       const hadMobs = livingMobs(ctx).length > 0
       for (const m of livingMobs(ctx)) {
-        const res = resolveHit({ amount, damageType: bb.damageType, critChance: eff(caster).crit, critMult: eff(caster).critMult, critable: true }, defenderOf(m), ctx.rng)
+        const res = resolveHit({ amount, damageType: bb.damageType, critChance: eff(caster).crit + talentCritBonus(caster, m, ctx), critMult: eff(caster).critMult, critable: true }, defenderOf(m), ctx.rng)
         dealDamage(m, res.dealt); caster.dmgDone += res.dealt
       }
       if (hadMobs)
@@ -311,22 +323,31 @@ function passiveDamageMult(attacker: Combatant, ctx: CombatCtx): number {
   if (passiveSpecial(attacker, "low-hp-bonus-scaling")) mult *= 1 + 0.25 * (1 - attacker.hp / Math.max(1, attacker.maxHp)) // placeholder curve — Phase 5 tuning
   // B.7 talents: flat / enemy-count / focus-HP-gated damage mods (focus target = the lead living enemy)
   if (attacker.talents.length) {
-    const mobs = livingMobs(ctx)
-    const focus = mobs[0]
+    // §A keystone: route talent dmg gates through the shared condHolds() evaluator (focus target = the lead living
+    // enemy, matching the prior dup-switch behaviour). Unknown/false conditions fail closed (no ungated bonus).
+    const focus = livingMobs(ctx)[0]
     for (const t of attacker.talents) {
-      const c = t.onlyIf
-      if (c) {
-        const pass =
-          c.type === "targetHpBelowPct" ? (!!focus && focus.hp / focus.maxHp < c.value / 100) :
-          c.type === "enemiesAtLeast"   ? mobs.length >= c.value :
-          c.type === "enemiesAtMost"    ? mobs.length <= c.value :
-          false   // unknown condition → fail closed (never apply an ungated bonus)
-        if (!pass) continue
-      }
+      if (t.onlyIf && !condHolds(t.onlyIf, attacker, focus, ctx)) continue
       mult *= 1 + t.dmgPct / 100
     }
   }
   return mult
+}
+
+/** §A keystone: product of conditional talent damage-taken factors whose onlyIf currently holds (defender = `c`).
+    Intake gates are self/pull-based (selfHpBelowPct, enemiesAtLeast/Most, allyHpBelowPct …); target-based gates eval
+    false here (no per-hit attacker context). Returns 1 when the defender has no gated intake — byte-identical default. */
+export function talentIntakeMult(c: Combatant, ctx: CombatCtx): number {
+  let m = 1
+  for (const t of c.talentCondIntake) if (!t.onlyIf || condHolds(t.onlyIf, c, undefined, ctx)) m *= 1 + t.pct / 100
+  return m
+}
+/** §A keystone: summed conditional talent crit (as a fraction) whose onlyIf currently holds (attacker = `c`, focus
+    `target`). Returns 0 when the attacker has no gated crit — byte-identical default. */
+export function talentCritBonus(c: Combatant, target: Combatant | undefined, ctx: CombatCtx): number {
+  let b = 0
+  for (const t of c.talentCondCrit) if (!t.onlyIf || condHolds(t.onlyIf, c, target, ctx)) b += t.pct / 100
+  return b
 }
 
 /** Runs after every party hit lands: lifesteal / atonement / on-crit passives / cooldown resets. */
@@ -373,7 +394,7 @@ function detonateBurn(caster: Combatant, ability: PlayerAbility, params: any, ct
   const per = (ps.base ?? 0) + (ps.scale ?? 0) * (ps.scaleStat === "maxHp" ? e.maxHp : e.power)
   const total = per * stacks * passiveDamageMult(caster, ctx)
   const dt: DamageType = params.damageType ?? "Magic"
-  const res = resolveHit({ amount: total, damageType: dt, critChance: e.crit, critMult: e.critMult, critable: params.critable !== false }, defenderOf(primary), ctx.rng)
+  const res = resolveHit({ amount: total, damageType: dt, critChance: e.crit + talentCritBonus(caster, primary, ctx), critMult: e.critMult, critable: params.critable !== false }, defenderOf(primary), ctx.rng)
   dealDamage(primary, res.dealt); caster.dmgDone += res.dealt
   afterHit(caster, ability, primary, res, ctx)
   ctx.emit(res.isCrit ? "crit" : "normal",
@@ -430,7 +451,7 @@ function splashDamage(caster: Combatant, ability: PlayerAbility, params: any, ct
   let pool = targets.filter((m) => m.hp > 0 && m !== primary)
   if (params.count != null) pool = pool.slice(0, params.count)
   for (const o of pool) {
-    const res = resolveHit({ amount, damageType: dt, critChance: e.crit, critMult: e.critMult, critable: params.critable === true }, defenderOf(o), ctx.rng)
+    const res = resolveHit({ amount, damageType: dt, critChance: e.crit + talentCritBonus(caster, o, ctx), critMult: e.critMult, critable: params.critable === true }, defenderOf(o), ctx.rng)
     dealDamage(o, res.dealt); caster.dmgDone += res.dealt
     afterHit(caster, ability, o, res, ctx)   // splash secondaries are silent (no per-target log line)
   }
@@ -599,7 +620,7 @@ export function executeAbility(caster: Combatant, ability: PlayerAbility, ctx: C
       if (!ctx.splashPrimary) ctx.splashPrimary = dmgTargets[0]   // first damage effect's primary anchors later splash/spread
       for (const tg of dmgTargets) {
         const res = resolveHit(
-          { amount: amountOf(caster, effect, tg, ctx) * mult, damageType: (effect.damageType ?? "Physical") as DamageType, critChance: emp.crit ? 1 : e.crit, critMult: e.critMult, critable: effect.critable !== false },
+          { amount: amountOf(caster, effect, tg, ctx) * mult, damageType: (effect.damageType ?? "Physical") as DamageType, critChance: emp.crit ? 1 : e.crit + talentCritBonus(caster, tg, ctx), critMult: e.critMult, critable: effect.critable !== false },
           defenderOf(tg), ctx.rng,
         )
         dealDamage(tg, res.dealt); caster.dmgDone += res.dealt
@@ -739,7 +760,7 @@ export function basicAttack(caster: Combatant, ctx: CombatCtx): void {
   const e = eff(caster)
   const emp = takeEmpower(caster)   // Camouflage: empower the auto-attack out of stealth
   const res = resolveHit(
-    { amount: e.power * caster.attackInterval * passiveDamageMult(caster, ctx) * emp.mult, damageType: caster.damageType, critChance: emp.crit ? 1 : e.crit, critMult: e.critMult, critable: true },
+    { amount: e.power * caster.attackInterval * passiveDamageMult(caster, ctx) * emp.mult, damageType: caster.damageType, critChance: emp.crit ? 1 : e.crit + talentCritBonus(caster, target, ctx), critMult: e.critMult, critable: true },
     defenderOf(target), ctx.rng,
   )
   dealDamage(target, res.dealt); caster.dmgDone += res.dealt

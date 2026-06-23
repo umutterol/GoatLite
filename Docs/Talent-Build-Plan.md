@@ -1,6 +1,6 @@
 # GOAT Lite — Talent Build Plan (C.2 implementation)
 
-**Status:** plan ✅ (2026-06-23) — awaiting sign-off; **no code written yet**. Companion to `Talent-Trait-Revamp.md` (the design) and `ROADMAP.md` C.2. Grounded in a 5-agent read of the live engine; every file:line below was verified.
+**Status:** plan ✅ (2026-06-23); **M1 ✅ shipped 2026-06-23** — M2–M8 pending. Companion to `Talent-Trait-Revamp.md` (the design) and `ROADMAP.md` C.2. Grounded in a 5-agent read of the live engine; every file:line below was verified.
 
 The deliverable here is the **sequence + scope + decisions** so we agree before M1. Each milestone ends with a build gate (`cd web && npx tsc -b` + `node scripts/egm-smoke.mjs`) and a commit. **Determinism is the invariant** — goldens stay byte-identical until content actually lands (M7).
 
@@ -42,7 +42,9 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 
 ## Milestones
 
-### M1 — §A The `condHolds` keystone *(the unlock — do first)*
+### M1 — §A The `condHolds` keystone *(the unlock — do first)* ✅ SHIPPED 2026-06-23
+> **Done:** talent `onlyIf` routed through `condHolds()` (dup switch deleted); enum widened (+ `selfHpBelowPct`/`allyHpBelowPct`/`lowestAllyHpBelowPct`/`selfStacksAtLeast`/`selfHoldsHardThreat`[M5 stub]; `enemiesAtLeast/Most` moved in); runtime conditional `intakePct` (per-step `intakeMult` refresh) + `critPct` (5 party-caster `resolveHit` sites) channels added. `tsc` clean · egm-smoke **byte-identical** · `web/scripts/talent-cond-verify.mjs` **15/15**. Files: `schema.ts`, `stats.ts`, `combat.ts`, `engine.ts`.
+
 **Goal:** one condition path; `onlyIf` gates **dmg + intake + crit**.
 **Changes:**
 - `schema.ts:205` — widen the talent `onlyIf` enum to the full closed set (+ `selfHpBelowPct`, `allyHpBelowPct`, `lowestAllyHpBelowPct`, `selfStacksAtLeast` (+ a `resource?` field), `selfHoldsHardThreat`, and move `enemiesAtLeast/atMost` here).
@@ -136,7 +138,7 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 
 | Milestone | Scope | Size | Depends on | Goldens |
 |---|---|---|---|---|
-| M1 §A keystone | engine condition unification + runtime intake/crit | M | — | byte-identical |
+| M1 §A keystone ✅ | engine condition unification + runtime intake/crit | M | — | ✅ byte-identical (shipped) |
 | M2 §B abilityOverride | enumerated param patching | S-M | M1 | byte-identical |
 | M3 §C+§E status + riders | the bulk of DPS/healer hooks | L | M1 | byte-identical |
 | M4 §D atonement | healer damage-to-heal extensions | S-M | M1, (M2) | byte-identical |

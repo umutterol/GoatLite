@@ -7,7 +7,7 @@ import { content } from "@/content"
 import { Rng } from "../rng"
 import type { RunInput, RunResult, LogLine, LogKind, LogMeta, ParseRow, DeathReport, ReplayStage, ReplayMob, ReplayTimeline } from "../types"
 import { buildParty, makeEnemy, eff, dealDamage, type Combatant } from "./stats"
-import { decideAction, decideEnemyTarget, executeAbility, basicAttack, applyPassiveAuras, onStatusEvents, emergencyHeals, resolveEnemyAttack, tickGuards, type CombatCtx } from "./combat"
+import { decideAction, decideEnemyTarget, executeAbility, basicAttack, applyPassiveAuras, onStatusEvents, emergencyHeals, resolveEnemyAttack, tickGuards, talentIntakeMult, type CombatCtx } from "./combat"
 import { tickStatuses, controlState, consumeDaze, applyStatus } from "./status"
 import { activeAffixIds } from "../affixes"
 import { DANGER_HP_FRAC, RECENT_DEATH_SEC } from "./operator"
@@ -242,7 +242,7 @@ export function runDungeonEGM(input: RunInput): RunResult {
       // --- Phase F: refresh the Composure clutch state for this step (any ally hurt or a recent death) ---
       const inDanger = aliveParty().some((p) => p.hp / p.maxHp < DANGER_HP_FRAC) || (t - lastDeathT < RECENT_DEATH_SEC)
       ctx.partyInDanger = inDanger
-      for (const p of party) p.intakeMult = p.opIntakeStatic * (inDanger ? p.opClutchIntakeMult : 1)
+      for (const p of party) p.intakeMult = p.opIntakeStatic * (inDanger ? p.opClutchIntakeMult : 1) * talentIntakeMult(p, ctx)
       refreshGuardShields()   // P.4: keep the guarded enemy's ward in sync with whether its guard still lives
 
       // --- party actions: cast the best ready ability, else a basic attack (gated by crowd control) ---

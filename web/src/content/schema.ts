@@ -201,8 +201,21 @@ export const TalentOptionSchema = z.object({
     dmgPct: z.number().optional(),
     intakePct: z.number().optional(),   // ± damage taken (flat; negative = takes less) — folds into the operator intake channel
     critPct: z.number().optional(),     // ± crit chance, percentage points
-    // condition type is a closed set the engine understands — a typo fails validation rather than silently un-gating
-    onlyIf: z.object({ type: z.enum(["targetHpBelowPct", "enemiesAtLeast", "enemiesAtMost"]), value: z.number() }).optional(),
+    // §A keystone: the talent onlyIf is routed through the engine's shared condHolds() evaluator. Closed set — a typo
+    // fails validation rather than silently un-gating. `value` is optional (status/band gates don't use it).
+    onlyIf: z.object({
+      type: z.enum([
+        "targetHpBelowPct", "enemiesAtLeast", "enemiesAtMost",
+        "selfHpBelowPct", "allyHpBelowPct", "lowestAllyHpBelowPct",
+        "selfStacksAtLeast", "selfHoldsHardThreat",
+        "targetHasStatus", "selfHasStatus", "targetBand",
+      ]),
+      value: z.number().optional(),
+      resource: z.string().optional(),               // selfStacksAtLeast (default "rampage")
+      status: z.string().optional(),                 // target/selfHasStatus
+      minStacks: z.number().optional(),              // target/selfHasStatus
+      band: z.enum(["front", "back"]).optional(),    // targetBand
+    }).optional(),
   }).optional(),
 })
 export const TalentNodeSchema = z.object({
