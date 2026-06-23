@@ -62,6 +62,13 @@ try {
     const c = mk({ talentCondIntake: [{ pct: -10 }] })
     ok("no-onlyIf intake always", talentIntakeMult(c, ctxOf()), 0.9)
   }
+  // 9. selfHoldsHardThreat (M5): the alive party tank holds threat; others don't
+  {
+    const tank = mk({ role: "tank", team: "party", talentCondCrit: [{ pct: 25, onlyIf: { type: "selfHoldsHardThreat" } }] })
+    ok("selfHoldsHardThreat crit (tank)", talentCritBonus(tank, undefined, ctxOf()), 0.25)
+    const dps = mk({ role: "dps", team: "party", talentCondCrit: [{ pct: 25, onlyIf: { type: "selfHoldsHardThreat" } }] })
+    ok("selfHoldsHardThreat crit (dps → 0)", talentCritBonus(dps, undefined, ctxOf()), 0)
+  }
 
   // ---- M2 §B: abilityOverride (clone-and-patch; shared content never mutated) ----
   const okEq = (label, got, want) => { const pass = got === want; if (!pass) fail++; console.log(`${pass ? "OK " : "XX "} ${label}: got ${JSON.stringify(got)} want ${JSON.stringify(want)}`) }

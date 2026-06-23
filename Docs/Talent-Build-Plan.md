@@ -80,7 +80,8 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 **Verify:** `tsc`; `egm-smoke` byte-identical; Cleric/Lifebinder heal scratch tests.
 **Commit:** M4.
 
-### M5 — §F tank-tool extensions
+### M5 — §F tank-tool extensions ✅ SHIPPED 2026-06-23
+> **Done:** `selfHoldsHardThreat` wired (= alive party tank). **Audit:** thorns/block/redirect/grip param tweaks are all M2-`abilityOverride`-covered (no new work). The locked-taunt + untargetable-while-taunt Guardian-capstone mechanics are content-coupled → build with their abilities in M7. `tsc`/egm-smoke/probe(+2) green.
 **Goal:** thorns→all-front-band; grip (+root/+count/on-kill-reset/convert-to-strike); block-reflect scalar + route as real damage; redirect (+extra DR / min-1-HP / multi-concurrent / un-cleansable); **Guardian "Sentinel's Voice"** (rally party-buff / **locked single-target taunt** / AoE soften+interrupt war cry); **untargetable-back-band-while-holding-taunt** + paired self −50% dmg.
 **Changes:** `combat.ts` SPECIALS (531-550) + guard/redirect/parry handlers; new **locked-taunt** state on Combatant; a minimal **threat read** so `selfHoldsHardThreat` (M1 stub) resolves — there's no numeric threat pool today (targeting is brain-priority), so define "holds hard threat" = "is the current taunt-holder / tank-focus".
 **Verify:** `tsc`; `egm-smoke` byte-identical; tank scratch tests.
@@ -147,7 +148,7 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 | M2 §B abilityOverride ✅ | enumerated param patching | S-M | M1 | ✅ byte-identical |
 | M3 §C+§E status + riders ✅ | the bulk of DPS/healer hooks | L | M1 | ✅ byte-identical |
 | M4 §D atonement ✅ | healer damage-to-heal extensions | S-M | M1, (M2) | ✅ byte-identical |
-| M5 §F tank tools | grip/reflect/redirect/Sentinel's Voice/threat | L | M1 | byte-identical |
+| M5 §F tank tools ✅ | threat predicate (rest M2-covered; capstone mechanics → M7) | S | M1 | ✅ byte-identical |
 | M6 §H summon | general enemy-add system | M | — | byte-identical |
 | M7 author + picker + seconds | 10 trees content + UI | XL | M1-M6 (per spec) | **rebump** |
 | M8 balance → P.5c | sweep + tune | M | M7 | tuned |

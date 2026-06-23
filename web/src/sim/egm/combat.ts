@@ -79,7 +79,7 @@ function condHolds(cond: Cond, caster: Combatant, target: Combatant | undefined,
       const lowest = allies.reduce((lo, a) => (a.hp / a.maxHp < lo.hp / lo.maxHp ? a : lo))
       return lowest.hp / lowest.maxHp < (cond.value ?? 0) / 100
     }
-    case "selfHoldsHardThreat": return false // M5: wire to the taunt/threat read — stub never gates until then
+    case "selfHoldsHardThreat": return caster.team === "party" && caster.role === "tank" && caster.downedUntil < 0   // M5: the abstract sim has no numeric threat pool — the alive party tank is the threat-holder ("while tanking")
     case "selfWasCleansed": return false // cleanse-of-self not tracked in Phase 3
     default: return false
   }
