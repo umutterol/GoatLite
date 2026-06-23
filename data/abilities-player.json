@@ -457,7 +457,7 @@
     "specId": "crusader",
     "category": "Utility",
     "trigger": "active",
-    "cooldownTurns": 4,
+    "cooldownTurns": 6,
     "targeting": {
       "side": "ally",
       "pattern": "single"
@@ -468,9 +468,10 @@
         "mechanic": "redirect-damage",
         "params": {
           "redirectPct": 100,
-          "reductionPct": 20,
+          "reductionPct": 0,
           "toSelf": true,
-          "durationTurns": 2
+          "durationTurns": 2,
+          "note": "P.5c-M2: reductionPct 20→0 (a pure PEEL — the redirected damage hits the tank, no free mitigation vanishes) + cd 4→6 (was ~50% uptime of full redirect — generic EHP; now a predict-and-press peel)."
         }
       }
     ]
@@ -482,7 +483,7 @@
     "specId": "crusader",
     "category": "Buff",
     "trigger": "active",
-    "cooldownTurns": 5,
+    "cooldownTurns": 6,
     "targeting": {
       "side": "ally",
       "pattern": "single"
@@ -492,8 +493,9 @@
         "type": "special",
         "mechanic": "attack-immunity",
         "params": {
-          "blocks": 2,
-          "cannotAttackDuringImmunity": true
+          "blocks": 1,
+          "cannotAttackDuringImmunity": true,
+          "note": "P.5c-M2: blocks 2→1 + cd 5→6 — the design intent is a single hard-negate of ONE incoming event (the P5/P7 proactive answer), not a 2-charge burst-peel sponge."
         }
       }
     ]
@@ -541,14 +543,15 @@
       {
         "type": "buff",
         "stat": "armour",
-        "amountPct": 15
+        "amountPct": 10,
+        "note": "P.5c-M2: permanent armour 15→10 (a generic-EHP passive; the intake floor caps stacked mitigation anyway)."
       },
       {
         "type": "special",
         "mechanic": "shield-amp",
         "params": {
-          "amountPct": 20,
-          "lowHpAmountPct": 40,
+          "amountPct": 15,
+          "lowHpAmountPct": 25,
           "lowHpBelowPct": 30
         }
       }
@@ -2118,7 +2121,7 @@
     "category": "Buff", "trigger": "active", "cooldownTurns": 20,
     "targeting": { "side": "self", "pattern": "self" },
     "effects": [
-      { "type": "buff", "stat": "damageTaken", "amountPct": -35, "durationTurns": 3, "appliesTo": "all-allies" }
+      { "type": "buff", "stat": "damageTaken", "amountPct": -35, "durationTurns": 3, "appliesTo": "self", "note": "P.5c-M2: was a -35% PARTY-wide DR major (generic EHP that any Guardian comp rode); recost to SELF/tank only (a Shield-Wall personal cooldown) per the Class-Tools design — the grip/intercept verbs that were meant to replace it (P11/P7) ship in P.5d/P.5e." }
     ],
     "tags": ["major"]
   },
