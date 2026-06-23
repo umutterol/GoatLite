@@ -189,7 +189,7 @@
 
   { "id": "pyromancer-t1", "node": 1, "specId": "pyromancer", "name": "The Ember's Nature", "options": [
     { "id": "pyromancer-creeping-embers", "name": "Creeping Embers", "effect": "+16% damage while 3 or more enemies are up — blanket the pack so every detonation hits everyone.", "tags": ["aoe"], "effects": { "dmgPct": 16, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
-    { "id": "pyromancer-smothering-ash", "name": "Smothering Ash", "effect": "Your Burn ticks 35% harder (up from +20%) — fewer targets, a far hotter bar.", "tags": ["burst", "sustain"], "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "combustion", "mechanic": "burn-amplify", "key": "amountPct", "value": 35 } ] } },
+    { "id": "pyromancer-smothering-ash", "name": "Smothering Ash", "effect": "Your Burn ticks 60% harder (up from +20%) — the slow-burn payoff that pulls ahead the longer Burn stays on the pack.", "tags": ["sustain", "burst"], "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "combustion", "mechanic": "burn-amplify", "key": "amountPct", "value": 60 } ] } },
     { "id": "pyromancer-kindled-patience", "name": "Kindled Patience", "effect": "+10% damage, always — a faster ramp with no commitment to spread or tall ticks.", "tags": ["sustain"], "default": true, "effects": { "dmgPct": 10 } }
   ] },
 

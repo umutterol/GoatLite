@@ -1,6 +1,6 @@
 # GOAT Lite — Talent Build Plan (C.2 implementation)
 
-**Status:** plan ✅ (2026-06-23); **M1 ✅ shipped 2026-06-23** — M2–M8 pending. Companion to `Talent-Trait-Revamp.md` (the design) and `ROADMAP.md` C.2. Grounded in a 5-agent read of the live engine; every file:line below was verified.
+**Status:** ✅ **COMPLETE 2026-06-23 — M1 through M8 all shipped** (engine M1-M6 byte-identical → M7 trees [deliberate rebump] → M8 balance). C.2 is done; the remaining balance work is **P.5c** (its own Phase-P milestone — global regime tuning against the final trees). Companion to `Talent-Trait-Revamp.md` (the design) and `ROADMAP.md` C.2. Grounded in a 5-agent read of the live engine; every file:line below was verified.
 
 The deliverable here is the **sequence + scope + decisions** so we agree before M1. Each milestone ends with a build gate (`cd web && npx tsc -b` + `node scripts/egm-smoke.mjs`) and a commit. **Determinism is the invariant** — goldens stay byte-identical until content actually lands (M7).
 
@@ -110,11 +110,13 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 **Risk:** save handling (sanitize, not reset — see Decisions); first deliberate golden change; spec-id reconciliation. **Likely split M7a (schema+data+validator+picker) / M7b (seconds display) / per-spec batches.**
 **Commit:** M7(a/b/…).
 
-### M8 — Balance pass → hand off to P.5c
+### M8 — Balance pass → hand off to P.5c ✅ SHIPPED 2026-06-23
+> **Done:** built `scripts/talent-balance.mjs` (role-aware power-equality harness — sweeps each tier's 3 options, others at default, and measures **clear DURATION** on a trash + a boss dungeon; duration is the real signal because cumulative damage ≈ fixed total HP in a *timed* clear). **Finding: the trees are already power-equal by content** — DPS tiers' boss-winners are the single-target/sustained/execute options, AoE/utility/anti-heal win their content; spreads 2-11%, no dead options, no universally-dominant option, defaults middle-ish. Tanks (1-3%) + healers (~2%) tight + survival-bound (survival options correctly inert on a no-death clear → P.5c regime). **One tune:** Pyromancer Smothering Ash burn-amp 35→60 (+honest reframe — burn DoT is a minor damage fraction in this engine, so a burn-magnitude pick can't out-clear a flat-damage pick on a boss without T1/T3 redundancy). **Verify:** `tsc -b`; egm-smoke unchanged (tune is non-default); **+2 floor 6/6** + **operator runway +2** (`f6-balance`); `balance-probe` reproduces M7b exactly (determinism + floor). **Known limits → P.5c/future engine:** no healer-output channel; survival options non-differentiable on no-death clears; absolute ceiling dropped (~+18→+15 fresh @ cap from the M7b rebump) — **`keyScalingPerLevel` recalibration is P.5c's job, deliberately not pre-empted.**
+
 **Goal:** sweep the trees vs the timer curve; every tier's 3 options power-equal; +2 floor holds; operator runway intact. Then **P.5c** (the regime tuning) calibrates once against the final trees.
-**Changes:** `scripts/*.mjs` sweeps, `data/tuning.json`, talent tuning.
-**Verify:** `balance-sweep`/`balance-probe`; +2 floor; determinism.
-**Commit:** M8 (then P.5c is its own phase).
+**Changes:** `scripts/talent-balance.mjs` (new harness), `data/talents.json` (one tune).
+**Verify:** `talent-balance`/`balance-probe`/`f6-balance`; +2 floor; determinism. **All green.**
+**Commit:** M8 (then P.5c is its own phase). **← C.2 is now COMPLETE.**
 
 ---
 
@@ -154,6 +156,6 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 | M5 §F tank tools ✅ | threat predicate (rest M2-covered; capstone mechanics → M7) | S | M1 | ✅ byte-identical |
 | M6 §H summon ✅ | general enemy-add system | M | — | ✅ byte-identical (+ summon-check) |
 | M7 author + picker + seconds ✅ | 10 trees content + UI | XL | M1-M6 (per spec) | ✅ M7a (struct byte-identical) + M7b (deliberate rebump 938/978/1208/1414, +2 floor holds) |
-| M8 balance → P.5c | sweep + tune | M | M7 | tuned |
+| M8 balance → P.5c ✅ | sweep + tune (power-equal by content) | M | M7 | ✅ +2 floor 6/6, runway +2, determinism reproduced; **C.2 done** |
 
 With M1-M5 done, ~9 of 10 specs are fully expressible; M6 adds the summon axis; M7 makes it playable.
