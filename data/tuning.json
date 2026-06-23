@@ -20,7 +20,7 @@
     "shieldGuardReductionPct": 99,
     "summonEverySec": 18,
     "curseEverySec": 8,
-    "curseBase": 0.06,
+    "curseBase": 0.25,
     "curseDurationSec": 30,
     "deathPenaltySec": 15,
     "rezStartCharges": 1,

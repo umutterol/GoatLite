@@ -29,14 +29,17 @@ try {
   pass(hiE.durationSec < lowE.durationSec, "execution 20 clears faster than execution 1")
 
   // B — Awareness → less intake (better survival on a hard, pressuring key)
-  const lowA = run(comp({ skills: sk(4, 1, 4), ilvl: 105 }), 22)
-  const hiA = run(comp({ skills: sk(4, 20, 4), ilvl: 105 }), 22)
+  // P.5c-M4: key 22→12. The M1 regime (hpUnit 1500) made key22/ilvl105 an UNWINNABLE total-wipe for both skill levels
+  // (death-count became a misleading proxy — more deaths can mean more progress before the wipe). key12/ilvl105 is the
+  // new survival edge: skill=1 wipes, skill=20 survives (depleted ~90% HP), so the monotonic assertion is meaningful.
+  const lowA = run(comp({ skills: sk(4, 1, 4), ilvl: 105 }), 12)
+  const hiA = run(comp({ skills: sk(4, 20, 4), ilvl: 105 }), 12)
   console.log(`\nB. Awareness intake:  awar1 ${lowA.outcome} deaths=${lowA.deaths.length} hp=${sumHp(lowA)}%  awar20 ${hiA.outcome} deaths=${hiA.deaths.length} hp=${sumHp(hiA)}%`)
   pass(hiA.deaths.length <= lowA.deaths.length && sumHp(hiA) >= sumHp(lowA), "awareness 20 takes less damage (≤ deaths, ≥ final HP)")
 
   // C — Composure → clutch survival on a hard, pressuring key
-  const lowC = run(comp({ skills: sk(4, 4, 1), ilvl: 105 }), 22)
-  const hiC = run(comp({ skills: sk(4, 4, 20), ilvl: 105 }), 22)
+  const lowC = run(comp({ skills: sk(4, 4, 1), ilvl: 105 }), 12)   // P.5c-M4: key 22→12 (see B — survival edge in the new regime)
+  const hiC = run(comp({ skills: sk(4, 4, 20), ilvl: 105 }), 12)
   console.log(`\nC. Composure clutch:  comp1 ${lowC.outcome} deaths=${lowC.deaths.length} hp=${sumHp(lowC)}%  comp20 ${hiC.outcome} deaths=${hiC.deaths.length} hp=${sumHp(hiC)}%`)
   pass(hiC.deaths.length <= lowC.deaths.length && sumHp(hiC) >= sumHp(lowC), "composure 20 survives better than composure 1")
 

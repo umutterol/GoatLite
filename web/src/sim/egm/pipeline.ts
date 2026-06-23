@@ -42,6 +42,12 @@ export function mitigationFraction(defenseValue: number, incoming: number): numb
    hit only ~2.4%), so there was no real school check. This taxes a wrong-school core a flat fraction on EVERY hit. 0
    defense → 0, so Ashveil (armour/resist 0) stays byte-identical. K/CAP are tuned in P.1 against the sweep to land the
    off-school tax at +3–5 keys; they start conservative here (structural change only — P.0 doesn't chase magnitudes). */
+// P.5c-M4 note: softening K (tried 200/300) was REVERTED. The Ossuary ceiling is low (~+6) in the timer-bound regime,
+// but softening the wall INVERTS the read — physical (mitigated) still out-clears magic because the magic≪physical
+// spec imbalance (see M3) is larger than the wall's mitigation gap, so a softer wall just lets strong physical win the
+// armour wall (nonsensical). K=155 is the only setting where the read points the right direction (magic ≥ physical,
+// weakly). Fully restoring the "bring magic" tax needs a pyromancer single-target buff (a follow-up magic-spec pass),
+// not a wall tweak. Left at 155.
 export const SCHOOL_WALL_K = 155
 export const SCHOOL_WALL_CAP = 0.65
 export function schoolWallFraction(defenseValue: number): number {
