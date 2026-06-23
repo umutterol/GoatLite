@@ -96,8 +96,9 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 **Risk:** replay-id stability (counter, not `mobs.length`). **Party-pet** (target enemies, contribute to party parse, own brain) is a **later increment (M6b), deferred with the Necromancer** — but the general enemy-add system ships here and is immediately usable for boss/trash adds.
 **Commit:** M6.
 
-### M7 — Author the 10 trees + picker + seconds display *(content lands — goldens move here)* 🟡 M7a ✅ SHIPPED 2026-06-23
-> **M7a (structure) done:** `specId` optional on `TalentNodeSchema` (back-compat → globals still apply, byte-identical); `resolveTalents`/picker filter by spec; cross-ref validates `specId`; SpellTip shows `{cd×3}s`. **M7b (remaining):** author the 10 per-spec trees in `talents.json` using the M1-M6 vocab (+ reconcile `bard`→`archer`), drop the global MVP nodes → **deliberate golden rebump**, then the signature-card + skills.json seconds cleanup. Then **M8** balance.
+### M7 — Author the 10 trees + picker + seconds display *(content lands — goldens move here)* ✅ SHIPPED 2026-06-23 (M7a + M7b)
+> **M7a (structure) done:** `specId` optional on `TalentNodeSchema` (back-compat → globals still apply, byte-identical); `resolveTalents`/picker filter by spec; cross-ref validates `specId`; SpellTip shows `{cd×3}s`.
+> **M7b (content) done 2026-06-23:** authored the **10 per-spec trees (50 nodes × 3 options = 150)** in `talents.json` against the M1-M6 honored vocab; dropped the 5 global MVP nodes (**deliberate golden rebump** → 938/978/1208/1414, all timed, 0 deaths; **+2 floor times for all 4 comps**). Archer kept `specId:"bard"` (decision: no rename — `specs.json` keeps the id for save stability, so decision #5's reconcile is moot). Added 2 anti-heal statuses (`riven-wound`/`serrated-wound`) + `selfHitSinceLastAction`+`targetHpAbovePct` to the talent `onlyIf` enum & `condHolds`. Store sanitize drops stale nodeIds on load (persisted shape unchanged → **no SAVE bump**, per decision #2). SignatureCard cd → `{cd×3}s`; `skills.json` player-facing prose "turn"→seconds (baseValues left as reference units). A **10-agent adversarial audit** caught a real no-op class — talent `dmgPct` gates evaluate against `livingMobs[0]` (the lead enemy), so `targetBand:back` is unreliable for front-fighting specs → Guardian Iron Tether reworked to an on-hit Mark rider, Assassin Sever-the-Thread to target-accurate `addModifier`s (which DO see the real hit target); + a cd-text bug + 2 near-inert healer `dmgPct` nodes swapped to self-survival. **Known engine gap (flag for M8/a future milestone): no healer-output (heal/HoT-magnitude) talent channel** — Lifebinder/Cleric throughput nodes use cooldown-reductions + Cleric atonement-`dmgPct` + self-survival; the design's one-shot-evasive / party-buff / status-magnitude hooks are intentional proxies. **Verify:** `tsc -b`; content validator; egm-smoke (rebumped); `balance-probe` (+2 floor); `talent-cond-verify` (M1-M6 channels); Playwright `talent-picker-live.mjs` PASS. Then **M8** balance.
 **Goal:** make it real.
 **Changes:**
 - `schema.ts` `TalentNodeSchema` += `specId` + rename/add `tier` (1-5). `index.ts` cross-ref: `specId ∈ specs`, every referenced `abilityId ∈ abilities`.
@@ -152,7 +153,7 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 | M4 §D atonement ✅ | healer damage-to-heal extensions | S-M | M1, (M2) | ✅ byte-identical |
 | M5 §F tank tools ✅ | threat predicate (rest M2-covered; capstone mechanics → M7) | S | M1 | ✅ byte-identical |
 | M6 §H summon ✅ | general enemy-add system | M | — | ✅ byte-identical (+ summon-check) |
-| M7 author + picker + seconds | 10 trees content + UI | XL | M1-M6 (per spec) | 🟡 M7a ✅ (struct byte-identical); M7b rebump |
+| M7 author + picker + seconds ✅ | 10 trees content + UI | XL | M1-M6 (per spec) | ✅ M7a (struct byte-identical) + M7b (deliberate rebump 938/978/1208/1414, +2 floor holds) |
 | M8 balance → P.5c | sweep + tune | M | M7 | tuned |
 
 With M1-M5 done, ~9 of 10 specs are fully expressible; M6 adds the summon axis; M7 makes it playable.

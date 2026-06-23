@@ -63,6 +63,7 @@ function cancelEnemyCast(enemy: Combatant, by: Combatant, ctx: CombatCtx): boole
 function condHolds(cond: Cond, caster: Combatant, target: Combatant | undefined, ctx: CombatCtx): boolean {
   switch (cond?.type) {
     case "targetHpBelowPct": return !!target && target.hp / target.maxHp < (cond.value ?? 0) / 100
+    case "targetHpAbovePct": return !!target && target.hp / target.maxHp > (cond.value ?? 100) / 100   // C.2: fresh-target / alpha-opener gate (Assassin Opening Cut)
     case "selfHpBelowPct": return caster.hp / caster.maxHp < (cond.value ?? 0) / 100
     case "selfHitSinceLastAction": return caster.hitSinceAction
     case "targetHasStatus": return !!target && (hasStatus(target, cond.status, cond.minStacks ?? 1) || target.statuses.some((s) => s.kind === cond.status))

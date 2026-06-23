@@ -245,9 +245,9 @@ export const TalentOptionSchema = z.object({
     // fails validation rather than silently un-gating. `value` is optional (status/band gates don't use it).
     onlyIf: z.object({
       type: z.enum([
-        "targetHpBelowPct", "enemiesAtLeast", "enemiesAtMost",
+        "targetHpBelowPct", "targetHpAbovePct", "enemiesAtLeast", "enemiesAtMost",
         "selfHpBelowPct", "allyHpBelowPct", "lowestAllyHpBelowPct",
-        "selfStacksAtLeast", "selfHoldsHardThreat",
+        "selfStacksAtLeast", "selfHoldsHardThreat", "selfHitSinceLastAction",
         "targetHasStatus", "selfHasStatus", "targetBand",
       ]),
       value: z.number().optional(),

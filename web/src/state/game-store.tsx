@@ -243,9 +243,13 @@ function loadState(): GameState {
       const p = JSON.parse(raw) as PersistState
       if (p.version === SAVE_VERSION) {
         const merged = { ...freshState(), ...p, ...TRANSIENT }
+        // M7: per-spec talent trees changed the node id-space (global node-1..5 → spec-prefixed). Drop any stale picks
+        // whose nodeId no longer exists so the picker/sim fall back cleanly to spec defaults (persisted shape unchanged → no SAVE bump).
+        const VALID_TALENT_NODES = new Set(content.talents.keys())
         // defensive: guarantee every member has a key + talents + the Phase F operator block so engine/UI never deref undefined
         merged.roster = merged.roster.map((m) => ({
-          ...m, key: m.key ?? freshKey(), talents: m.talents ?? {},
+          ...m, key: m.key ?? freshKey(),
+          talents: Object.fromEntries(Object.entries(m.talents ?? {}).filter(([nodeId]) => VALID_TALENT_NODES.has(nodeId))),
           skills: m.skills ?? freshOperatorSkills(), ceilings: m.ceilings ?? freshOperatorSkills(),
           skillXp: m.skillXp ?? zeroSkillMap(), revealed: m.revealed ?? falseRevealMap(), potentialProfile: m.potentialProfile ?? {},
         }))

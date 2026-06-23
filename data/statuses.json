@@ -15,5 +15,7 @@
   { "id": "regrowth",       "name": "Regrowth",       "kind": "hot",      "maxStacks": 2, "refresh": "stack",   "perTick": true, "defaultDurationTurns": 3 },
   { "id": "blossom",        "name": "Blossom",        "kind": "hot",      "maxStacks": 3, "refresh": "stack",   "perTick": true, "defaultDurationTurns": 3, "note": "Blooms for burst on trigger/expire (special)." },
   { "id": "natures-breath", "name": "Nature's Breath","kind": "hot",      "maxStacks": 1, "refresh": "refresh", "perTick": true, "defaultDurationTurns": 3 },
-  { "id": "spirit-link-hot","name": "Spirit Link",    "kind": "hot",      "maxStacks": 1, "refresh": "refresh", "perTick": true, "defaultDurationTurns": 3 }
+  { "id": "spirit-link-hot","name": "Spirit Link",    "kind": "hot",      "maxStacks": 1, "refresh": "refresh", "perTick": true, "defaultDurationTurns": 3 },
+  { "id": "riven-wound",    "name": "Riven Wound",    "kind": "debuff",   "maxStacks": 1, "refresh": "refresh", "statMods": [{ "stat": "healingReceived", "amountPct": -50 }], "defaultDurationTurns": 2, "note": "C.2 P9 anti-heal: Berserker Riving Wound. Cuts the bearer's incoming healing -50% (honored in eff()/healInto). Applied by an on-hit talent event rider; bites against self-healing/Sanguine-fed enemies." },
+  { "id": "serrated-wound", "name": "Serrated Wound", "kind": "debuff",   "maxStacks": 1, "refresh": "refresh", "statMods": [{ "stat": "healingReceived", "amountPct": -40 }], "defaultDurationTurns": 2, "note": "C.2 P9 anti-heal: Archer Serrated Shot (ranged). Cuts the bearer's incoming healing -40%. Applied by an on-hit talent event rider gated to the Mark applier." }
 ]

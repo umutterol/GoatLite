@@ -1,27 +1,313 @@
 [
-  { "id": "node-1", "node": 1, "name": "Survival vs. Throughput", "options": [
-    { "id": "iron-will",          "name": "Iron Will",    "effect": "+15% max HP",                                "tags": ["survival"],          "effects": { "maxHpPct": 15 } },
-    { "id": "executioner-talent", "name": "Executioner",  "effect": "+12% damage while your focus target is below 30% HP", "tags": ["burst"], "effects": { "dmgPct": 12, "onlyIf": { "type": "targetHpBelowPct", "value": 30 } } },
-    { "id": "adaptive",           "name": "Adaptive",     "effect": "+8% HP and +6% damage (balanced)",           "tags": ["survival", "burst"], "default": true, "effects": { "maxHpPct": 8, "dmgPct": 6 } }
+
+
+  { "id": "guardian-t1", "node": 1, "specId": "guardian", "name": "The Reactive Engine", "options": [
+    { "id": "guardian-mounting-fury", "name": "Mounting Fury", "effect": "+20% damage right after an enemy strikes you — the reactive bruiser answers every blow.", "tags": ["burst", "tank"], "effects": { "dmgPct": 20, "onlyIf": { "type": "selfHitSinceLastAction" } } },
+    { "id": "guardian-bristling-bulwark", "name": "Bristling Bulwark", "effect": "+22% damage while 3 or more enemies are up — turn a packed pull into a grinder.", "tags": ["aoe", "cleave"], "effects": { "dmgPct": 22, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "guardian-tempered-edge", "name": "Tempered Edge", "effect": "+16% damage while 2 or fewer enemies remain — a reliable single-target floor.", "tags": ["burst"], "default": true, "effects": { "dmgPct": 16, "onlyIf": { "type": "enemiesAtMost", "value": 2 } } }
   ] },
-  { "id": "node-2", "node": 2, "name": "Single Target vs. AoE", "options": [
-    { "id": "focused-strike",     "name": "Focused Strike","effect": "+20% damage when 2 or fewer enemies remain (single-target / boss)", "tags": ["burst"], "effects": { "dmgPct": 20, "onlyIf": { "type": "enemiesAtMost", "value": 2 } } },
-    { "id": "cleaving-blow",      "name": "Cleaving Blow", "effect": "+22% damage while 3 or more enemies are up (AoE / trash)",          "tags": ["aoe", "cleave"], "effects": { "dmgPct": 22, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
-    { "id": "opportunist-talent", "name": "Opportunist",   "effect": "+10% damage, always (balanced)",            "tags": ["aoe"], "default": true, "effects": { "dmgPct": 10 } }
+
+  { "id": "guardian-t2", "node": 2, "specId": "guardian", "name": "The Grip Fork", "options": [
+    { "id": "guardian-iron-tether", "name": "Iron Tether", "effect": "Your Shield Bash brands the target with a Tether (Mark) — the whole party hits it +15% harder.", "tags": ["tank", "burst"], "effects": { "eventRiders": [ { "trigger": "on-hit", "ability": "shield-bash", "applyStatus": { "statusId": "mark", "target": "enemy-target", "durationTurns": 2 } } ] } },
+    { "id": "guardian-twin-chain-haul", "name": "Twin-Chain Haul", "effect": "Revenge now strikes an extra adjacent enemy — collapse two foes at once.", "tags": ["aoe", "cleave"], "effects": { "abilityOverrides": [ { "kind": "targeting", "abilityId": "revenge", "pattern": "adjacent", "count": 1 } ] } },
+    { "id": "guardian-brand-the-caught", "name": "Brand the Caught", "effect": "Shield Bash hits 40% harder against targets below 30% HP — punish what you've caught.", "tags": ["burst", "tank"], "default": true, "effects": { "abilityOverrides": [ { "kind": "addModifier", "abilityId": "shield-bash", "when": { "type": "targetHpBelowPct", "value": 30 }, "multiplyDamage": 1.4 } ] } }
   ] },
-  { "id": "node-3", "node": 3, "name": "Tempo vs. Spike", "options": [
-    { "id": "steady-hand", "name": "Steady Hand", "effect": "+8% output, always (steady tempo)",                          "tags": ["sustain"], "effects": { "dmgPct": 8 } },
-    { "id": "overload",    "name": "Overload",    "effect": "+16% damage while your focus target is below 50% HP (spike the kill)", "tags": ["burst"], "effects": { "dmgPct": 16, "onlyIf": { "type": "targetHpBelowPct", "value": 50 } } },
-    { "id": "metronome",   "name": "Metronome",   "effect": "+6% output and +5% crit (balanced)",                         "tags": ["sustain", "crit"], "default": true, "effects": { "dmgPct": 6, "critPct": 5 } }
+
+  { "id": "guardian-t3", "node": 3, "specId": "guardian", "name": "The Sentinel's Voice", "options": [
+    { "id": "guardian-banner-of-valor", "name": "Banner of Valor", "effect": "Bulwark Banner's cooldown drops to 48s — raise the party's guard far more often.", "tags": ["tank", "survival"], "default": true, "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "bulwark-banner", "cooldownTurns": 16 } ] } },
+    { "id": "guardian-unbreaking-glare", "name": "Unbreaking Glare", "effect": "Challenge's cooldown drops to 6s — snap a loose threat back onto you twice as fast.", "tags": ["tank", "interrupt"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "challenge", "cooldownTurns": 2 } ] } },
+    { "id": "guardian-daunting-roar", "name": "Daunting Roar", "effect": "−10% damage taken while 3 or more enemies are up — weather a packed pull.", "tags": ["survival", "tank"], "effects": { "intakePct": -10, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } }
   ] },
-  { "id": "node-4", "node": 4, "name": "Defensive Tech", "options": [
-    { "id": "bulwark",       "name": "Bulwark",       "effect": "-12% damage taken (the wall)",          "tags": ["survival", "tank"], "effects": { "intakePct": -12 } },
-    { "id": "fleetfoot",     "name": "Fleetfoot",     "effect": "-6% damage taken and +4% output",       "tags": ["positioning"], "default": true, "effects": { "intakePct": -6, "dmgPct": 4 } },
-    { "id": "second-breath", "name": "Second Breath", "effect": "+12% max HP (a deeper buffer)",         "tags": ["survival"], "effects": { "maxHpPct": 12 } }
+
+  { "id": "guardian-t4", "node": 4, "specId": "guardian", "name": "Active Mitigation", "options": [
+    { "id": "guardian-riposting-aegis", "name": "Riposting Aegis", "effect": "+16% damage right after you are struck — the more they beat the wall, the more it answers.", "tags": ["tank", "burst"], "effects": { "dmgPct": 16, "onlyIf": { "type": "selfHitSinceLastAction" } } },
+    { "id": "guardian-sheltering-ward", "name": "Sheltering Ward", "effect": "+12% max HP — a deeper buffer for the predicted spike.", "tags": ["survival"], "effects": { "maxHpPct": 12 } },
+    { "id": "guardian-resolute-footing", "name": "Resolute Footing", "effect": "−22% damage taken while below 50% HP — smooth every spike once the fight is rolling.", "tags": ["survival", "tank"], "default": true, "effects": { "intakePct": -22, "onlyIf": { "type": "selfHpBelowPct", "value": 50 } } }
   ] },
-  { "id": "node-5", "node": 5, "name": "Affix Specialist", "options": [
-    { "id": "focus-fire",     "name": "Focus Fire",     "effect": "+10% damage while 3 or more enemies are up (Kill Order)", "tags": ["cleave"], "effects": { "dmgPct": 10, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
-    { "id": "quick-reflexes", "name": "Quick Reflexes", "effect": "-7% damage taken (dodge the mechanics)",                 "tags": ["interrupt"], "effects": { "intakePct": -7 } },
-    { "id": "spatial-sense",  "name": "Spatial Sense",  "effect": "-5% damage taken and +5% max HP (positioning)",          "tags": ["positioning"], "default": true, "effects": { "intakePct": -5, "maxHpPct": 5 } }
+
+  { "id": "guardian-t5", "node": 5, "specId": "guardian", "name": "The Sentinel's Oath", "options": [
+    { "id": "guardian-sentinels-burden", "name": "Sentinel's Burden", "effect": "−18% damage taken while you hold hard threat — the immovable anchor the pull breaks on.", "tags": ["tank", "survival"], "default": true, "effects": { "intakePct": -18, "onlyIf": { "type": "selfHoldsHardThreat" } } },
+    { "id": "guardian-valor-repaid", "name": "Valor Repaid", "effect": "Your strikes heal the lowest-HP ally for 30% of the damage dealt — soak it, give it back.", "tags": ["tank", "sustain"], "effects": { "eventRiders": [ { "trigger": "on-hit", "heal": { "target": "lowest-ally", "pctOfDamage": 30 } } ] } },
+    { "id": "guardian-the-line-breaks", "name": "The Line Breaks", "effect": "+24% damage while 3 or more enemies are up — a pack-shredding chain-collapse finisher.", "tags": ["aoe", "cleave"], "effects": { "dmgPct": 24, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } }
+  ] },
+
+
+  { "id": "berserker-t1", "node": 1, "specId": "berserker", "name": "The Price of Wrath", "options": [
+    { "id": "berserker-edge-of-ruin", "name": "Edge of Ruin", "effect": "+18% damage while below 40% HP — ride the edge for the snowball.", "tags": ["burst"], "effects": { "dmgPct": 18, "onlyIf": { "type": "selfHpBelowPct", "value": 40 } } },
+    { "id": "berserker-lifeblood-renewal", "name": "Lifeblood Renewal", "effect": "+12% max HP and your crits heal you for 6% max HP (up from 3%) — a self-topping body.", "tags": ["sustain", "survival"], "effects": { "maxHpPct": 12, "abilityOverrides": [ { "kind": "param", "abilityId": "bloodlust", "mechanic": "crit-lifesteal", "key": "healHpPct", "value": 6 } ] } },
+    { "id": "berserker-warbound-cadence", "name": "Warbound Cadence", "effect": "+12% damage while at 3 or more Rampage — a steady payoff that never stalls.", "tags": ["sustain", "burst"], "default": true, "effects": { "dmgPct": 12, "onlyIf": { "type": "selfStacksAtLeast", "value": 3, "resource": "rampage" } } }
+  ] },
+
+  { "id": "berserker-t2", "node": 2, "specId": "berserker", "name": "The Shape of the Swing", "options": [
+    { "id": "berserker-reaving-sweep", "name": "Reaving Sweep", "effect": "+24% damage while 3 or more enemies are up — multiply Steel Cyclone into packs.", "tags": ["aoe", "cleave"], "effects": { "dmgPct": 24, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "berserker-throat-finder", "name": "Throat-Finder", "effect": "+22% damage while 2 or fewer enemies remain — fatten every blow in a duel.", "tags": ["burst"], "effects": { "dmgPct": 22, "onlyIf": { "type": "enemiesAtMost", "value": 2 } } },
+    { "id": "berserker-even-temper", "name": "Even Temper", "effect": "+11% damage, always — the safe generalist that never whiffs.", "tags": ["sustain"], "default": true, "effects": { "dmgPct": 11 } }
+  ] },
+
+  { "id": "berserker-t3", "node": 3, "specId": "berserker", "name": "The Wound That Will Not Close", "options": [
+    { "id": "berserker-riving-wound", "name": "Riving Wound", "effect": "Your Cleaving Strike brands the target with Riven Wound: −50% incoming healing — the only true anti-heal.", "tags": ["burst"], "effects": { "eventRiders": [ { "trigger": "on-hit", "ability": "cleaving-strike", "applyStatus": { "statusId": "riven-wound", "target": "enemy-target", "durationTurns": 2 } } ] } },
+    { "id": "berserker-rending-frenzy", "name": "Rending Frenzy", "effect": "Steel Cyclone (Bladestorm) hits far harder (scale 1.35 → 1.6) — your premier sustained AoE nuke.", "tags": ["aoe"], "effects": { "abilityOverrides": [ { "kind": "scalar", "abilityId": "bladestorm", "effectType": "damage", "field": "scale", "value": 1.6 } ] } },
+    { "id": "berserker-hungering-onslaught", "name": "Hungering Onslaught", "effect": "+20% damage to targets below 30% HP, and a Reaping Blow kill refunds 2 Rampage.", "tags": ["burst", "sustain"], "default": true, "effects": { "dmgPct": 20, "onlyIf": { "type": "targetHpBelowPct", "value": 30 }, "eventRiders": [ { "trigger": "on-kill", "ability": "massacre", "refundResource": { "resource": "rampage", "amount": 2 } } ] } }
+  ] },
+
+  { "id": "berserker-t4", "node": 4, "specId": "berserker", "name": "Surviving the Bleed-Out", "options": [
+    { "id": "berserker-battle-resolve", "name": "Battle Resolve", "effect": "−20% damage taken while below 35% HP — a net for the edge-walker.", "tags": ["survival"], "default": true, "effects": { "intakePct": -20, "onlyIf": { "type": "selfHpBelowPct", "value": 35 } } },
+    { "id": "berserker-crimson-tithe", "name": "Crimson Tithe", "effect": "+12% max HP and −6% damage taken — the undying-bruiser body that needs no babysitting.", "tags": ["survival", "sustain"], "effects": { "maxHpPct": 12, "intakePct": -6 } },
+    { "id": "berserker-reckless-disregard", "name": "Reckless Disregard", "effect": "Reckless Frenzy lasts +9s longer — a deadlier all-in offensive window.", "tags": ["burst"], "effects": { "abilityOverrides": [ { "kind": "scalar", "abilityId": "reckless-frenzy", "effectType": "buff", "field": "durationTurns", "value": 6 } ] } }
+  ] },
+
+  { "id": "berserker-t5", "node": 5, "specId": "berserker", "name": "The Last Stroke", "options": [
+    { "id": "berserker-rampant-slaughter", "name": "Rampant Slaughter", "effect": "A Reaping Blow kill resets its own cooldown — chain executes across a dying pack.", "tags": ["aoe", "burst"], "effects": { "eventRiders": [ { "trigger": "on-kill", "ability": "massacre", "adjustCooldown": { "abilityId": "massacre", "deltaTurns": -900 } } ] } },
+    { "id": "berserker-crimson-crescendo", "name": "Crimson Crescendo", "effect": "Each Rampage stack now grants +6% damage (up from 4%) — the highest steady ceiling.", "tags": ["sustain", "burst"], "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "bloodlust", "mechanic": "rampage-damage-bonus", "key": "perStackPct", "value": 6 } ] } },
+    { "id": "berserker-headsmans-certainty", "name": "Headsman's Certainty", "effect": "Reaping Blow strikes 50% harder against targets below 35% HP — delete bosses in the kill window.", "tags": ["burst"], "default": true, "effects": { "abilityOverrides": [ { "kind": "addModifier", "abilityId": "massacre", "when": { "type": "targetHpBelowPct", "value": 35 }, "multiplyDamage": 1.5 } ] } }
+  ] },
+
+
+  { "id": "crusader-t1", "node": 1, "specId": "crusader", "name": "The Oath's Reach", "options": [
+    { "id": "crusader-light-of-the-sworn", "name": "Light of the Sworn", "effect": "Guardian's Oath reduces the redirected damage you take by 35% (up from 20%) — the predictive peeler.", "tags": ["tank", "survival"], "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "guardians-oath", "mechanic": "redirect-damage", "key": "reductionPct", "value": 35 } ] } },
+    { "id": "crusader-goldwrought-vigil", "name": "Goldwrought Vigil", "effect": "Holy Strike's ally guard is +10% armour for 6s (up from +5%/3s) — a rolling shield on whoever takes the heat.", "tags": ["tank", "survival"], "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "holy-strike", "mechanic": "buff-nearest-ally", "key": "amountPct", "value": 10 }, { "kind": "param", "abilityId": "holy-strike", "mechanic": "buff-nearest-ally", "key": "durationTurns", "value": 2 } ] } },
+    { "id": "crusader-the-bulwark-holds", "name": "The Bulwark Holds", "effect": "−10% damage taken while you hold hard threat — the selfish anchor wall.", "tags": ["tank", "survival"], "default": true, "effects": { "intakePct": -10, "onlyIf": { "type": "selfHoldsHardThreat" } } }
+  ] },
+
+  { "id": "crusader-t2", "node": 2, "specId": "crusader", "name": "The Sheltering Light", "options": [
+    { "id": "crusader-bulwark-litany", "name": "Bulwark Litany", "effect": "Rally Cry's cooldown drops to 12s — press the party window before every heavy stretch.", "tags": ["tank", "survival"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "rally-cry", "cooldownTurns": 4 } ] } },
+    { "id": "crusader-stillvalor-aegis", "name": "Stillvalor Aegis", "effect": "Sacred Bastion's cooldown drops to 48s — two surgical peels for a two-spike fight.", "tags": ["survival", "tank"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "sacred-bastion", "cooldownTurns": 16 } ] } },
+    { "id": "crusader-daybreak-cadence", "name": "Daybreak Cadence", "effect": "Rally Cry's party power buff rises to +20% (from +15%) — lean into the timer race.", "tags": ["tank", "burst"], "default": true, "effects": { "abilityOverrides": [ { "kind": "scalar", "abilityId": "rally-cry", "effectType": "buff", "field": "amountPct", "value": 20 } ] } }
+  ] },
+
+  { "id": "crusader-t3", "node": 3, "specId": "crusader", "name": "The Aegis's Discipline", "options": [
+    { "id": "crusader-dawnforged-bulwark", "name": "Dawnforged Bulwark", "effect": "Radiant Aegis's absorb is +50% larger — the surest pre-block for a known big hit.", "tags": ["survival", "tank"], "default": true, "effects": { "abilityOverrides": [ { "kind": "scalar", "abilityId": "divine-shield", "effectType": "shield", "field": "scale", "value": 0.6 } ] } },
+    { "id": "crusader-spreading-benediction", "name": "Spreading Benediction", "effect": "Radiant Aegis's cooldown drops to 18s — keep a shield rolling across a bleeding line.", "tags": ["survival"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "divine-shield", "cooldownTurns": 6 } ] } },
+    { "id": "crusader-radiant-reprisal", "name": "Radiant Reprisal", "effect": "+12% damage while 3 or more enemies are up — a damage-tank that swings the kill clock.", "tags": ["tank", "aoe"], "effects": { "dmgPct": 12, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } }
+  ] },
+
+  { "id": "crusader-t4", "node": 4, "specId": "crusader", "name": "The Redirect's Edge", "options": [
+    { "id": "crusader-steadfast-forbearance", "name": "Steadfast Forbearance", "effect": "−25% damage taken while below 50% HP — eat a lethal hit for an ally and live.", "tags": ["tank", "survival"], "default": true, "effects": { "intakePct": -25, "onlyIf": { "type": "selfHpBelowPct", "value": 50 } } },
+    { "id": "crusader-oathbound-reprisal", "name": "Oathbound Reprisal", "effect": "+24% damage while you hold hard threat — convert the peel into a personal burst window.", "tags": ["tank", "burst"], "effects": { "dmgPct": 24, "onlyIf": { "type": "selfHoldsHardThreat" } } },
+    { "id": "crusader-reckoning-of-the-warden", "name": "Reckoning of the Warden", "effect": "Guardian's Oath's cooldown drops to 9s — peel a chained spike beat after beat.", "tags": ["tank", "interrupt"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "guardians-oath", "cooldownTurns": 3 } ] } }
+  ] },
+
+  { "id": "crusader-t5", "node": 5, "specId": "crusader", "name": "The Last Bastion", "options": [
+    { "id": "crusader-aegis-of-the-dawnsworn", "name": "Aegis of the Dawnsworn", "effect": "Sacred Bastion becomes a 70%-max-HP peel on a 42s cooldown — the definitive single-event refusal.", "tags": ["tank", "survival"], "default": true, "effects": { "abilityOverrides": [ { "kind": "scalar", "abilityId": "sacred-bastion", "effectType": "shield", "field": "scale", "value": 0.7 }, { "kind": "cooldown", "abilityId": "sacred-bastion", "cooldownTurns": 14 } ] } },
+    { "id": "crusader-vault-of-the-dawn", "name": "Vault of the Dawn", "effect": "Sacred Bastion becomes a 90%-max-HP disaster dome — read the heavy window and press it.", "tags": ["survival", "tank"], "effects": { "abilityOverrides": [ { "kind": "scalar", "abilityId": "sacred-bastion", "effectType": "shield", "field": "scale", "value": 0.9 } ] } },
+    { "id": "crusader-reliquary-of-radiance", "name": "Reliquary of Radiance", "effect": "+16% damage while you hold hard threat, plus a sturdy Sacred Bastion — one cooldown that peels and swings.", "tags": ["tank", "burst"], "effects": { "dmgPct": 16, "onlyIf": { "type": "selfHoldsHardThreat" }, "abilityOverrides": [ { "kind": "scalar", "abilityId": "sacred-bastion", "effectType": "shield", "field": "scale", "value": 0.6 } ] } }
+  ] },
+
+
+  { "id": "cleric-t1", "node": 1, "specId": "cleric", "name": "The Atonement Shape", "options": [
+    { "id": "cleric-choir-of-dawn", "name": "Choir of Dawn", "effect": "Smite's Atonement heals for 70% of damage dealt (up from 50%) — the off-school throughput floor.", "tags": ["sustain"], "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "smite", "mechanic": "atonement-heal", "key": "healPctOfDamage", "value": 70 } ] } },
+    { "id": "cleric-kindled-offering", "name": "Kindled Offering", "effect": "Holy Fire's cooldown drops to 9s and Smite no longer Atones — commit to the burning DoT.", "tags": ["sustain"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "holy-fire", "cooldownTurns": 3 } ], "atonement": { "disableAbilityId": "smite" } } },
+    { "id": "cleric-piercing-ray", "name": "Piercing Ray", "effect": "+15% damage — weaponise your filler into bigger smites and bigger Atonement.", "tags": ["burst", "sustain"], "default": true, "effects": { "dmgPct": 15 } }
+  ] },
+
+  { "id": "cleric-t2", "node": 2, "specId": "cleric", "name": "The Spike", "options": [
+    { "id": "cleric-sanctuary-bloom", "name": "Sanctuary Bloom", "effect": "Mending Light heals 25% harder — a bigger reactive top for the spike.", "tags": ["survival", "sustain"], "effects": { "abilityOverrides": [ { "kind": "scalar", "abilityId": "flash-heal", "effectType": "heal", "field": "scale", "value": 1.5 } ] } },
+    { "id": "cleric-steadfast-grace", "name": "Steadfast Grace", "effect": "Mending Light's cooldown drops to 3s — a near-spammable instant top to pre-empt the spike.", "tags": ["sustain"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "flash-heal", "cooldownTurns": 1 } ] } },
+    { "id": "cleric-greater-mending", "name": "Greater Mending", "effect": "Dawnward heals far harder (scale 1.8 → 2.2) — your hardest non-major top.", "tags": ["survival"], "default": true, "effects": { "abilityOverrides": [ { "kind": "scalar", "abilityId": "greater-heal", "effectType": "heal", "field": "scale", "value": 2.2 } ] } }
+  ] },
+
+  { "id": "cleric-t3", "node": 3, "specId": "cleric", "name": "The Cleanse", "options": [
+    { "id": "cleric-radiant-absolution", "name": "Radiant Absolution", "effect": "Cleansing Light's cooldown drops to 12s — keep the Magic/Curse wave off the party.", "tags": ["interrupt", "sustain"], "default": true, "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "mass-dispel", "cooldownTurns": 4 } ] } },
+    { "id": "cleric-sanctified-fervor", "name": "Sanctified Fervor", "effect": "+14% damage — steadier off-school throughput that always pays.", "tags": ["sustain", "burst"], "effects": { "dmgPct": 14 } },
+    { "id": "cleric-solar-verdict", "name": "Solar Verdict", "effect": "+18% damage while 3 or more enemies are up — lean into AoE radiant damage that feeds Atonement.", "tags": ["aoe"], "effects": { "dmgPct": 18, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } }
+  ] },
+
+  { "id": "cleric-t4", "node": 4, "specId": "cleric", "name": "Off-School Damage", "options": [
+    { "id": "cleric-crowned-in-light", "name": "Crowned in Light", "effect": "While any ally is below 30% HP, your Atonement spreads to the whole party — off-school crisis healing.", "tags": ["sustain", "aoe"], "default": true, "effects": { "atonement": { "partyWhenLowestAllyBelowPct": 30 } } },
+    { "id": "cleric-zealous-devotion", "name": "Zealous Devotion", "effect": "+18% damage while 3 or more enemies are up — radiant spam clears trash and trickle-heals.", "tags": ["aoe"], "effects": { "dmgPct": 18, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "cleric-final-light", "name": "Final Light", "effect": "+20% damage to targets below 30% HP — the kill window's biggest Atonement heals.", "tags": ["burst"], "effects": { "dmgPct": 20, "onlyIf": { "type": "targetHpBelowPct", "value": 30 } } }
+  ] },
+
+  { "id": "cleric-t5", "node": 5, "specId": "cleric", "name": "Light's Salvation Recut", "options": [
+    { "id": "cleric-lights-salvation", "name": "Light's Salvation", "effect": "Light's Salvation heals far harder (scale 1.6 → 2.0) — the single biggest instant save in the game.", "tags": ["survival"], "default": true, "effects": { "abilityOverrides": [ { "kind": "scalar", "abilityId": "lights-salvation", "effectType": "heal", "field": "scale", "value": 2.0 } ] } },
+    { "id": "cleric-solar-reckoning", "name": "Solar Reckoning", "effect": "Light's Salvation's cooldown drops to 48s, +12% damage on packs — the AoE damage-as-healing burst.", "tags": ["aoe"], "effects": { "dmgPct": 12, "onlyIf": { "type": "enemiesAtLeast", "value": 3 }, "abilityOverrides": [ { "kind": "cooldown", "abilityId": "lights-salvation", "cooldownTurns": 16 } ] } },
+    { "id": "cleric-dawnpeal", "name": "Dawnpeal", "effect": "Light's Salvation comes up in 42s and Cleansing Light in 12s — the dispel build's hard-reset.", "tags": ["interrupt", "sustain"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "lights-salvation", "cooldownTurns": 14 }, { "kind": "cooldown", "abilityId": "mass-dispel", "cooldownTurns": 4 } ] } }
+  ] },
+
+
+  { "id": "assassin-t1", "node": 1, "specId": "assassin", "name": "The Opener", "options": [
+    { "id": "assassin-opening-cut", "name": "Opening Cut", "effect": "+25% damage to targets above 80% HP — front-load the alpha strike on a fresh add.", "tags": ["burst"], "effects": { "dmgPct": 25, "onlyIf": { "type": "targetHpAbovePct", "value": 80 } } },
+    { "id": "assassin-shadowleap", "name": "Shadowleap", "effect": "Ambush hits the back band 30% harder — fold the dive into your stealth opener.", "tags": ["positioning"], "effects": { "abilityOverrides": [ { "kind": "addModifier", "abilityId": "ambush", "when": { "type": "targetBand", "band": "back" }, "multiplyDamage": 1.3 } ] } },
+    { "id": "assassin-throatcut", "name": "Throatcut", "effect": "Ambush hits targets below 35% HP 30% harder — a second finisher for the kill race.", "tags": ["burst"], "default": true, "effects": { "abilityOverrides": [ { "kind": "addModifier", "abilityId": "ambush", "when": { "type": "targetHpBelowPct", "value": 35 }, "multiplyDamage": 1.3 } ] } }
+  ] },
+
+  { "id": "assassin-t2", "node": 2, "specId": "assassin", "name": "Single Target vs. the Wave", "options": [
+    { "id": "assassin-singular-malice", "name": "Singular Malice", "effect": "+22% damage while 2 or fewer enemies remain — single-target erase for bosses and adds.", "tags": ["burst"], "effects": { "dmgPct": 22, "onlyIf": { "type": "enemiesAtMost", "value": 2 } } },
+    { "id": "assassin-whispering-edge", "name": "Whispering Edge", "effect": "Poisoned Blade also strikes an adjacent enemy — the tree's only AoE answer.", "tags": ["aoe", "cleave"], "effects": { "abilityOverrides": [ { "kind": "targeting", "abilityId": "poisoned-blade", "pattern": "adjacent", "count": 1 } ] } },
+    { "id": "assassin-twin-daggers", "name": "Twin Daggers", "effect": "+9% damage and +5% crit, always — reliable uptime with no condition to read.", "tags": ["sustain", "crit"], "default": true, "effects": { "dmgPct": 9, "critPct": 5 } }
+  ] },
+
+  { "id": "assassin-t3", "node": 3, "specId": "assassin", "name": "The Poison Economy", "options": [
+    { "id": "assassin-weeping-venom", "name": "Weeping Venom", "effect": "+12% damage to targets below 50% HP — a ramp that pays across a long fight.", "tags": ["sustain"], "effects": { "dmgPct": 12, "onlyIf": { "type": "targetHpBelowPct", "value": 50 } } },
+    { "id": "assassin-venom-glut", "name": "Venom Glut", "effect": "+16% damage to targets below 30% HP — turn the poison ramp into one explosive spend.", "tags": ["burst"], "effects": { "dmgPct": 16, "onlyIf": { "type": "targetHpBelowPct", "value": 30 } } },
+    { "id": "assassin-silent-patience", "name": "Silent Patience", "effect": "+6% damage and +5% crit, always — steady value that ignores the stack economy.", "tags": ["crit", "sustain"], "default": true, "effects": { "dmgPct": 6, "critPct": 5 } }
+  ] },
+
+  { "id": "assassin-t4", "node": 4, "specId": "assassin", "name": "The Crit-Chain", "options": [
+    { "id": "assassin-bladed-cascade", "name": "Bladed Cascade", "effect": "+12% crit while your focus target is below 50% HP — keep the kill-window chain alive.", "tags": ["crit", "burst"], "effects": { "critPct": 12, "onlyIf": { "type": "targetHpBelowPct", "value": 50 } } },
+    { "id": "assassin-lethal-precision", "name": "Lethal Precision", "effect": "+8% crit and +4% damage, always — reliable throughput without a chain to hold.", "tags": ["crit"], "default": true, "effects": { "critPct": 8, "dmgPct": 4 } },
+    { "id": "assassin-predators-vigor", "name": "Predator's Vigor", "effect": "Your crits heal you for 4% max HP — enough lifesteal to dive without a babysitter.", "tags": ["crit", "sustain"], "effects": { "eventRiders": [ { "trigger": "on-crit", "heal": { "target": "self", "pctOfMaxHp": 4 } } ] } }
+  ] },
+
+  { "id": "assassin-t5", "node": 5, "specId": "assassin", "name": "The Capstone", "options": [
+    { "id": "assassin-endless-slaughter", "name": "Endless Slaughter", "effect": "A kill resets Eviscerate's cooldown — a wave-erasing soft-enrage executioner.", "tags": ["aoe", "burst"], "default": true, "effects": { "eventRiders": [ { "trigger": "on-kill", "adjustCooldown": { "abilityId": "eviscerate", "deltaTurns": -900 } } ] } },
+    { "id": "assassin-sever-the-thread", "name": "Sever the Thread", "effect": "Ambush and Poisoned Blade hit the back band 40% harder — erase the sheltered caster.", "tags": ["positioning", "burst"], "effects": { "abilityOverrides": [ { "kind": "addModifier", "abilityId": "ambush", "when": { "type": "targetBand", "band": "back" }, "multiplyDamage": 1.4 }, { "kind": "addModifier", "abilityId": "poisoned-blade", "when": { "type": "targetBand", "band": "back" }, "multiplyDamage": 1.4 } ] } },
+    { "id": "assassin-fade-to-black", "name": "Fade to Black", "effect": "After a kill you re-enter Stealth — a free empowered opener as you chain through the pull.", "tags": ["survival", "burst"], "effects": { "eventRiders": [ { "trigger": "on-kill", "applyStatus": { "statusId": "stealth", "target": "self", "durationTurns": 1 } } ] } }
+  ] },
+
+
+  { "id": "bard-t1", "node": 1, "specId": "bard", "name": "The Mark's Purpose", "options": [
+    { "id": "bard-killing-mark", "name": "Killing Mark", "effect": "+14% damage to targets below 50% HP — the Mark becomes a personal kill stamp.", "tags": ["burst"], "effects": { "dmgPct": 14, "onlyIf": { "type": "targetHpBelowPct", "value": 50 } } },
+    { "id": "bard-hunting-marks", "name": "Hunting Marks", "effect": "+16% damage while 3 or more enemies are up — spray Marks across the pack.", "tags": ["aoe"], "effects": { "dmgPct": 16, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "bard-steady-mark", "name": "Steady Mark", "effect": "+8% damage, always — a level draw that never goes dark.", "tags": ["sustain"], "default": true, "effects": { "dmgPct": 8 } }
+  ] },
+
+  { "id": "bard-t2", "node": 2, "specId": "bard", "name": "The Reach", "options": [
+    { "id": "bard-hawkeyes-volley", "name": "Hawkeye's Volley", "effect": "Hawkeye's Reach picks off two back-band targets and hits there 30% harder — the back-line assassin.", "tags": ["positioning", "aoe"], "effects": { "abilityOverrides": [ { "kind": "targeting", "abilityId": "over-the-barrow", "pattern": "adjacent", "count": 1, "band": "back" }, { "kind": "addModifier", "abilityId": "over-the-barrow", "when": { "type": "targetBand", "band": "back" }, "multiplyDamage": 1.3 } ] } },
+    { "id": "bard-heavy-draw", "name": "Heavy Draw", "effect": "Hawkeye's Reach hits targets below 35% HP 50% harder — a second execute hammer.", "tags": ["burst"], "effects": { "abilityOverrides": [ { "kind": "addModifier", "abilityId": "over-the-barrow", "when": { "type": "targetHpBelowPct", "value": 35 }, "multiplyDamage": 1.5 } ] } },
+    { "id": "bard-patient-line", "name": "Patient Line", "effect": "+12% damage while 2 or fewer enemies remain — favour the patient line over the crowd.", "tags": ["burst"], "default": true, "effects": { "dmgPct": 12, "onlyIf": { "type": "enemiesAtMost", "value": 2 } } }
+  ] },
+
+  { "id": "bard-t3", "node": 3, "specId": "bard", "name": "The Aim Window", "options": [
+    { "id": "bard-serrated-shot", "name": "Serrated Shot", "effect": "Your Mark also barbs the target: Serrated Wound, −40% incoming healing — the ranged anti-heal.", "tags": ["burst"], "effects": { "eventRiders": [ { "trigger": "on-hit", "ability": "barrow-quarrel", "applyStatus": { "statusId": "serrated-wound", "target": "enemy-target", "durationTurns": 2 } } ] } },
+    { "id": "bard-falling-aim", "name": "Falling Aim", "effect": "+18% damage to targets below 30% HP — save your steadiest shots for the kill.", "tags": ["burst"], "effects": { "dmgPct": 18, "onlyIf": { "type": "targetHpBelowPct", "value": 30 } } },
+    { "id": "bard-steady-sight", "name": "Steady Sight", "effect": "+6% crit, always — passive precision that always contributes.", "tags": ["crit"], "default": true, "effects": { "critPct": 6 } }
+  ] },
+
+  { "id": "bard-t4", "node": 4, "specId": "bard", "name": "Keeping the Line", "options": [
+    { "id": "bard-hawkstride", "name": "Hawkstride", "effect": "−14% damage taken while 3 or more enemies are up — read the pull and stay out of the hail.", "tags": ["survival", "aoe"], "effects": { "intakePct": -14, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "bard-set-feet", "name": "Set Feet", "effect": "−12% damage taken while below 35% HP — plant your feet for the kill without dying.", "tags": ["survival"], "effects": { "intakePct": -12, "onlyIf": { "type": "selfHpBelowPct", "value": 35 } } },
+    { "id": "bard-roll-aside", "name": "Roll Aside", "effect": "−8% damage taken, always — a standing cushion against back-line spillover.", "tags": ["survival"], "default": true, "effects": { "intakePct": -8 } }
+  ] },
+
+  { "id": "bard-t5", "node": 5, "specId": "bard", "name": "The Last Shot", "options": [
+    { "id": "bard-the-last-shot", "name": "The Last Shot", "effect": "+28% damage to targets below 35% HP — every shot becomes a finisher in the kill window.", "tags": ["burst"], "default": true, "effects": { "dmgPct": 28, "onlyIf": { "type": "targetHpBelowPct", "value": 35 } } },
+    { "id": "bard-culling-storm", "name": "Culling Storm", "effect": "+24% damage on packs and a far heavier Arrow Storm — the pack-clearing crescendo.", "tags": ["aoe", "cleave"], "effects": { "dmgPct": 24, "onlyIf": { "type": "enemiesAtLeast", "value": 3 }, "abilityOverrides": [ { "kind": "scalar", "abilityId": "culling-rain", "effectType": "damage", "field": "scale", "value": 1.7 } ] } },
+    { "id": "bard-hunters-largesse", "name": "Hunter's Largesse", "effect": "+12% damage to any Marked target — focus everything onto the Mark.", "tags": ["burst"], "effects": { "dmgPct": 12, "onlyIf": { "type": "targetHasStatus", "status": "mark" } } }
+  ] },
+
+
+  { "id": "pyromancer-t1", "node": 1, "specId": "pyromancer", "name": "The Ember's Nature", "options": [
+    { "id": "pyromancer-creeping-embers", "name": "Creeping Embers", "effect": "+16% damage while 3 or more enemies are up — blanket the pack so every detonation hits everyone.", "tags": ["aoe"], "effects": { "dmgPct": 16, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "pyromancer-smothering-ash", "name": "Smothering Ash", "effect": "Your Burn ticks 35% harder (up from +20%) — fewer targets, a far hotter bar.", "tags": ["burst", "sustain"], "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "combustion", "mechanic": "burn-amplify", "key": "amountPct", "value": 35 } ] } },
+    { "id": "pyromancer-kindled-patience", "name": "Kindled Patience", "effect": "+10% damage, always — a faster ramp with no commitment to spread or tall ticks.", "tags": ["sustain"], "default": true, "effects": { "dmgPct": 10 } }
+  ] },
+
+  { "id": "pyromancer-t2", "node": 2, "specId": "pyromancer", "name": "The Detonation", "options": [
+    { "id": "pyromancer-pyre-vents", "name": "Pyre-Vents", "effect": "Detonating 4+ Burn grants +35% power for 9s (up from +25%/6s) — the inferno payoff.", "tags": ["burst"], "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "combustion", "mechanic": "on-detonate-buff", "key": "buffAmountPct", "value": 35 }, { "kind": "param", "abilityId": "combustion", "mechanic": "on-detonate-buff", "key": "buffDurationTurns", "value": 3 } ] } },
+    { "id": "pyromancer-cinderburst", "name": "Cinderburst", "effect": "Ignite splashes to +1 more target at 70% — the widest explosion across a stacked pack.", "tags": ["aoe", "cleave"], "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "ignite", "mechanic": "detonate-burn", "key": "splashCount", "value": 3 }, { "kind": "param", "abilityId": "ignite", "mechanic": "detonate-burn", "key": "splashPct", "value": 70 } ] } },
+    { "id": "pyromancer-stoked-furnace", "name": "Stoked Furnace", "effect": "Ignite's cooldown drops to 12s — detonate far more often for steady throughput.", "tags": ["sustain"], "default": true, "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "ignite", "cooldownTurns": 4 } ] } }
+  ] },
+
+  { "id": "pyromancer-t3", "node": 3, "specId": "pyromancer", "name": "Where the Fire Reaches", "options": [
+    { "id": "pyromancer-far-cast-ember", "name": "Far-Cast Ember", "effect": "+18% damage while 3 or more enemies are up — answer the wall and the back caster at once.", "tags": ["aoe", "positioning"], "effects": { "dmgPct": 18, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "pyromancer-focused-pyre", "name": "Focused Pyre", "effect": "+20% damage while 2 or fewer enemies remain — pure ceiling on the kill target.", "tags": ["burst"], "effects": { "dmgPct": 20, "onlyIf": { "type": "enemiesAtMost", "value": 2 } } },
+    { "id": "pyromancer-banked-heat", "name": "Banked Heat", "effect": "+10% damage, always — a modest tempo reward for parking on one target.", "tags": ["sustain"], "default": true, "effects": { "dmgPct": 10 } }
+  ] },
+
+  { "id": "pyromancer-t4", "node": 4, "specId": "pyromancer", "name": "Ward of the Flame", "options": [
+    { "id": "pyromancer-ashen-veil", "name": "Ashen Veil", "effect": "−12% damage taken while 3 or more enemies are up — survival earned by playing the pack.", "tags": ["survival", "aoe"], "effects": { "intakePct": -12, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "pyromancer-searing-resolve", "name": "Searing Resolve", "effect": "+14% damage to targets below 30% HP — pure offense for the soft-enrage race.", "tags": ["burst"], "effects": { "dmgPct": 14, "onlyIf": { "type": "targetHpBelowPct", "value": 30 } } },
+    { "id": "pyromancer-emberglass", "name": "Emberglass", "effect": "−8% damage taken and +4% damage — a thin always-on cushion plus a little output.", "tags": ["survival"], "default": true, "effects": { "intakePct": -8, "dmgPct": 4 } }
+  ] },
+
+  { "id": "pyromancer-t5", "node": 5, "specId": "pyromancer", "name": "The Last Coal", "options": [
+    { "id": "pyromancer-conflagrant-bloom", "name": "Conflagrant Bloom", "effect": "+16% damage on packs and Emberstorm splashes wider — the definitive trash-melter.", "tags": ["aoe", "cleave"], "default": true, "effects": { "dmgPct": 16, "onlyIf": { "type": "enemiesAtLeast", "value": 3 }, "abilityOverrides": [ { "kind": "param", "abilityId": "emberstorm", "mechanic": "detonate-burn", "key": "splashCount", "value": 4 } ] } },
+    { "id": "pyromancer-crown-of-cinders", "name": "Crown of Cinders", "effect": "+18% damage to targets below 35% HP — a chain-detonation kill engine on the boss.", "tags": ["burst"], "effects": { "dmgPct": 18, "onlyIf": { "type": "targetHpBelowPct", "value": 35 } } },
+    { "id": "pyromancer-warden-of-embers", "name": "Warden of Embers", "effect": "+20% damage to stunned targets — fuse the detonation lock into a throughput spike.", "tags": ["interrupt", "burst"], "effects": { "dmgPct": 20, "onlyIf": { "type": "targetHasStatus", "status": "stun" } } }
+  ] },
+
+
+  { "id": "arcanist-t1", "node": 1, "specId": "arcanist", "name": "The Opening Read", "options": [
+    { "id": "arcanist-silence-the-spire", "name": "Silence the Spire", "effect": "+14% damage to silenced targets — pays off when a dangerous caster must die first.", "tags": ["interrupt", "burst"], "effects": { "dmgPct": 14, "onlyIf": { "type": "targetHasStatus", "status": "silence" } } },
+    { "id": "arcanist-glaciate", "name": "Glaciate", "effect": "Arcane Bolt hits Chilled targets 30% harder — every bolt into your own slow snowballs.", "tags": ["sustain", "burst"], "effects": { "abilityOverrides": [ { "kind": "addModifier", "abilityId": "arcane-bolt", "when": { "type": "targetHasStatus", "status": "chill" }, "multiplyDamage": 1.3 } ] } },
+    { "id": "arcanist-glittering-frost", "name": "Glittering Frost", "effect": "+14% damage while 3 or more enemies are up — unconditional-feeling cleave for add packs.", "tags": ["aoe"], "default": true, "effects": { "dmgPct": 14, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } }
+  ] },
+
+  { "id": "arcanist-t2", "node": 2, "specId": "arcanist", "name": "The Lock", "options": [
+    { "id": "arcanist-hushing-frost", "name": "Hushing Frost", "effect": "Glacial Burst also Silences everything it hits — a true mass shut-up for an add wave.", "tags": ["interrupt", "aoe"], "effects": { "eventRiders": [ { "trigger": "on-hit", "ability": "frost-nova", "applyStatus": { "statusId": "silence", "target": "enemy-target", "durationTurns": 1 } } ] } },
+    { "id": "arcanist-deepening-cold", "name": "Deepening Cold", "effect": "Glacial Burst hits harder (scale 0.6 → 0.8) — a heavier freeze-setup nuke.", "tags": ["aoe", "interrupt"], "effects": { "abilityOverrides": [ { "kind": "scalar", "abilityId": "frost-nova", "effectType": "damage", "field": "scale", "value": 0.8 } ] } },
+    { "id": "arcanist-rimebrand", "name": "Rimebrand", "effect": "+12% damage to Chilled targets — convert your spammy slow into raw pack damage.", "tags": ["sustain"], "default": true, "effects": { "dmgPct": 12, "onlyIf": { "type": "targetHasStatus", "status": "chill" } } }
+  ] },
+
+  { "id": "arcanist-t3", "node": 3, "specId": "arcanist", "name": "The Barrier's Purpose", "options": [
+    { "id": "arcanist-warded-mind", "name": "Warded Mind", "effect": "Rune Barrier's cooldown drops to 12s — the lockdown caster who can't be locked down.", "tags": ["survival", "interrupt"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "arcane-barrier", "cooldownTurns": 4 } ] } },
+    { "id": "arcanist-shattering-aegis", "name": "Shattering Aegis", "effect": "+14% damage while 3 or more enemies are up — fold your defensive into a pack-clearing bomb.", "tags": ["aoe", "burst"], "effects": { "dmgPct": 14, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "arcanist-frostward-veil", "name": "Frostward Veil", "effect": "−10% damage taken, always — a small personal buffer for the back line under a soft-enrage.", "tags": ["survival"], "default": true, "effects": { "intakePct": -10 } }
+  ] },
+
+  { "id": "arcanist-t4", "node": 4, "specId": "arcanist", "name": "The Engine", "options": [
+    { "id": "arcanist-cold-focus", "name": "Cold Focus", "effect": "+10% crit against Chilled targets — reward bolting into your own CC.", "tags": ["crit", "burst"], "effects": { "critPct": 10, "onlyIf": { "type": "targetHasStatus", "status": "chill" } } },
+    { "id": "arcanist-resonant-cadence", "name": "Resonant Cadence", "effect": "+8% damage, always — the reliable tempo floor that works on any target.", "tags": ["sustain"], "default": true, "effects": { "dmgPct": 8 } },
+    { "id": "arcanist-winters-hunger", "name": "Winter's Hunger", "effect": "+20% damage to targets below 35% HP — close kills fast in the soft-enrage race.", "tags": ["burst"], "effects": { "dmgPct": 20, "onlyIf": { "type": "targetHpBelowPct", "value": 35 } } }
+  ] },
+
+  { "id": "arcanist-t5", "node": 5, "specId": "arcanist", "name": "The Capstone", "options": [
+    { "id": "arcanist-winterwarden", "name": "Winterwarden", "effect": "+22% damage to Chilled targets — convert every lock into a damage window.", "tags": ["interrupt", "burst"], "default": true, "effects": { "dmgPct": 22, "onlyIf": { "type": "targetHasStatus", "status": "chill" } } },
+    { "id": "arcanist-the-long-winter", "name": "The Long Winter", "effect": "Spellbreak's cooldown drops to 6s and adds +9s to the target's next cast — the interrupt tyrant.", "tags": ["interrupt"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "counterspell", "cooldownTurns": 2 }, { "kind": "param", "abilityId": "counterspell", "mechanic": "cooldown-increase", "key": "addTurns", "value": 3 } ] } },
+    { "id": "arcanist-glacial-cataclysm", "name": "Glacial Cataclysm", "effect": "Glacial Burst comes up in 9s and hits harder — chain Bursts across back-to-back packs.", "tags": ["aoe", "cleave"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "frost-nova", "cooldownTurns": 3 }, { "kind": "scalar", "abilityId": "frost-nova", "effectType": "damage", "field": "scale", "value": 0.85 } ] } }
+  ] },
+
+
+  { "id": "lifebinder-t1", "node": 1, "specId": "lifebinder", "name": "The Grove's Reach", "options": [
+    { "id": "lifebinder-verdant-spread", "name": "Verdant Spread", "effect": "Grove's Embrace comes up in 12s — maximum rolling-HoT coverage when the room is full.", "tags": ["aoe", "sustain"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "groves-embrace", "cooldownTurns": 4 } ] } },
+    { "id": "lifebinder-sunwarden-vigor", "name": "Sunwarden's Vigor", "effect": "−8% damage taken, always — steel the grove-keeper so a thin healer survives the long pull.", "tags": ["survival"], "effects": { "intakePct": -8 } },
+    { "id": "lifebinder-quick-bloom", "name": "Quick Bloom", "effect": "Blossom Ward comes up in 6s — re-blanket a fresh layer the moment the floor opens.", "tags": ["sustain"], "default": true, "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "blossom-ward", "cooldownTurns": 2 } ] } }
+  ] },
+
+  { "id": "lifebinder-t2", "node": 2, "specId": "lifebinder", "name": "The Cleansing Word", "options": [
+    { "id": "lifebinder-cleansing-litany", "name": "Cleansing Litany", "effect": "Unbinding Word comes up in 6s — the plague never escalates past you (the Mire answer).", "tags": ["interrupt", "sustain"], "default": true, "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "unbinding-word", "cooldownTurns": 2 } ] } },
+    { "id": "lifebinder-thornward-vigor", "name": "Thornward Vigor", "effect": "+14% damage while 3 or more enemies are up — contribute to the trash race while you heal.", "tags": ["aoe"], "effects": { "dmgPct": 14, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "lifebinder-grounded-roots", "name": "Grounded Roots", "effect": "+12% max HP — a deeper grave to draw from on a clean week with nothing to dispel.", "tags": ["survival"], "effects": { "maxHpPct": 12 } }
+  ] },
+
+  { "id": "lifebinder-t3", "node": 3, "specId": "lifebinder", "name": "Duration vs. Magnitude", "options": [
+    { "id": "lifebinder-sudden-bloom", "name": "Sudden Bloom", "effect": "Flourish comes up in 6s — short, intense blooms for the kill window.", "tags": ["burst", "sustain"], "default": true, "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "flourish", "cooldownTurns": 2 } ] } },
+    { "id": "lifebinder-evergreen-renewal", "name": "Evergreen Renewal", "effect": "−10% damage taken while 3 or more enemies are up — the green that outlasts a long grind.", "tags": ["survival", "aoe"], "effects": { "intakePct": -10, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "lifebinder-even-tending", "name": "Even Tending", "effect": "+12% max HP — a steady durability floor that asks nothing of your timing.", "tags": ["survival"], "effects": { "maxHpPct": 12 } }
+  ] },
+
+  { "id": "lifebinder-t4", "node": 4, "specId": "lifebinder", "name": "Vital Surge's Tribute", "options": [
+    { "id": "lifebinder-verdant-reclamation", "name": "Verdant Reclamation", "effect": "Vital Surge comes up in 9s — fold emergency triage into a faster button.", "tags": ["burst", "survival"], "default": true, "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "vital-surge", "cooldownTurns": 3 } ] } },
+    { "id": "lifebinder-sheltering-bloom", "name": "Sheltering Bloom", "effect": "−8% damage taken, always — a thin standing cushion for the back line.", "tags": ["survival"], "effects": { "intakePct": -8 } },
+    { "id": "lifebinder-gale-severance", "name": "Gale Severance", "effect": "+12% damage to targets below 30% HP — lean into offensive draw in the kill window.", "tags": ["burst"], "effects": { "dmgPct": 12, "onlyIf": { "type": "targetHpBelowPct", "value": 30 } } }
+  ] },
+
+  { "id": "lifebinder-t5", "node": 5, "specId": "lifebinder", "name": "The Deep Commitment", "options": [
+    { "id": "lifebinder-endless-spring", "name": "Endless Spring", "effect": "Blossoming Tide comes up in 48s — keep the party pre-blanketed against sustained pressure.", "tags": ["survival", "sustain"], "default": true, "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "blossoming-tide", "cooldownTurns": 16 } ] } },
+    { "id": "lifebinder-verdant-reckoning", "name": "Verdant Reckoning", "effect": "+18% damage while 3 or more enemies are up — an off-school smite answer to the armour wall.", "tags": ["aoe"], "effects": { "dmgPct": 18, "onlyIf": { "type": "enemiesAtLeast", "value": 3 } } },
+    { "id": "lifebinder-grove-warden", "name": "Grove Warden", "effect": "+12% max HP and −8% damage taken — the survival capstone for a healer-light comp.", "tags": ["survival"], "effects": { "maxHpPct": 12, "intakePct": -8 } }
+  ] },
+
+
+  { "id": "mystic-t1", "node": 1, "specId": "mystic", "name": "The Counter", "options": [
+    { "id": "mystic-spirit-drinker", "name": "Spirit Drinker", "effect": "Earthen Stance parries 60% of attacks (up from 40%) — more counters, more drink-back.", "tags": ["tank", "sustain"], "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "earthen-stance", "mechanic": "parry-counter", "key": "parryChancePct", "value": 60 } ] } },
+    { "id": "mystic-flowing-calm", "name": "Flowing Calm", "effect": "Your strikes heal the lowest-HP ally for 15% of the damage dealt — a trickle of party sustain.", "tags": ["tank", "sustain"], "effects": { "eventRiders": [ { "trigger": "on-hit", "heal": { "target": "lowest-ally", "pctOfDamage": 15 } } ] } },
+    { "id": "mystic-stone-cadence", "name": "Stone Cadence", "effect": "Earthen Sweep comes up in 6s — near-permanent AoE-stun lockdown on a busy pack.", "tags": ["tank", "interrupt"], "default": true, "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "leg-sweep", "cooldownTurns": 2 } ] } }
+  ] },
+
+  { "id": "mystic-t2", "node": 2, "specId": "mystic", "name": "Single Lock vs. Sweeping Lock", "options": [
+    { "id": "mystic-iron-focus", "name": "Iron Focus", "effect": "Zen Strike comes up in 12s — a clean kick off cooldown for the dangerous-cast boss.", "tags": ["interrupt"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "zen-strike", "cooldownTurns": 4 } ] } },
+    { "id": "mystic-gathering-storm", "name": "Gathering Storm", "effect": "Earthen Sweep hits the whole front band and stuns it all — the add-wave answer.", "tags": ["aoe", "interrupt"], "effects": { "abilityOverrides": [ { "kind": "targeting", "abilityId": "leg-sweep", "pattern": "all", "band": "front" } ] } },
+    { "id": "mystic-resonant-chime", "name": "Resonant Chime", "effect": "+12% damage to stunned targets — your lockdown becomes a kill window.", "tags": ["interrupt", "burst"], "default": true, "effects": { "dmgPct": 12, "onlyIf": { "type": "targetHasStatus", "status": "stun" } } }
+  ] },
+
+  { "id": "mystic-t3", "node": 3, "specId": "mystic", "name": "Active Mitigation", "options": [
+    { "id": "mystic-rooted-stance", "name": "Rooted Stance", "effect": "−16% damage taken while below 60% HP — strong once the pressure is on, dead while topped.", "tags": ["survival", "tank"], "effects": { "intakePct": -16, "onlyIf": { "type": "selfHpBelowPct", "value": 60 } } },
+    { "id": "mystic-steadying-brew", "name": "Steadying Brew", "effect": "−8% damage taken, always — a small reliable cushion for an unsteady pilot.", "tags": ["survival"], "effects": { "intakePct": -8 } },
+    { "id": "mystic-rising-breath", "name": "Rising Breath", "effect": "−20% damage taken while below 35% HP — the comeback lever that saves the killing spike.", "tags": ["survival", "tank"], "default": true, "effects": { "intakePct": -20, "onlyIf": { "type": "selfHpBelowPct", "value": 35 } } }
+  ] },
+
+  { "id": "mystic-t4", "node": 4, "specId": "mystic", "name": "The Peel", "options": [
+    { "id": "mystic-shared-burden", "name": "Shared Burden", "effect": "Spirit Tether redirects 50% of the ally's damage onto you (up from 30%) — the sustained-drain save.", "tags": ["tank", "survival"], "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "spirit-link", "mechanic": "damage-redirect", "key": "redirectPct", "value": 50 } ] } },
+    { "id": "mystic-severing-tether", "name": "Severing Tether", "effect": "Spirit Tether comes up in 9s — a frequent emergency spike-soak.", "tags": ["survival"], "effects": { "abilityOverrides": [ { "kind": "cooldown", "abilityId": "spirit-link", "cooldownTurns": 3 } ] } },
+    { "id": "mystic-twin-spirits", "name": "Twin Spirits", "effect": "Spirit Tether reduces the redirected damage by 30% (up from 20%) — a gentler, broader peel.", "tags": ["tank", "survival"], "default": true, "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "spirit-link", "mechanic": "damage-redirect", "key": "reductionPct", "value": 30 } ] } }
+  ] },
+
+  { "id": "mystic-t5", "node": 5, "specId": "mystic", "name": "The Mystic You Become", "options": [
+    { "id": "mystic-the-mountain-holds", "name": "The Mountain Holds", "effect": "Living Mountain comes up in 48s and Earthen Stance parries 70% — the immovable control-tank.", "tags": ["tank", "survival"], "default": true, "effects": { "abilityOverrides": [ { "kind": "param", "abilityId": "earthen-stance", "mechanic": "parry-counter", "key": "parryChancePct", "value": 70 }, { "kind": "cooldown", "abilityId": "unmoving-mountain", "cooldownTurns": 16 } ] } },
+    { "id": "mystic-warden-of-spirits", "name": "Warden of Spirits", "effect": "−16% damage taken while you hold hard threat, but −10% of your own damage — the pure protector.", "tags": ["tank", "survival"], "effects": { "intakePct": -16, "onlyIf": { "type": "selfHoldsHardThreat" }, "dmgPct": -10 } },
+    { "id": "mystic-hand-of-stillwater", "name": "Hand of Stillwater", "effect": "+20% damage below 30% HP and Palm Strike hits 50% harder there — finish the pull by drinking it dry.", "tags": ["burst", "sustain"], "effects": { "dmgPct": 20, "onlyIf": { "type": "targetHpBelowPct", "value": 30 }, "abilityOverrides": [ { "kind": "addModifier", "abilityId": "palm-strike", "when": { "type": "targetHpBelowPct", "value": 30 }, "multiplyDamage": 1.5 } ] } }
   ] }
+
 ]

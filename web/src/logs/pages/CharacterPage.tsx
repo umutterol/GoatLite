@@ -108,8 +108,9 @@ function SignatureCard({ specId, color }: { specId: string; color: string }) {
   const major = [...content.playerAbilities.values()].find((a) => a.specId === specId && (a.tags ?? []).includes("major"))
   if (!major) return null
   const sk = content.skills.get(major.id)
+  const cdLabel = sk && sk.cd > 0 ? `${sk.cd * 3}s CD` : "No CD"
   return (
-    <Panel title="Signature" right={<span className="mono" style={{ fontSize: 11, color: "var(--faint)" }}>~60s CD</span>} bodyStyle={{ padding: 14 }}>
+    <Panel title="Signature" right={<span className="mono" style={{ fontSize: 11, color: "var(--faint)" }}>{cdLabel}</span>} bodyStyle={{ padding: 14 }}>
       <Tip tip={<SpellTip skillId={major.id} name={major.name} />} style={{ width: "100%" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 11, width: "100%", cursor: "help" }}>
           <GameIcon kind="ability" id={major.id} size={36} noTip style={{ border: `1px solid ${color}55` }} />
