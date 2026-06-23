@@ -1,14 +1,14 @@
 {
   "sim": {
     "tickSeconds": 1,
-    "keyScalingPerLevel": 1.052,
+    "keyScalingPerLevel": 1.05,
     "affixMultiplier": 1.3,
     "softEnrageAfterSeconds": 90,
     "softEnragePerStep": 0.05,
     "softEnrageStepSeconds": 5,
-    "hpUnit": 1020,
+    "hpUnit": 1500,
     "dmgUnit": 4.6,
-    "enemyDmgMult": 2.0,
+    "enemyDmgMult": 1.5,
     "intakeFloorFrac": 0.4,
     "castEverySec": 12,
     "castPayloadBase": 16,
