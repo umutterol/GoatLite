@@ -189,16 +189,25 @@ export function runDungeonEGM(input: RunInput): RunResult {
     // P.4 (P8 unify): the summon-shield boss calls a real `guarding` add mid-fight. Spawns into the live `mobs` array AND
     // mirrors a ReplayMob (stable id, spawn-second-relative HP) so the 2D replay shows the add appear/fight/die; then
     // re-shields the boss now that a guard is up. The party must cut the guard down (focus + burst) to expose the boss.
-    const summonGuard = () => {
-      const st = activeStage; if (!st) return
-      const g = content.enemies.get(bossSummonsId); if (!g) return
-      const guard = makeEnemy({ name: g.name, baseHp: g.baseHp, baseDamage: g.baseDamage, isBoss: false, keyScale, affMult, band: g.band, armour: g.armour, resist: g.resist, guarding: g.guarding, shielded: g.shielded })
-      guard.nextActionAt = t
-      mobs.push(guard)
-      const rec: ReplayMob = { id: `s${stageIdx}m${st.mobs.length}`, name: guard.name, band: guard.position === "Back" ? "back" : "front", isBoss: false, stageIdx, spawnSec: Math.floor(t), deathSec: null, hp: [hpFrac(guard)] }
+    // §H (M6): general enemy-add spawner — builds an enemy from a content def, drops it into the live `mobs` array, and
+    // mirrors a ReplayMob (stable id `s{stage}m{index}`, spawn-second-relative HP). Reusable for any boss/affix add; the
+    // summon-shield guard is one caller. (Party-side pets are deferred with the Necromancer — they need a party-combatant
+    // builder, not makeEnemy.) Pure extraction of the prior inline guard-spawn: same args, order, and id scheme.
+    const spawnSummonedCombatant = (g: any, opts: { band?: "front" | "back"; isBoss?: boolean; guarding?: boolean; shielded?: boolean } = {}): Combatant | null => {
+      const st = activeStage; if (!st) return null
+      const c = makeEnemy({ name: g.name, baseHp: g.baseHp, baseDamage: g.baseDamage, isBoss: opts.isBoss ?? false, keyScale, affMult, band: opts.band ?? g.band, armour: g.armour, resist: g.resist, guarding: opts.guarding ?? g.guarding, shielded: opts.shielded ?? g.shielded })
+      c.nextActionAt = t
+      mobs.push(c)
+      const rec: ReplayMob = { id: `s${stageIdx}m${st.mobs.length}`, name: c.name, band: c.position === "Back" ? "back" : "front", isBoss: c.isBoss, stageIdx, spawnSec: Math.floor(t), deathSec: null, hp: [hpFrac(c)] }
       st.rec.mobIds.push(rec.id)
-      st.mobs.push({ c: guard, rec })
+      st.mobs.push({ c, rec })
       replayMobs.push(rec)
+      return c
+    }
+    const summonGuard = () => {
+      const g = content.enemies.get(bossSummonsId); if (!g) return
+      const guard = spawnSummonedCombatant(g)
+      if (!guard) return
       refreshGuardShields()   // a guard is up now → re-ward the boss this instant
       emit("mechanic", `${bossName} calls a ${guard.name} to ward it — cut the guard down to strike ${bossName}.`, { sourceName: bossName, ability: bossAbil, target: guard.name, result: "Guard summoned" })
     }

@@ -88,7 +88,8 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 **Risk:** locked-taunt + untargetable-aura touch the targeting brain (`combat.ts:898-962`) — determinism-sensitive. The threat read is the one genuinely new tank concept.
 **Commit:** M5.
 
-### M6 — §H summon engine (general)
+### M6 — §H summon engine (general) ✅ SHIPPED 2026-06-23
+> **Done:** extracted `spawnSummonedCombatant(g, opts)` from the inline guard code (reusable enemy-add spawner); `summonGuard` is now a thin caller. Party-pet deferred with necro. `tsc`/egm-smoke byte-identical + `summon-check.mjs` (hour-of-bells) byte-identical at +6/+10.
 **Goal:** a general summoned-combatant system — enemy adds **now**, party-pet **later**.
 **Changes:** `engine.ts` — extract `spawnSummonedCombatant({team, duration?, ownerId, sourceName, band})` from the guard code (192-208); add a **per-stage summon counter** → stable replay id `s{stage}a{n}` (fixes the array-length id drift). The existing boss-guard calls the new spawner. `types.ts` ReplayMob unchanged. `combat.ts` targeting handles summoned combatants (already does — unified struct).
 **Verify:** `tsc`; `egm-smoke` **byte-identical** (guard math preserved); summon scratch test (deterministic ids).
@@ -149,7 +150,7 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 | M3 §C+§E status + riders ✅ | the bulk of DPS/healer hooks | L | M1 | ✅ byte-identical |
 | M4 §D atonement ✅ | healer damage-to-heal extensions | S-M | M1, (M2) | ✅ byte-identical |
 | M5 §F tank tools ✅ | threat predicate (rest M2-covered; capstone mechanics → M7) | S | M1 | ✅ byte-identical |
-| M6 §H summon | general enemy-add system | M | — | byte-identical |
+| M6 §H summon ✅ | general enemy-add system | M | — | ✅ byte-identical (+ summon-check) |
 | M7 author + picker + seconds | 10 trees content + UI | XL | M1-M6 (per spec) | **rebump** |
 | M8 balance → P.5c | sweep + tune | M | M7 | tuned |
 
