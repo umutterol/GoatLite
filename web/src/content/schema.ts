@@ -220,6 +220,18 @@ export const AbilityOverrideSchema = z.discriminatedUnion("kind", [
   }).strict(),
 ])
 
+/* §E (M3a): talent event rider — on a combat event (hit/crit/kill), run an action. Strict shape; actions are
+   strict sub-objects. on-parry/detonate/expiry/cleanse triggers are reserved (schema-allowed; engine-wired when authored). */
+export const EventRiderSchema = z.object({
+  trigger: z.enum(["on-hit", "on-crit", "on-kill", "on-parry", "on-detonate", "on-expiry", "on-cleanse"]),
+  ability: z.string().optional(),     // gate to a specific ability id (else fires on any qualifying hit incl. basics)
+  chancePct: z.number().optional(),   // proc chance (default 100)
+  applyStatus: z.object({ statusId: z.string(), target: z.enum(["enemy-target", "self", "lowest-ally"]).optional(), durationTurns: z.number().optional(), stacks: z.number().int().positive().optional() }).strict().optional(),
+  adjustCooldown: z.object({ abilityId: z.string(), deltaTurns: z.number() }).strict().optional(),   // negative reduces; <= -900 = full reset to now
+  refundResource: z.object({ resource: z.string(), amount: z.number() }).strict().optional(),
+  heal: z.object({ target: z.enum(["self", "lowest-ally"]), pctOfDamage: z.number().optional(), pctOfMaxHp: z.number().optional() }).strict().optional(),
+}).strict()
+
 export const TalentOptionSchema = z.object({
   id: z.string(), name: z.string(), effect: z.string(), tags: z.array(z.string()),
   default: z.boolean().optional(),   // the balanced pick a member starts on
@@ -245,6 +257,7 @@ export const TalentOptionSchema = z.object({
       band: z.enum(["front", "back"]).optional(),    // targetBand
     }).optional(),
     abilityOverrides: z.array(AbilityOverrideSchema).optional(),   // §B (M2): patch a named ability's params at buildParty time
+    eventRiders: z.array(EventRiderSchema).optional(),             // §E (M3a): on hit/crit/kill → applyStatus / adjustCooldown / refundResource / heal
   }).optional(),
 })
 export const TalentNodeSchema = z.object({

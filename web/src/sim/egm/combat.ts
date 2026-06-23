@@ -350,7 +350,27 @@ export function talentCritBonus(c: Combatant, target: Combatant | undefined, ctx
   return b
 }
 
-/** Runs after every party hit lands: lifesteal / atonement / on-crit passives / cooldown resets. */
+/** §E (M3a): execute a talent event rider's action(s). Exported for the M3 probe. */
+export function applyEventRider(attacker: Combatant, defender: Combatant, r: any, res: { dealt: number }, ctx: CombatCtx): void {
+  if (r.applyStatus) {
+    const a = r.applyStatus
+    const tgt = a.target === "self" ? attacker : a.target === "lowest-ally" ? (injuredAllies(ctx)[0] ?? attacker) : defender
+    const sd = content.statuses.get(a.statusId)
+    applyStatus(tgt, a.statusId, { durationSec: (a.durationTurns ?? sd?.defaultDurationTurns ?? 2) * ctx.secondsPerTurn, stacks: a.stacks ?? 1, applierId: attacker.id, t: ctx.t })
+  }
+  if (r.adjustCooldown) {
+    const cur = attacker.cooldowns[r.adjustCooldown.abilityId] ?? ctx.t
+    attacker.cooldowns[r.adjustCooldown.abilityId] = r.adjustCooldown.deltaTurns <= -900 ? ctx.t : Math.max(ctx.t, cur + r.adjustCooldown.deltaTurns * ctx.secondsPerTurn)
+  }
+  if (r.refundResource) attacker.resources[r.refundResource.resource] = (attacker.resources[r.refundResource.resource] ?? 0) + r.refundResource.amount
+  if (r.heal) {
+    const tgt = r.heal.target === "lowest-ally" ? (injuredAllies(ctx)[0] ?? attacker) : attacker
+    const amt = (r.heal.pctOfDamage ? (res.dealt * r.heal.pctOfDamage) / 100 : 0) + (r.heal.pctOfMaxHp ? (tgt.maxHp * r.heal.pctOfMaxHp) / 100 : 0)
+    if (amt > 0) healInto(attacker, tgt, amt)
+  }
+}
+
+/** Runs after every party hit lands: lifesteal / atonement / on-crit passives / cooldown resets / talent event riders. */
 function afterHit(attacker: Combatant, ability: PlayerAbility | null, defender: Combatant, res: { dealt: number; isCrit: boolean }, ctx: CombatCtx): void {
   if (res.dealt > 0) {
     if (ability) for (const e of ability.effects as any[]) {
@@ -381,6 +401,14 @@ function afterHit(attacker: Combatant, ability: PlayerAbility | null, defender: 
   }
   if (defender.hp <= 0 && ability) for (const e of ability.effects as any[])
     if (e.type === "special" && e.mechanic === "reset-cooldown-on-kill" && e.params?.resetAbility) attacker.cooldowns[e.params.resetAbility] = ctx.t
+  // §E (M3a): talent event riders (on-hit / on-crit / on-kill). Empty for enemies / no-talent members → no-op (byte-identical).
+  if (attacker.talentEventRiders.length) for (const r of attacker.talentEventRiders) {
+    const fires = (r.trigger === "on-hit" && res.dealt > 0) || (r.trigger === "on-crit" && res.isCrit && res.dealt > 0) || (r.trigger === "on-kill" && defender.hp <= 0)
+    if (!fires) continue
+    if (r.ability && ability?.id !== r.ability) continue
+    if (r.chancePct != null && r.chancePct < 100 && !ctx.rng.chance(r.chancePct / 100)) continue
+    applyEventRider(attacker, defender, r, res, ctx)
+  }
 }
 
 function detonateBurn(caster: Combatant, ability: PlayerAbility, params: any, ctx: CombatCtx, targets: Combatant[]): void {

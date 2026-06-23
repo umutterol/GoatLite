@@ -156,6 +156,10 @@ for (const t of talents.values())
   for (const o of t.options) {
     for (const tag of o.tags) ref(potentials.has(tag), `talent '${t.id}' option '${o.id}' → unknown tag '${tag}'`)
     for (const ov of o.effects?.abilityOverrides ?? []) ref(playerAbilities.has(ov.abilityId), `talent '${t.id}' option '${o.id}' → abilityOverride unknown ability '${ov.abilityId}'`)   // §B (M2)
+    for (const r of o.effects?.eventRiders ?? []) {   // §E (M3a)
+      if (r.applyStatus) ref(statuses.has(r.applyStatus.statusId), `talent '${t.id}' option '${o.id}' → eventRider unknown status '${r.applyStatus.statusId}'`)
+      if (r.adjustCooldown) ref(playerAbilities.has(r.adjustCooldown.abilityId), `talent '${t.id}' option '${o.id}' → eventRider unknown ability '${r.adjustCooldown.abilityId}'`)
+    }
   }
 for (const lt of lootTables.values()) {
   ref(dungeons.has(lt.dungeonId), `loot-table '${lt.id}' → unknown dungeon '${lt.dungeonId}'`)

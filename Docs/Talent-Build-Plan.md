@@ -64,7 +64,8 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 **Risk:** must deep-clone the patched ability per combatant. Powers Berserker/Cleric/Arcanist/Mystic/Archer/Crusader/Lifebinder/Pyromancer scalar+targeting edits.
 **Commit:** M2.
 
-### M3 — §C + §E status authoring + event riders
+### M3 — §C + §E status authoring + event riders 🟡 M3a ✅ SHIPPED 2026-06-23
+> **M3a done:** `EventRiderSchema` (on-hit/crit/kill → applyStatus/adjustCooldown/refundResource/heal), wired in `afterHit`; `applyEventRider` exported; cross-ref validated. `tsc`/egm-smoke/probe green. **DoT/HoT tuning** → use M2 `scalar` override (no separate statusMod). **M3b:** the healing-received (anti-heal) channel. `cleanseImmune`/`suppressCrit` deferred (limited active-spec use).
 **Goal:** talents apply/tune/suppress statuses and hook on-kill/crit/parry/detonate/expiry/cleanse.
 **Changes:** `schema.ts` — enumerated `statusRider` (apply debuff on hit), `statusMod` (magnitude/duration tune), `statusFlags` (suppressCrit / cleanseImmune), `eventRiders[]` (trigger enum → {applyStatus|adjustCooldown|refundResource|heal|dealDamage}). `combat.ts` — insert into `afterHit` (333-363), `detonateBurn` (365-392), `onStatusEvents` (147-163), parry (213-217); guard the loops (`if (!riders.length) return`). `stats.ts` ActiveStatus += `suppressCrit?/cleanseImmune?/eventRiderId?`. `status.ts` cleanse path honors `cleanseImmune`. **`on-cleanse` is net-new.**
 **Verify:** `tsc`; `egm-smoke` byte-identical; per-rider scratch tests.
@@ -142,7 +143,7 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 |---|---|---|---|---|
 | M1 §A keystone ✅ | engine condition unification + runtime intake/crit | M | — | ✅ byte-identical (shipped) |
 | M2 §B abilityOverride ✅ | enumerated param patching | S-M | M1 | ✅ byte-identical |
-| M3 §C+§E status + riders | the bulk of DPS/healer hooks | L | M1 | byte-identical |
+| M3 §C+§E status + riders | the bulk of DPS/healer hooks | L | M1 | 🟡 M3a ✅ byte-identical |
 | M4 §D atonement | healer damage-to-heal extensions | S-M | M1, (M2) | byte-identical |
 | M5 §F tank tools | grip/reflect/redirect/Sentinel's Voice/threat | L | M1 | byte-identical |
 | M6 §H summon | general enemy-add system | M | — | byte-identical |
