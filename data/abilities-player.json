@@ -196,9 +196,10 @@
         "type": "damage",
         "damageType": "Physical",
         "base": 40,
-        "scale": 0.85,
+        "scale": 0.65,
         "scaleStat": "power",
-        "critable": true
+        "critable": true,
+        "note": "P.5f DPS-identity: Cleaving-Strike (the cd0 spam) 0.85→0.65 — a single-target trim so Berserker reads as the AoE SPECIALIST (its AoE engine = Bladestorm/Whirlwind rampage-scaling is untouched, still the 5-target king) with a real boss-DPS weakness, sitting below the buffed Pyro/Arcanist/Archer on single-target. NOT a P.5b revert (cleave coefficients kept high)."
       }
     ]
   },
@@ -225,8 +226,9 @@
       {
         "type": "buff",
         "stat": "power",
-        "amountPct": 25,
-        "durationTurns": 2
+        "amountPct": 20,
+        "durationTurns": 2,
+        "note": "P.5f DPS-identity: Blood-Frenzy power buff 25→20 — trims Berserker's universal output a touch (the AoE engine Bladestorm/Whirlwind stays the 5-target king; this + the Cleaving trim push its single-target clearly below the buffed Pyro/Arcanist)."
       },
       {
         "type": "buff",
@@ -404,7 +406,9 @@
     "cooldownTurns": 0,
     "targeting": {
       "side": "enemy",
-      "pattern": "single"
+      "pattern": "adjacent",
+      "count": 1,
+      "note": "P.5f DPS-identity: single→adjacent (primary + 1) — modest cleave threat so Crusader isn't anomalously flat-20/20/20 (the lowest tank by 3x). It stays the lowest tank by far (its kit is otherwise pure defensive bubble/immunity/redirect); this just de-weirds the dead-flat offensive profile. Trivial revert to pure-wall if the defensive-purist identity is preferred."
     },
     "effects": [
       {
@@ -1015,9 +1019,10 @@
         "type": "damage",
         "damageType": "Physical",
         "base": 40,
-        "scale": 0.7,
+        "scale": 0.9,
         "scaleStat": "power",
-        "critable": true
+        "critable": true,
+        "note": "P.5f DPS-identity: Barrow-Quarrel (the cd0 ST spam) 0.7→0.9. Archer was bottom-tier at EVERY target count — its sustained ranged single-target was starved (no poison/Cold-Blood ramp like Assassin). Lifting the spam + Marrow-Piercer + Over-the-Barrow makes it a real ranged single-target spec (kept its AoE-burst major Culling-Rain — no new mechanics)."
       },
       {
         "type": "applyStatus",
@@ -1045,7 +1050,7 @@
         "type": "damage",
         "damageType": "Physical",
         "base": 70,
-        "scale": 1.1,
+        "scale": 1.35,
         "scaleStat": "power",
         "critable": true,
         "modifiers": [
@@ -1071,7 +1076,7 @@
         "type": "damage",
         "damageType": "Physical",
         "base": 50,
-        "scale": 0.8,
+        "scale": 0.95,
         "scaleStat": "power",
         "critable": true,
         "modifiers": [
@@ -1097,9 +1102,10 @@
         "type": "damage",
         "damageType": "Physical",
         "base": 40,
-        "scale": 0.6,
+        "scale": 0.78,
         "scaleStat": "power",
-        "critable": true
+        "critable": true,
+        "note": "P.5f DPS-identity: Carrion-Hail (the only AoE filler) 0.6→0.78 so Archer isn't abysmal on trash; it stays single-target-leaning (Culling-Rain remains its AoE-burst major)."
       }
     ]
   },
@@ -1177,10 +1183,10 @@
         "type": "damage",
         "damageType": "Magic",
         "base": 40,
-        "scale": 0.95,
+        "scale": 1.18,
         "scaleStat": "power",
         "critable": true,
-        "note": "P.5c-M3: scale 0.65→0.95. Arcanist was the broken-LOW DPS in the timer-bound regime (mono +1 trash / +4 boss — its only real damage is this spam; the rest is CC/shield). This is the analog of the P.5b berserker fix: lift the sustained ST so the arcanist (and the pure-magic AoE-Stack comp) reach the band. egm-smoke has no arcanist → byte-identical.",
+        "note": "P.5c-M3: scale 0.65→0.95 (lift broken-LOW arcanist out of the timer regime). P.5f DPS-identity: 0.95→1.18 to move Arcanist's single-target UP to a respectable boss tier (it stays AoE/control-leaning; Frost Nova AoE untouched). egm-smoke has no arcanist → byte-identical.",
         "modifiers": [
           {
             "when": {
@@ -1420,9 +1426,10 @@
         "type": "damage",
         "damageType": "Magic",
         "base": 35,
-        "scale": 0.6,
+        "scale": 0.85,
         "scaleStat": "power",
-        "critable": true
+        "critable": true,
+        "note": "P.5f DPS-identity: Scorch (the cd0 ST spam — never splashes/detonates) 0.6→0.85 to move Pyromancer's single-target UP (the timer regime made HP-sponge bosses the DPS-check, leaving AoE-flavored magic weak on bosses); AoE (Fireball/Ignite/Meteor) untouched. Pyromancer IS in the egm-smoke/f6 golden comp → goldens rebump."
       },
       {
         "type": "applyStatus",
