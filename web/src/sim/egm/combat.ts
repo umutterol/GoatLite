@@ -124,6 +124,8 @@ function targetsFor(side: string, pattern: string, count: number | undefined, ca
 
 /** Heal `target` capped at maxHp, crediting the healer; returns the amount actually healed. */
 function healInto(healer: Combatant, target: Combatant, amount: number): number {
+  const recv = eff(target).healingTakenPct   // §C (M3b): a "healingReceived" debuff (anti-heal) cuts incoming healing; 0 → unchanged (byte-identical)
+  if (recv) amount *= Math.max(0, 1 + recv / 100)
   const h = Math.min(amount, target.maxHp - target.hp)
   if (h > 0) { target.hp += h; healer.healDone += h }
   return h

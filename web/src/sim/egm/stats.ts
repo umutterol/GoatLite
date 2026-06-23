@@ -41,7 +41,7 @@ export interface ActiveStatus {
 export interface EffStats {
   power: number; maxHp: number; armour: number; resist: number
   crit: number; critMult: number; attackInterval: number
-  dodgeChance: number; damageTakenPct: number
+  dodgeChance: number; damageTakenPct: number; healingTakenPct: number
 }
 
 const SIM = content.tuning.sim as Record<string, number>
@@ -290,7 +290,7 @@ export function passiveSpecial(c: Combatant, mechanic: string): Record<string, u
 
 /** Effective stats = base stats with all active buff/debuff/Chill/Mark stat-mods applied. */
 export function eff(c: Combatant): EffStats {
-  let power = 0, maxhp = 0, armour = 0, resist = 0, crit = 0, critmult = 0, haste = 0, vers = 0, dtaken = 0
+  let power = 0, maxhp = 0, armour = 0, resist = 0, crit = 0, critmult = 0, haste = 0, vers = 0, dtaken = 0, healrecv = 0
   for (const s of c.statuses) {
     if (!s.statMods) continue
     for (const m of s.statMods) {
@@ -304,6 +304,7 @@ export function eff(c: Combatant): EffStats {
         case "haste": haste += m.amountPct; break
         case "versatility": vers += m.amountPct; break
         case "damageTaken": dtaken += m.amountPct; break
+        case "healingReceived": healrecv += m.amountPct; break   // §C (M3b): anti-heal channel
       }
     }
   }
@@ -319,6 +320,7 @@ export function eff(c: Combatant): EffStats {
     // P.4: include the base field (always 0 for party/normal enemies → byte-identical) so the engine can set a flat
     // damage-taken delta directly on a combatant (the guarded enemy's near-immunity) without authoring a status.
     damageTakenPct: dtaken + c.damageTakenPct,
+    healingTakenPct: healrecv,   // §C (M3b): anti-heal — "healingReceived" statMods cut incoming healing on this combatant (0 → unchanged)
   }
 }
 

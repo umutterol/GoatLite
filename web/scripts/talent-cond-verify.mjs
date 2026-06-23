@@ -7,7 +7,7 @@ const server = await createServer({ server: { middlewareMode: true }, appType: "
 let fail = 0
 try {
   const { talentIntakeMult, talentCritBonus } = await server.ssrLoadModule("/src/sim/egm/combat.ts")
-  const { applyAbilityOverrides } = await server.ssrLoadModule("/src/sim/egm/stats.ts")
+  const { applyAbilityOverrides, eff } = await server.ssrLoadModule("/src/sim/egm/stats.ts")
   const { applyEventRider } = await server.ssrLoadModule("/src/sim/egm/combat.ts")
 
   const mk = (o = {}) => ({ hp: 100, maxHp: 100, position: "Front", statuses: [], resources: {}, downedUntil: -1, hitSinceAction: false, talentCondIntake: [], talentCondCrit: [], ...o })
@@ -101,21 +101,29 @@ try {
   // ---- M3a §E: event riders (deterministic actions) ----
   {
     const ctx = { t: 100, secondsPerTurn: 3, rng: { chance: () => true }, party: [] }
-    const a1 = { cooldowns: {}, resources: {}, hp: 50, maxHp: 100, healDone: 0, shield: 0, downedUntil: -1 }; ctx.party = [a1]
+    const a1 = { cooldowns: {}, resources: {}, hp: 50, maxHp: 100, healDone: 0, shield: 0, downedUntil: -1, statuses: [] }; ctx.party = [a1]
     applyEventRider(a1, {}, { trigger: "on-kill", adjustCooldown: { abilityId: "fin", deltaTurns: -999 } }, { dealt: 0 }, ctx)
     okEq("rider: cooldown full reset to now", a1.cooldowns.fin, 100)
-    const a2 = { cooldowns: { fin: 130 }, resources: {}, hp: 50, maxHp: 100, healDone: 0, shield: 0, downedUntil: -1 }; ctx.party = [a2]
+    const a2 = { cooldowns: { fin: 130 }, resources: {}, hp: 50, maxHp: 100, healDone: 0, shield: 0, downedUntil: -1, statuses: [] }; ctx.party = [a2]
     applyEventRider(a2, {}, { trigger: "on-hit", adjustCooldown: { abilityId: "fin", deltaTurns: -2 } }, { dealt: 0 }, ctx)
     okEq("rider: cooldown -2 turns (=-6s)", a2.cooldowns.fin, 124)
-    const a3 = { cooldowns: {}, resources: { fury: 1 }, hp: 50, maxHp: 100, healDone: 0, shield: 0, downedUntil: -1 }; ctx.party = [a3]
+    const a3 = { cooldowns: {}, resources: { fury: 1 }, hp: 50, maxHp: 100, healDone: 0, shield: 0, downedUntil: -1, statuses: [] }; ctx.party = [a3]
     applyEventRider(a3, {}, { trigger: "on-kill", refundResource: { resource: "fury", amount: 2 } }, { dealt: 0 }, ctx)
     okEq("rider: refund +2 fury", a3.resources.fury, 3)
-    const a4 = { cooldowns: {}, resources: {}, hp: 50, maxHp: 100, healDone: 0, shield: 0, downedUntil: -1 }; ctx.party = [a4]
+    const a4 = { cooldowns: {}, resources: {}, hp: 50, maxHp: 100, healDone: 0, shield: 0, downedUntil: -1, statuses: [] }; ctx.party = [a4]
     applyEventRider(a4, {}, { trigger: "on-crit", heal: { target: "self", pctOfMaxHp: 4 } }, { dealt: 0 }, ctx)
     okEq("rider: heal 4% maxHp self", a4.hp, 54)
-    const a5 = { cooldowns: {}, resources: {}, hp: 50, maxHp: 100, healDone: 0, shield: 0, downedUntil: -1 }; ctx.party = [a5]
+    const a5 = { cooldowns: {}, resources: {}, hp: 50, maxHp: 100, healDone: 0, shield: 0, downedUntil: -1, statuses: [] }; ctx.party = [a5]
     applyEventRider(a5, {}, { trigger: "on-hit", heal: { target: "self", pctOfDamage: 10 } }, { dealt: 200 }, ctx)
     okEq("rider: heal 10% of 200 dmg self", a5.hp, 70)
+  }
+
+  // ---- M3b §C: healing-received (anti-heal) channel ----
+  {
+    const base = { power: 0, maxHp: 100, armour: 0, resist: 0, critChance: 0, critMult: 1, attackInterval: 1, dodgeChance: 0, damageTakenPct: 0 }
+    const c = { ...base, statuses: [{ statMods: [{ stat: "healingReceived", amountPct: -50 }] }] }
+    okEq("anti-heal: eff.healingTakenPct = -50", eff(c).healingTakenPct, -50)
+    okEq("no debuff: healingTakenPct = 0", eff({ ...base, statuses: [] }).healingTakenPct, 0)
   }
 
   console.log(`\n${fail === 0 ? "ALL PASS" : `${fail} FAILED`}`)
