@@ -55,7 +55,9 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 **Risk:** determinism — pure conditions (no RNG), cache `livingMobs`, keep the 3 existing types' math identical. No SAVE bump. **Decision needed:** confirm conditional intake/crit moves to runtime in M1 (vs deferring) — recommended **yes** (Tier-4 defenses need it).
 **Commit:** M1.
 
-### M2 — §B `abilityOverride` (enumerated, Zod-strict)
+### M2 — §B `abilityOverride` (enumerated, Zod-strict) ✅ SHIPPED 2026-06-23
+> **Done:** `AbilityOverrideSchema` discriminated union (`cooldown`/`targeting`/`param`/`scalar`/`addModifier`), applied via `applyAbilityOverrides` in `buildParty` (clones the patched ability — shared content never mutated). Cross-ref validates `abilityId`. `tsc` clean · egm-smoke byte-identical · probe +10. Files: `schema.ts`, `index.ts`, `stats.ts`.
+
 **Goal:** a talent patches a named ability's params.
 **Changes:** `schema.ts` — **enumerated** override kinds (`abilityScalarOverride`, `abilityTargetingOverride`, `abilityCooldownOverride`, `abilityChargeOverride`) — no loose bag (typos fail-closed). `stats.ts` buildParty (141-181) — after loading a combatant's ability array, **clone** the targeted ability (never mutate the shared content Map) and apply the patch. `index.ts` cross-ref — `abilityId` must exist.
 **Verify:** `tsc`; `egm-smoke` byte-identical; scratch test that an override changes a cooldown.
@@ -139,7 +141,7 @@ M2-M6 depend only on M1; they can be done in any order (or batched). M7 depends 
 | Milestone | Scope | Size | Depends on | Goldens |
 |---|---|---|---|---|
 | M1 §A keystone ✅ | engine condition unification + runtime intake/crit | M | — | ✅ byte-identical (shipped) |
-| M2 §B abilityOverride | enumerated param patching | S-M | M1 | byte-identical |
+| M2 §B abilityOverride ✅ | enumerated param patching | S-M | M1 | ✅ byte-identical |
 | M3 §C+§E status + riders | the bulk of DPS/healer hooks | L | M1 | byte-identical |
 | M4 §D atonement | healer damage-to-heal extensions | S-M | M1, (M2) | byte-identical |
 | M5 §F tank tools | grip/reflect/redirect/Sentinel's Voice/threat | L | M1 | byte-identical |

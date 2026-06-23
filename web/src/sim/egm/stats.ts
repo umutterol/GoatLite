@@ -113,11 +113,65 @@ export interface TalentDmg { dmgPct: number; onlyIf?: { type: string; value?: nu
 /** A talent's onlyIf-gated intake or crit modifier (`pct` = intakePct or critPct, %), evaluated at runtime via condHolds. */
 export interface TalentCondMod { pct: number; onlyIf?: { type: string; value?: number; resource?: string; status?: string; minStacks?: number; band?: string } }
 
+/** §B (M2): a talent's ability-override (structural; the closed shape is enforced by Zod in schema.ts / AbilityOverrideSchema). */
+export type AbilityOverride = { kind: string; abilityId: string; [k: string]: any }
+
+/** §B (M2): apply a member's talent ability-overrides to CLONES of the targeted abilities (never mutate shared content).
+    Returns the same arrays untouched when there are no overrides (byte-identical default). Exported for the M2 probe. */
+export function applyAbilityOverrides(abilities: PlayerAbility[], passive: PlayerAbility | null, overrides: AbilityOverride[] | undefined): { abilities: PlayerAbility[]; passive: PlayerAbility | null } {
+  if (!overrides || !overrides.length) return { abilities, passive }
+  const cloned = new Map<string, PlayerAbility>()
+  const getClone = (id: string): any | undefined => {
+    if (cloned.has(id)) return cloned.get(id)
+    const orig = abilities.find((a) => a.id === id) ?? (passive?.id === id ? passive : undefined)
+    if (!orig) return undefined
+    const c = structuredClone(orig) as PlayerAbility
+    cloned.set(id, c)
+    return c
+  }
+  for (const ov of overrides) {
+    const a = getClone(ov.abilityId)
+    if (!a) continue   // unknown ability (the cross-ref validator should have caught this) → skip
+    applyOneOverride(a, ov)
+  }
+  if (!cloned.size) return { abilities, passive }
+  return {
+    abilities: abilities.map((a) => cloned.get(a.id) ?? a),
+    passive: passive ? (cloned.get(passive.id) ?? passive) : null,
+  }
+}
+
+function applyOneOverride(a: any, ov: AbilityOverride): void {
+  switch (ov.kind) {
+    case "cooldown": a.cooldownTurns = ov.cooldownTurns; break
+    case "targeting":
+      if (ov.pattern != null) a.targeting.pattern = ov.pattern
+      if (ov.count != null) a.targeting.count = ov.count
+      if (ov.band != null) a.targeting.band = ov.band
+      break
+    case "param": {
+      const e = (a.effects as any[]).find((x) => x.type === "special" && x.mechanic === ov.mechanic)
+      if (e) { e.params = e.params ?? {}; e.params[ov.key] = ov.value }
+      break
+    }
+    case "scalar": {
+      const e = (a.effects as any[]).find((x) => x.type === ov.effectType)
+      if (e) e[ov.field] = ov.value
+      break
+    }
+    case "addModifier": {
+      const e = (a.effects as any[]).find((x) => x.type === "damage")
+      if (e) { e.modifiers = e.modifiers ?? []; e.modifiers.push({ when: ov.when, multiplyDamage: ov.multiplyDamage }) }
+      break
+    }
+  }
+}
+
 /** Resolve a member's chosen talents → maxHp mult, damage mods, UNCONDITIONAL intake/crit deltas, AND onlyIf-gated
     conditional intake/crit mods (evaluated at runtime via condHolds). Defaults to the balanced pick. */
-function resolveTalents(chosen: Record<string, string> | undefined): { hpMult: number; dmg: TalentDmg[]; intakePct: number; critPct: number; condIntake: TalentCondMod[]; condCrit: TalentCondMod[] } {
+function resolveTalents(chosen: Record<string, string> | undefined): { hpMult: number; dmg: TalentDmg[]; intakePct: number; critPct: number; condIntake: TalentCondMod[]; condCrit: TalentCondMod[]; abilityOverrides: AbilityOverride[] } {
   let hpMult = 1, intakePct = 0, critPct = 0
-  const dmg: TalentDmg[] = [], condIntake: TalentCondMod[] = [], condCrit: TalentCondMod[] = []
+  const dmg: TalentDmg[] = [], condIntake: TalentCondMod[] = [], condCrit: TalentCondMod[] = [], abilityOverrides: AbilityOverride[] = []
   for (const node of content.talents.values()) {
     // chosen → default → first option (matches the Character-sheet picker's fallback exactly)
     const opt = (chosen?.[node.id] && node.options.find((o) => o.id === chosen[node.id])) || node.options.find((o) => o.default) || node.options[0]
@@ -128,8 +182,9 @@ function resolveTalents(chosen: Record<string, string> | undefined): { hpMult: n
     // §A: an onlyIf-gated intake/crit becomes a runtime conditional mod; unconditional ones keep the build-time fold (byte-identical).
     if (eff.intakePct) { if (eff.onlyIf) condIntake.push({ pct: eff.intakePct, onlyIf: eff.onlyIf }); else intakePct += eff.intakePct }
     if (eff.critPct) { if (eff.onlyIf) condCrit.push({ pct: eff.critPct, onlyIf: eff.onlyIf }); else critPct += eff.critPct }
+    if (eff.abilityOverrides) abilityOverrides.push(...(eff.abilityOverrides as AbilityOverride[]))   // §B (M2)
   }
-  return { hpMult, dmg, intakePct, critPct, condIntake, condCrit }
+  return { hpMult, dmg, intakePct, critPct, condIntake, condCrit, abilityOverrides }
 }
 
 export function moraleMult(m: number): number {
@@ -163,8 +218,9 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
     // H.3: talent intakePct folds into the operator (uniform) intake channel
     const intakeStatic = Math.max(0.2, Math.min(2, op.intakeStatic * (1 + tal.intakePct / 100)))
     const maxHp = c.hpPerIlvl * p.ilvl * tal.hpMult * op.hpMult
-    const abilities = [...content.playerAbilities.values()].filter((a) => a.specId === p.specId && a.trigger === "active")
-    const passive = [...content.playerAbilities.values()].find((a) => a.specId === p.specId && a.trigger === "passive") ?? null
+    const baseAbilities = [...content.playerAbilities.values()].filter((a) => a.specId === p.specId && a.trigger === "active")
+    const basePassive = [...content.playerAbilities.values()].find((a) => a.specId === p.specId && a.trigger === "passive") ?? null
+    const { abilities, passive } = applyAbilityOverrides(baseAbilities, basePassive, tal.abilityOverrides)   // §B (M2)
     return {
       id: p.id, name: p.name, specId: p.specId, team: "party",
       role, position: spec.position, profile: p.profile ?? spec.defaultProfile,

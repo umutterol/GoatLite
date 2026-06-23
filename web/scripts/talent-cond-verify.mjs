@@ -7,6 +7,7 @@ const server = await createServer({ server: { middlewareMode: true }, appType: "
 let fail = 0
 try {
   const { talentIntakeMult, talentCritBonus } = await server.ssrLoadModule("/src/sim/egm/combat.ts")
+  const { applyAbilityOverrides } = await server.ssrLoadModule("/src/sim/egm/stats.ts")
 
   const mk = (o = {}) => ({ hp: 100, maxHp: 100, position: "Front", statuses: [], resources: {}, downedUntil: -1, hitSinceAction: false, talentCondIntake: [], talentCondCrit: [], ...o })
   const ctxOf = (mobs = [], party = []) => ({ mobs, party })
@@ -59,6 +60,41 @@ try {
   {
     const c = mk({ talentCondIntake: [{ pct: -10 }] })
     ok("no-onlyIf intake always", talentIntakeMult(c, ctxOf()), 0.9)
+  }
+
+  // ---- M2 §B: abilityOverride (clone-and-patch; shared content never mutated) ----
+  const okEq = (label, got, want) => { const pass = got === want; if (!pass) fail++; console.log(`${pass ? "OK " : "XX "} ${label}: got ${JSON.stringify(got)} want ${JSON.stringify(want)}`) }
+  {
+    // a Massacre-like ability (top-level cooldown + a damage effect w/ modifiers + a special w/ params)
+    const orig = () => ({ id: "x", cooldownTurns: 7, targeting: { side: "enemy", pattern: "single" },
+      effects: [ { type: "damage", base: 60, scale: 1.2, modifiers: [{ when: { type: "targetHpBelowPct", value: 20 }, multiplyDamage: 2 }] },
+                 { type: "special", mechanic: "rampage-damage-bonus", params: { perStackPct: 4, resource: "rampage" } } ] })
+    const base = orig()
+    const r1 = applyAbilityOverrides([base], null, [{ kind: "cooldown", abilityId: "x", cooldownTurns: 3 }])
+    okEq("cooldown override (clone cd)", r1.abilities[0].cooldownTurns, 3)
+    okEq("cooldown override (orig untouched)", base.cooldownTurns, 7)
+    okEq("cooldown override (clone is a new obj)", r1.abilities[0] === base, false)
+
+    const r2 = applyAbilityOverrides([orig()], null, [{ kind: "targeting", abilityId: "x", pattern: "all", band: "front" }])
+    okEq("targeting override pattern", r2.abilities[0].targeting.pattern, "all")
+    okEq("targeting override band", r2.abilities[0].targeting.band, "front")
+
+    const r3 = applyAbilityOverrides([orig()], null, [{ kind: "param", abilityId: "x", mechanic: "rampage-damage-bonus", key: "perStackPct", value: 6 }])
+    okEq("param override perStackPct", r3.abilities[0].effects[1].params.perStackPct, 6)
+
+    const r4 = applyAbilityOverrides([orig()], null, [{ kind: "scalar", abilityId: "x", effectType: "damage", field: "scale", value: 1.5 }])
+    okEq("scalar override damage.scale", r4.abilities[0].effects[0].scale, 1.5)
+
+    const r5 = applyAbilityOverrides([orig()], null, [{ kind: "addModifier", abilityId: "x", when: { type: "targetBand", band: "back" }, multiplyDamage: 1.6 }])
+    okEq("addModifier appended", r5.abilities[0].effects[0].modifiers.length, 2)
+    okEq("addModifier value", r5.abilities[0].effects[0].modifiers[1].multiplyDamage, 1.6)
+
+    const noop = orig()
+    const r6 = applyAbilityOverrides([noop], null, [])
+    okEq("no overrides → same array ref", r6.abilities[0] === noop, true)
+
+    const r7 = applyAbilityOverrides([orig()], null, [{ kind: "cooldown", abilityId: "missing", cooldownTurns: 1 }])
+    okEq("unknown abilityId → skipped (no throw)", r7.abilities[0].cooldownTurns, 7)
   }
 
   console.log(`\n${fail === 0 ? "ALL PASS" : `${fail} FAILED`}`)

@@ -192,6 +192,34 @@ export const BarksSchema = z.object({
 /* ---- previously-scaffolded domains, now filled ---- */
 export const LogKind = z.enum(["normal", "crit", "dodge", "death", "mechanic", "heal", "flavor", "good"])
 
+/* §B (M2): talent ability-override — enumerated, STRICT patch kinds applied to a clone of a named ability at
+   buildParty time (the shared content object is never mutated). Closed kinds + enum keys mean a typo fails Zod
+   validation rather than silently no-opping; the cross-ref validator checks `abilityId` exists. */
+export const AbilityOverrideSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("cooldown"), abilityId: z.string(), cooldownTurns: z.number().int().nonnegative() }).strict(),
+  z.object({
+    kind: z.literal("targeting"), abilityId: z.string(),
+    pattern: z.enum(["single", "adjacent", "all", "lowest-hp", "self", "aura"]).optional(),
+    count: z.number().int().positive().optional(),
+    band: z.enum(["front", "back", "any"]).optional(),
+  }).strict(),
+  z.object({  // patch a numeric param on a special-mechanic effect (selected by mechanic)
+    kind: z.literal("param"), abilityId: z.string(), mechanic: z.string(),
+    key: z.enum(["perStackPct", "healHpPct", "healPctOfDamage", "redirectPct", "reductionPct", "splashCount", "splashPct", "amountPct", "buffAmountPct", "buffDurationTurns", "durationTurns", "stacks", "chancePct", "addTurns", "extendTurns", "reduceTurns", "parryChancePct"]),
+    value: z.number(),
+  }).strict(),
+  z.object({  // patch a top-level field on the ability's primary damage/heal/shield/dot/hot effect
+    kind: z.literal("scalar"), abilityId: z.string(),
+    effectType: z.enum(["damage", "heal", "shield", "dot", "hot", "buff", "debuff"]),
+    field: z.enum(["base", "scale", "durationTurns", "stacks", "amountPct"]), value: z.number(),
+  }).strict(),
+  z.object({  // add a conditional damage modifier to the ability's primary damage effect (execute / band amps)
+    kind: z.literal("addModifier"), abilityId: z.string(),
+    when: z.object({ type: z.string(), value: z.number().optional(), band: z.enum(["front", "back"]).optional(), status: z.string().optional() }).strict().optional(),
+    multiplyDamage: z.number(),
+  }).strict(),
+])
+
 export const TalentOptionSchema = z.object({
   id: z.string(), name: z.string(), effect: z.string(), tags: z.array(z.string()),
   default: z.boolean().optional(),   // the balanced pick a member starts on
@@ -216,6 +244,7 @@ export const TalentOptionSchema = z.object({
       minStacks: z.number().optional(),              // target/selfHasStatus
       band: z.enum(["front", "back"]).optional(),    // targetBand
     }).optional(),
+    abilityOverrides: z.array(AbilityOverrideSchema).optional(),   // §B (M2): patch a named ability's params at buildParty time
   }).optional(),
 })
 export const TalentNodeSchema = z.object({

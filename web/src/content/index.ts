@@ -153,7 +153,10 @@ for (const m of save.roster) {
   for (const tid of m.traitIds) ref(traits.has(tid), `roster '${m.id}' → unknown traitId '${tid}'`)
 }
 for (const t of talents.values())
-  for (const o of t.options) for (const tag of o.tags) ref(potentials.has(tag), `talent '${t.id}' option '${o.id}' → unknown tag '${tag}'`)
+  for (const o of t.options) {
+    for (const tag of o.tags) ref(potentials.has(tag), `talent '${t.id}' option '${o.id}' → unknown tag '${tag}'`)
+    for (const ov of o.effects?.abilityOverrides ?? []) ref(playerAbilities.has(ov.abilityId), `talent '${t.id}' option '${o.id}' → abilityOverride unknown ability '${ov.abilityId}'`)   // §B (M2)
+  }
 for (const lt of lootTables.values()) {
   ref(dungeons.has(lt.dungeonId), `loot-table '${lt.id}' → unknown dungeon '${lt.dungeonId}'`)
   for (const e of lt.entries) ref(items.has(e.itemId), `loot-table '${lt.id}' → unknown item '${e.itemId}'`)
