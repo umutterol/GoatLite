@@ -174,11 +174,12 @@ function applyOneOverride(a: any, ov: AbilityOverride): void {
 
 /** Resolve a member's chosen talents → maxHp mult, damage mods, UNCONDITIONAL intake/crit deltas, AND onlyIf-gated
     conditional intake/crit mods (evaluated at runtime via condHolds). Defaults to the balanced pick. */
-function resolveTalents(chosen: Record<string, string> | undefined): { hpMult: number; dmg: TalentDmg[]; intakePct: number; critPct: number; condIntake: TalentCondMod[]; condCrit: TalentCondMod[]; abilityOverrides: AbilityOverride[]; eventRiders: EventRider[]; atonement: { disableAbilityId?: string; partyWhenLowestAllyBelowPct?: number } | undefined } {
+function resolveTalents(chosen: Record<string, string> | undefined, specId?: string): { hpMult: number; dmg: TalentDmg[]; intakePct: number; critPct: number; condIntake: TalentCondMod[]; condCrit: TalentCondMod[]; abilityOverrides: AbilityOverride[]; eventRiders: EventRider[]; atonement: { disableAbilityId?: string; partyWhenLowestAllyBelowPct?: number } | undefined } {
   let hpMult = 1, intakePct = 0, critPct = 0
   const dmg: TalentDmg[] = [], condIntake: TalentCondMod[] = [], condCrit: TalentCondMod[] = [], abilityOverrides: AbilityOverride[] = [], eventRiders: EventRider[] = []
   let atonement: { disableAbilityId?: string; partyWhenLowestAllyBelowPct?: number } | undefined
   for (const node of content.talents.values()) {
+    if (node.specId && node.specId !== specId) continue   // M7: a per-spec node applies only to its spec (global nodes have no specId)
     // chosen → default → first option (matches the Character-sheet picker's fallback exactly)
     const opt = (chosen?.[node.id] && node.options.find((o) => o.id === chosen[node.id])) || node.options.find((o) => o.default) || node.options[0]
     const eff = opt?.effects
@@ -221,7 +222,7 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
     const power = c.powerPerIlvl * p.ilvl * moraleMult(p.morale) * aggressionOutput
     const haste = 0 // Phase 1: no haste source yet (gear secondaries land later)
     const attackInterval = ATTACK_INTERVAL_BASE / (1 + haste / 100)
-    const tal = resolveTalents(p.talents)
+    const tal = resolveTalents(p.talents, p.specId)   // M7: filter to global + this spec's nodes
     const op = resolveOperator(p.skills, p.traitIds)   // Phase F: operator skills + trait combat → multipliers
     // H.3: talent intakePct folds into the operator (uniform) intake channel
     const intakeStatic = Math.max(0.2, Math.min(2, op.intakeStatic * (1 + tal.intakePct / 100)))

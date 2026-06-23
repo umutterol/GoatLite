@@ -152,7 +152,8 @@ for (const m of save.roster) {
   ref(specs.has(m.specId), `roster '${m.id}' → unknown specId '${m.specId}'`)
   for (const tid of m.traitIds) ref(traits.has(tid), `roster '${m.id}' → unknown traitId '${tid}'`)
 }
-for (const t of talents.values())
+for (const t of talents.values()) {
+  if (t.specId) ref(specs.has(t.specId), `talent '${t.id}' → unknown specId '${t.specId}'`)   // M7: per-spec tree
   for (const o of t.options) {
     for (const tag of o.tags) ref(potentials.has(tag), `talent '${t.id}' option '${o.id}' → unknown tag '${tag}'`)
     for (const ov of o.effects?.abilityOverrides ?? []) ref(playerAbilities.has(ov.abilityId), `talent '${t.id}' option '${o.id}' → abilityOverride unknown ability '${ov.abilityId}'`)   // §B (M2)
@@ -163,6 +164,7 @@ for (const t of talents.values())
     const atb = o.effects?.atonement?.disableAbilityId   // §D (M4)
     if (atb) ref(playerAbilities.has(atb), `talent '${t.id}' option '${o.id}' → atonement disable unknown ability '${atb}'`)
   }
+}
 for (const lt of lootTables.values()) {
   ref(dungeons.has(lt.dungeonId), `loot-table '${lt.id}' → unknown dungeon '${lt.dungeonId}'`)
   for (const e of lt.entries) ref(items.has(e.itemId), `loot-table '${lt.id}' → unknown item '${e.itemId}'`)

@@ -263,6 +263,7 @@ export const TalentOptionSchema = z.object({
 })
 export const TalentNodeSchema = z.object({
   id: z.string(), node: z.number().int().min(1).max(5), name: z.string(),
+  specId: z.string().optional(),   // M7: per-spec tree (absent = global node, applies to every spec — back-compat with the MVP shared nodes)
   options: z.array(TalentOptionSchema),
 })
 

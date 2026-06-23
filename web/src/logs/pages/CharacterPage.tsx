@@ -180,7 +180,7 @@ function ItemRow({ label, item }: { label: string; item?: GearItem }) {
 function Talents({ member, color, behavior }: { member: Member; color: string; behavior: string }) {
   const g = useGame()
   // MVP: only nodes whose options carry real engine effects are pickable (nodes 3-5 are prose-only until C.2)
-  const nodes = [...content.talents.values()].filter((n) => n.options.some((o) => o.effects)).sort((a, b) => a.node - b.node)
+  const nodes = [...content.talents.values()].filter((n) => (!n.specId || n.specId === member.spec) && n.options.some((o) => o.effects)).sort((a, b) => a.node - b.node)
   const chosenId = (node: typeof nodes[number]) =>
     member.talents?.[node.id] ?? node.options.find((o) => o.default)?.id ?? node.options[0].id
   return (

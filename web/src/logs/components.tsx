@@ -151,7 +151,7 @@ export function SpellTip({ skillId, name }: { skillId?: string; name?: string })
       {sk ? (
         <>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginTop: 2, color: "var(--muted)", fontSize: 11.5 }}>
-            <span>{sk.cd > 0 ? `${sk.cd} turn cooldown` : "No cooldown"}</span>
+            <span>{sk.cd > 0 ? `${sk.cd * 3}s cooldown` : "No cooldown"}</span>
             <span>{sk.targetType}</span>
           </div>
           {sk.damageType && sk.damageType !== "None"
