@@ -165,7 +165,7 @@ function ScoutDetail({ r }: { r: ReturnType<typeof useGame>["recruits"][number] 
 
       {/* operator skills */}
       <div style={{ padding: 16, borderBottom: "1px solid var(--line-soft)" }}>
-        <div className="eyebrow" style={{ fontSize: 10, marginBottom: 11 }}>Operator Skills <span style={{ color: "var(--faint)", letterSpacing: 0, textTransform: "none", fontWeight: 400 }}>— ceiling shown where scouted</span></div>
+        <div className="eyebrow" style={{ fontSize: 10, marginBottom: 11 }}>Aptitudes <span style={{ color: "var(--faint)", letterSpacing: 0, textTransform: "none", fontWeight: 400 }}>— ceiling shown where scouted</span></div>
         <SkillBars skills={r.skills} ceilings={r.ceilings} revealed={r.revealed} color={info.color} />
       </div>
 

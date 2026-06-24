@@ -132,7 +132,7 @@ function OperatorCard({ member, color }: { member: Member; color: string }) {
   const stars = potentialStars(member.ceilings ?? member.skills, role)
   const combat = traitCombatSummary(member.traitIds)
   return (
-    <Panel title="Operator" right={<span className="mono" style={{ fontSize: 13, fontWeight: 700, color: corColor(cor) }}>{cor} <span style={{ color: "var(--faint)", fontWeight: 400, fontSize: 10 }}>COR</span></span>} bodyStyle={{ padding: 14 }}>
+    <Panel title="Aptitudes" right={<span className="mono" style={{ fontSize: 13, fontWeight: 700, color: corColor(cor) }}>{cor} <span style={{ color: "var(--faint)", fontWeight: 400, fontSize: 10 }}>COR</span></span>} bodyStyle={{ padding: 14 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 13 }}>
         <span className="flux" style={{ fontSize: 12 }}>Potential</span>
         <Stars value={stars} size={15} />

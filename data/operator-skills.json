@@ -1,22 +1,22 @@
 [
   {
     "id": "execution",
-    "name": "Execution",
-    "satire": "Clean APM, ships clean code, no fat-fingered globals.",
-    "effect": "Raises the bot's damage/healing output.",
+    "name": "Precision",
+    "satire": "Lands the blow that matters — clean pulls, no fumbled rotation.",
+    "effect": "Raises damage and healing output.",
     "icon": "skill-execution"
   },
   {
     "id": "awareness",
-    "name": "Awareness",
-    "satire": "Reads the room, catches the bug before prod, never stands in the bad.",
+    "name": "Instinct",
+    "satire": "Reads the fight a beat early — out of the fire before it blooms.",
     "effect": "Reduces damage taken, with a little extra output.",
     "icon": "skill-awareness"
   },
   {
     "id": "composure",
     "name": "Composure",
-    "satire": "Calm during the incident — no grey parses when the raid is on fire.",
+    "satire": "Holds the line when it all goes sideways — one death never becomes five.",
     "effect": "Clutch output and survival while the party is in danger, and steadier (less swingy) results overall.",
     "icon": "skill-composure"
   }
