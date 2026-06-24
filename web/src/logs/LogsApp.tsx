@@ -47,7 +47,7 @@ export function LogsApp() {
           <div className="nav-tabs">
             {NAV.map((n) => (
               <button key={n.id} className={"nav-tab" + (activeNav === n.id ? " active" : "")} onClick={() => go(n.id)}>
-                <Icon name={n.icon} size={15} color={activeNav === n.id ? "var(--accent)" : "currentColor"} />
+                <Icon name={n.icon} size={17} color={activeNav === n.id ? "var(--accent)" : "currentColor"} />
                 {n.label}
               </button>
             ))}

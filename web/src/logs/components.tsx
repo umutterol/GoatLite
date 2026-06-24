@@ -103,7 +103,7 @@ const ICON_PREFIX = {
   skill: "skill", ability: "ability", class: "class", talent: "talent", trait: "trait", item: "item", dungeon: "dungeon",
 } as const
 export type IconKind = keyof typeof ICON_PREFIX
-export function GameIcon({ kind, id, size = 16, label, style, noTip = false }: {
+export function GameIcon({ kind, id, size = 18, label, style, noTip = false }: {
   kind: IconKind; id: string; size?: number; color?: string; label?: string; style?: CSSProperties; noTip?: boolean
 }) {
   const aria = label ?? `${id} ${kind}`
@@ -161,9 +161,11 @@ export const ROLE_META: Record<RoleKey, { label: string; color: string }> = {
   healer: { label: "Healer", color: "var(--healer)" },
   dps: { label: "DPS", color: "var(--dps)" },
 }
-export function RolePill({ role }: { role: RoleKey }) {
+export function RolePill({ role, iconOnly = false }: { role: RoleKey; iconOnly?: boolean }) {
   const r = ROLE_META[role]
-  return <span className="role-pill" style={{ color: r.color }}><GameIcon kind="role" id={role} size={12} color={r.color} label={`${r.label} role`} noTip />{r.label}</span>
+  // dense rows (roster/recruit, Raider.io look): the role icon alone carries it — name on hover
+  if (iconOnly) return <GameIcon kind="role" id={role} size={22} color={r.color} label={`${r.label} role`} />
+  return <span className="role-pill" style={{ color: r.color }}><GameIcon kind="role" id={role} size={14} color={r.color} label={`${r.label} role`} noTip />{r.label}</span>
 }
 
 /* A `.chip` that tooltips its affix's effect (J.10). Looks the affix up by display name. */

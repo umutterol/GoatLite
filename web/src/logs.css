@@ -95,7 +95,7 @@ a { color: var(--link); text-decoration: none; }
 }
 .nav-tab:hover { color: var(--text); background: rgba(255,255,255,.025); }
 .nav-tab.active { color: var(--text); border-bottom-color: var(--accent); }
-.nav-tab .ic { width: 15px; height: 15px; opacity: .85; }
+.nav-tab .ic { width: 17px; height: 17px; opacity: .85; }
 
 .nav-spacer { flex: 1; }
 .nav-readout { display: flex; align-items: center; gap: 16px; padding-right: 4px; }

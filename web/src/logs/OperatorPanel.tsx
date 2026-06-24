@@ -47,7 +47,7 @@ export function SkillBars({ skills, ceilings, revealed, skillXp, color, showXp =
           <div key={s.id}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }}>
               <span style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
-                <GameIcon kind="skill" id={s.id} size={15} color={color} label={s.name} />
+                <GameIcon kind="skill" id={s.id} size={18} color={color} label={s.name} />
                 <span style={{ fontWeight: 600, fontSize: 13 }}>{s.name}</span>
               </span>
               <span className="mono" style={{ fontSize: 12.5, fontWeight: 700 }}>
