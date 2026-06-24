@@ -18,4 +18,10 @@ try {
   show("d4", "chest", 160, "Epic", "Strength")
   console.log("\nSlot weights at Epic ilvl 160 (weapon is the biggest stat stick):")
   for (const s of ["weapon", "chest", "legs", "helm", "boots", "trinket"]) show(`w-${s}`, s, 160, "Epic", "Intellect")
+
+  console.log("\nSAME item (Epic chest ilvl160), 5 different DROPS → random secondaries each (players hunt the roll):")
+  for (let i = 1; i <= 5; i++) {
+    const s = rollItemStats({ uid: `breastplate-of-the-pale-vigil-${i}`, slot: "chest", ilvl: 160, rarity: "Epic" }, "Strength")
+    console.log(`  drop #${i}: ${s.secondaries.map((x) => `${x.stat} +${x.value}`).join(" · ")}`)
+  }
 } finally { await server.close() }
