@@ -324,7 +324,7 @@ function CastsTab({ rows, dur }: { rows: DmgRow[]; dur: number }) {
           <div className="dd-row" key={d.id}>
             <div className="dd-rank">{i + 1}</div>
             <div className="dd-name-cell">
-              <div className="dd-fill" style={{ width: (d.casts / max) * 100 + "%", background: `linear-gradient(90deg, ${info.color}cc, ${info.color}55)`, boxShadow: `inset 2px 0 0 ${info.color}` }} />
+              <div className="dd-fill" style={{ width: (d.casts / max) * 100 + "%", background: `${info.color}cc`, boxShadow: `inset 2px 0 0 ${info.color}` }} />
               <div className="dd-name"><span className="nm" style={{ color: info.color }}>{d.name}</span><span className="sp">{info.subspec}</span></div>
             </div>
             <div className="dd-amt mono">{d.casts}</div>

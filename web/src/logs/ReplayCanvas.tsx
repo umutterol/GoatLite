@@ -217,11 +217,11 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
   return (
     <div ref={wrapRef} className="panel replay-arena" style={{
       position: "relative", height: H, overflow: "hidden", padding: 0,
-      background: `radial-gradient(130% 95% at 50% -10%, hsl(${bg} 22% 15%), hsl(${bg} 30% 6%) 72%)`,
+      background: `hsl(${bg} 26% 9%)`,
     }}>
       {/* abstract floor (placeholder for real dungeon art) */}
-      <div style={{ position: "absolute", left: "6%", right: "6%", top: ARENA_TOP + ARENA_H * 0.5, height: 1, background: `linear-gradient(90deg, transparent, hsl(${bg} 35% 42% / .35), transparent)` }} />
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 120, background: `linear-gradient(180deg, transparent, hsl(${bg} 32% 5%))` }} />
+      <div style={{ position: "absolute", left: "6%", right: "6%", top: ARENA_TOP + ARENA_H * 0.5, height: 1, background: `hsl(${bg} 35% 38% / .3)` }} />
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 120, background: `hsl(${bg} 32% 5% / .55)` }} />
 
       {/* HUD overlays */}
       {hudLeft ? <div style={{ position: "absolute", top: 10, left: 12, zIndex: 6, maxWidth: "50%" }}>{hudLeft}</div> : null}
@@ -246,7 +246,7 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
       {/* projectiles / impacts / floats / death bursts / flashes */}
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 5 }}>
         {flashes.map((f) => (
-          <div key={f.key} className="replay-flash" style={{ background: `radial-gradient(120% 90% at 70% 50%, ${f.tint.replace(",1)", ",.3)")}, transparent 60%)` }}>
+          <div key={f.key} className="replay-flash" style={{ background: f.tint.replace(",1)", ",.16)") }}>
             <span style={{ position: "absolute", top: ARENA_TOP, left: "62%", transform: "translateX(-50%)", color: f.tint, fontWeight: 800, fontSize: 12, letterSpacing: ".06em", textTransform: "uppercase", textShadow: "0 1px 4px #000" }}>{f.label}</span>
           </div>
         ))}
@@ -271,7 +271,7 @@ function DotView({ d, lunge, playing }: { d: Dot & { px: number; py: number; axP
   const ring = d.team === "party" ? (info?.color ?? "#6cc") : d.isBoss ? "var(--amber)" : "#7a2f33"
   const barColor = d.dead ? "#3a3d48"
     : d.team === "party" ? (d.frac > 0.5 ? "var(--good)" : d.frac > 0.25 ? "var(--amber)" : "var(--danger)")
-    : "linear-gradient(90deg,#e0626b,#f0a52e)"
+    : "#e0626b"
   const m = lunge && !d.dead ? (Math.hypot(lunge.x, lunge.y) || 1) : 1
   const lx = lunge && !d.dead ? (lunge.x / m) * 11 : 0, ly = lunge && !d.dead ? (lunge.y / m) * 11 : 0
   return (
@@ -279,7 +279,7 @@ function DotView({ d, lunge, playing }: { d: Dot & { px: number; py: number; axP
       <div className="replay-idle" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, animationDelay: `-${(hashF(d.key) * 2.6).toFixed(2)}s`, animationPlayState: playing ? undefined : "paused" }}>
         <span aria-label={`${d.name} ${pct}%`} style={{
           position: "relative", width: size, height: size, borderRadius: d.isBoss ? 13 : "50%", flex: "none",
-          border: `2px solid ${ring}`, overflow: "hidden", background: d.team === "party" ? (info?.color ?? "#244") : d.isBoss ? "radial-gradient(circle at 40% 30%,#5a2e1a,#1c0e0c)" : "radial-gradient(circle at 40% 30%,#5b2226,#210d0f)",
+          border: `2px solid ${ring}`, overflow: "hidden", background: d.team === "party" ? (info?.color ?? "#244") : d.isBoss ? "#3a1e12" : "#3a1619",
           filter: d.dead ? "grayscale(1) brightness(.6)" : "none", display: "flex", alignItems: "center", justifyContent: "center",
           boxShadow: d.dead ? "none" : `0 2px 8px rgba(0,0,0,.45)`,
         }}>

@@ -68,7 +68,7 @@ export function LootPage({ go }: { go: Go }) {
             return (
               <div key={it.uid} className="panel" style={{ padding: 0, overflow: "hidden", borderColor: choice ? (choice === "scrap" ? "var(--line)" : "var(--accent)") : "var(--line)", opacity: choice === "scrap" ? .7 : 1 }}>
                 <div style={{ display: "flex", alignItems: "stretch" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px", flex: "0 0 360px", borderRight: "1px solid var(--line-soft)", background: `linear-gradient(120deg, ${qColor}10, transparent)` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px", flex: "0 0 360px", borderRight: "1px solid var(--line-soft)", background: `${qColor}10` }}>
                     <Tip accent={qColor} tip={<ItemTip item={it} />}><span style={{ cursor: "help", display: "inline-flex" }}><ItemIcon item={it} size={50} /></span></Tip>
                     <div>
                       <Tip accent={qColor} tip={<ItemTip item={it} />}><span style={{ color: qColor, fontWeight: 700, fontSize: 16, cursor: "help" }}>{it.name}</span></Tip>

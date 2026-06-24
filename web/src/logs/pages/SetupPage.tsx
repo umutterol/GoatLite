@@ -52,7 +52,7 @@ export function SetupPage({ go }: { go: Go }) {
             <Panel title="Choose a Key" right={<span className="mono" style={{ fontSize: 11.5, color: "var(--faint)" }}>week {g.weekNumber}</span>} bodyStyle={{ padding: 12 }}>
               {/* selected key — the one this run will use (its holder is locked into the party) */}
               <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "8px 10px 14px", borderBottom: "1px solid var(--line-soft)" }}>
-                <div style={{ width: 50, height: 50, borderRadius: 12, background: "linear-gradient(150deg, var(--accent), var(--accent-dim))", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}>
+                <div style={{ width: 50, height: 50, borderRadius: 12, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}>
                   <span className="mono" style={{ fontWeight: 700, fontSize: 14, color: "#04201d" }}>{g.keystone.dungeonShort}</span>
                 </div>
                 <div style={{ flex: 1 }}>

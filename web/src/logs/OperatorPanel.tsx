@@ -57,7 +57,7 @@ export function SkillBars({ skills, ceilings, revealed, skillXp, color, showXp =
             </div>
             <div style={{ position: "relative", height: 9, borderRadius: "var(--radius)", background: "var(--panel-3)", overflow: "hidden" }}>
               {reveal ? <div style={{ position: "absolute", insetBlock: 0, left: 0, width: `${ceilPct}%`, background: `${color}26` }} /> : null}
-              <div style={{ position: "absolute", insetBlock: 0, left: 0, width: `${curPct}%`, background: `linear-gradient(90deg, ${color}, ${color}aa)`, borderRadius: "var(--radius)" }} />
+              <div style={{ position: "absolute", insetBlock: 0, left: 0, width: `${curPct}%`, background: color, borderRadius: "var(--radius)" }} />
               {xpPct > 0 ? <div style={{ position: "absolute", insetBlock: 0, left: `${curPct}%`, width: `${(xpPct / 100) * (Math.max(0, 100 - curPct))}%`, background: `${color}55` }} /> : null}
               {reveal && ceil > 0 ? <div style={{ position: "absolute", top: -1, bottom: -1, left: `calc(${ceilPct}% - 1px)`, width: 2, background: "var(--text)", opacity: .55 }} /> : null}
             </div>

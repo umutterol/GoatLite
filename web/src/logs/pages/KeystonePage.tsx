@@ -50,12 +50,12 @@ export function KeystonePage({ go }: { go: Go }) {
         {/* the keystone reveal */}
         <div style={{ marginTop: 24, perspective: 1000 }}>
           <div style={{ opacity: revealed ? 1 : 0, transform: revealed ? "translateY(0) scale(1)" : "translateY(16px) scale(.96)", transition: "all .55s cubic-bezier(.2,.8,.2,1)" }}>
-            <div style={{ position: "relative", borderRadius: 18, overflow: "hidden", border: "1px solid var(--line)", background: "linear-gradient(160deg, #1c1f27, #131419)", boxShadow: "0 18px 50px rgba(0,0,0,.5)" }}>
-              <div style={{ position: "absolute", inset: 0, background: "radial-gradient(120% 90% at 50% 0%, rgba(43,182,164,.22), transparent 60%)", opacity: revealed ? 1 : 0, transition: "opacity .8s ease .2s" }} />
+            <div style={{ position: "relative", borderRadius: 18, overflow: "hidden", border: "1px solid var(--line)", background: "#1c1f27", boxShadow: "0 18px 50px rgba(0,0,0,.5)" }}>
+              <div style={{ position: "absolute", inset: 0, background: "rgba(43,182,164,.10)", opacity: revealed ? 1 : 0, transition: "opacity .8s ease .2s" }} />
               <div style={{ position: "relative", padding: "34px 30px 30px" }}>
                 <div className="eyebrow" style={{ marginBottom: 10 }}>New Keystone</div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 18 }}>
-                  <div style={{ width: 84, height: 84, borderRadius: 18, background: "linear-gradient(150deg, var(--accent), var(--accent-dim))", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}>
+                  <div style={{ width: 84, height: 84, borderRadius: 18, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}>
                     <span className="mono" style={{ fontWeight: 700, fontSize: 16, color: "#04201d" }}>{k.dungeonShort}</span>
                   </div>
                   <div style={{ textAlign: "left" }}>

@@ -6,13 +6,6 @@ import { Panel } from "../components"
 const CRESTS = ["#2bb6a4", "#f0a52e", "#a98ce0", "#e0626b", "#56a8ff", "#4ec77b", "#c41f3b", "#e5cc80"]
 const CREST_GLYPHS = ["⚔", "☠", "✦", "❖", "⛨", "✷", "✪", "♆"]
 
-function shade(hex: string, amt: number): string {
-  const h = hex.replace("#", "")
-  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16)
-  const f = (c: number) => Math.max(0, Math.min(255, Math.round(c + (amt < 0 ? c * amt : (255 - c) * amt))))
-  return "#" + [f(r), f(g), f(b)].map((c) => c.toString(16).padStart(2, "0")).join("")
-}
-
 export function GuildCreatePage() {
   const game = useGame()
   const [name, setName] = useState("")
@@ -35,9 +28,9 @@ export function GuildCreatePage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 22, alignItems: "start" }}>
           {/* live crest preview */}
-          <div className="panel" style={{ padding: 24, position: "sticky", top: 20, textAlign: "center", background: `linear-gradient(160deg, ${crest}14, var(--panel))` }}>
+          <div className="panel" style={{ padding: 24, position: "sticky", top: 20, textAlign: "center", background: "var(--panel)" }}>
             <div className="eyebrow" style={{ marginBottom: 16 }}>Preview</div>
-            <div style={{ width: 132, height: 132, margin: "0 auto", borderRadius: 24, background: `linear-gradient(150deg, ${crest}, ${shade(crest, -0.4)})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "inset 0 2px 0 rgba(255,255,255,.18)", border: `2px solid ${crest}` }}>
+            <div style={{ width: 132, height: 132, margin: "0 auto", borderRadius: 24, background: crest, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "inset 0 2px 0 rgba(255,255,255,.18)", border: `2px solid ${crest}` }}>
               <span style={{ fontSize: 64, color: "#0c0d11", lineHeight: 1 }}>{glyph}</span>
             </div>
             <div style={{ fontSize: 22, fontWeight: 700, marginTop: 18, color: crest, minHeight: 28 }}>{name.trim() ? "<" + name.trim() + ">" : "<Your Guild>"}</div>

@@ -35,9 +35,9 @@ export function RosterPage({ goChar }: { goChar: GoChar }) {
     <div className="page-scroll" style={{ padding: 24 }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         {/* guild header */}
-        <div className="panel" style={{ padding: 22, marginBottom: 18, display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(110deg, #1c1f27, #16171c)" }}>
+        <div className="panel" style={{ padding: 22, marginBottom: 18, display: "flex", alignItems: "center", justifyContent: "space-between", background: "#1c1f27" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <div style={{ width: 58, height: 58, borderRadius: 12, background: `linear-gradient(150deg, ${crest}, ${crest}88)`, display: "flex", alignItems: "center", justifyContent: "center", color: "#04201d", fontWeight: 700, fontSize: 28, border: `2px solid ${crest}` }}>{g.guild?.glyph ?? "G"}</div>
+            <div style={{ width: 58, height: 58, borderRadius: 12, background: crest, display: "flex", alignItems: "center", justifyContent: "center", color: "#04201d", fontWeight: 700, fontSize: 28, border: `2px solid ${crest}` }}>{g.guild?.glyph ?? "G"}</div>
             <div>
               <div style={{ fontSize: 24, fontWeight: 700, whiteSpace: "nowrap" }}>&lt;{g.guild?.name ?? "Greatest of All Time"}&gt;</div>
             </div>

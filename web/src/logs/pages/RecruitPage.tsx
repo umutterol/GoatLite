@@ -138,8 +138,8 @@ function ScoutDetail({ r }: { r: ReturnType<typeof useGame>["recruits"][number] 
   return (
     <div className="panel" style={{ position: "sticky", top: 12, overflow: "hidden" }}>
       {/* header */}
-      <div style={{ padding: "16px 16px 14px", display: "flex", gap: 13, alignItems: "center", background: `linear-gradient(120deg, ${info.color}1f, transparent)`, borderBottom: "1px solid var(--line-soft)" }}>
-        <span style={{ width: 50, height: 50, borderRadius: "var(--radius)", background: `linear-gradient(150deg, ${info.color}, ${info.color}99)`, border: `2px solid ${info.color}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#0c0d11", fontSize: 23, flex: "none" }}>{r.name[0]}</span>
+      <div style={{ padding: "16px 16px 14px", display: "flex", gap: 13, alignItems: "center", background: `${info.color}1f`, borderBottom: "1px solid var(--line-soft)" }}>
+        <span style={{ width: 50, height: 50, borderRadius: "var(--radius)", background: info.color, border: `2px solid ${info.color}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#0c0d11", fontSize: 23, flex: "none" }}>{r.name[0]}</span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ color: info.color, fontWeight: 700, fontSize: 19 }}>{r.name}</div>
           <div style={{ color: "var(--faint)", fontSize: 12.5, display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}><GameIcon kind="spec" id={r.specId} size={13} color={info.color} label={info.subspec} />{info.subspec} {info.klass}</div>

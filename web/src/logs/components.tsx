@@ -29,8 +29,8 @@ export function ItemIcon({ item, size = 36 }: { item?: GearItem; size?: number }
   const q = item ? qualityColor(item.rarity) : "#444"
   const letter = item ? ((content.itemSlots.get(item.slot)?.name ?? item.slot)[0] ?? "?") : "—"
   return (
-    <span style={{ position: "relative", width: size, height: size, flex: "none", borderRadius: Math.round(size * 0.19), border: `1.5px solid ${q}`, background: "linear-gradient(145deg,#23252e,#15161b)", display: "inline-flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-      <span style={{ position: "absolute", fontFamily: "IBM Plex Mono, monospace", fontWeight: 700, fontSize: Math.round(size * 0.36), color: q, opacity: .9 }}>{letter}</span>
+    <span style={{ position: "relative", width: size, height: size, flex: "none", borderRadius: Math.round(size * 0.19), border: `1.5px solid ${q}`, background: "#1b1d24", display: "inline-flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+      <span style={{ position: "absolute", fontFamily: "var(--mono)", fontWeight: 700, fontSize: Math.round(size * 0.36), color: q, opacity: .9 }}>{letter}</span>
       {item ? <img key={item.baseId} src={`/icons/item-${item.baseId}.png`} width={size - 3} height={size - 3} alt=""
         onError={(e) => { e.currentTarget.style.display = "none" }}
         style={{ position: "relative", objectFit: "cover", borderRadius: "var(--radius)" }} /> : null}
@@ -235,7 +235,7 @@ export function DamageTable({ rows, metric = "dps" }: { rows: DmgRow[]; metric?:
           <div className="dd-row" key={d.id}>
             <div className="dd-rank">{i + 1}</div>
             <div className="dd-name-cell">
-              <div className="dd-fill" style={{ width: (d.amount / max) * 100 + "%", background: `linear-gradient(90deg, ${info.color}cc, ${info.color}55)`, boxShadow: `inset 2px 0 0 ${info.color}` }} />
+              <div className="dd-fill" style={{ width: (d.amount / max) * 100 + "%", background: `${info.color}cc`, boxShadow: `inset 2px 0 0 ${info.color}` }} />
               <div className="dd-name">
                 <Parse p={d.parse} />
                 <span className="nm" style={{ color: info.color }}>{d.name}</span>
@@ -267,7 +267,7 @@ export function Meter({ rows, metric = "dps", segName, total, duration }: { rows
           const info = mc(d.specId)
           return (
             <div className="meter-row" key={d.id}>
-              <div className="meter-bar" style={{ width: (d.amount / max) * 100 + "%", background: `linear-gradient(90deg, ${info.color}, ${info.color}aa)` }} />
+              <div className="meter-bar" style={{ width: (d.amount / max) * 100 + "%", background: info.color }} />
               <div className="meter-content">
                 <span className="ml"><span style={{ opacity: .8 }}>{i + 1}.</span>{d.name}</span>
                 <span className="mr">{fmt(rate(d))} <span style={{ opacity: .7 }}>({d.pct.toFixed(1)}%)</span></span>

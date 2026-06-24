@@ -30,12 +30,12 @@ export function CharacterPage({ id, go }: { id: string; go: Go; goChar: GoChar }
     <div className="page-scroll">
       {/* hero banner */}
       <div style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid var(--line)" }}>
-        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(110deg, ${info.color}33, transparent 55%), linear-gradient(180deg, #15171d, var(--bg))` }} />
-        <div style={{ position: "absolute", inset: 0, opacity: .5, background: `radial-gradient(120% 140% at 0% 0%, ${info.color}22, transparent 50%)` }} />
+        <div style={{ position: "absolute", inset: 0, background: "var(--bg-grad-top)" }} />
+        <div style={{ position: "absolute", inset: 0, opacity: .5, background: `${info.color}14` }} />
         <div style={{ position: "relative", maxWidth: 1280, margin: "0 auto", padding: "22px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
             <button className="btn btn-ghost btn-sm" onClick={() => go("roster")} style={{ position: "absolute", top: -2, left: 0 }}>← Roster</button>
-            <div style={{ width: 92, height: 92, borderRadius: 16, marginTop: 14, background: `linear-gradient(150deg, ${info.color}, ${info.color}99)`, border: `2px solid ${info.color}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#0c0d11", fontWeight: 700, fontSize: 44 }}>{m.name[0]}</div>
+            <div style={{ width: 92, height: 92, borderRadius: 16, marginTop: 14, background: info.color, border: `2px solid ${info.color}`, display: "flex", alignItems: "center", justifyContent: "center", color: "#0c0d11", fontWeight: 700, fontSize: 44 }}>{m.name[0]}</div>
             <div style={{ marginTop: 14 }}>
               <div style={{ fontSize: 30, fontWeight: 700, color: info.color, lineHeight: 1.1 }}>{m.name}</div>
               {m.title ? <div style={{ color: "var(--muted)", fontSize: 14, marginTop: 2 }}>{m.name} {m.title}</div> : null}
@@ -75,7 +75,7 @@ export function CharacterPage({ id, go }: { id: string; go: Go; goChar: GoChar }
                   <tr key={r.short}>
                     <td>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span style={{ width: 26, height: 26, borderRadius: 6, background: "var(--panel-3)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "var(--muted)", fontFamily: "IBM Plex Mono, monospace", flex: "none" }}>{r.short}</span>
+                        <span style={{ width: 26, height: 26, borderRadius: 6, background: "var(--panel-3)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "var(--muted)", fontFamily: "var(--mono)", flex: "none" }}>{r.short}</span>
                         <span style={{ fontWeight: 600 }}>{r.dungeon}</span>
                       </div>
                     </td>
