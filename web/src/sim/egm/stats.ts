@@ -58,6 +58,9 @@ export const ENEMY_ATTACK_INTERVAL = SIM.enemyAttackInterval ?? 1.0
 // DR buffs) can never cut a hit below this fraction of its pre-mitigation size (i.e. mitigation caps at a 60% reduction).
 // Shields (a finite pool) and HoTs (separate healing) are deliberately NOT clamped here — they're recost in P.5.
 export const INTAKE_FLOOR_FRAC = SIM.intakeFloorFrac ?? 0.4
+// item-stats M3: gear secondary RATING → effect %. 1% per this many rating points (so a full-Epic stat total ~360
+// rating ≈ 18%). Versatility's intake side folds into the floored intake channel; Crit Damage adds to the multiplier.
+export const SECONDARY_RATING_K = (SIM.secondaryRatingK as number) ?? 20
 
 export type Role = "tank" | "healer" | "dps"
 const ROLE: Record<string, Role> = { Tank: "tank", Healer: "healer", DPS: "dps" }
@@ -213,7 +216,7 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
   const rm = content.tuning.roleModel as Record<string, Record<string, number>>
   const hq = content.tuning.hitQuality as Record<string, unknown>
   const baseCrit = (hq.baseCrit as number) ?? 0.05
-  const critMult = ((hq.critMultiplier as number[]) ?? [1.5, 2.0])[1] ?? 2.0
+  const baseCritMult = ((hq.critMultiplier as number[]) ?? [1.5, 2.0])[1] ?? 2.0
 
   return party.map((p) => {
     const spec = content.specs.get(p.specId)!
@@ -222,13 +225,20 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
     // item-stats M2: power/HP/armour scale off the gear-derived effective ilvl (Σ mainStat/MAIN_K, rarity+slot-weighted).
     // Absent (harnesses set raw ilvl) → falls back to plain ilvl → byte-identical. Rarity's spike rides here.
     const il = p.effIlvl ?? p.ilvl
+    // item-stats M3: gear secondary ratings → effect %. Haste→attack speed · Crit Chance→crit% · Crit Damage→crit
+    // multiplier · Versatility→ +output% and −intake% (the intake side folds into the floored intake channel below).
+    const sec = p.secondaries ?? {}
+    const hastePct = (sec.haste ?? 0) / SECONDARY_RATING_K
+    const critChancePts = (sec.critChance ?? 0) / SECONDARY_RATING_K     // percentage points of crit chance
+    const critDmgPts = (sec.critDamage ?? 0) / SECONDARY_RATING_K        // added to the crit multiplier (×0.01)
+    const versPct = (sec.versatility ?? 0) / SECONDARY_RATING_K          // +output%, −intake%
     const power = c.powerPerIlvl * il * moraleMult(p.morale) * aggressionOutput
-    const haste = 0 // M3 wires Haste from p.secondaries here
+    const haste = hastePct
     const attackInterval = ATTACK_INTERVAL_BASE / (1 + haste / 100)
     const tal = resolveTalents(p.talents, p.specId)   // M7: filter to global + this spec's nodes
     const op = resolveOperator(p.skills, p.traitIds)   // Phase F: operator skills + trait combat → multipliers
-    // H.3: talent intakePct folds into the operator (uniform) intake channel
-    const intakeStatic = Math.max(0.2, Math.min(2, op.intakeStatic * (1 + tal.intakePct / 100)))
+    // H.3: talent intakePct + item-stats Versatility fold into the operator (uniform, floored) intake channel
+    const intakeStatic = Math.max(0.2, Math.min(2, op.intakeStatic * (1 + tal.intakePct / 100) * (1 - versPct / 100)))
     const maxHp = c.hpPerIlvl * il * tal.hpMult * op.hpMult
     const baseAbilities = [...content.playerAbilities.values()].filter((a) => a.specId === p.specId && a.trigger === "active")
     const basePassive = [...content.playerAbilities.values()].find((a) => a.specId === p.specId && a.trigger === "passive") ?? null
@@ -242,14 +252,15 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
       attackInterval,
       damageType: autoDamageType(spec.classId, p.specId),
       armour: (c.armourPerIlvl ?? 0) * il, resist: 0,
-      critChance: Math.max(0, baseCrit + dialCrit + op.critBonus + tal.critPct / 100), critMult,
+      critChance: Math.max(0, baseCrit + dialCrit + op.critBonus + tal.critPct / 100 + critChancePts / 100),
+      critMult: baseCritMult + critDmgPts / 100,
       dodgeChance: op.dodgeBonus, damageTakenPct: 0,
       mana: c.mana ?? 0, maxMana: c.mana ?? 0, healCost: c.healCost ?? 0,
       manaRegen: c.manaRegenPerSec ?? 0, hps: (c.hpsPerIlvl ?? 0) * il,
       nextActionAt: 0, downedUntil: -1, dmgDone: 0, healDone: 0, deaths: 0, isBoss: false,
       abilities, passive, cooldowns: {}, statuses: [], resources: {}, hitSinceAction: false, lastActionAt: 0,
       emergencyHealed: false, guards: {}, talents: tal.dmg, talentCondIntake: tal.condIntake, talentCondCrit: tal.condCrit, talentEventRiders: tal.eventRiders, talentAtonement: tal.atonement,
-      intakeMult: intakeStatic, opOutputMult: op.outputMult, opClutchOutMult: op.clutchOutMult,
+      intakeMult: intakeStatic, opOutputMult: op.outputMult * (1 + versPct / 100), opClutchOutMult: op.clutchOutMult,
       opIntakeStatic: intakeStatic, opClutchIntakeMult: op.clutchIntakeMult,
     }
   })

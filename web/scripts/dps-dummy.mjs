@@ -8,6 +8,7 @@ import { createServer } from "vite"
 
 const ILVL = Number(process.argv[2] ?? 150)
 const RARITY = Number(process.argv[3] ?? 1)   // item-stats: effIlvl = ILVL × rarityMult (1.0 Common … 1.25 Epic) to show the gear spike
+const SEC = Number(process.argv[4] ?? 0)      // item-stats M3: per-stat secondary RATING (haste/crit/critDmg/vers each), 0 = none
 const server = await createServer({ server: { middlewareMode: true }, appType: "custom", logLevel: "error" })
 try {
   const { content } = await server.ssrLoadModule("/src/content/index.ts")
@@ -36,7 +37,8 @@ try {
     for (const seed of seeds) {
       const r = runDungeonEGM({ dungeonId: `dps-${n}`, keyLevel: 2, affixIds: [], aggression: "Balanced", seed,
         tactics: { interrupts: 0, positioning: 0, cooldowns: 0, killorder: 0 },
-        party: [{ id: "m0", name: specId, specId, ilvl: ILVL, effIlvl: ILVL * RARITY, morale: 60, traitIds: [] }] })
+        party: [{ id: "m0", name: specId, specId, ilvl: ILVL, effIlvl: ILVL * RARITY, morale: 60, traitIds: [],
+          secondaries: SEC ? { haste: SEC, critChance: SEC, critDamage: SEC, versatility: SEC } : undefined }] })
       const last = r.series.filter(Boolean).at(-1)
       sum += (last ? last[0] : 0) / Math.max(1, r.durationSec)
     }
