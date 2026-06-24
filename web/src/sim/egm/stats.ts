@@ -61,6 +61,11 @@ export const INTAKE_FLOOR_FRAC = SIM.intakeFloorFrac ?? 0.4
 // item-stats M3: gear secondary RATING → effect %. 1% per this many rating points (so a full-Epic stat total ~360
 // rating ≈ 18%). Versatility's intake side folds into the floored intake channel; Crit Damage adds to the multiplier.
 export const SECONDARY_RATING_K = (SIM.secondaryRatingK as number) ?? 20
+// Versatility's OUTPUT is a FLAT damage multiplier — nearly 1:1 DPS-per-rating, vs probabilistic crit (~0.5:1) — so at
+// full rate it was the strict best DPS stat for everyone (kills the which-2-of-4 choice). Its output runs at this
+// FRACTION of a dedicated offensive stat, so Crit/Haste win on raw DPS while Versatility stays the safe pick (its
+// −intake/survival side is unchanged + floored by INTAKE_FLOOR_FRAC).
+export const VERS_OUTPUT_FACTOR = (SIM.versOutputFactor as number) ?? 0.4
 
 export type Role = "tank" | "healer" | "dps"
 const ROLE: Record<string, Role> = { Tank: "tank", Healer: "healer", DPS: "dps" }
@@ -231,7 +236,7 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
     const hastePct = (sec.haste ?? 0) / SECONDARY_RATING_K
     const critChancePts = (sec.critChance ?? 0) / SECONDARY_RATING_K     // percentage points of crit chance
     const critDmgPts = (sec.critDamage ?? 0) / SECONDARY_RATING_K        // added to the crit multiplier (×0.01)
-    const versPct = (sec.versatility ?? 0) / SECONDARY_RATING_K          // +output%, −intake%
+    const versPct = (sec.versatility ?? 0) / SECONDARY_RATING_K          // −intake% (full); +output% runs at VERS_OUTPUT_FACTOR (so vers isn't the universal best DPS stat)
     const power = c.powerPerIlvl * il * moraleMult(p.morale) * aggressionOutput
     const haste = hastePct
     const attackInterval = ATTACK_INTERVAL_BASE / (1 + haste / 100)
@@ -260,7 +265,7 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
       nextActionAt: 0, downedUntil: -1, dmgDone: 0, healDone: 0, deaths: 0, isBoss: false,
       abilities, passive, cooldowns: {}, statuses: [], resources: {}, hitSinceAction: false, lastActionAt: 0,
       emergencyHealed: false, guards: {}, talents: tal.dmg, talentCondIntake: tal.condIntake, talentCondCrit: tal.condCrit, talentEventRiders: tal.eventRiders, talentAtonement: tal.atonement,
-      intakeMult: intakeStatic, opOutputMult: op.outputMult * (1 + versPct / 100), opClutchOutMult: op.clutchOutMult,
+      intakeMult: intakeStatic, opOutputMult: op.outputMult * (1 + versPct * VERS_OUTPUT_FACTOR / 100), opClutchOutMult: op.clutchOutMult,
       opIntakeStatic: intakeStatic, opClutchIntakeMult: op.clutchIntakeMult,
     }
   })
