@@ -77,14 +77,11 @@ export function RecruitPage({ go }: { go: Go }) {
                       style={{ cursor: "pointer", background: isSel ? "rgba(43,182,164,.08)" : undefined, boxShadow: isSel ? "inset 2px 0 0 var(--accent)" : undefined }}>
                       <td>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <span style={{ width: 30, height: 30, borderRadius: "var(--radius)", background: info.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#0c0d11", fontSize: 14, flex: "none", opacity: isSigned ? .7 : 1 }}>{r.name[0]}</span>
-                          <div style={{ minWidth: 0 }}>
-                            <div style={{ color: info.color, fontWeight: 700, fontSize: 14 }}>{r.name}{isSigned ? <span style={{ color: "var(--accent)", fontSize: 11, marginLeft: 6 }}>✓</span> : null}</div>
-                            <div style={{ color: "var(--faint)", fontSize: 11.5, display: "flex", alignItems: "center", gap: 5 }}><GameIcon kind="spec" id={r.specId} size={11} color={info.color} label={info.subspec} />{info.subspec} {info.klass}</div>
-                          </div>
+                          <span style={{ width: 34, height: 34, borderRadius: "var(--radius)", background: "var(--panel-3)", border: `1.5px solid ${info.color}`, display: "flex", alignItems: "center", justifyContent: "center", flex: "none", opacity: isSigned ? .7 : 1 }}><GameIcon kind="spec" id={r.specId} size={24} color={info.color} label={`${info.subspec} ${info.klass}`} /></span>
+                          <span style={{ color: info.color, fontWeight: 700, fontSize: 14.5 }}>{r.name}{isSigned ? <span style={{ color: "var(--accent)", fontSize: 11, marginLeft: 6 }}>✓</span> : null}</span>
                         </div>
                       </td>
-                      <td><RolePill role={r.role} /></td>
+                      <td><RolePill role={r.role} iconOnly /></td>
                       <td className="r mono" style={{ fontWeight: 600 }}>{r.ilvl}</td>
                       <td className="r"><span className="mono" style={{ fontWeight: 700, fontSize: 15, color: corColor(r.cor) }}>{r.cor}</span></td>
                       <td><Stars value={r.stars} size={13} /></td>

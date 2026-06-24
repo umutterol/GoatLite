@@ -89,14 +89,11 @@ export function RosterPage({ goChar }: { goChar: GoChar }) {
                     <td className="mono" style={{ color: "var(--faint)" }}>{i + 1}</td>
                     <td>
                       <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-                        <span style={{ width: 30, height: 30, borderRadius: 7, background: info.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#0c0d11", fontSize: 14, flex: "none" }}>{r.name[0]}</span>
-                        <div>
-                          <div style={{ color: info.color, fontWeight: 700, fontSize: 14.5 }}>{r.name}</div>
-                          <div style={{ color: "var(--faint)", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}><GameIcon kind="spec" id={r.spec} size={12} color={info.color} label={`${info.subspec} ${info.klass}`} />{info.subspec} {info.klass}</div>
-                        </div>
+                        <span style={{ width: 34, height: 34, borderRadius: 7, background: "var(--panel-3)", border: `1.5px solid ${info.color}`, display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><GameIcon kind="spec" id={r.spec} size={24} color={info.color} label={`${info.subspec} ${info.klass}`} /></span>
+                        <span style={{ color: info.color, fontWeight: 700, fontSize: 15 }}>{r.name}</span>
                       </div>
                     </td>
-                    <td><RolePill role={r.role} /></td>
+                    <td><RolePill role={r.role} iconOnly /></td>
                     <td className="r mono" style={{ fontWeight: 600 }}>{r.ilvl}</td>
                     <td className="r"><span className="mono" style={{ fontWeight: 700, fontSize: 15, color: scoreColor(r.score) }}>{r.score}</span></td>
                     <td className="r"><span className="key-badge" style={{ color: "var(--amber)" }}>+{r.keyLvl}</span></td>
