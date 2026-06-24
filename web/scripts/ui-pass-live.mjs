@@ -25,9 +25,11 @@ try {
   await page.waitForTimeout(300)
   check(await page.evaluate(() => window.__game.phase) === "playing", "reached playing phase")
 
-  // ---- font sanity: body font-family resolves to Pixelify Sans ----
-  const fam = await page.evaluate(() => getComputedStyle(document.body).fontFamily)
-  check(/pixelify/i.test(fam), `body font is Pixelify Sans (got: ${fam})`)
+  // ---- font sanity: UI reverted to IBM Plex Sans; Pixelify is scoped to the chat (+ item display) ----
+  const bodyFam = await page.evaluate(() => getComputedStyle(document.body).fontFamily)
+  check(/IBM Plex Sans/i.test(bodyFam) && !/pixelify/i.test(bodyFam), `body font = IBM Plex Sans, not Pixelify (got: ${bodyFam})`)
+  const chatFam = await page.evaluate(() => { const el = document.querySelector(".guild-feed"); return el ? getComputedStyle(el).fontFamily : "" })
+  check(/pixelify/i.test(chatFam), `chat (.guild-feed) font = Pixelify (got: ${chatFam})`)
 
   // ---- no CSS gradients anywhere in the live DOM (flat-colors gate) ----
   const grad = await page.evaluate(() => {

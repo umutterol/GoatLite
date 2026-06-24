@@ -167,7 +167,7 @@ function ItemRow({ label, item }: { label: string; item?: GearItem }) {
     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "5px 7px", borderRadius: "var(--radius)", background: "var(--row)", width: "100%" }}>
       <ItemIcon item={item} size={36} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ color: qColor, fontWeight: 600, fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item?.name ?? "—"}</div>
+        <div className="pixel" style={{ color: qColor, fontWeight: 600, fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item?.name ?? "—"}</div>
         <div style={{ color: "var(--faint)", fontSize: 11, marginTop: 1 }}>{label}</div>
       </div>
       <span className="mono" style={{ fontSize: 13.5, fontWeight: 700, color: qColor, flex: "none" }}>{item?.ilvl ?? "—"}</span>

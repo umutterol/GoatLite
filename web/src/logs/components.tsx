@@ -30,7 +30,7 @@ export function ItemIcon({ item, size = 36 }: { item?: GearItem; size?: number }
   const letter = item ? ((content.itemSlots.get(item.slot)?.name ?? item.slot)[0] ?? "?") : "—"
   return (
     <span style={{ position: "relative", width: size, height: size, flex: "none", borderRadius: Math.round(size * 0.19), border: `1.5px solid ${q}`, background: "#1b1d24", display: "inline-flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-      <span style={{ position: "absolute", fontFamily: "var(--mono)", fontWeight: 700, fontSize: Math.round(size * 0.36), color: q, opacity: .9 }}>{letter}</span>
+      <span style={{ position: "absolute", fontFamily: "var(--font-pixel)", fontWeight: 700, fontSize: Math.round(size * 0.36), color: q, opacity: .9 }}>{letter}</span>
       {item ? <img key={item.baseId} src={`/icons/item-${item.baseId}.png`} width={size - 3} height={size - 3} alt=""
         onError={(e) => { e.currentTarget.style.display = "none" }}
         style={{ position: "relative", objectFit: "cover", borderRadius: "var(--radius)" }} /> : null}
@@ -43,7 +43,7 @@ export function ItemTip({ item, label }: { item: GearItem; label?: string }) {
   const q = qualityColor(item.rarity)
   const slotName = content.itemSlots.get(item.slot)?.name ?? item.slot
   return (
-    <div style={{ minWidth: 172, maxWidth: 260 }}>
+    <div className="pixel" style={{ minWidth: 172, maxWidth: 260 }}>
       <div style={{ fontWeight: 700, fontSize: 14, color: q, display: "flex", alignItems: "center", gap: 7 }}><ItemIcon item={item} size={22} />{item.name}</div>
       <div style={{ color: "var(--muted)", fontSize: 11.5, marginTop: 1, display: "flex", justifyContent: "space-between", gap: 14 }}>
         <span>{label ?? slotName}</span><span style={{ color: q }}>{item.rarity}</span>
