@@ -9,7 +9,7 @@ import {
   type SkillMap, type RevealMap, type OperatorProfile,
 } from "@/data/operator"
 import { generateBarks, type BarkMoment } from "./barks"
-import { Rng } from "@/sim/rng"
+import { Rng, seedFromString } from "@/sim/rng"
 import { rollItemStats, gearEffectiveIlvl, gearSecondaries, type ItemStats } from "./item-stats"
 
 const SAVE_KEY = "goatlite.save"
@@ -26,6 +26,7 @@ export interface GuildInfo { name: string; crest: string; glyph: string; motto: 
 export interface Recruit {
   id: string; name: string; specId: string; role: RoleKey; ilvl: number; score: number; morale: number
   traitId: string; traitName: string; traitGood: boolean; traitFlavor: string; cost: number
+  gear: Record<string, GearItem>   // their actual equipped paper-doll (varies by ilvl + recruit quality); inherited on sign
   // Phase F operator layer (rolled at generation; copied onto the member on sign)
   skills: SkillMap; ceilings: SkillMap; revealed: RevealMap; potentialProfile: OperatorProfile
   cor: number; stars: number   // derived display numbers: Current Operator Rating + Potential ★
@@ -70,6 +71,24 @@ function starterGear(specId: string, ilvl: number, memberId: string): Record<str
   const mainType = primaryStatOf(specId)
   for (const s of SLOTS) {
     const base = { uid: `starter-${memberId}-${s}`, baseId: "beta-standard-issue", name: `Worn ${content.itemSlots.get(s)!.name}`, slot: s, specs: [specId], ilvl, rarity: "Common" }
+    g[s] = { ...base, ...rollItemStats(base, mainType) }
+  }
+  return g
+}
+/** A recruit's actual equipped paper-doll: per-slot ilvl jitter around their headline ilvl (averages ≈ ilvl, so the
+    table/header number still reads true) + quality-weighted rarity — premium recruits (high ★) arrive with a few
+    Uncommon/Rare pieces, duds stay all-Common. Epic stays drop-only (key-gated). Deterministic from the recruit id so
+    the on-load backfill is stable and what you scout = what you sign. `quality` is 0..1 (derived from Potential ★). */
+function recruitGear(specId: string, ilvl: number, recruitId: string, quality: number): Record<string, GearItem> {
+  const g: Record<string, GearItem> = {}
+  const mainType = primaryStatOf(specId)
+  const rng = new Rng(seedFromString("gear-" + recruitId))
+  const q = Math.max(0, Math.min(1, quality))
+  for (const s of SLOTS) {
+    const slotIlvl = Math.max(95, ilvl + rng.int(-4, 4))
+    const roll = rng.next()
+    const rarity = roll < q * 0.18 ? "Rare" : roll < q * 0.5 ? "Uncommon" : "Common"
+    const base = { uid: `rec-${recruitId}-${s}`, baseId: "beta-standard-issue", name: `Worn ${content.itemSlots.get(s)!.name}`, slot: s, specs: [specId], ilvl: slotIlvl, rarity }
     g[s] = { ...base, ...rollItemStats(base, mainType) }
   }
   return g
@@ -154,12 +173,17 @@ function makeRecruit(role: RoleKey, bestIlvl: number, used: Set<string>): Recrui
   const veteranFrac = isDud ? 0.1 + Math.random() * 0.2 : 0.35 + Math.random() * 0.45
   const skills = rollSkills(ceilings, veteranFrac)
   const revealed = rollRevealMask()
+  const id = "rec-" + Math.random().toString(36).slice(2, 9)
+  const stars = potentialStars(ceilings, role)
+  // gear quality tracks Potential ★ — better prospects arrive better-equipped; duds stay all-Common
+  const quality = isDud ? 0 : Math.max(0, Math.min(1, (stars - 2) / 2.5))
   return {
-    id: "rec-" + Math.random().toString(36).slice(2, 9),
+    id,
     name, specId, role, ilvl, score, morale,
     traitId: trait.id, traitName: trait.name, traitGood: !isDud, traitFlavor: trait.effect, cost,
+    gear: recruitGear(specId, ilvl, id, quality),
     skills, ceilings, revealed, potentialProfile: profile,
-    cor: corOf(skills, role), stars: potentialStars(ceilings, role),
+    cor: corOf(skills, role), stars,
   }
 }
 function generateRecruits(bestIlvl: number, opts: { balanced?: boolean } = {}): Recruit[] {
@@ -275,6 +299,13 @@ function loadState(): GameState {
           gear: Object.fromEntries(Object.entries(m.gear ?? {}).map(([s, it]) => [s, withStats(it)])),
         }))
         merged.stash = (merged.stash ?? []).map(withStats)   // item-stats: backfill stashed gear too
+        // recruit gear is first-class now — backfill any pre-gear recruits (deterministic from id → stable; additive → no SAVE bump)
+        merged.recruits = (merged.recruits ?? []).map((r) => ({
+          ...r,
+          gear: r.gear && Object.keys(r.gear).length
+            ? Object.fromEntries(Object.entries(r.gear).map(([s, it]) => [s, withStats(it)]))
+            : recruitGear(r.specId, r.ilvl, r.id, r.traitGood ? Math.max(0, Math.min(1, ((r.stars ?? 0) - 2) / 2.5)) : 0),
+        }))
         // history changed shape (string[] → RunTicket[]) — drop any legacy/malformed entries so replay can't crash
         merged.history = ((merged.history as unknown[]) ?? []).filter((t): t is RunTicket =>
           !!t && typeof t === "object" && typeof (t as RunTicket).seed === "number" && Array.isArray((t as RunTicket).party) && typeof (t as RunTicket).aggression === "string")
@@ -411,7 +442,9 @@ function reducer(state: GameState, action: Action): GameState {
       if (!signed.length) return state
       const newMembers: RawMember[] = signed.map((rec) => ({
         id: "m-" + rec.id, name: rec.name, title: "", specId: rec.specId, morale: rec.morale,
-        portrait: pick(PORTRAITS), traitIds: [rec.traitId], gear: starterGear(rec.specId, rec.ilvl, "m-" + rec.id),
+        // inherit exactly the gear you scouted (what you see = what you sign); fall back to a fresh Common set if absent
+        portrait: pick(PORTRAITS), traitIds: [rec.traitId],
+        gear: rec.gear && Object.keys(rec.gear).length ? Object.fromEntries(Object.entries(rec.gear).map(([s, it]) => [s, gearFields(it)])) : starterGear(rec.specId, rec.ilvl, "m-" + rec.id),
         key: freshKey(),   // every recruit arrives holding their own random +2 key
         talents: {},       // starts on balanced defaults; player tunes per member
         // Phase F: carry over the scouted operator skills/ceilings; XP starts empty and grows with play

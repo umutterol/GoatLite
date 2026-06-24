@@ -1,9 +1,9 @@
 /* Step 2 / 5 — Recruitment: a Warcraft-Logs-style scouting board. Dense list (left) + scout detail panel (right).
    Two display numbers per recruit: precise Current Operator Rating (now) and a fuzzy Potential ★ (ceiling). */
 import { useState } from "react"
-import { useGame, type RoleKey } from "@/state/game-store"
-import { mc } from "../analytics"
-import { RolePill, GameIcon, Tip, TipBody } from "../components"
+import { useGame, type RoleKey, SLOTS } from "@/state/game-store"
+import { mc, qualityColor } from "../analytics"
+import { RolePill, GameIcon, Tip, TipBody, ItemIcon, ItemTip } from "../components"
 import { Stars, corColor, SkillBars, scoutBlurb, traitCombatSummary } from "../OperatorPanel"
 import type { Go } from "../LogsApp"
 
@@ -177,6 +177,19 @@ function ScoutDetail({ r }: { r: ReturnType<typeof useGame>["recruits"][number] 
       {/* scout report */}
       <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--line-soft)", background: "var(--row-alt)" }}>
         <div className="flux" style={{ fontSize: 12.5, fontStyle: "italic" }}>“{scoutBlurb(r.cor, r.stars)}”</div>
+      </div>
+
+      {/* equipped gear — a real paper-doll reflecting their ilvl (per-slot) + quality (rarity); inherited on sign */}
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--line-soft)" }}>
+        <div className="eyebrow" style={{ fontSize: 10, marginBottom: 9 }}>Equipped</div>
+        <div style={{ display: "flex", gap: 6 }}>
+          {SLOTS.map((s) => {
+            const it = r.gear?.[s]
+            return it
+              ? <Tip key={s} accent={qualityColor(it.rarity)} tip={<ItemTip item={it} />}><span style={{ display: "inline-flex" }}><ItemIcon item={it} size={36} /></span></Tip>
+              : <span key={s} style={{ width: 36, height: 36, borderRadius: "var(--radius)", border: "1px solid var(--line-soft)", display: "inline-block" }} />
+          })}
+        </div>
       </div>
 
       {/* operator skills */}
