@@ -3,9 +3,13 @@
 import { useState } from "react"
 import { useGame, type RoleKey } from "@/state/game-store"
 import { mc } from "../analytics"
-import { RolePill, GameIcon } from "../components"
+import { RolePill, GameIcon, Tip, TipBody } from "../components"
 import { Stars, corColor, SkillBars, scoutBlurb, traitCombatSummary } from "../OperatorPanel"
 import type { Go } from "../LogsApp"
+
+/** Canonical morale colour ramp (good ≥70 · amber ≥55 · danger) — shared by the table + the scout panel. */
+const moraleColor = (m: number): string => (m >= 70 ? "var(--good)" : m >= 55 ? "var(--amber)" : "var(--danger)")
+const MORALE_TIP = "How willing they are to show up and grind. Wins lift it, wipes tank it — high morale sharpens performance, and below 25 they may walk."
 
 export function RecruitPage({ go }: { go: Go }) {
   const g = useGame()
@@ -71,7 +75,6 @@ export function RecruitPage({ go }: { go: Go }) {
                   const isSigned = g.signedRecruitIds.includes(r.id)
                   const isSel = sel?.id === r.id
                   const afford = g.wallet.emblems >= r.cost
-                  const moraleColor = r.morale >= 70 ? "var(--good)" : r.morale >= 55 ? "var(--amber)" : "var(--danger)"
                   return (
                     <tr key={r.id} onClick={() => setSelId(r.id)}
                       style={{ cursor: "pointer", background: isSel ? "rgba(43,182,164,.08)" : undefined, boxShadow: isSel ? "inset 2px 0 0 var(--accent)" : undefined }}>
@@ -85,7 +88,7 @@ export function RecruitPage({ go }: { go: Go }) {
                       <td className="r mono" style={{ fontWeight: 600 }}>{r.ilvl}</td>
                       <td className="r"><span className="mono" style={{ fontWeight: 700, fontSize: 15, color: corColor(r.cor) }}>{r.cor}</span></td>
                       <td><Stars value={r.stars} size={13} /></td>
-                      <td className="r mono" style={{ color: moraleColor, fontWeight: 600 }}>{r.morale}%</td>
+                      <td className="r mono" style={{ color: moraleColor(r.morale), fontWeight: 600 }}>{r.morale}%</td>
                       <td className="r mono" style={{ color: afford || isSigned ? "var(--amber)" : "var(--danger)" }}>◈{r.cost}</td>
                       <td className="r">
                         {isSigned ? (
@@ -134,14 +137,27 @@ function ScoutDetail({ r }: { r: ReturnType<typeof useGame>["recruits"][number] 
   const combat = traitCombatSummary([r.traitId])
   return (
     <div className="panel" style={{ position: "sticky", top: 12, overflow: "hidden" }}>
-      {/* header */}
+      {/* header — spec icon fills a tight border; role is icon-only beside the name; ilvl + morale sit where the role pill used to */}
       <div style={{ padding: "16px 16px 14px", display: "flex", gap: 13, alignItems: "center", background: `${info.color}1f`, borderBottom: "1px solid var(--line-soft)" }}>
-        <span style={{ width: 50, height: 50, borderRadius: "var(--radius)", background: info.color, border: `2px solid ${info.color}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#0c0d11", fontSize: 23, flex: "none" }}>{r.name[0]}</span>
+        <span style={{ width: 52, height: 52, borderRadius: "var(--radius)", background: "var(--panel-3)", border: `1.5px solid ${info.color}`, display: "flex", alignItems: "center", justifyContent: "center", flex: "none", overflow: "hidden" }}>
+          <GameIcon kind="spec" id={r.specId} size={46} color={info.color} label={`${info.subspec} ${info.klass}`} />
+        </span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ color: info.color, fontWeight: 700, fontSize: 19 }}>{r.name}</div>
-          <div style={{ color: "var(--faint)", fontSize: 12.5, display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}><GameIcon kind="spec" id={r.specId} size={13} color={info.color} label={info.subspec} />{info.subspec} {info.klass}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ color: info.color, fontWeight: 700, fontSize: 19, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.name}</span>
+            <RolePill role={r.role} iconOnly />
+          </div>
+          <div style={{ color: "var(--faint)", fontSize: 12.5, marginTop: 2 }}>{info.subspec} {info.klass}</div>
         </div>
-        <RolePill role={r.role} />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 5, flex: "none" }}>
+          <div style={{ textAlign: "right" }}>
+            <div className="eyebrow" style={{ fontSize: 8.5, lineHeight: 1 }}>iLvl</div>
+            <div className="mono" style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.1 }}>{r.ilvl}</div>
+          </div>
+          <Tip tip={<TipBody title="Morale" desc={MORALE_TIP} />}>
+            <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: moraleColor(r.morale), cursor: "help" }}>{r.morale}% <span style={{ color: "var(--faint)", fontWeight: 400, fontSize: 9.5 }}>mrl</span></span>
+          </Tip>
+        </div>
       </div>
 
       {/* the two scouting numbers */}
