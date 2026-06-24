@@ -175,9 +175,9 @@ function ScoutDetail({ r }: { r: ReturnType<typeof useGame>["recruits"][number] 
         </div>
       </div>
 
-      {/* scout report */}
+      {/* scout report — fixed 2-line height (clamped) so the panel stays one constant height across recruits */}
       <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--line-soft)", background: "var(--row-alt)" }}>
-        <div className="flux" style={{ fontSize: 12.5, fontStyle: "italic" }}>“{scoutBlurb(r.cor, r.stars)}”</div>
+        <div className="flux" title={scoutBlurb(r.cor, r.stars)} style={{ fontSize: 12.5, fontStyle: "italic", lineHeight: 1.4, height: 35, display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 2, overflow: "hidden" }}>“{scoutBlurb(r.cor, r.stars)}”</div>
       </div>
 
       {/* equipped gear — a real paper-doll reflecting their ilvl (per-slot) + quality (rarity); inherited on sign */}
@@ -208,7 +208,7 @@ function ScoutDetail({ r }: { r: ReturnType<typeof useGame>["recruits"][number] 
           <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".04em", textTransform: "uppercase", padding: "2px 9px", borderRadius: "var(--radius)", color: r.traitGood ? "var(--good)" : "var(--danger)", background: r.traitGood ? "rgba(78,199,123,.12)" : "rgba(224,68,78,.12)", border: `1px solid ${r.traitGood ? "rgba(78,199,123,.32)" : "rgba(224,68,78,.32)"}` }}>{r.traitName}</span>
           {combat ? <span className="mono" style={{ fontSize: 11, color: "var(--muted)" }}>{combat}</span> : null}
         </div>
-        <div className="flux" style={{ fontSize: 12.5, minHeight: 32 }}>{r.traitFlavor}</div>
+        <div className="flux" title={r.traitFlavor} style={{ fontSize: 12.5, lineHeight: 1.4, height: 35, display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 2, overflow: "hidden" }}>{r.traitFlavor}</div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 14 }}>
           <span className="mono" style={{ fontSize: 13, color: afford || isSigned ? "var(--amber)" : "var(--danger)" }}>◈ {r.cost} emblems</span>
           {isSigned ? (

@@ -49,6 +49,16 @@ try {
   check(/iLvl/i.test(header?.txt || "") || /\bmrl\b/i.test(header?.txt || ""), "panel header shows iLvl / morale block")
   check(/aptitudes/i.test(header?.txt || ""), "section renamed to Aptitudes")
 
+  // #2: the scout panel must be ONE constant height regardless of which recruit (trait/blurb length) is selected
+  const heights = []
+  for (let i = 0; i < n; i++) {
+    await rows.nth(i).click().catch(() => {})
+    await page.waitForTimeout(120)
+    heights.push(await page.evaluate(() => { const p = [...document.querySelectorAll(".panel")].pop(); return p ? p.offsetHeight : -1 }))
+  }
+  const uniq = [...new Set(heights)]
+  check(uniq.length === 1, `scout panel is a constant height across all ${n} recruits — heights: ${uniq.join(", ")}`)
+
   // Talents (added in finding #4): a 'Talents' button opens a popup grid. Only assert if present.
   const talentsBtn = page.locator("button", { hasText: /^Talents/ }).first()
   if (await talentsBtn.count()) {
