@@ -228,9 +228,11 @@ interface GameState extends PersistState {
   lastRunOwnerId: string | null       // which member's key the last run used (for loot/progression)
   lastRunKey: MemberKey | null        // snapshot of that key as it was at run time (for the report header)
   autoplaySeed: number | null         // the just-run's seed — its Report auto-plays once, then this is consumed
+  watchedSeed: number | null          // the run the player has fully watched once → results (HUD/loot/feed) unlock
+  pendingFeed: FeedPartial[] | null   // deferred outcome/loot feed lines — pushed only once the run is watched (no spoilers)
 }
 const DEFAULT_CONFIG: RunConfig = { tactics: { interrupts: 2, positioning: 1, cooldowns: 1, killorder: 2 }, aggression: "Balanced" }
-const TRANSIENT = { lastResult: null, lastLoot: null, lastConfig: null, pendingLoot: null, lastKeystoneChange: null, lastRunOwnerId: null, lastRunKey: null, autoplaySeed: null } as const
+const TRANSIENT = { lastResult: null, lastLoot: null, lastConfig: null, pendingLoot: null, lastKeystoneChange: null, lastRunOwnerId: null, lastRunKey: null, autoplaySeed: null, watchedSeed: null, pendingFeed: null } as const
 
 function freshState(): GameState {
   return {
@@ -314,6 +316,7 @@ type Action =
   | { type: "TOGGLE_PARTY"; id: string }
   | { type: "SELECT_KEY"; ownerId: string }
   | { type: "CONSUME_AUTOPLAY" }
+  | { type: "MARK_WATCHED"; seed: number }
   | { type: "SET_TALENT"; memberId: string; nodeId: string; optionId: string }
   | { type: "EQUIP"; memberId: string; uid: string }
   | { type: "RAN_KEY"; result: RunResult; config: RunConfig; ownerId: string; runKey: MemberKey; ticket: RunTicket }
@@ -491,13 +494,19 @@ function reducer(state: GameState, action: Action): GameState {
       return {
         ...state, lastResult: action.result, lastConfig: action.config,
         lastRunOwnerId: action.ownerId, lastRunKey: action.runKey, autoplaySeed: action.result.seed,
+        // gate: the outcome/loot feed lines are DEFERRED (held in pendingFeed) so the always-visible chat doesn't
+        // spoil the result before the player has watched the replay — they're flushed on MARK_WATCHED.
+        watchedSeed: null, pendingFeed: runLines,
         lastLoot: null, pendingLoot: drops,
         history: [action.ticket, ...state.history].slice(0, 50),   // record every run for the Reports list
-        ...pushFeed(state, ...runLines),
       }
     }
     case "CONSUME_AUTOPLAY":
       return state.autoplaySeed == null ? state : { ...state, autoplaySeed: null }
+    case "MARK_WATCHED":
+      // first full watch of a run → unlock its results and flush the deferred outcome/loot feed lines
+      return state.watchedSeed === action.seed ? state
+        : { ...state, watchedSeed: action.seed, pendingFeed: null, ...pushFeed(state, ...(state.pendingFeed ?? [])) }
     case "CONFIRM_LOOT": {
       const r = state.lastResult
       if (!r) return state
@@ -705,6 +714,8 @@ interface GameApi {
   lastKeystoneChange: KeystoneChange | null
   autoplaySeed: number | null
   consumeAutoplay: () => void
+  watchedSeed: number | null
+  markRunWatched: (seed: number) => void
   history: RunTicket[]
   feed: FeedEntry[]
   replayTicket: (t: RunTicket) => RunResult
@@ -791,6 +802,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       lastKeystoneChange: state.lastKeystoneChange,
       autoplaySeed: state.autoplaySeed,
       consumeAutoplay: () => dispatch({ type: "CONSUME_AUTOPLAY" }),
+      watchedSeed: state.watchedSeed,
+      markRunWatched: (seed: number) => dispatch({ type: "MARK_WATCHED", seed }),
       history: state.history,
       feed: state.feed,
       replayTicket,

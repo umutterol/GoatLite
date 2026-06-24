@@ -52,7 +52,10 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
   // StrictMode-safe). Historical runs & re-visits show the finished report (paused) — press play to re-watch.
   useEffect(() => {
     if (!result) return
-    if (result.seed === g.autoplaySeed) { setClock(0); setPlaying(true); g.consumeAutoplay() }
+    // an unwatched current run ALWAYS starts at 0 and plays (forced watch) — closes the navigate-away-and-back bypass;
+    // everything else (already-watched current run, or a historical re-view) opens at the end, fully revealed.
+    const current = isLatest && !!g.lastResult && g.lastResult.seed === result.seed
+    if (current && g.watchedSeed !== result.seed) { setClock(0); setPlaying(true); setSpeed(1); if (result.seed === g.autoplaySeed) g.consumeAutoplay() }
     else { setClock(playEnd); setPlaying(false) }
   }, [result?.seed]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -68,6 +71,14 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
     }, 120)
     return () => clearInterval(iv)
   }, [playing, speed, playEnd, result])
+
+  // watch-gate: once the freshly-run key's replay reaches the end, lock in "watched" → reveal results + flush the
+  // deferred outcome/loot feed lines (marked once; re-views/history start at playEnd so they never gate).
+  useEffect(() => {
+    if (!result) return
+    const current = isLatest && !!g.lastResult && g.lastResult.seed === result.seed
+    if (clock >= playEnd && current && g.watchedSeed !== result.seed) g.markRunWatched(result.seed)
+  }, [clock, playEnd, isLatest, result, g.lastResult, g.watchedSeed]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!result || !R) {
     return (
@@ -92,6 +103,11 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
   const visibleDeaths = result.deaths.filter((d) => d.tSec <= clock)
   const activeFight = R.fights.find((f) => f.id !== "all" && clock >= f.start && clock < f.end) ?? R.fights[R.fights.length - 1]
   const showAction = isLatest && !!g.lastResult   // loot/continue only applies to the current, unfinished run
+  // watch-gate: the freshly-run key hides ALL results (outcome, deaths, loot) + locks the transport (no scrub-ahead,
+  // no fast-forward) until the replay has played out once. Re-views / history tickets start at playEnd ⇒ already revealed.
+  const isCurrentRun = isLatest && !!g.lastResult && g.lastResult.seed === result.seed
+  const revealed = !isCurrentRun || finished || g.watchedSeed === result.seed
+  const gated = !revealed
   const hasLoot = (g.pendingLoot?.length ?? 0) > 0
   const distribute = () => { if (hasLoot) go("loot"); else { g.confirmLoot({}); go("keystone") } }
   const seek = (t: number) => setClock(Math.max(0, Math.min(duration, t)))
@@ -118,8 +134,7 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
                 <span className="fight-ic" style={{ background: oc, borderRadius: 3 }} />
                 <span className="fight-nm">{t.ownerName} · +{t.keyLevel}{i === 0 ? <span style={{ color: "var(--faint)", fontWeight: 400 }}> · latest</span> : null}</span>
                 <span className="fight-meta mono">
-                  {t.deaths > 0 ? <span style={{ color: "var(--danger)", marginRight: 6 }}>☠{t.deaths}</span> : null}
-                  {mmss(t.durationSec)}
+                  {gated && t.seed === result.seed ? "···" : <>{t.deaths > 0 ? <span style={{ color: "var(--danger)", marginRight: 6 }}>☠{t.deaths}</span> : null}{mmss(t.durationSec)}</>}
                 </span>
               </div>
             )
@@ -130,12 +145,11 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
             const tint = f.type === "boss" ? "var(--amber)" : f.type === "all" ? "var(--accent)" : "#5b6472"
             const isActive = f.id === "all" ? false : f.id === activeFight.id
             return (
-              <div key={f.id} className={"fight" + (isActive ? " active" : "")} onClick={() => f.id === "all" ? seek(0) : seek(f.start)}>
+              <div key={f.id} className={"fight" + (isActive ? " active" : "")} style={gated ? { cursor: "default" } : undefined} onClick={gated ? undefined : () => f.id === "all" ? seek(0) : seek(f.start)}>
                 <span className="fight-ic" style={{ background: tint, borderRadius: f.type === "boss" ? 6 : 2 }} />
                 <span className="fight-nm">{f.name}</span>
                 <span className="fight-meta mono">
-                  {f.deaths > 0 ? <span style={{ color: "var(--danger)", marginRight: 6 }}>☠{f.deaths}</span> : null}
-                  {mmss(f.end - f.start)}
+                  {gated ? null : <>{f.deaths > 0 ? <span style={{ color: "var(--danger)", marginRight: 6 }}>☠{f.deaths}</span> : null}{mmss(f.end - f.start)}</>}
                 </span>
               </div>
             )
@@ -160,7 +174,7 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
                   {R.affixes.map((a) => <AffixChip name={a} key={a} />)}
                 </div>
                 <div style={{ display: "flex", gap: 18, marginTop: 8 }}>
-                  <Summary label="Result" value={<span style={{ color: R.outcomeColor }}>{R.outcome} {R.upgradeLabel}</span>} />
+                  <Summary label="Result" value={gated ? <span style={{ color: "var(--faint)" }}>· · ·</span> : <span style={{ color: R.outcomeColor }}>{R.outcome} {R.upgradeLabel}</span>} />
                   <Summary label="Time" value={<span className="mono">{mmss(clock)}</span>} sub={"par " + R.par} />
                   <Summary label="Deaths" value={<span className="mono" style={{ color: visibleDeaths.length ? "var(--danger)" : "var(--good)" }}>{visibleDeaths.length}</span>} />
                   <Summary label="Rez" value={<span className="mono" style={{ color: result.finalRezCharges > 0 ? "var(--good)" : "var(--danger)" }}>{result.finalRezCharges}</span>} sub={result.nextRezChargeAtSec > 0 ? "+1 in " + mmss(result.nextRezChargeAtSec) : "ready"} />
@@ -187,16 +201,16 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
           <button className="btn btn-primary btn-sm" style={{ width: 38, height: 34, justifyContent: "center", padding: 0, fontSize: 15 }} onClick={togglePlay} title={playing ? "Pause" : finished ? "Replay" : "Play"}>
             {playing ? "❚❚" : finished ? "↻" : "▶"}
           </button>
-          <div className="seg-group" style={{ padding: 2 }}>
+          <div className="seg-group" style={{ padding: 2, opacity: gated ? .4 : 1 }} title={gated ? "Locked until you've watched the run" : undefined}>
             {SPEEDS.map((s) => (
-              <button key={s} className={"seg-btn" + (speed === s ? " on accent" : "")} style={{ padding: "4px 10px", fontSize: 11.5 }} onClick={() => setSpeed(s)}>{s}×</button>
+              <button key={s} className={"seg-btn" + (speed === s ? " on accent" : "")} style={{ padding: "4px 10px", fontSize: 11.5 }} disabled={gated} onClick={() => setSpeed(s)}>{s}×</button>
             ))}
           </div>
-          {/* scrubber with death markers */}
+          {/* scrubber with death markers — locked (no scrub-ahead) + markers hidden while watch-gated, to avoid spoilers */}
           <div style={{ position: "relative", flex: 1, height: 22, display: "flex", alignItems: "center" }}>
-            <input type="range" min={0} max={Math.max(1, Math.round(duration))} value={Math.round(clock)} onChange={(e) => { setPlaying(false); seek(Number(e.target.value)) }}
-              style={{ width: "100%", accentColor: "var(--accent)", cursor: "pointer" }} />
-            {result.deaths.map((d, i) => (
+            <input type="range" min={0} max={Math.max(1, Math.round(duration))} value={Math.round(clock)} disabled={gated} onChange={(e) => { setPlaying(false); seek(Number(e.target.value)) }}
+              style={{ width: "100%", accentColor: "var(--accent)", cursor: gated ? "not-allowed" : "pointer", opacity: gated ? .5 : 1 }} />
+            {!gated && result.deaths.map((d, i) => (
               <span key={i} title={`${d.name} · ${d.t}`} style={{ position: "absolute", left: `calc(${(d.tSec / Math.max(1, duration)) * 100}% - 3px)`, top: 0, width: 6, height: 6, borderRadius: "50%", background: "var(--danger)", pointerEvents: "none" }} />
             ))}
           </div>
@@ -225,7 +239,11 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
           <div style={{ width: 320, flex: "none", display: "flex", flexDirection: "column", gap: 16 }}>
             <PartyHealth result={result} hp={hp} members={g.members} goChar={goChar} />
 
-            {showAction ? (
+            {gated ? (
+              <button className="btn" disabled style={{ justifyContent: "center", padding: 12, fontSize: 13.5, opacity: .65, cursor: "not-allowed" }} title="Watch the run to the end to reveal results">
+                <Icon name="report" size={15} color="var(--faint)" /> Watch the run to reveal results…
+              </button>
+            ) : showAction ? (
               <button className="btn btn-primary" style={{ justifyContent: "center", padding: 12, fontSize: 14 }} onClick={distribute}>
                 <Icon name="star" size={15} color="#04201d" /> {hasLoot ? "Distribute Loot →" : "Continue → Keystone"}
               </button>

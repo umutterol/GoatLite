@@ -50,10 +50,26 @@ try {
   // ---- run a key → report (autoplay) ----
   await tab("New Run")
   await page.locator("button", { hasText: "Simulate Run" }).click().catch(() => {})
-  await page.waitForTimeout(600)
-  await shot("report-midplay")
+  await page.waitForTimeout(900)
+  await shot("report-gated")
   // guild feed (WoW chat) is the right aside while playing
   await page.locator(".guild-feed, aside").first().screenshot({ path: "scripts/_shot-feed.png" }).catch(() => {})
+
+  // ---- C5 watch-gate: results hidden + transport locked until the replay plays out ----
+  const distSel = "button:has-text('Distribute Loot'), button:has-text('Continue → Keystone')"
+  check(await page.locator("button:has-text('Watch the run to reveal')").count() === 1, "gated: 'Watch the run…' button shown")
+  check(await page.locator(distSel).count() === 0, "gated: loot/continue button hidden")
+  const speedBtn = page.locator(".seg-group button:has-text('4×')").first()
+  check(await speedBtn.isDisabled().catch(() => false), "gated: speed dial (4×) locked")
+  check(await page.locator("input[type=range]").first().isDisabled().catch(() => false), "gated: scrubber locked")
+  // the deferred feed line must NOT have leaked the outcome yet (no 'Timed/Depleted/Wiped in' line)
+  check(!/\b(Timed|Depleted|Wiped) in \d/.test(await page.locator(".guild-feed").innerText().catch(() => "")), "gated: outcome not yet in the chat feed")
+
+  // let the forced 1× watch play out (RATE 40 → ~35-50s real), then results reveal + feed flushes
+  await page.locator(distSel).first().waitFor({ timeout: 80000 }).catch(() => {})
+  check(await page.locator(distSel).count() === 1, "revealed: Distribute/Continue appears after the replay finished")
+  check(/\b(Timed|Depleted|Wiped) in \d/.test(await page.locator(".guild-feed").innerText().catch(() => "")), "revealed: outcome line flushed to the chat feed")
+  await shot("report-revealed")
 
   console.log(`\nconsole errors: ${errors.length}`)
   errors.slice(0, 12).forEach((e) => console.log("  ✗ " + e))
