@@ -362,7 +362,7 @@ function EventLog({ log, specById, playing, speed }: { log: LogEntry[]; specById
   // (slow, readable fade at 0.5×; snappy at 4×) so the speed visibly changes the log cadence. Off when paused/seeking.
   const reveal = playing ? `logIn ${Math.max(0.07, 0.42 / speed).toFixed(2)}s ease-out` : undefined
   return (
-    <div ref={ref} className="scroll-thin" style={{ display: "flex", flexDirection: "column", maxHeight: "calc(100vh - 320px)", overflowY: "auto" }}>
+    <div ref={ref} className="scroll-thin" style={{ display: "flex", flexDirection: "column", maxHeight: "calc(var(--stage-h) - 320px)", overflowY: "auto" }}>
       {log.map((e, i) => {
         const specId = e.who ? specById.get(e.who) : null
         const color = specId ? mc(specId).color : null

@@ -1,6 +1,7 @@
 /* Shared components for the GOAT Lite · Logs reskin. */
 import { useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { createPortal } from "react-dom"
+import { useStage, toStageCoords, STAGE_W, STAGE_H } from "./ViewportStage"
 import { content } from "@/content"
 import { mc, parseColor, parseLabel, fmt, fmtInt, mmss, qualityColor, type DmgRow } from "./analytics"
 import type { RoleKey, GearItem } from "@/state/game-store"
@@ -10,15 +11,20 @@ export function Tip({ tip, children, max = 280, style, accent }: { tip: ReactNod
   const [show, setShow] = useState(false)
   const [pos, setPos] = useState({ x: 0, y: 0 })
   const ref = useRef<HTMLSpanElement>(null)
+  const { scale, el } = useStage()
   if (!tip) return <>{children}</>
-  const place = () => { const r = ref.current?.getBoundingClientRect(); if (r) setPos({ x: r.left + r.width / 2, y: r.top }) }
+  // anchor at the trigger's top-centre, converted into the scaled stage's local coordinate space
+  const place = () => {
+    const r = ref.current?.getBoundingClientRect(); if (!r) return
+    setPos(toStageCoords(el, scale, r.left + r.width / 2, r.top))
+  }
   return (
     <span ref={ref} onMouseEnter={() => { place(); setShow(true) }} onMouseLeave={() => setShow(false)} style={{ display: "inline-flex", alignItems: "center", ...style }}>
       {children}
       {show ? createPortal(
         <div role="tooltip" style={{ position: "fixed", left: pos.x, top: pos.y, transform: "translate(-50%,-100%) translateY(-9px)", zIndex: 9999, pointerEvents: "none", maxWidth: max, background: "var(--panel-3)", border: `1px solid ${accent ?? "var(--line)"}`, borderRadius: "var(--radius)", boxShadow: "0 8px 24px rgba(0,0,0,.55)", padding: "8px 11px", fontSize: 12.5, lineHeight: 1.5, color: "var(--text)" }}>
           {tip}
-        </div>, document.body) : null}
+        </div>, el ?? document.body) : null}
     </span>
   )
 }
@@ -204,9 +210,12 @@ export function SpellTip({ skillId, name }: { skillId?: string; name?: string })
 export function LogSpell({ name, skillId, color }: { name: string; skillId?: string; color?: string }) {
   const [show, setShow] = useState(false)
   const [pos, setPos] = useState({ x: 0, y: 0 })
+  const { scale, el } = useStage()
+  // follow the cursor in stage-local space; flip/clamp against the design canvas, not the real viewport
   const move = (e: { clientX: number; clientY: number }) => {
-    const flip = e.clientX > window.innerWidth - 300
-    setPos({ x: flip ? e.clientX - 300 : e.clientX + 16, y: Math.min(e.clientY + 18, window.innerHeight - 150) })
+    const p = toStageCoords(el, scale, e.clientX, e.clientY)
+    const flip = p.x > STAGE_W - 300
+    setPos({ x: flip ? p.x - 300 : p.x + 16, y: Math.min(p.y + 18, STAGE_H - 150) })
   }
   return (
     <>
@@ -216,7 +225,7 @@ export function LogSpell({ name, skillId, color }: { name: string; skillId?: str
       {show ? createPortal(
         <div role="tooltip" style={{ position: "fixed", left: pos.x, top: pos.y, zIndex: 9999, pointerEvents: "none", background: "var(--panel-3)", border: "1px solid var(--line)", borderRadius: "var(--radius)", boxShadow: "0 8px 24px rgba(0,0,0,.55)", padding: "9px 12px" }}>
           <SpellTip skillId={skillId} name={name} />
-        </div>, document.body) : null}
+        </div>, el ?? document.body) : null}
     </>
   )
 }
