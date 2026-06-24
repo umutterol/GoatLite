@@ -27,7 +27,7 @@ try {
 
   // ---- font sanity: UI reverted to IBM Plex Sans; Pixelify is scoped to the chat (+ item display) ----
   const bodyFam = await page.evaluate(() => getComputedStyle(document.body).fontFamily)
-  check(/IBM Plex Sans/i.test(bodyFam) && !/pixelify/i.test(bodyFam), `body font = IBM Plex Sans, not Pixelify (got: ${bodyFam})`)
+  check(/Space Grotesk/i.test(bodyFam) && !/pixelify/i.test(bodyFam), `body font = Space Grotesk, not Pixelify (got: ${bodyFam})`)
   const chatFam = await page.evaluate(() => { const el = document.querySelector(".guild-feed"); return el ? getComputedStyle(el).fontFamily : "" })
   check(/pixelify/i.test(chatFam), `chat (.guild-feed) font = Pixelify (got: ${chatFam})`)
 

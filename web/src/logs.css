@@ -1,14 +1,15 @@
 /* ============================================================
    GOAT LITE — "Warcraft-web" design system
    Warcraft Logs report tables · Details! meter · Raider.io profiles
-   Dark data-tool aesthetic. IBM Plex Sans/Mono (UI) + Pixelify Sans accent (chat + item display only).
+   Dark data-tool aesthetic. Space Grotesk (UI) + IBM Plex Mono (numbers) + Pixelify Sans accent (chat + items only).
    Ported from the Claude Design handoff (web.css), wired to the real app.
    ============================================================ */
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Pixelify+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Pixelify+Sans:wght@400;500;600;700&display=swap");
 
 :root {
-  /* UI font = clean IBM Plex; --font-pixel (Pixelify Sans) is scoped to the chat + item displays only */
-  --font: "IBM Plex Sans", system-ui, sans-serif;
+  /* UI font = Space Grotesk (character, still legible); --mono keeps tabular numbers aligned; --font-pixel
+     (Pixelify Sans) is scoped to the chat + item displays only */
+  --font: "Space Grotesk", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
   --font-pixel: "Pixelify Sans", system-ui, sans-serif;
 
