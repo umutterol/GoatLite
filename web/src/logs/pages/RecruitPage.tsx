@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useGame, type RoleKey, SLOTS } from "@/state/game-store"
 import { mc, qualityColor } from "../analytics"
 import { RolePill, GameIcon, Tip, TipBody, ItemIcon, ItemTip } from "../components"
+import { TalentStrip } from "../TalentGrid"
 import { Stars, corColor, SkillBars, scoutBlurb, traitCombatSummary } from "../OperatorPanel"
 import type { Go } from "../LogsApp"
 
@@ -192,7 +193,10 @@ function ScoutDetail({ r }: { r: ReturnType<typeof useGame>["recruits"][number] 
         </div>
       </div>
 
-      {/* operator skills */}
+      {/* talents — selected default build (one row) + a popup with the full 5×3 grid */}
+      <TalentStrip specId={r.specId} />
+
+      {/* aptitudes (operator skills) */}
       <div style={{ padding: 16, borderBottom: "1px solid var(--line-soft)" }}>
         <div className="eyebrow" style={{ fontSize: 10, marginBottom: 11 }}>Aptitudes <span style={{ color: "var(--faint)", letterSpacing: 0, textTransform: "none", fontWeight: 400 }}>— ceiling shown where scouted</span></div>
         <SkillBars skills={r.skills} ceilings={r.ceilings} revealed={r.revealed} color={info.color} />

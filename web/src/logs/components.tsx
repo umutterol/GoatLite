@@ -72,13 +72,18 @@ export function TipBody({ title, desc, accent }: { title: string; desc?: ReactNo
     </div>
   )
 }
-/** Resolve a content tooltip for an asset icon (spec/role/tactic/affix/skill); null = no tooltip. */
+/** Talent option lookup by optionId (talents are keyed by NODE id, but icons reference the OPTION id). */
+const TALENT_OPT = new Map<string, { name: string; effect: string }>()
+for (const n of content.talents.values()) for (const o of n.options) TALENT_OPT.set(o.id, { name: o.name, effect: o.effect })
+
+/** Resolve a content tooltip for an asset icon (spec/role/tactic/affix/skill/talent); null = no tooltip. */
 function iconTip(kind: IconKind, id: string, label?: string): ReactNode {
   if (kind === "spec") { const s = content.specs.get(id); if (s) return <TipBody title={`${s.name} ${content.classes.get(s.classId)?.name ?? ""}`.trim()} desc={s.blurb} accent={mc(id).color} /> }
   else if (kind === "tactic") { const t = content.tactics.get(id); if (t) return <TipBody title={t.name} desc={t.perPoint} /> }
   else if (kind === "affix") { const a = content.affixes.get(id); if (a) return <TipBody title={a.name} desc={a.effect} /> }
   else if (kind === "skill") { const k = content.operatorSkills.get(id); if (k) return <TipBody title={k.name} desc={k.effect} /> }
   else if (kind === "ability") { const sk = content.skills.get(id); if (sk) return <TipBody title={sk.name} desc={sk.description} /> }
+  else if (kind === "talent") { const t = TALENT_OPT.get(id); if (t) return <TipBody title={t.name} desc={t.effect} /> }
   else if (kind === "role") return <TipBody title={id.charAt(0).toUpperCase() + id.slice(1)} desc="Party role" />
   return label ? <TipBody title={label} /> : null
 }
