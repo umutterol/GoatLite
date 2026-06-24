@@ -330,10 +330,12 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).
 /* deterministic loot for a finished run (player distributes it on the Loot screen) */
 function computeLoot(state: GameState, r: RunResult, runKeyState: MemberKey): LootDrop[] {
   const lootCount = r.outcome === "timed" ? 2 : r.outcome === "depleted" ? 1 : 0
-  const dungeon = content.dungeons.get(runKeyState.dungeonId)
-  const table = dungeon?.lootTable ?? []
-  if (!lootCount || !table.length) return []
   const party = state.partyIds.map((id) => state.roster.find((m) => m.id === id)).filter(Boolean) as RawMember[]
+  // item-coverage: drop from the FULL item roster filtered to the party's specs (every drop is usable by SOMEONE in the
+  // party). The per-dungeon `dungeon.lootTable` only ever held the original 3-spec items → reserved for future per-dungeon curation.
+  const partySpecs = new Set(party.map((m) => m.specId))
+  const table = [...content.items.values()].filter((it) => it.specs.some((s) => partySpecs.has(s))).map((it) => it.id)
+  if (!lootCount || !table.length) return []
   const drops: LootDrop[] = []
   let seed = r.seed >>> 0
   for (let i = 0; i < lootCount; i++) {
