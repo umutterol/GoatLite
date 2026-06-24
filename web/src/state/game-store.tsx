@@ -10,7 +10,7 @@ import {
 } from "@/data/operator"
 import { generateBarks, type BarkMoment } from "./barks"
 import { Rng, seedFromString } from "@/sim/rng"
-import { rollItemStats, gearEffectiveIlvl, gearSecondaries, type ItemStats } from "./item-stats"
+import { rollItemStats, gearEffectiveIlvl, gearSecondaries, rarityForIlvl, type ItemStats } from "./item-stats"
 
 const SAVE_KEY = "goatlite.save"
 const SAVE_VERSION = 6 // bumped: Phase P GATE 0 (boss-dive fix + intake floor + school wall) changes deterministic run results → clean reset
@@ -55,12 +55,6 @@ export interface FeedEntry {
 type FeedPartial = Omit<FeedEntry, "id" | "week">
 
 /* ---- gear helpers ---- */
-function rarityForKey(key: number): string {
-  if (key <= 5) return "Uncommon"
-  if (key <= 10) return "Rare"
-  if (key <= 15) return key >= 14 ? "Epic" : "Rare"
-  return "Epic"
-}
 // Drops track the key: gear-appropriate ilvl for a key is ~108+4·key, so a drop lands a few above that —
 // a real upgrade that nudges you toward the next key's requirement (timing K gears you to attempt K+1).
 // Phase F: HARD gear cap — drops stop scaling at the key-12 value (ilvl 160). Past the cap, power hands off
@@ -70,25 +64,22 @@ function starterGear(specId: string, ilvl: number, memberId: string): Record<str
   const g: Record<string, GearItem> = {}
   const mainType = primaryStatOf(specId)
   for (const s of SLOTS) {
-    const base = { uid: `starter-${memberId}-${s}`, baseId: "beta-standard-issue", name: `Worn ${content.itemSlots.get(s)!.name}`, slot: s, specs: [specId], ilvl, rarity: "Common" }
+    const base = { uid: `starter-${memberId}-${s}`, baseId: "beta-standard-issue", name: `Worn ${content.itemSlots.get(s)!.name}`, slot: s, specs: [specId], ilvl, rarity: rarityForIlvl(ilvl) }
     g[s] = { ...base, ...rollItemStats(base, mainType) }
   }
   return g
 }
 /** A recruit's actual equipped paper-doll: per-slot ilvl jitter around their headline ilvl (averages ≈ ilvl, so the
-    table/header number still reads true) + quality-weighted rarity — premium recruits (high ★) arrive with a few
-    Uncommon/Rare pieces, duds stay all-Common. Epic stays drop-only (key-gated). Deterministic from the recruit id so
-    the on-load backfill is stable and what you scout = what you sign. `quality` is 0..1 (derived from Potential ★). */
-function recruitGear(specId: string, ilvl: number, recruitId: string, quality: number): Record<string, GearItem> {
+    table/header number still reads true). Rarity is derived from each slot's ilvl via rarityForIlvl — so a lower-rarity
+    piece can never out-level a higher-rarity one, and recruit "quality" rides on the headline ilvl (better prospects get
+    a higher ilvl → naturally rarer gear). Deterministic from the recruit id so the on-load backfill is stable. */
+function recruitGear(specId: string, ilvl: number, recruitId: string): Record<string, GearItem> {
   const g: Record<string, GearItem> = {}
   const mainType = primaryStatOf(specId)
   const rng = new Rng(seedFromString("gear-" + recruitId))
-  const q = Math.max(0, Math.min(1, quality))
   for (const s of SLOTS) {
     const slotIlvl = Math.max(95, ilvl + rng.int(-4, 4))
-    const roll = rng.next()
-    const rarity = roll < q * 0.18 ? "Rare" : roll < q * 0.5 ? "Uncommon" : "Common"
-    const base = { uid: `rec-${recruitId}-${s}`, baseId: "beta-standard-issue", name: `Worn ${content.itemSlots.get(s)!.name}`, slot: s, specs: [specId], ilvl: slotIlvl, rarity }
+    const base = { uid: `rec-${recruitId}-${s}`, baseId: "beta-standard-issue", name: `Worn ${content.itemSlots.get(s)!.name}`, slot: s, specs: [specId], ilvl: slotIlvl, rarity: rarityForIlvl(slotIlvl) }
     g[s] = { ...base, ...rollItemStats(base, mainType) }
   }
   return g
@@ -100,14 +91,19 @@ function memberIlvl(gear: Record<string, GearItem>): number {
 function makeDrop(baseId: string, key: number, uidSeed: number): GearItem | null {
   const t = content.items.get(baseId)
   if (!t) return null
-  const base = { uid: `${baseId}-${uidSeed.toString(36)}`, baseId, name: t.name, slot: t.slot, specs: t.specs, ilvl: dropIlvl(key), rarity: rarityForKey(key) }
+  const il = dropIlvl(key)
+  const base = { uid: `${baseId}-${uidSeed.toString(36)}`, baseId, name: t.name, slot: t.slot, specs: t.specs, ilvl: il, rarity: rarityForIlvl(il) }
   return { ...base, ...rollItemStats(base, primaryStatOf(t.specs[0] ?? "guardian")) }
 }
-/** Ensure a (possibly pre-item-stats) gear item carries a stat block — deterministic from its uid, so old saves
-    backfill to the same block every load (no SAVE_VERSION bump needed; the block was additive). */
-function withStats(item: GearItem): GearItem {
-  if (typeof item.mainStat === "number" && Array.isArray(item.secondaries)) return item
-  return { ...item, ...rollItemStats(item, primaryStatOf(item.specs?.[0] ?? "guardian")) }
+/** Normalize a stored gear item on load: backfill a missing stat block AND enforce the rarity↔ilvl invariant
+    (rarity is a step-function of ilvl now, so an old forced-Common-at-128 piece becomes Uncommon and its block is
+    re-rolled to match). Deterministic from uid → old saves converge stably + idempotently (no SAVE_VERSION bump). */
+function normalizeGear(item: GearItem): GearItem {
+  const rarity = rarityForIlvl(item.ilvl)
+  const hasBlock = typeof item.mainStat === "number" && Array.isArray(item.secondaries)
+  if (hasBlock && item.rarity === rarity) return item
+  const mainType = item.mainStatType ?? primaryStatOf(item.specs?.[0] ?? "guardian")
+  return { ...item, rarity, ...rollItemStats({ uid: item.uid, slot: item.slot, ilvl: item.ilvl, rarity }, mainType) }
 }
 /** Pick exactly the GearItem fields (drops any transient LootDrop extras before it's stored). */
 const gearFields = (d: GearItem): GearItem => ({
@@ -175,13 +171,11 @@ function makeRecruit(role: RoleKey, bestIlvl: number, used: Set<string>): Recrui
   const revealed = rollRevealMask()
   const id = "rec-" + Math.random().toString(36).slice(2, 9)
   const stars = potentialStars(ceilings, role)
-  // gear quality tracks Potential ★ — better prospects arrive better-equipped; duds stay all-Common
-  const quality = isDud ? 0 : Math.max(0, Math.min(1, (stars - 2) / 2.5))
   return {
     id,
     name, specId, role, ilvl, score, morale,
     traitId: trait.id, traitName: trait.name, traitGood: !isDud, traitFlavor: trait.effect, cost,
-    gear: recruitGear(specId, ilvl, id, quality),
+    gear: recruitGear(specId, ilvl, id),
     skills, ceilings, revealed, potentialProfile: profile,
     cor: corOf(skills, role), stars,
   }
@@ -295,16 +289,16 @@ function loadState(): GameState {
           talents: Object.fromEntries(Object.entries(m.talents ?? {}).filter(([nodeId]) => VALID_TALENT_NODES.has(nodeId))),
           skills: m.skills ?? freshOperatorSkills(), ceilings: m.ceilings ?? freshOperatorSkills(),
           skillXp: m.skillXp ?? zeroSkillMap(), revealed: m.revealed ?? falseRevealMap(), potentialProfile: m.potentialProfile ?? {},
-          // item-stats: backfill stat blocks on pre-item-stats gear (deterministic from uid → stable; additive → no SAVE bump)
-          gear: Object.fromEntries(Object.entries(m.gear ?? {}).map(([s, it]) => [s, withStats(it)])),
+          // backfill stat blocks + enforce the rarity↔ilvl invariant on stored gear (deterministic → stable; no SAVE bump)
+          gear: Object.fromEntries(Object.entries(m.gear ?? {}).map(([s, it]) => [s, normalizeGear(it)])),
         }))
-        merged.stash = (merged.stash ?? []).map(withStats)   // item-stats: backfill stashed gear too
-        // recruit gear is first-class now — backfill any pre-gear recruits (deterministic from id → stable; additive → no SAVE bump)
+        merged.stash = (merged.stash ?? []).map(normalizeGear)   // normalize stashed gear too
+        // recruit gear is first-class now — backfill any pre-gear recruits + normalize stored gear (deterministic → stable; no SAVE bump)
         merged.recruits = (merged.recruits ?? []).map((r) => ({
           ...r,
           gear: r.gear && Object.keys(r.gear).length
-            ? Object.fromEntries(Object.entries(r.gear).map(([s, it]) => [s, withStats(it)]))
-            : recruitGear(r.specId, r.ilvl, r.id, r.traitGood ? Math.max(0, Math.min(1, ((r.stars ?? 0) - 2) / 2.5)) : 0),
+            ? Object.fromEntries(Object.entries(r.gear).map(([s, it]) => [s, normalizeGear(it)]))
+            : recruitGear(r.specId, r.ilvl, r.id),
         }))
         // history changed shape (string[] → RunTicket[]) — drop any legacy/malformed entries so replay can't crash
         merged.history = ((merged.history as unknown[]) ?? []).filter((t): t is RunTicket =>

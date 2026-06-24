@@ -59,6 +59,19 @@ try {
   const uniq = [...new Set(heights)]
   check(uniq.length === 1, `scout panel is a constant height across all ${n} recruits — heights: ${uniq.join(", ")}`)
 
+  // rarity↔ilvl invariant: no lower-rarity item may out-level a higher-rarity one (across every recruit's gear)
+  const violation = await page.evaluate(() => {
+    const RANK = { Common: 0, Uncommon: 1, Rare: 2, Epic: 3 }
+    for (const r of window.__game.recruits) {
+      const items = Object.values(r.gear || {})
+      for (const a of items) for (const b of items) {
+        if (RANK[a.rarity] < RANK[b.rarity] && a.ilvl > b.ilvl) return `${r.name}: ${a.rarity}@${a.ilvl} out-levels ${b.rarity}@${b.ilvl}`
+      }
+    }
+    return null
+  })
+  check(!violation, `rarity↔ilvl invariant holds across all recruits' gear${violation ? " — VIOLATION " + violation : ""}`)
+
   // Talents (added in finding #4): a 'Talents' button opens a popup grid. Only assert if present.
   const talentsBtn = page.locator("button", { hasText: /^Talents/ }).first()
   if (await talentsBtn.count()) {

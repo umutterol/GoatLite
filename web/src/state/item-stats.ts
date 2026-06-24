@@ -16,6 +16,14 @@ export interface ItemStats {
 
 export const RARITY_MULT: Record<string, number> = { Common: 1.0, Uncommon: 1.06, Rare: 1.12, Epic: 1.25 }
 export const SECONDARY_COUNT: Record<string, number> = { Common: 0, Uncommon: 1, Rare: 2, Epic: 2 }
+// Rarity is a STEP-FUNCTION OF ILVL — the single source of truth for every item (drops, starter, recruit) so a lower
+// rarity can never out-level a higher one. Bands: Common <120 · Uncommon 120–135 · Rare 136–159 · Epic ≥160 (gear cap).
+export const RARITY_ILVL_BANDS: { min: number; rarity: string }[] = [
+  { min: 160, rarity: "Epic" }, { min: 136, rarity: "Rare" }, { min: 120, rarity: "Uncommon" }, { min: 0, rarity: "Common" },
+]
+export function rarityForIlvl(ilvl: number): string {
+  return (RARITY_ILVL_BANDS.find((b) => ilvl >= b.min) ?? RARITY_ILVL_BANDS[RARITY_ILVL_BANDS.length - 1]).rarity
+}
 // per-slot share of the budget (sums to 1 across the 6-slot paper-doll). Weapon is the biggest stat stick.
 export const SLOT_WEIGHT: Record<string, number> = { weapon: 0.28, chest: 0.18, legs: 0.18, helm: 0.12, boots: 0.12, trinket: 0.12 }
 export const SECONDARY_POOL: SecondaryStat[] = ["Haste", "Crit Chance", "Crit Damage", "Versatility"]
