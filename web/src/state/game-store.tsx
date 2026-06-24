@@ -10,6 +10,7 @@ import {
 } from "@/data/operator"
 import { generateBarks, type BarkMoment } from "./barks"
 import { Rng } from "@/sim/rng"
+import { rollItemStats, type ItemStats } from "./item-stats"
 
 const SAVE_KEY = "goatlite.save"
 const SAVE_VERSION = 6 // bumped: Phase P GATE 0 (boss-dive fix + intake floor + school wall) changes deterministic run results → clean reset
@@ -18,7 +19,7 @@ export const SLOTS = [...content.itemSlots.keys()] // weapon, helm, chest, legs,
 export type RoleKey = "tank" | "healer" | "dps"
 export type Phase = "create" | "recruit" | "playing"
 
-export interface GearItem {
+export interface GearItem extends ItemStats {
   uid: string; baseId: string; name: string; slot: string; specs: string[]; ilvl: number; rarity: string
 }
 export interface GuildInfo { name: string; crest: string; glyph: string; motto: string }
@@ -66,7 +67,11 @@ function rarityForKey(key: number): string {
 const dropIlvl = (key: number) => Math.min(112 + 4 * key, GEAR_CAP_ILVL)
 function starterGear(specId: string, ilvl: number, memberId: string): Record<string, GearItem> {
   const g: Record<string, GearItem> = {}
-  for (const s of SLOTS) g[s] = { uid: `starter-${memberId}-${s}`, baseId: "beta-standard-issue", name: `Worn ${content.itemSlots.get(s)!.name}`, slot: s, specs: [specId], ilvl, rarity: "Common" }
+  const mainType = primaryStatOf(specId)
+  for (const s of SLOTS) {
+    const base = { uid: `starter-${memberId}-${s}`, baseId: "beta-standard-issue", name: `Worn ${content.itemSlots.get(s)!.name}`, slot: s, specs: [specId], ilvl, rarity: "Common" }
+    g[s] = { ...base, ...rollItemStats(base, mainType) }
+  }
   return g
 }
 function memberIlvl(gear: Record<string, GearItem>): number {
@@ -76,8 +81,20 @@ function memberIlvl(gear: Record<string, GearItem>): number {
 function makeDrop(baseId: string, key: number, uidSeed: number): GearItem | null {
   const t = content.items.get(baseId)
   if (!t) return null
-  return { uid: `${baseId}-${uidSeed.toString(36)}`, baseId, name: t.name, slot: t.slot, specs: t.specs, ilvl: dropIlvl(key), rarity: rarityForKey(key) }
+  const base = { uid: `${baseId}-${uidSeed.toString(36)}`, baseId, name: t.name, slot: t.slot, specs: t.specs, ilvl: dropIlvl(key), rarity: rarityForKey(key) }
+  return { ...base, ...rollItemStats(base, primaryStatOf(t.specs[0] ?? "guardian")) }
 }
+/** Ensure a (possibly pre-item-stats) gear item carries a stat block — deterministic from its uid, so old saves
+    backfill to the same block every load (no SAVE_VERSION bump needed; the block was additive). */
+function withStats(item: GearItem): GearItem {
+  if (typeof item.mainStat === "number" && Array.isArray(item.secondaries)) return item
+  return { ...item, ...rollItemStats(item, primaryStatOf(item.specs?.[0] ?? "guardian")) }
+}
+/** Pick exactly the GearItem fields (drops any transient LootDrop extras before it's stored). */
+const gearFields = (d: GearItem): GearItem => ({
+  uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity,
+  mainStat: d.mainStat, mainStatType: d.mainStatType, stamina: d.stamina, secondaries: d.secondaries,
+})
 export const roleOf = (specId: string): RoleKey => (content.specs.get(specId)?.role ?? "DPS").toLowerCase() as RoleKey
 export const dShort = (n: string) => n.replace(/^the\s+/i, "").split(/\s+/)[0].slice(0, 3).toUpperCase()
 
@@ -252,7 +269,10 @@ function loadState(): GameState {
           talents: Object.fromEntries(Object.entries(m.talents ?? {}).filter(([nodeId]) => VALID_TALENT_NODES.has(nodeId))),
           skills: m.skills ?? freshOperatorSkills(), ceilings: m.ceilings ?? freshOperatorSkills(),
           skillXp: m.skillXp ?? zeroSkillMap(), revealed: m.revealed ?? falseRevealMap(), potentialProfile: m.potentialProfile ?? {},
+          // item-stats: backfill stat blocks on pre-item-stats gear (deterministic from uid → stable; additive → no SAVE bump)
+          gear: Object.fromEntries(Object.entries(m.gear ?? {}).map(([s, it]) => [s, withStats(it)])),
         }))
+        merged.stash = (merged.stash ?? []).map(withStats)   // item-stats: backfill stashed gear too
         // history changed shape (string[] → RunTicket[]) — drop any legacy/malformed entries so replay can't crash
         merged.history = ((merged.history as unknown[]) ?? []).filter((t): t is RunTicket =>
           !!t && typeof t === "object" && typeof (t as RunTicket).seed === "number" && Array.isArray((t as RunTicket).party) && typeof (t as RunTicket).aggression === "string")
@@ -507,7 +527,7 @@ function reducer(state: GameState, action: Action): GameState {
         const member = roster.find((m) => m.id === a)
         if (member && d.specs.includes(member.specId)) {
           const old = member.gear[d.slot]
-          member.gear[d.slot] = { uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity }
+          member.gear[d.slot] = gearFields(d)
           if (old && old.baseId !== "beta-standard-issue") stash.push(old)
           feed.push({ kind: "loot", tone: "good", memberId: member.id, icon: specIcon(member.specId), text: `${member.name} equipped ${d.name} (ilvl ${d.ilvl}).` })
           // (A) a SNUB fires only when a skipped member had a MATERIALLY bigger claim than the one you chose
@@ -520,7 +540,7 @@ function reducer(state: GameState, action: Action): GameState {
             if (lm) { snub(lm, gap >= LOOT_BIG_GAP ? -2 : 0, `Loot snub — ${member.name} took ${d.name} over ${lm.name}'s bigger claim (+${u.delta} vs +${winnerDelta}).`); barkSnubs.push({ loserId: lm.id, winnerName: member.name, item: d.name }) }
           }
         } else {
-          stash.push({ uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity })   // wrong spec → vaulted, not a choice → no snub
+          stash.push(gearFields(d))   // wrong spec → vaulted, not a choice → no snub
         }
       }
       // morale
@@ -629,7 +649,7 @@ function reducer(state: GameState, action: Action): GameState {
         morale: partySet.has(m.id) ? clamp(m.morale + md, 0, 100) : m.morale,
         key: m.id === ownerId ? newKey : m.key,
       }))
-      const drops = (state.pendingLoot ?? []).map((d) => ({ uid: d.uid, baseId: d.baseId, name: d.name, slot: d.slot, specs: d.specs, ilvl: d.ilvl, rarity: d.rarity }))
+      const drops = (state.pendingLoot ?? []).map(gearFields)
       const emblem = state.wallet.emblem + (r.outcome === "timed" ? 5 : r.outcome === "depleted" ? 2 : 0)
       const gold = state.wallet.gold + (r.outcome === "wipe" ? 0 : 200 + ranKey.level * 40)
       return {
