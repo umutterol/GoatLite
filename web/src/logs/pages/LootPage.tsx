@@ -3,6 +3,7 @@ import { useState } from "react"
 import { content } from "@/content"
 import { useGame, LOOT_SNUB_GAP, LOOT_SCRAP_MIN } from "@/state/game-store"
 import { mc, qualityColor } from "../analytics"
+import { Tip, ItemTip } from "../components"
 import type { Go } from "../LogsApp"
 
 const SHARDS_PER_SCRAP = 8
@@ -70,7 +71,7 @@ export function LootPage({ go }: { go: Go }) {
                   <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px", flex: "0 0 360px", borderRight: "1px solid var(--line-soft)", background: `linear-gradient(120deg, ${qColor}10, transparent)` }}>
                     <span style={{ width: 50, height: 50, flex: "none", borderRadius: 11, background: "linear-gradient(145deg,#23252e,#15161b)", border: `2px solid ${qColor}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "IBM Plex Mono, monospace", fontWeight: 700, fontSize: 17, color: qColor }}>{slotName[0]}</span>
                     <div>
-                      <div style={{ color: qColor, fontWeight: 700, fontSize: 16 }}>{it.name}</div>
+                      <Tip accent={qColor} tip={<ItemTip item={it} />}><span style={{ color: qColor, fontWeight: 700, fontSize: 16, cursor: "help" }}>{it.name}</span></Tip>
                       <div style={{ color: "var(--faint)", fontSize: 12.5, marginTop: 2 }}>{slotName} · {it.primaryStat}</div>
                       <div style={{ display: "flex", gap: 8, marginTop: 6, alignItems: "center" }}>
                         <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: qColor }}>ilvl {it.ilvl}</span>

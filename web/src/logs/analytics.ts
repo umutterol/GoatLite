@@ -48,7 +48,8 @@ export function scoreColor(s: number): string {
   if (s >= 1500) return "#1eff00"
   return "#9d9d9d"
 }
-const QUALITY_COLOR: Record<string, string> = { Common: "#9d9d9d", Uncommon: "#1eff00", Rare: "#0070ff", Epic: "#a335ee", Legendary: "#ff8000" }
+// WoW rarity colours (Umut spec): name + icon-border + tooltip-border use these.
+const QUALITY_COLOR: Record<string, string> = { Common: "#ffffff", Uncommon: "#1eff00", Rare: "#0070dd", Epic: "#a335ee", Legendary: "#ff8000" }
 export const qualityColor = (q: string) => QUALITY_COLOR[q] || "#9d9d9d"
 
 /* ---- member class identity (real specs/classes) ---- */

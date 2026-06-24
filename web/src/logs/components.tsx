@@ -2,11 +2,11 @@
 import { useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { createPortal } from "react-dom"
 import { content } from "@/content"
-import { mc, parseColor, parseLabel, fmt, fmtInt, mmss, type DmgRow } from "./analytics"
-import type { RoleKey } from "@/state/game-store"
+import { mc, parseColor, parseLabel, fmt, fmtInt, mmss, qualityColor, type DmgRow } from "./analytics"
+import type { RoleKey, GearItem } from "@/state/game-store"
 
 /* ---- J.10: one reusable hover tooltip (fixed-position portal — never clipped, follows the trigger) ---- */
-export function Tip({ tip, children, max = 280, style }: { tip: ReactNode; children: ReactNode; max?: number; style?: CSSProperties }) {
+export function Tip({ tip, children, max = 280, style, accent }: { tip: ReactNode; children: ReactNode; max?: number; style?: CSSProperties; accent?: string }) {
   const [show, setShow] = useState(false)
   const [pos, setPos] = useState({ x: 0, y: 0 })
   const ref = useRef<HTMLSpanElement>(null)
@@ -16,10 +16,30 @@ export function Tip({ tip, children, max = 280, style }: { tip: ReactNode; child
     <span ref={ref} onMouseEnter={() => { place(); setShow(true) }} onMouseLeave={() => setShow(false)} style={{ display: "inline-flex", alignItems: "center", ...style }}>
       {children}
       {show ? createPortal(
-        <div role="tooltip" style={{ position: "fixed", left: pos.x, top: pos.y, transform: "translate(-50%,-100%) translateY(-9px)", zIndex: 9999, pointerEvents: "none", maxWidth: max, background: "var(--panel-3)", border: "1px solid var(--line)", borderRadius: "var(--radius)", boxShadow: "0 8px 24px rgba(0,0,0,.55)", padding: "8px 11px", fontSize: 12.5, lineHeight: 1.5, color: "var(--text)" }}>
+        <div role="tooltip" style={{ position: "fixed", left: pos.x, top: pos.y, transform: "translate(-50%,-100%) translateY(-9px)", zIndex: 9999, pointerEvents: "none", maxWidth: max, background: "var(--panel-3)", border: `1px solid ${accent ?? "var(--line)"}`, borderRadius: "var(--radius)", boxShadow: "0 8px 24px rgba(0,0,0,.55)", padding: "8px 11px", fontSize: 12.5, lineHeight: 1.5, color: "var(--text)" }}>
           {tip}
         </div>, document.body) : null}
     </span>
+  )
+}
+/** WoW-style item card: rarity-coloured name, type/ilvl line, then white base stats (main + stamina) and green
+    secondary stats. Pair with <Tip accent={qualityColor(item.rarity)}> so the tooltip border matches the rarity. */
+export function ItemTip({ item, label }: { item: GearItem; label?: string }) {
+  const q = qualityColor(item.rarity)
+  const slotName = content.itemSlots.get(item.slot)?.name ?? item.slot
+  return (
+    <div style={{ minWidth: 172, maxWidth: 260 }}>
+      <div style={{ fontWeight: 700, fontSize: 14, color: q }}>{item.name}</div>
+      <div style={{ color: "var(--muted)", fontSize: 11.5, marginTop: 1, display: "flex", justifyContent: "space-between", gap: 14 }}>
+        <span>{label ?? slotName}</span><span style={{ color: q }}>{item.rarity}</span>
+      </div>
+      <div style={{ color: "var(--faint)", fontSize: 11 }}>Item Level {item.ilvl}</div>
+      <div style={{ marginTop: 5 }}>
+        {item.mainStat ? <div style={{ color: "var(--text)" }}>+{item.mainStat} {item.mainStatType}</div> : null}
+        {item.stamina ? <div style={{ color: "var(--text)" }}>+{item.stamina} Stamina</div> : null}
+        {(item.secondaries ?? []).map((s, i) => <div key={i} style={{ color: "var(--good)" }}>+{s.value} {s.stat}</div>)}
+      </div>
+    </div>
   )
 }
 /** Standard tooltip body: a bold title + optional muted description. */
