@@ -22,6 +22,21 @@ export function Tip({ tip, children, max = 280, style, accent }: { tip: ReactNod
     </span>
   )
 }
+/** Item slot icon: the painted PNG at /icons/item-{baseId}.png if present, else the slot's initial in a rarity-bordered
+    box (a more useful placeholder than the generic bear until art lands — the img hides itself on error, revealing the
+    letter behind; the key=baseId remounts the img when the item changes so it retries the new src). */
+export function ItemIcon({ item, size = 36 }: { item?: GearItem; size?: number }) {
+  const q = item ? qualityColor(item.rarity) : "#444"
+  const letter = item ? ((content.itemSlots.get(item.slot)?.name ?? item.slot)[0] ?? "?") : "—"
+  return (
+    <span style={{ position: "relative", width: size, height: size, flex: "none", borderRadius: Math.round(size * 0.19), border: `1.5px solid ${q}`, background: "linear-gradient(145deg,#23252e,#15161b)", display: "inline-flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+      <span style={{ position: "absolute", fontFamily: "IBM Plex Mono, monospace", fontWeight: 700, fontSize: Math.round(size * 0.36), color: q, opacity: .9 }}>{letter}</span>
+      {item ? <img key={item.baseId} src={`/icons/item-${item.baseId}.png`} width={size - 3} height={size - 3} alt=""
+        onError={(e) => { e.currentTarget.style.display = "none" }}
+        style={{ position: "relative", objectFit: "cover", borderRadius: "var(--radius)" }} /> : null}
+    </span>
+  )
+}
 /** WoW-style item card: rarity-coloured name, type/ilvl line, then white base stats (main + stamina) and green
     secondary stats. Pair with <Tip accent={qualityColor(item.rarity)}> so the tooltip border matches the rarity. */
 export function ItemTip({ item, label }: { item: GearItem; label?: string }) {
@@ -29,7 +44,7 @@ export function ItemTip({ item, label }: { item: GearItem; label?: string }) {
   const slotName = content.itemSlots.get(item.slot)?.name ?? item.slot
   return (
     <div style={{ minWidth: 172, maxWidth: 260 }}>
-      <div style={{ fontWeight: 700, fontSize: 14, color: q }}>{item.name}</div>
+      <div style={{ fontWeight: 700, fontSize: 14, color: q, display: "flex", alignItems: "center", gap: 7 }}><ItemIcon item={item} size={22} />{item.name}</div>
       <div style={{ color: "var(--muted)", fontSize: 11.5, marginTop: 1, display: "flex", justifyContent: "space-between", gap: 14 }}>
         <span>{label ?? slotName}</span><span style={{ color: q }}>{item.rarity}</span>
       </div>

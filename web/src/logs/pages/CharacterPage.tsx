@@ -4,7 +4,7 @@ import { useGame, roleOf, SLOTS, type GearItem } from "@/state/game-store"
 import type { Member } from "@/data/game"
 import { corOf, potentialStars, roleKeyOf } from "@/data/operator"
 import { mc, memberScore, scoreColor, qualityColor, bestRunsFor } from "../analytics"
-import { Icon, Panel, RolePill, Upgrade, Tip, ItemTip, SpellTip, GameIcon } from "../components"
+import { Icon, Panel, RolePill, Upgrade, Tip, ItemTip, ItemIcon, SpellTip, GameIcon } from "../components"
 import { SkillBars, Stars, corColor, traitCombatSummary } from "../OperatorPanel"
 import type { Go, GoChar } from "../LogsApp"
 
@@ -165,9 +165,7 @@ function ItemRow({ label, item }: { label: string; item?: GearItem }) {
   return (
     <Tip accent={qColor} tip={item ? <ItemTip item={item} label={label} /> : null} style={{ width: "100%" }}>
     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "5px 7px", borderRadius: "var(--radius)", background: "var(--row)", width: "100%" }}>
-      <span style={{ width: 36, height: 36, flex: "none", borderRadius: 7, background: "linear-gradient(145deg,#23252e,#15161b)", border: `1.5px solid ${qColor}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ fontFamily: "IBM Plex Mono, monospace", fontSize: 13, fontWeight: 700, color: qColor, opacity: .9 }}>{label[0]}</span>
-      </span>
+      <ItemIcon item={item} size={36} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ color: qColor, fontWeight: 600, fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item?.name ?? "—"}</div>
         <div style={{ color: "var(--faint)", fontSize: 11, marginTop: 1 }}>{label}</div>
