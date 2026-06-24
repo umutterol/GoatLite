@@ -7,6 +7,7 @@
 import { createServer } from "vite"
 
 const ILVL = Number(process.argv[2] ?? 150)
+const RARITY = Number(process.argv[3] ?? 1)   // item-stats: effIlvl = ILVL × rarityMult (1.0 Common … 1.25 Epic) to show the gear spike
 const server = await createServer({ server: { middlewareMode: true }, appType: "custom", logLevel: "error" })
 try {
   const { content } = await server.ssrLoadModule("/src/content/index.ts")
@@ -35,7 +36,7 @@ try {
     for (const seed of seeds) {
       const r = runDungeonEGM({ dungeonId: `dps-${n}`, keyLevel: 2, affixIds: [], aggression: "Balanced", seed,
         tactics: { interrupts: 0, positioning: 0, cooldowns: 0, killorder: 0 },
-        party: [{ id: "m0", name: specId, specId, ilvl: ILVL, morale: 60, traitIds: [] }] })
+        party: [{ id: "m0", name: specId, specId, ilvl: ILVL, effIlvl: ILVL * RARITY, morale: 60, traitIds: [] }] })
       const last = r.series.filter(Boolean).at(-1)
       sum += (last ? last[0] : 0) / Math.max(1, r.durationSec)
     }
@@ -45,7 +46,7 @@ try {
   const rows = SPECS.map((s) => ({ ...s, d1: dpsOf(s.id, 1), d3: dpsOf(s.id, 3), d5: dpsOf(s.id, 5) }))
     .sort((a, b) => (ROLE_ORDER[a.role] - ROLE_ORDER[b.role]) || (b.d1 - a.d1))
 
-  console.log(`=== DPS meta — solo spec vs N training dummies @ ilvl${ILVL}, keyLevel 2, Balanced, no talents/operator (avg of ${seeds.length} seeds) ===`)
+  console.log(`=== DPS meta — solo spec vs N training dummies @ ilvl${ILVL} (rarityMult ${RARITY} → effIlvl ${ILVL * RARITY}), keyLevel 2, Balanced, no talents/operator (avg of ${seeds.length} seeds) ===`)
   console.log(`spec          role    |   1-tgt |   3-tgt |   5-tgt |  5T/1T (AoE scaling)`)
   for (const r of rows) {
     const scale = r.d1 > 0 ? (r.d5 / r.d1).toFixed(2) : "—"

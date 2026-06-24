@@ -10,7 +10,7 @@ import {
 } from "@/data/operator"
 import { generateBarks, type BarkMoment } from "./barks"
 import { Rng } from "@/sim/rng"
-import { rollItemStats, type ItemStats } from "./item-stats"
+import { rollItemStats, gearEffectiveIlvl, gearSecondaries, type ItemStats } from "./item-stats"
 
 const SAVE_KEY = "goatlite.save"
 const SAVE_VERSION = 6 // bumped: Phase P GATE 0 (boss-dive fix + intake floor + school wall) changes deterministic run results → clean reset
@@ -746,7 +746,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const party: SimPartyMember[] = state.partyIds
         .map((id) => state.roster.find((m) => m.id === id))
         .filter(Boolean)
-        .map((m) => ({ id: m!.id, name: m!.name, specId: m!.specId, ilvl: memberIlvl(m!.gear), morale: m!.morale, traitIds: m!.traitIds, talents: m!.talents, skills: m!.skills }))
+        .map((m) => {
+          const eq = SLOTS.map((s) => m!.gear[s]).filter(Boolean)   // item-stats M2: power/HP from summed gear stats
+          return { id: m!.id, name: m!.name, specId: m!.specId, ilvl: memberIlvl(m!.gear), effIlvl: gearEffectiveIlvl(eq), secondaries: gearSecondaries(eq), morale: m!.morale, traitIds: m!.traitIds, talents: m!.talents, skills: m!.skills }
+        })
       const seed = Math.floor(Math.random() * 0xffffffff)
       const result = runDungeon({ dungeonId: runKeyState.dungeonId, keyLevel: runKeyState.level, affixIds: affIds, party, tactics: cfg.tactics, aggression: cfg.aggression, seed })
       const dgn = content.dungeons.get(runKeyState.dungeonId)

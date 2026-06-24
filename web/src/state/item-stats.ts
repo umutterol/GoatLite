@@ -43,3 +43,19 @@ export function rollItemStats(item: { uid: string; slot: string; ilvl: number; r
     secondaries,
   }
 }
+
+/* ---- gear → sim summary (M2/M3). The sim sources power/HP/armour from `effIlvl` and secondaries from the summed
+   ratings; a full Common set reproduces its plain ilvl (no spike), rarity multiplies effIlvl up (the spike). ---- */
+export interface SecondaryTotals { haste: number; critChance: number; critDamage: number; versatility: number }
+const SEC_KEY: Record<string, keyof SecondaryTotals> = { "Haste": "haste", "Crit Chance": "critChance", "Crit Damage": "critDamage", "Versatility": "versatility" }
+
+/** Effective ilvl = Σ(mainStat)/MAIN_K (rarity + slot weighted). A Common full set → its plain ilvl; an Epic set → ×1.25. */
+export function gearEffectiveIlvl(items: Pick<ItemStats, "mainStat">[]): number {
+  return items.reduce((a, it) => a + (it?.mainStat ?? 0), 0) / MAIN_K
+}
+/** Summed secondary RATINGS across equipped gear (rating→% conversion happens in the sim, M3). */
+export function gearSecondaries(items: Pick<ItemStats, "secondaries">[]): SecondaryTotals {
+  const t: SecondaryTotals = { haste: 0, critChance: 0, critDamage: 0, versatility: 0 }
+  for (const it of items) for (const s of it?.secondaries ?? []) { const k = SEC_KEY[s.stat]; if (k) t[k] += s.value }
+  return t
+}

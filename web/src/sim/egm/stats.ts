@@ -219,14 +219,17 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
     const spec = content.specs.get(p.specId)!
     const role = ROLE[spec.role]
     const c = rm[role]
-    const power = c.powerPerIlvl * p.ilvl * moraleMult(p.morale) * aggressionOutput
-    const haste = 0 // Phase 1: no haste source yet (gear secondaries land later)
+    // item-stats M2: power/HP/armour scale off the gear-derived effective ilvl (Σ mainStat/MAIN_K, rarity+slot-weighted).
+    // Absent (harnesses set raw ilvl) → falls back to plain ilvl → byte-identical. Rarity's spike rides here.
+    const il = p.effIlvl ?? p.ilvl
+    const power = c.powerPerIlvl * il * moraleMult(p.morale) * aggressionOutput
+    const haste = 0 // M3 wires Haste from p.secondaries here
     const attackInterval = ATTACK_INTERVAL_BASE / (1 + haste / 100)
     const tal = resolveTalents(p.talents, p.specId)   // M7: filter to global + this spec's nodes
     const op = resolveOperator(p.skills, p.traitIds)   // Phase F: operator skills + trait combat → multipliers
     // H.3: talent intakePct folds into the operator (uniform) intake channel
     const intakeStatic = Math.max(0.2, Math.min(2, op.intakeStatic * (1 + tal.intakePct / 100)))
-    const maxHp = c.hpPerIlvl * p.ilvl * tal.hpMult * op.hpMult
+    const maxHp = c.hpPerIlvl * il * tal.hpMult * op.hpMult
     const baseAbilities = [...content.playerAbilities.values()].filter((a) => a.specId === p.specId && a.trigger === "active")
     const basePassive = [...content.playerAbilities.values()].find((a) => a.specId === p.specId && a.trigger === "passive") ?? null
     const { abilities, passive } = applyAbilityOverrides(baseAbilities, basePassive, tal.abilityOverrides)   // §B (M2)
@@ -238,11 +241,11 @@ export function buildParty(party: SimPartyMember[], aggressionOutput: number, di
       attackPower: power * attackInterval,   // so pre-crit DPS ≈ power, matching the current balance
       attackInterval,
       damageType: autoDamageType(spec.classId, p.specId),
-      armour: (c.armourPerIlvl ?? 0) * p.ilvl, resist: 0,
+      armour: (c.armourPerIlvl ?? 0) * il, resist: 0,
       critChance: Math.max(0, baseCrit + dialCrit + op.critBonus + tal.critPct / 100), critMult,
       dodgeChance: op.dodgeBonus, damageTakenPct: 0,
       mana: c.mana ?? 0, maxMana: c.mana ?? 0, healCost: c.healCost ?? 0,
-      manaRegen: c.manaRegenPerSec ?? 0, hps: (c.hpsPerIlvl ?? 0) * p.ilvl,
+      manaRegen: c.manaRegenPerSec ?? 0, hps: (c.hpsPerIlvl ?? 0) * il,
       nextActionAt: 0, downedUntil: -1, dmgDone: 0, healDone: 0, deaths: 0, isBoss: false,
       abilities, passive, cooldowns: {}, statuses: [], resources: {}, hitSinceAction: false, lastActionAt: 0,
       emergencyHealed: false, guards: {}, talents: tal.dmg, talentCondIntake: tal.condIntake, talentCondCrit: tal.condCrit, talentEventRiders: tal.eventRiders, talentAtonement: tal.atonement,

@@ -13,7 +13,13 @@ export interface SimPartyMember {
   talents?: Record<string, string>   // nodeId → chosen optionId (absent → balanced defaults)
   skills?: Record<string, number>    // Phase F: operator-skill id → current value (1..20); absent → engine uses baseline
   profile?: string
+  // item-stats: gear-derived. `effIlvl` = rarity+slot-weighted effective ilvl (Σ item mainStat / MAIN_K) — drives
+  // power/HP/armour. ABSENT → falls back to plain `ilvl`, so harnesses that set a raw ilvl stay byte-identical.
+  // `secondaries` = summed gear RATINGS (haste/crit/vers); applied in M3 (rating→% conversion).
+  effIlvl?: number
+  secondaries?: SimItemSecondaries
 }
+export interface SimItemSecondaries { haste?: number; critChance?: number; critDamage?: number; versatility?: number }
 
 export interface RunInput {
   dungeonId: string
