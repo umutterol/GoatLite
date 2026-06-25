@@ -2,11 +2,11 @@
 import { useState } from "react"
 import { content } from "@/content"
 import { useGame } from "@/state/game-store"
-import { affixUnlockKey } from "@/sim/affixes"
+import { activeAffixIds } from "@/sim/affixes"
 import type { Aggression } from "@/sim"
 import { mc, qualityColor, moraleColor, MORALE_TIP } from "../analytics"
 import { rarityForIlvl } from "@/state/item-stats"
-import { Icon, GameIcon, Panel, RolePill, Tip, TipBody } from "../components"
+import { Icon, GameIcon, Panel, RolePill, Tip, TipBody, KeyTip } from "../components"
 import type { Go } from "../LogsApp"
 
 const TACTICS = [...content.tactics.values()]
@@ -28,11 +28,9 @@ export function SetupPage({ go }: { go: Go }) {
     const next = { ...tactics, [id]: Math.max(0, Math.min(MAX_PER, (tactics[id] || 0) + delta)) }
     if (TACTICS.reduce((s, t) => s + (next[t.id] || 0), 0) <= TOTAL_POINTS) setTactics(next)
   }
-  const tier1 = g.weekAffixes.find((a) => a.tier === 1)
-  const tier2 = g.weekAffixes.filter((a) => a.tier === 2)
   const partyFull = g.party.length === 5
   const keys = [...g.keys].sort((a, b) => b.level - a.level)   // highest keys first
-  const owner = g.keys.find((k) => k.ownerId === g.selectedKeyOwnerId)
+  const weekAffixes = g.weekAffixes  // weekly + level-gated (same set for every key; which are ACTIVE depends on the key's level)
   // roster picker order: key owner first, then the rest of the party, then the bench (each by ilvl desc)
   const rank = (id: string) => id === g.selectedKeyOwnerId ? 0 : g.partyIds.includes(id) ? 1 : 2
   const roster = [...g.members].sort((a, b) => rank(a.id) - rank(b.id) || b.ilvl - a.ilvl)
@@ -48,69 +46,56 @@ export function SetupPage({ go }: { go: Go }) {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, alignItems: "start" }}>
-          {/* keystone & affixes */}
+          {/* keys — the focus of this board. Pick one to run; its holder locks into the party. */}
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-            <Panel title="Choose a Key" right={<span className="mono" style={{ fontSize: 11.5, color: "var(--faint)" }}>week {g.weekNumber}</span>} bodyStyle={{ padding: 12 }}>
-              {/* selected key — the one this run will use (its holder is locked into the party) */}
-              <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "8px 10px 14px", borderBottom: "1px solid var(--line-soft)" }}>
-                <div style={{ width: 50, height: 50, borderRadius: 12, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}>
-                  <span className="mono" style={{ fontWeight: 700, fontSize: 14, color: "#04201d" }}>{g.keystone.dungeonShort}</span>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 18, fontWeight: 700 }}>{g.keystone.dungeon}</div>
-                  <div className="flux" style={{ fontSize: 12.5, marginTop: 2 }}>{owner ? `${owner.ownerName}'s key · ` : ""}timer {g.keystone.timer} · best +{g.keystone.best || g.keystone.level}</div>
-                </div>
-                <span className="mono" style={{ fontSize: 34, fontWeight: 700, color: "var(--amber)" }}>+{g.keystone.level}</span>
-              </div>
-              {/* every member's key — pick one to run; its holder auto-joins (and locks into) the party */}
-              <div style={{ display: "flex", flexDirection: "column", maxHeight: 280, overflowY: "auto", marginTop: 6 }}>
-                {keys.map((k) => {
-                  const info = mc(k.spec)
-                  const sel = k.ownerId === g.selectedKeyOwnerId
-                  return (
-                    <button key={k.ownerId} onClick={() => g.selectKey(k.ownerId)}
-                      style={{ display: "flex", alignItems: "center", gap: 11, padding: "8px 9px", borderRadius: 8, border: "1px solid " + (sel ? "var(--accent)" : "transparent"), background: sel ? "rgba(43,182,164,.10)" : "transparent", cursor: "pointer", textAlign: "left", width: "100%" }}>
-                      <span style={{ width: 26, height: 26, borderRadius: 6, background: info.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#0c0d11", fontSize: 13, flex: "none" }}>{k.ownerName[0]}</span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ color: info.color, fontWeight: 700, fontSize: 13.5 }}>{k.ownerName}</div>
-                        <div style={{ color: "var(--faint)", fontSize: 11.5 }}>{k.dungeonShort} · best +{k.best || k.level}</div>
-                      </div>
-                      <span className="mono" style={{ fontSize: 18, fontWeight: 700, color: sel ? "var(--amber)" : "var(--muted)", width: 44, textAlign: "right" }}>+{k.level}</span>
-                    </button>
-                  )
-                })}
-              </div>
+            <Panel title="Choose a Key" right={<span className="mono" style={{ fontSize: 11.5, color: "var(--faint)" }}>timer {g.keystone.timer}</span>} bodyStyle={{ padding: 0 }}>
+              <table className="runs">
+                <thead>
+                  <tr>
+                    <th style={{ width: 40 }}></th>
+                    <th>Key</th>
+                    <th>Affixes</th>
+                    <th>Owner</th>
+                    <th className="r">Lvl</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {keys.map((k) => {
+                    const info = mc(k.spec)
+                    const sel = k.ownerId === g.selectedKeyOwnerId
+                    const active = activeAffixIds(weekAffixes.map((a) => a.id), k.level)
+                    return (
+                      <tr key={k.ownerId} data-key-row onClick={() => g.selectKey(k.ownerId)}
+                        style={{ cursor: "pointer", background: sel ? "rgba(43,182,164,.08)" : undefined, boxShadow: sel ? "inset 2px 0 0 var(--accent)" : undefined }}>
+                        <td><GameIcon kind="dungeon" id={k.dungeonId} size={26} label={`${k.dungeon} Keystone`} /></td>
+                        <td>
+                          <Tip accent={qualityColor("Epic")} tip={<KeyTip name={k.dungeon} level={k.level} timer={k.timer} best={k.best} affixes={weekAffixes} />}>
+                            <span style={{ color: qualityColor("Epic"), fontWeight: 700, fontSize: 13.5, cursor: "help" }}>{k.dungeon} Keystone</span>
+                          </Tip>
+                        </td>
+                        <td>
+                          {weekAffixes.length ? (
+                            <span style={{ display: "inline-flex", gap: 3 }}>
+                              {weekAffixes.map((a) => <GameIcon key={a.id} kind="affix" id={a.id} size={16} label={a.name} style={{ opacity: active.includes(a.id) ? 1 : .28 }} />)}
+                            </span>
+                          ) : <span style={{ color: "var(--faint)", fontSize: 11.5 }}>—</span>}
+                        </td>
+                        <td>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ width: 22, height: 22, borderRadius: "var(--radius)", background: "var(--panel-3)", border: `1.5px solid ${info.color}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flex: "none" }}><GameIcon kind="spec" id={k.spec} size={18} color={info.color} label={`${info.subspec} ${info.klass}`} /></span>
+                            <span style={{ color: info.color, fontWeight: 700, fontSize: 13 }}>{k.ownerName}</span>
+                          </div>
+                        </td>
+                        <td className="r mono" style={{ fontWeight: 700, fontSize: 15, color: sel ? "var(--amber)" : "var(--muted)" }}>+{k.level}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+              {weekAffixes.length && !activeAffixIds(weekAffixes.map((a) => a.id), g.keystone.level).length
+                ? <div className="flux" style={{ fontSize: 11.5, color: "var(--faint)", padding: "8px 14px 12px" }}>Affixes unlock as the key climbs — none are live at this level yet.</div>
+                : null}
             </Panel>
-
-            {tier1 ? (() => {
-              const at = affixUnlockKey(tier1.id), active = g.keystone.level >= at
-              return (
-                <Panel title="Affix · Tier 1" bodyStyle={{ padding: 18 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <span className="seg-btn on accent" style={{ cursor: "default", opacity: active ? 1 : .45 }}>{tier1.name}</span>
-                    <span className="chip" style={{ color: active ? "var(--good)" : "var(--faint)" }}>{active ? "active this run" : `unlocks at +${at}`}</span>
-                  </div>
-                  <p className="flux" style={{ fontSize: 13.5, marginTop: 12, opacity: active ? 1 : .55 }}>{tier1.effect}</p>
-                </Panel>
-              )
-            })() : null}
-
-            {tier2.length ? (
-              <Panel title="Affix · Tier 2" bodyStyle={{ padding: 18 }}>
-                {tier2.map((a) => {
-                  const at = affixUnlockKey(a.id), active = g.keystone.level >= at
-                  return (
-                    <div key={a.id} style={{ marginBottom: 10, opacity: active ? 1 : .55 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontWeight: 700, fontSize: 15 }}>{a.name}</span>
-                        <span className="chip" style={{ fontSize: 11, color: active ? "var(--good)" : "var(--faint)" }}>{active ? "active" : `+${at}`}</span>
-                      </div>
-                      <p className="flux" style={{ fontSize: 13, marginTop: 4 }}>{a.effect}</p>
-                    </div>
-                  )
-                })}
-              </Panel>
-            ) : null}
           </div>
 
           {/* party & tactics */}

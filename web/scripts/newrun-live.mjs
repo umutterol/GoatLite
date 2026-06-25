@@ -54,8 +54,18 @@ try {
 
   // key table (finding N7) — only assert if present
   const keyRows = await page.locator("[data-key-row]").count().catch(() => 0)
-  if (keyRows > 0) check(keyRows >= 1, `key table present (${keyRows} rows)`)
-  else console.log("(no key table yet — finding N7 not landed)")
+  if (keyRows > 0) {
+    check(keyRows >= 1, `key table present (${keyRows} rows)`)
+    // N9: hovering the (purple, Epic) key name pops the KeyTip — exercise its render (it only mounts on hover)
+    await page.locator("[data-key-row] span", { hasText: /Keystone/ }).first().hover().catch(() => {})
+    await page.waitForTimeout(200)
+    const keyTip = await page.evaluate(() => {
+      const t = document.querySelector('[role="tooltip"]')
+      return t ? t.innerText.slice(0, 120) : null
+    })
+    check(!!keyTip && /Keystone/i.test(keyTip), `KeyTip renders on hover — ${keyTip ? keyTip.replace(/\n/g, " · ") : "none"}`)
+    await shot("keytip")
+  } else console.log("(no key table yet — finding N7 not landed)")
 
   console.log(`\nconsole errors: ${errors.length}`)
   errors.slice(0, 12).forEach((e) => console.log("  x " + e))

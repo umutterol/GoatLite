@@ -3,6 +3,7 @@ import { useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { createPortal } from "react-dom"
 import { useStage, toStageCoords, STAGE_W, STAGE_H } from "./ViewportStage"
 import { content } from "@/content"
+import { activeAffixIds, affixUnlockKey } from "@/sim/affixes"
 import { mc, parseColor, parseLabel, fmt, fmtInt, mmss, qualityColor, type DmgRow } from "./analytics"
 import type { RoleKey, GearItem } from "@/state/game-store"
 
@@ -59,6 +60,34 @@ export function ItemTip({ item, label }: { item: GearItem; label?: string }) {
         {item.mainStat ? <div style={{ color: "var(--text)" }}>+{item.mainStat} {item.mainStatType}</div> : null}
         {item.stamina ? <div style={{ color: "var(--text)" }}>+{item.stamina} Stamina</div> : null}
         {(item.secondaries ?? []).map((s, i) => <div key={i} style={{ color: "var(--good)" }}>+{s.value} {s.stat}</div>)}
+      </div>
+    </div>
+  )
+}
+/** WoW-style tooltip for a Mythic Keystone (an Epic-quality "item"): purple name, type/level line, timer + best,
+    then the week's affixes as rows — active ones green, still-locked ones faint with their unlock level. Pair with
+    <Tip accent={qualityColor("Epic")}>. */
+export function KeyTip({ name, level, timer, best, affixes }: { name: string; level: number; timer: string; best: number; affixes: { id: string; name: string; effect: string }[] }) {
+  const q = qualityColor("Epic")
+  const active = new Set(activeAffixIds(affixes.map((a) => a.id), level))
+  return (
+    <div style={{ minWidth: 210, maxWidth: 280 }}>
+      <div style={{ fontWeight: 700, fontSize: 14, color: q }}>{name} Keystone</div>
+      <div style={{ color: "var(--muted)", fontSize: 11.5, marginTop: 1, display: "flex", justifyContent: "space-between", gap: 14 }}>
+        <span>Keystone · +{level}</span><span style={{ color: q }}>Epic</span>
+      </div>
+      <div style={{ color: "var(--faint)", fontSize: 11 }}>Timer {timer} · Best +{best || level}</div>
+      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 4 }}>
+        {affixes.length === 0 ? <div style={{ color: "var(--faint)", fontSize: 11.5 }}>No affixes set this week.</div> : affixes.map((a) => {
+          const on = active.has(a.id)
+          return (
+            <div key={a.id} style={{ fontSize: 11.5, opacity: on ? 1 : .7 }}>
+              <span style={{ fontWeight: 700, color: on ? "var(--good)" : "var(--faint)" }}>{a.name}</span>
+              {on ? null : <span style={{ color: "var(--faint)" }}> · unlocks at +{affixUnlockKey(a.id)}</span>}
+              <div style={{ color: "var(--muted)" }}>{a.effect}</div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
