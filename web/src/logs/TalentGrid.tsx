@@ -7,7 +7,7 @@ import { useMemo, useState, type CSSProperties } from "react"
 import { createPortal } from "react-dom"
 import { content } from "@/content"
 import { mc } from "./analytics"
-import { Tip, TipBody } from "./components"
+import { Tip, TipBody, Panel } from "./components"
 import { useStage } from "./ViewportStage"
 
 type TalentOption = { id: string; name: string; effect: string; default?: boolean }
@@ -41,8 +41,9 @@ function nodesFor(specId: string): TalentNode[] {
 const defaultOpt = (n: TalentNode, chosen?: Record<string, string>): TalentOption =>
   n.options.find((o) => o.id === chosen?.[n.id]) ?? n.options.find((o) => o.default) ?? n.options[0]
 
-/** The full 5×3 talent grid, portaled into the scaled stage as a click-dismiss modal. Read-only. */
-function TalentPopup({ specId, nodes, chosen, onClose }: { specId: string; nodes: TalentNode[]; chosen?: Record<string, string>; onClose: () => void }) {
+/** The full 5×3 talent grid, portaled into the scaled stage as a click-dismiss modal. Read-only unless `onPick` is
+    passed (then cells are clickable to set the build, e.g. on the Character sheet). */
+function TalentPopup({ specId, nodes, chosen, onClose, onPick }: { specId: string; nodes: TalentNode[]; chosen?: Record<string, string>; onClose: () => void; onPick?: (nodeId: string, optionId: string) => void }) {
   const { el } = useStage()
   const info = mc(specId)
   const cell: CSSProperties = { display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "10px 6px", borderRadius: "var(--radius)", textAlign: "center" }
@@ -64,7 +65,7 @@ function TalentPopup({ specId, nodes, chosen, onClose }: { specId: string; nodes
                     const on = o.id === cur
                     return (
                       <Tip key={o.id} accent={on ? "var(--accent)" : undefined} tip={<TipBody title={o.name} desc={o.effect} accent={on ? "var(--accent)" : undefined} />}>
-                        <div data-talent-cell style={{ ...cell, border: on ? "1px solid var(--accent)" : "1px solid var(--line-soft)", background: on ? "rgba(43,182,164,.08)" : "transparent", cursor: "help" }}>
+                        <div data-talent-cell onClick={onPick ? () => onPick(n.id, o.id) : undefined} style={{ ...cell, border: on ? "1px solid var(--accent)" : "1px solid var(--line-soft)", background: on ? "rgba(43,182,164,.08)" : "transparent", cursor: onPick ? "pointer" : "help" }}>
                           <TalentIcon opt={o} tier={n.node} on={on} size={40} />
                           <span style={{ fontSize: 11.5, fontWeight: 600, lineHeight: 1.25, color: on ? "var(--text)" : "var(--muted)" }}>{o.name}</span>
                         </div>
@@ -75,7 +76,7 @@ function TalentPopup({ specId, nodes, chosen, onClose }: { specId: string; nodes
               </div>
             )
           })}
-          <div className="flux" style={{ fontSize: 11, color: "var(--faint)" }}>Recruits show the spec's default build (highlighted). Builds are tuned per member after signing.</div>
+          <div className="flux" style={{ fontSize: 11, color: "var(--faint)" }}>{onPick ? "Click an option to set this member's build — applied on the next run." : "Recruits show the spec's default build (highlighted). Builds are tuned per member after signing."}</div>
         </div>
       </div>
     </div>
@@ -83,28 +84,34 @@ function TalentPopup({ specId, nodes, chosen, onClose }: { specId: string; nodes
   return createPortal(modal, el ?? document.body)
 }
 
-/** A one-row strip of the spec's selected default talents + a "Talents" button opening the full grid. */
-export function TalentStrip({ specId, chosen }: { specId: string; chosen?: Record<string, string> }) {
+/** A one-row strip of the spec's selected talents + a "Talents" button opening the full grid. Pass `chosen` to reflect
+    a member's saved build (else spec defaults), `onPick` to make the popup editable (Character sheet), and `framed` to
+    render inside a Panel (vs the bordered section used in the recruit scout panel). */
+export function TalentStrip({ specId, chosen, onPick, framed }: { specId: string; chosen?: Record<string, string>; onPick?: (nodeId: string, optionId: string) => void; framed?: boolean }) {
   const [open, setOpen] = useState(false)
   const nodes = useMemo(() => nodesFor(specId), [specId])
   if (!nodes.length) return null
+  const body = (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+      <div style={{ display: "flex", gap: 6 }}>
+        {nodes.map((n) => {
+          const o = defaultOpt(n, chosen)
+          return (
+            <Tip key={n.id} tip={<TipBody title={o.name} desc={o.effect} />}>
+              <span style={{ display: "inline-flex" }}><TalentIcon opt={o} tier={n.node} on /></span>
+            </Tip>
+          )
+        })}
+      </div>
+      <button className="btn btn-sm btn-ghost" style={{ flex: "none" }} onClick={() => setOpen(true)}>Talents ▾</button>
+    </div>
+  )
+  const popup = open ? <TalentPopup specId={specId} nodes={nodes} chosen={chosen} onPick={onPick} onClose={() => setOpen(false)} /> : null
+  if (framed) return <Panel title="Talents" bodyStyle={{ padding: 14 }}>{body}{popup}</Panel>
   return (
     <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--line-soft)" }}>
       <div className="eyebrow" style={{ fontSize: 10, marginBottom: 9 }}>Talents</div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-        <div style={{ display: "flex", gap: 6 }}>
-          {nodes.map((n) => {
-            const o = defaultOpt(n, chosen)
-            return (
-              <Tip key={n.id} tip={<TipBody title={o.name} desc={o.effect} />}>
-                <span style={{ display: "inline-flex" }}><TalentIcon opt={o} tier={n.node} on /></span>
-              </Tip>
-            )
-          })}
-        </div>
-        <button className="btn btn-sm btn-ghost" style={{ flex: "none" }} onClick={() => setOpen(true)}>Talents ▾</button>
-      </div>
-      {open ? <TalentPopup specId={specId} nodes={nodes} chosen={chosen} onClose={() => setOpen(false)} /> : null}
+      {body}{popup}
     </div>
   )
 }

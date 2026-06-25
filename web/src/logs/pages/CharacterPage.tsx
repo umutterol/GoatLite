@@ -5,6 +5,7 @@ import type { Member } from "@/data/game"
 import { corOf, potentialStars, roleKeyOf } from "@/data/operator"
 import { mc, memberScore, scoreColor, qualityColor, bestRunsFor } from "../analytics"
 import { Icon, Panel, RolePill, Upgrade, Tip, ItemTip, ItemIcon, SpellTip, GameIcon } from "../components"
+import { TalentStrip } from "../TalentGrid"
 import { SkillBars, corColor, potentialLabel, potentialCor, traitCombatSummary } from "../OperatorPanel"
 import type { Go, GoChar } from "../LogsApp"
 
@@ -23,7 +24,6 @@ export function CharacterPage({ id, go }: { id: string; go: Go; goChar: GoChar }
   const role = roleOf(m.spec)
   const inParty = g.partyIds.includes(m.id)
   const gear = g.gearFor(m.id)
-  const profileName = (() => { const sp = content.specs.get(m.spec); const p = sp ? content.profiles.get(sp.defaultProfile) : undefined; return p?.name ?? "Default" })()
   const runColor = (s: number) => (s >= 280 ? "#e268a8" : s >= 250 ? "#ff8000" : s >= 220 ? "#a335ee" : s >= 190 ? "#0070ff" : "#1eff00")
 
   return (
@@ -92,9 +92,9 @@ export function CharacterPage({ id, go }: { id: string; go: Go; goChar: GoChar }
 
         {/* right: signature + operator + talents */}
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <SignatureCard specId={m.spec} color={info.color} />
+          <SkillsCard specId={m.spec} color={info.color} />
           <OperatorCard member={m} color={info.color} />
-          <Talents member={m} color={info.color} behavior={profileName} />
+          <TalentStrip specId={m.spec} chosen={m.talents} onPick={(node, opt) => g.setTalent(m.id, node, opt)} framed />
           <button className="btn btn-primary" style={{ justifyContent: "center", padding: "11px" }} onClick={() => go("report")}>
             <Icon name="report" size={15} color="#04201d" /> View Latest Report
           </button>
@@ -104,23 +104,19 @@ export function CharacterPage({ id, go }: { id: string; go: Go; goChar: GoChar }
   )
 }
 
-function SignatureCard({ specId, color }: { specId: string; color: string }) {
-  const major = [...content.playerAbilities.values()].find((a) => a.specId === specId && (a.tags ?? []).includes("major"))
-  if (!major) return null
-  const sk = content.skills.get(major.id)
-  const cdLabel = sk && sk.cd > 0 ? `${sk.cd * 3}s CD` : "No CD"
+/** All of the spec's skills as icons — hover each for its full spell card (name, cooldown, school, effect). */
+function SkillsCard({ specId, color }: { specId: string; color: string }) {
+  const abilities = [...content.playerAbilities.values()].filter((a) => a.specId === specId)
+  if (!abilities.length) return null
   return (
-    <Panel title="Signature" right={<span className="mono" style={{ fontSize: 11, color: "var(--faint)" }}>{cdLabel}</span>} bodyStyle={{ padding: 14 }}>
-      <Tip tip={<SpellTip skillId={major.id} name={major.name} />} style={{ width: "100%" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 11, width: "100%", cursor: "help" }}>
-          <GameIcon kind="ability" id={major.id} size={36} noTip style={{ border: `1px solid ${color}55` }} />
-
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 700, color, fontSize: 14 }}>{major.name}</div>
-            <div className="flux" style={{ fontSize: 11.5, lineHeight: 1.4 }}>{(sk?.description ?? "Signature cooldown.").replace(/^MAJOR\.\s*/, "")}</div>
-          </div>
-        </div>
-      </Tip>
+    <Panel title="Skills" right={<span className="mono" style={{ fontSize: 11, color: "var(--faint)" }}>{abilities.length}</span>} bodyStyle={{ padding: 14 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {abilities.map((a) => (
+          <Tip key={a.id} tip={<SpellTip skillId={a.id} name={a.name} />}>
+            <span style={{ display: "inline-flex", cursor: "help" }}><GameIcon kind="ability" id={a.id} size={40} noTip style={{ border: `1px solid ${color}55` }} /></span>
+          </Tip>
+        ))}
+      </div>
     </Panel>
   )
 }
@@ -176,39 +172,3 @@ function ItemRow({ label, item }: { label: string; item?: GearItem }) {
   )
 }
 
-function Talents({ member, color, behavior }: { member: Member; color: string; behavior: string }) {
-  const g = useGame()
-  // MVP: only nodes whose options carry real engine effects are pickable (nodes 3-5 are prose-only until C.2)
-  const nodes = [...content.talents.values()].filter((n) => (!n.specId || n.specId === member.spec) && n.options.some((o) => o.effects)).sort((a, b) => a.node - b.node)
-  const chosenId = (node: typeof nodes[number]) =>
-    member.talents?.[node.id] ?? node.options.find((o) => o.default)?.id ?? node.options[0].id
-  return (
-    <Panel title="Talents" right={<span className="chip" style={{ color }}>{behavior}</span>} bodyStyle={{ padding: 14 }}>
-      {nodes.map((node, gi) => {
-        const cur = chosenId(node)
-        return (
-          <div key={node.id} style={{ marginBottom: gi === nodes.length - 1 ? 0 : 14 }}>
-            <div className="eyebrow" style={{ fontSize: 10, marginBottom: 7 }}>{node.name}</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {node.options.map((ch) => {
-                const on = ch.id === cur
-                return (
-                  <button key={ch.id} onClick={() => g.setTalent(member.id, node.id, ch.id)}
-                    style={{ display: "flex", gap: 9, alignItems: "flex-start", padding: "7px 9px", borderRadius: 7, width: "100%", textAlign: "left", cursor: "pointer",
-                      background: on ? color + "14" : "transparent", border: on ? `1px solid ${color}55` : "1px solid var(--line-soft)", opacity: on ? 1 : .62 }}>
-                    <span style={{ width: 9, height: 9, borderRadius: "50%", marginTop: 4, flex: "none", background: on ? color : "transparent", border: on ? "none" : "2px solid var(--faint)" }} />
-                    <div style={{ lineHeight: 1.4 }}>
-                      <span style={{ fontWeight: 700, fontSize: 13.5, color: on ? "var(--text)" : "var(--muted)" }}>{ch.name}</span>
-                      <div className="flux" style={{ fontSize: 12, marginTop: 2 }}>{ch.effect}</div>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        )
-      })}
-      <div className="flux" style={{ fontSize: 11, marginTop: 12, color: "var(--faint)" }}>Builds are saved per member and applied on the next run. More nodes unlock with talent trees.</div>
-    </Panel>
-  )
-}
