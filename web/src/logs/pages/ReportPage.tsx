@@ -124,15 +124,12 @@ export function ReportPage({ go, goChar, viewId, setViewId }: { go: Go; goChar: 
             hudTopLeft={<PartyHealth result={result} hp={hp} goChar={goChar} />}
             hudTopRight={
               <div style={{ background: "rgba(10,11,15,.66)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "7px 11px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 14.5, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{R.title}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                  <span style={{ fontSize: 14.5, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: "1 1 auto", minWidth: 0 }}>{R.title}</span>
                   <span className="mono" style={{ fontSize: 14, fontWeight: 700, color: "var(--amber)", flex: "none" }}>+{R.keyLevel}</span>
+                  {/* affix icons ride next to the key level */}
+                  {affixIds.map((id) => <GameIcon key={id} kind="affix" id={id} size={16} label={content.affixes.get(id)?.name} />)}
                 </div>
-                {affixIds.length ? (
-                  <div style={{ display: "flex", gap: 5, marginTop: 6, flexWrap: "wrap" }}>
-                    {affixIds.map((id) => <GameIcon key={id} kind="affix" id={id} size={18} label={content.affixes.get(id)?.name} />)}
-                  </div>
-                ) : null}
                 <div style={{ display: "flex", gap: 14, marginTop: 8, justifyContent: "flex-end" }}>
                   <Stat label="Time" value={<span className="mono">{mmss(clock)}</span>} sub={"/ " + R.par} />
                   <Stat label="Deaths" value={<span className="mono" style={{ color: visibleDeaths.length ? "var(--danger)" : "var(--good)" }}>{visibleDeaths.length}</span>} />
@@ -240,36 +237,42 @@ export function ReportPage({ go, goChar, viewId, setViewId }: { go: Go; goChar: 
   )
 }
 
-/* ---- party live health overlay (top-left of the replay canvas): name · health bar · square class icon ----
-   buff/debuff row is deferred (the sim exposes no per-second status timeline yet — would need engine instrumentation). */
+/* ---- party live health overlay (top-left of the replay canvas): raid-frame grid, one column per member ----
+   row 1 = square class icons · row 2 = names · row 3 = health bars. (Buff/debuff row deferred — the sim exposes no
+   per-second status timeline yet; that needs engine instrumentation.) */
 function PartyHealth({ result, hp, goChar }: { result: RunResult; hp: Record<string, number>; goChar: GoChar }) {
   const rows = result.partyMeta
     .map((pm) => ({ ...pm, role: roleOf(pm.specId), classId: content.specs.get(pm.specId)?.classId ?? "", frac: hp[pm.id] ?? 1 }))
     .sort((a, b) => ROLE_ORDER[a.role] - ROLE_ORDER[b.role])
   return (
-    <div style={{ background: "rgba(10,11,15,.66)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "8px 10px", width: 212 }}>
+    <div style={{ background: "rgba(10,11,15,.66)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "8px 11px", width: 360 }}>
       <div className="eyebrow" style={{ marginBottom: 8 }}>Party · Health</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${rows.length}, minmax(0, 1fr))`, columnGap: 9, rowGap: 6, alignItems: "center" }}>
+        {/* row 1 — square class icons */}
         {rows.map((r) => {
-          const info = mc(r.specId)
-          const down = r.frac <= 0.001
-          const pct = Math.round(r.frac * 100)
+          const info = mc(r.specId), down = r.frac <= 0.001
+          return (
+            <span key={"i" + r.id} onClick={() => goChar(r.id)} style={{ display: "flex", justifyContent: "center", cursor: "pointer" }}>
+              <GameIcon kind="class" id={r.classId} size={24} label={info.klass} noTip style={{ borderRadius: 3, border: `1px solid ${info.color}`, filter: down ? "grayscale(.8) brightness(.7)" : "none" }} />
+            </span>
+          )
+        })}
+        {/* row 2 — names */}
+        {rows.map((r) => {
+          const info = mc(r.specId), down = r.frac <= 0.001
+          return (
+            <div key={"n" + r.id} onClick={() => goChar(r.id)} title={r.name}
+              style={{ width: "100%", textAlign: "center", color: down ? "var(--danger)" : info.color, fontWeight: 700, fontSize: 11, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", cursor: "pointer" }}>{r.name}</div>
+          )
+        })}
+        {/* row 3 — health bars */}
+        {rows.map((r) => {
+          const down = r.frac <= 0.001, pct = Math.round(r.frac * 100)
           const barColor = down ? "#3a3d48" : r.frac > 0.5 ? "var(--good)" : r.frac > 0.25 ? "var(--amber)" : "var(--danger)"
           return (
-            <div key={r.id} style={{ cursor: "pointer", filter: down ? "grayscale(.7) brightness(.8)" : "none" }} onClick={() => goChar(r.id)}>
-              {/* name */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 6 }}>
-                <span style={{ color: info.color, fontWeight: 700, fontSize: 12.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.name}</span>
-                <span className="mono" style={{ fontSize: 11, color: down ? "var(--danger)" : "var(--faint)", flex: "none" }}>{down ? "DOWN" : pct + "%"}</span>
-              </div>
-              {/* health bar */}
-              <div style={{ height: 6, borderRadius: 4, background: "rgba(255,255,255,.06)", marginTop: 3, overflow: "hidden" }}>
-                <div style={{ height: "100%", width: pct + "%", background: barColor, borderRadius: 4, transition: "width .12s linear, background .2s" }} />
-              </div>
-              {/* square class icon (buff/debuff row goes here next) */}
-              <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 5 }}>
-                <GameIcon kind="class" id={r.classId} size={18} label={info.klass} noTip style={{ borderRadius: 3, border: `1px solid ${info.color}` }} />
-              </div>
+            <div key={"h" + r.id} onClick={() => goChar(r.id)} title={down ? "DOWN" : pct + "%"}
+              style={{ width: "100%", height: 7, borderRadius: 4, background: "rgba(255,255,255,.06)", overflow: "hidden", cursor: "pointer" }}>
+              <div style={{ height: "100%", width: pct + "%", background: barColor, borderRadius: 4, transition: "width .12s linear, background .2s" }} />
             </div>
           )
         })}
