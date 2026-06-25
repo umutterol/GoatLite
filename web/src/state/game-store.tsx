@@ -388,11 +388,12 @@ function computeLoot(state: GameState, r: RunResult, runKeyState: MemberKey): Lo
       upgrades.push({ memberId: m.id, delta, currentIlvl: cur })
       if (delta > upgradeAmt) { upgradeAmt = delta; upgradeFor = m.id }
     }
-    // preview the stat for the prospective wearer (best upgrade, else first eligible party member) — every drop is
-    // party-spec-filtered so there's always one; the label is finalised to the actual wearer on assign (CONFIRM_LOOT)
-    const previewSpec = (upgradeFor ? party.find((m) => m.id === upgradeFor) : party.find((m) => base.specs.includes(m.specId)))?.specId ?? base.specs[0] ?? "guardian"
-    const previewStat = primaryStatOf(previewSpec)
-    drops.push({ ...base, mainStatType: previewStat, primaryStat: previewStat, upgradeFor, upgradeAmt, upgrades })
+    // loot shows the item's ADAPTIVE stat RANGE across its eligible party wearers ("Strength / Intellect"), not one
+    // archetype's stat — so a shared plate piece doesn't read "Strength" and scare players off giving it to a healer
+    // (it becomes the wearer's stat on assign). Single-stat items (e.g. cloth) just show that one stat.
+    const eligibleSpecs = party.filter((m) => base.specs.includes(m.specId)).map((m) => m.specId)
+    const statLabel = [...new Set((eligibleSpecs.length ? eligibleSpecs : base.specs).map(primaryStatOf))].join(" / ")
+    drops.push({ ...base, primaryStat: statLabel, upgradeFor, upgradeAmt, upgrades })
   }
   return drops
 }

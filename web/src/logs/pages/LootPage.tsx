@@ -69,9 +69,9 @@ export function LootPage({ go }: { go: Go }) {
               <div key={it.uid} className="panel" style={{ padding: 0, overflow: "hidden", borderColor: choice ? (choice === "scrap" ? "var(--line)" : "var(--accent)") : "var(--line)", opacity: choice === "scrap" ? .7 : 1 }}>
                 <div style={{ display: "flex", alignItems: "stretch" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px", flex: "0 0 360px", borderRight: "1px solid var(--line-soft)", background: `${qColor}10` }}>
-                    <Tip accent={qColor} tip={<ItemTip item={it} />}><span style={{ cursor: "help", display: "inline-flex" }}><ItemIcon item={it} size={50} /></span></Tip>
+                    <Tip accent={qColor} tip={<ItemTip item={it} statLabel={it.primaryStat} />}><span style={{ cursor: "help", display: "inline-flex" }}><ItemIcon item={it} size={50} /></span></Tip>
                     <div>
-                      <Tip accent={qColor} tip={<ItemTip item={it} />}><span className="pixel" style={{ color: qColor, fontWeight: 700, fontSize: 16, cursor: "help" }}>{it.name}</span></Tip>
+                      <Tip accent={qColor} tip={<ItemTip item={it} statLabel={it.primaryStat} />}><span className="pixel" style={{ color: qColor, fontWeight: 700, fontSize: 16, cursor: "help" }}>{it.name}</span></Tip>
                       <div style={{ color: "var(--faint)", fontSize: 12.5, marginTop: 2 }}>{slotName} · {it.primaryStat}</div>
                       <div style={{ display: "flex", gap: 8, marginTop: 6, alignItems: "center" }}>
                         <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: qColor }}>ilvl {it.ilvl}</span>

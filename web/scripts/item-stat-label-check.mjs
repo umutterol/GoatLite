@@ -41,6 +41,22 @@ try {
     if (res.specs.includes(sp)) check(true, `tested ${sp} (→ ${EXPECT[sp]})`)
     else console.log(`(no ${sp} in this roster — not exercised this run)`)
   }
+  // loot drops show the ADAPTIVE stat RANGE (e.g. "Strength / Intellect"), not one archetype's stat. Run several keys
+  // to sample varied drops; the "/" appears whenever the party has differently-statted wearers of that armour type.
+  const validStat = /^(Strength|Agility|Intellect)( \/ (Strength|Agility|Intellect))*$/
+  const seen = new Map()
+  for (let i = 0; i < 8; i++) {
+    await page.evaluate(() => window.__game.runKey({ tactics: { interrupts: 2, positioning: 1, cooldowns: 1, killorder: 2 }, aggression: "Balanced" }))
+    await page.waitForTimeout(220)
+    for (const d of await page.evaluate(() => (window.__game.pendingLoot ?? []).map((x) => ({ s: x.slot, p: x.primaryStat })))) seen.set(`${d.s} · ${d.p}`, d.p)
+  }
+  const labels = [...seen.values()]
+  console.log("loot stat-labels seen across 8 keys:", [...seen.keys()].join("  |  "))
+  check(labels.length > 0 && labels.every((p) => validStat.test(p)), `all loot labels are valid stat ranges (${labels.length} distinct)`)
+  const multi = labels.filter((p) => p.includes("/"))
+  if (multi.length) check(true, `adaptive multi-stat label shown as a range: ${[...new Set(multi)].join(", ")}`)
+  else console.log("(no multi-stat label sampled — this party's armour wearers happen to share one stat per type)")
+
   check(errors.length === 0, `0 page errors`)
   const pass = errors.length === 0 && ok.every(Boolean)
   console.log(pass ? "\nLABEL CHECK PASS" : "\nLABEL CHECK FAIL")
