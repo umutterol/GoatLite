@@ -124,11 +124,19 @@ function shapeKey(k: MemberKey): KeyView {
   const d = content.dungeons.get(k.dungeonId) ?? [...content.dungeons.values()][0]
   return { dungeonId: k.dungeonId, dungeon: d.name, dungeonShort: dShort(d.name), level: k.level, timer: fmtMMSS(d.timerSeconds), timerSec: d.timerSeconds, best: k.best, rating: k.rating }
 }
-const PRIMARY_BY_CLASS: Record<string, string> = { warrior: "Strength", paladin: "Strength", rogue: "Agility", mage: "Intellect", sage: "Intellect" }
-function primaryStatOf(specId: string): string {
-  const cls = content.specs.get(specId)?.classId
-  return (cls && PRIMARY_BY_CLASS[cls]) || "Versatility"
+// Primary stat is a COSMETIC label — power/HP scale off item level (mainStat MAGNITUDE), never the stat TYPE. It's the
+// WEARER's flavour stat, mapped per-SPEC (not per-class) so healer/caster specs read Intellect even in plate/leather
+// (cleric) and a physical leather tank reads Agility (mystic). Items get it stamped from whoever holds them.
+const PRIMARY_BY_SPEC: Record<string, string> = {
+  guardian: "Strength", berserker: "Strength", crusader: "Strength",
+  assassin: "Agility", bard: "Agility", mystic: "Agility",
+  cleric: "Intellect", lifebinder: "Intellect", pyromancer: "Intellect", arcanist: "Intellect",
 }
+function primaryStatOf(specId: string): string {
+  return PRIMARY_BY_SPEC[specId] ?? "Versatility"
+}
+/** Stamp an item's cosmetic primary-stat label with the WEARER's stat (magnitude untouched — power is stat-agnostic). */
+const withWearerStat = (item: GearItem, specId: string): GearItem => ({ ...item, mainStatType: primaryStatOf(specId) })
 
 /* ---- recruitment generation ---- */
 const SPECS_BY_ROLE: Record<RoleKey, string[]> = {
@@ -290,7 +298,7 @@ function loadState(): GameState {
           skills: m.skills ?? freshOperatorSkills(), ceilings: m.ceilings ?? freshOperatorSkills(),
           skillXp: m.skillXp ?? zeroSkillMap(), revealed: m.revealed ?? falseRevealMap(), potentialProfile: m.potentialProfile ?? {},
           // backfill stat blocks + enforce the rarity↔ilvl invariant on stored gear (deterministic → stable; no SAVE bump)
-          gear: Object.fromEntries(Object.entries(m.gear ?? {}).map(([s, it]) => [s, normalizeGear(it)])),
+          gear: Object.fromEntries(Object.entries(m.gear ?? {}).map(([s, it]) => [s, withWearerStat(normalizeGear(it), m.specId)])),
         }))
         merged.stash = (merged.stash ?? []).map(normalizeGear)   // normalize stashed gear too
         // recruit gear is first-class now — backfill any pre-gear recruits + normalize stored gear (deterministic → stable; no SAVE bump)
@@ -380,7 +388,11 @@ function computeLoot(state: GameState, r: RunResult, runKeyState: MemberKey): Lo
       upgrades.push({ memberId: m.id, delta, currentIlvl: cur })
       if (delta > upgradeAmt) { upgradeAmt = delta; upgradeFor = m.id }
     }
-    drops.push({ ...base, primaryStat: primaryStatOf(base.specs[0] ?? "guardian"), upgradeFor, upgradeAmt, upgrades })
+    // preview the stat for the prospective wearer (best upgrade, else first eligible party member) — every drop is
+    // party-spec-filtered so there's always one; the label is finalised to the actual wearer on assign (CONFIRM_LOOT)
+    const previewSpec = (upgradeFor ? party.find((m) => m.id === upgradeFor) : party.find((m) => base.specs.includes(m.specId)))?.specId ?? base.specs[0] ?? "guardian"
+    const previewStat = primaryStatOf(previewSpec)
+    drops.push({ ...base, mainStatType: previewStat, primaryStat: previewStat, upgradeFor, upgradeAmt, upgrades })
   }
   return drops
 }
@@ -502,7 +514,7 @@ function reducer(state: GameState, action: Action): GameState {
       if (!item || !member || !item.specs.includes(member.specId)) return state
       const slot = item.slot
       const old = member.gear[slot]
-      const roster = state.roster.map((m) => m.id === member.id ? { ...m, gear: { ...m.gear, [slot]: item } } : m)
+      const roster = state.roster.map((m) => m.id === member.id ? { ...m, gear: { ...m.gear, [slot]: withWearerStat(item, member.specId) } } : m)
       const stash = state.stash.filter((i) => i.uid !== item.uid)
       if (old && old.baseId !== "beta-standard-issue") stash.push(old)
       return { ...state, roster, stash }
@@ -565,7 +577,7 @@ function reducer(state: GameState, action: Action): GameState {
         const member = roster.find((m) => m.id === a)
         if (member && d.specs.includes(member.specId)) {
           const old = member.gear[d.slot]
-          member.gear[d.slot] = gearFields(d)
+          member.gear[d.slot] = withWearerStat(gearFields(d), member.specId)
           if (old && old.baseId !== "beta-standard-issue") stash.push(old)
           feed.push({ kind: "loot", tone: "good", memberId: member.id, icon: specIcon(member.specId), text: `${member.name} equipped ${d.name} (ilvl ${d.ilvl}).` })
           // (A) a SNUB fires only when a skipped member had a MATERIALLY bigger claim than the one you chose
