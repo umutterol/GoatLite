@@ -6,7 +6,7 @@ import { activeAffixIds } from "@/sim/affixes"
 import type { Aggression } from "@/sim"
 import { mc, qualityColor, moraleColor, MORALE_TIP } from "../analytics"
 import { rarityForIlvl } from "@/state/item-stats"
-import { Icon, GameIcon, Panel, RolePill, Tip, TipBody, KeyTip } from "../components"
+import { Icon, GameIcon, Panel, RolePill, Tip, TipBody, KeyTip, IconLabel } from "../components"
 import type { Go } from "../LogsApp"
 
 const TACTICS = [...content.tactics.values()]
@@ -21,6 +21,7 @@ export function SetupPage({ go }: { go: Go }) {
   const g = useGame()
   const [aggression, setAggression] = useState<Aggression>("Balanced")
   const [tactics, setTactics] = useState<Record<string, number>>({ interrupts: 2, positioning: 1, cooldowns: 1, killorder: 2 })
+  const [keyPage, setKeyPage] = useState(0)
 
   const used = TACTICS.reduce((s, t) => s + (tactics[t.id] || 0), 0)
   const left = TOTAL_POINTS - used
@@ -31,6 +32,10 @@ export function SetupPage({ go }: { go: Go }) {
   const partyFull = g.party.length === 5
   const keys = [...g.keys].sort((a, b) => b.level - a.level)   // highest keys first
   const weekAffixes = g.weekAffixes  // weekly + level-gated (same set for every key; which are ACTIVE depends on the key's level)
+  const KEYS_PER_PAGE = 10
+  const totalKeyPages = Math.max(1, Math.ceil(keys.length / KEYS_PER_PAGE))
+  const keyPg = Math.min(keyPage, totalKeyPages - 1)
+  const pageKeys = keys.slice(keyPg * KEYS_PER_PAGE, keyPg * KEYS_PER_PAGE + KEYS_PER_PAGE)
   // roster picker order: key owner first, then the rest of the party, then the bench (each by ilvl desc)
   const rank = (id: string) => id === g.selectedKeyOwnerId ? 0 : g.partyIds.includes(id) ? 1 : 2
   const roster = [...g.members].sort((a, b) => rank(a.id) - rank(b.id) || b.ilvl - a.ilvl)
@@ -52,7 +57,6 @@ export function SetupPage({ go }: { go: Go }) {
               <table className="runs">
                 <thead>
                   <tr>
-                    <th style={{ width: 40 }}></th>
                     <th>Key</th>
                     <th>Affixes</th>
                     <th>Owner</th>
@@ -60,19 +64,16 @@ export function SetupPage({ go }: { go: Go }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {keys.map((k) => {
+                  {pageKeys.map((k) => {
                     const info = mc(k.spec)
                     const sel = k.ownerId === g.selectedKeyOwnerId
                     const active = activeAffixIds(weekAffixes.map((a) => a.id), k.level)
                     return (
                       <tr key={k.ownerId} data-key-row onClick={() => g.selectKey(k.ownerId)}
                         style={{ cursor: "pointer", background: sel ? "rgba(43,182,164,.08)" : undefined, boxShadow: sel ? "inset 2px 0 0 var(--accent)" : undefined }}>
-                        <td><GameIcon kind="dungeon" id={k.dungeonId} size={26} label={`${k.dungeon} Keystone`} /></td>
-                        <td>
-                          <Tip accent={qualityColor("Epic")} tip={<KeyTip name={k.dungeon} level={k.level} timer={k.timer} best={k.best} affixes={weekAffixes} />}>
-                            <span style={{ color: qualityColor("Epic"), fontWeight: 700, fontSize: 13.5, cursor: "help" }}>{k.dungeon} Keystone</span>
-                          </Tip>
-                        </td>
+                        {/* key icon + name as ONE merged element, whole thing pops the Epic KeyTip */}
+                        <td><IconLabel kind="dungeon" id={k.dungeonId} name={`${k.dungeon} Keystone`} color={qualityColor("Epic")} accent={qualityColor("Epic")} size={24}
+                          tip={<KeyTip name={k.dungeon} level={k.level} timer={k.timer} best={k.best} affixes={weekAffixes} />} /></td>
                         <td>
                           {weekAffixes.length ? (
                             <span style={{ display: "inline-flex", gap: 3 }}>
@@ -80,18 +81,22 @@ export function SetupPage({ go }: { go: Go }) {
                             </span>
                           ) : <span style={{ color: "var(--faint)", fontSize: 11.5 }}>—</span>}
                         </td>
-                        <td>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ width: 22, height: 22, borderRadius: "var(--radius)", background: "var(--panel-3)", border: `1.5px solid ${info.color}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flex: "none" }}><GameIcon kind="spec" id={k.spec} size={18} color={info.color} label={`${info.subspec} ${info.klass}`} /></span>
-                            <span style={{ color: info.color, fontWeight: 700, fontSize: 13 }}>{k.ownerName}</span>
-                          </div>
-                        </td>
+                        <td><IconLabel kind="spec" id={k.spec} name={k.ownerName} color={info.color} size={18} fontSize={13} /></td>
                         <td className="r mono" style={{ fontWeight: 700, fontSize: 15, color: sel ? "var(--amber)" : "var(--muted)" }}>+{k.level}</td>
                       </tr>
                     )
                   })}
                 </tbody>
               </table>
+              {totalKeyPages > 1 ? (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 14px" }}>
+                  <span className="flux mono" style={{ fontSize: 11.5, color: "var(--faint)" }}>{keyPg * KEYS_PER_PAGE + 1}–{Math.min(keys.length, keyPg * KEYS_PER_PAGE + KEYS_PER_PAGE)} of {keys.length}</span>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button className="btn btn-sm btn-ghost" disabled={keyPg <= 0} onClick={() => setKeyPage(keyPg - 1)}>‹ Prev</button>
+                    <button className="btn btn-sm btn-ghost" disabled={keyPg >= totalKeyPages - 1} onClick={() => setKeyPage(keyPg + 1)}>Next ›</button>
+                  </div>
+                </div>
+              ) : null}
               {weekAffixes.length && !activeAffixIds(weekAffixes.map((a) => a.id), g.keystone.level).length
                 ? <div className="flux" style={{ fontSize: 11.5, color: "var(--faint)", padding: "8px 14px 12px" }}>Affixes unlock as the key climbs — none are live at this level yet.</div>
                 : null}

@@ -161,6 +161,21 @@ export function GameIcon({ kind, id, size = 18, label, style, noTip = false }: {
   return <Tip tip={iconTip(kind, id, label)}>{img}</Tip>
 }
 
+/** Icon + name as ONE merged inline element (the unit used for keys, and rolling out to specs/items/spells so the
+    icon and its name are never separate columns). Pass `tip` to make the WHOLE element show a custom tooltip (e.g.
+    KeyTip) — otherwise the icon keeps its own GameIcon tooltip and the name is plain text. */
+export function IconLabel({ kind, id, name, color, size = 18, fontSize = 13.5, weight = 700, gap = 8, accent, tip, style }: {
+  kind: IconKind; id: string; name: ReactNode; color?: string; size?: number; fontSize?: number; weight?: number; gap?: number; accent?: string; tip?: ReactNode; style?: CSSProperties
+}) {
+  const inner = (
+    <span style={{ display: "inline-flex", alignItems: "center", gap, minWidth: 0, ...style }}>
+      <GameIcon kind={kind} id={id} size={size} color={color} noTip={!!tip} label={typeof name === "string" ? name : undefined} />
+      <span style={{ color, fontWeight: weight, fontSize, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
+    </span>
+  )
+  return tip ? <Tip accent={accent} tip={tip}>{inner}</Tip> : inner
+}
+
 export function Panel({ title, right, children, className = "", style = {}, bodyStyle = {}, bodyClass = "" }: {
   title?: ReactNode; right?: ReactNode; children: ReactNode; className?: string; style?: CSSProperties; bodyStyle?: CSSProperties; bodyClass?: string
 }) {
