@@ -139,40 +139,37 @@ export function SetupPage({ go }: { go: Go }) {
               {!partyFull ? <div className="flux" style={{ fontSize: 12.5, padding: "8px 6px 2px", color: "var(--danger)" }}>Pick {5 - g.party.length} more — click reserves below to add them.</div> : null}
             </Panel>
 
-            <Panel title="Aggression" bodyStyle={{ padding: 18 }}>
-              <div className="seg-group" style={{ width: "100%" }}>
-                {AGGRO.map((a) => (
-                  <button key={a.id} className={"seg-btn" + (aggression === a.id ? " on accent" : "")} style={{ flex: 1 }} onClick={() => setAggression(a.id)}>{a.name}</button>
-                ))}
+            {/* thin aggression strip — seg + live math (from tuning, can't drift); flavour on hover */}
+            <Panel title="Aggression" bodyStyle={{ padding: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div className="seg-group" style={{ flex: "none" }}>
+                  {AGGRO.map((a) => (
+                    <button key={a.id} title={a.desc} className={"seg-btn" + (aggression === a.id ? " on accent" : "")} onClick={() => setAggression(a.id)}>{a.name}</button>
+                  ))}
+                </div>
+                {(() => {
+                  const a = content.tuning.aggression[aggression]
+                  const dc = (content.tuning.hitQuality.dialCrit as Record<string, number>)[aggression] ?? 0
+                  const out = Math.round((a.output - 1) * 100), intake = Math.round((a.avoidableIntake - 1) * 100), crit = Math.round(dc * 100)
+                  const sign = (n: number) => (n > 0 ? "+" : "") + n
+                  const parts = [`${sign(out)}% output`, `${sign(intake)}% avoidable taken`]
+                  if (crit !== 0) parts.push(`${sign(crit)}% crit`)
+                  const neutral = out === 0 && intake === 0 && crit === 0
+                  return <div className="mono" style={{ fontSize: 11.5, color: "var(--muted)", lineHeight: 1.3 }}>{neutral ? "Baseline — no modifiers." : parts.join(" · ")}</div>
+                })()}
               </div>
-              <p className="flux" style={{ fontSize: 13, marginTop: 10 }}>{AGGRO.find((a) => a.id === aggression)!.desc}</p>
-              {/* live math, pulled from tuning so the numbers can never drift from the engine */}
-              {(() => {
-                const a = content.tuning.aggression[aggression]
-                const dc = (content.tuning.hitQuality.dialCrit as Record<string, number>)[aggression] ?? 0
-                const out = Math.round((a.output - 1) * 100), intake = Math.round((a.avoidableIntake - 1) * 100), crit = Math.round(dc * 100)
-                const sign = (n: number) => (n > 0 ? "+" : "") + n
-                const parts = [`${sign(out)}% party output`, `${sign(intake)}% avoidable damage taken`]
-                if (crit !== 0) parts.push(`${sign(crit)}% crit`)
-                const neutral = out === 0 && intake === 0 && crit === 0
-                return <div className="mono" style={{ fontSize: 12, marginTop: 8, color: "var(--muted)" }}>{neutral ? "Baseline — no modifiers." : parts.join("  ·  ")}</div>
-              })()}
             </Panel>
 
+            {/* compact tactics — 4 icons across, name + dials below each; the icon's tooltip carries the full effect */}
             <Panel title="Tactics" right={<span className="mono" style={{ fontSize: 12, color: left === 0 ? "var(--good)" : "var(--amber)" }}>{left} of {TOTAL_POINTS} left</span>} bodyStyle={{ padding: 14 }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ display: "flex", gap: 10 }}>
                 {TACTICS.map((t) => (
-                  <div key={t.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-                      <GameIcon kind="tactic" id={t.id} size={20} color="var(--muted)" label={t.name} />
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ fontWeight: 600, fontSize: 14 }}>{t.name}</div>
-                        <div className="flux" style={{ fontSize: 12 }}>{t.perPoint}</div>
-                      </div>
-                    </div>
-                    <div className="stepper" style={{ flex: "none" }}>
+                  <div key={t.id} style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
+                    <GameIcon kind="tactic" id={t.id} size={30} color="var(--muted)" label={t.name} />
+                    <div style={{ fontWeight: 600, fontSize: 12, textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{t.name}</div>
+                    <div className="stepper">
                       <button disabled={(tactics[t.id] || 0) <= 0} onClick={() => setTactic(t.id, -1)}>−</button>
-                      <span className="v" style={{ minWidth: 32, fontSize: 15 }}>{tactics[t.id] || 0}</span>
+                      <span className="v" style={{ minWidth: 26, fontSize: 15 }}>{tactics[t.id] || 0}</span>
                       <button disabled={left <= 0 || (tactics[t.id] || 0) >= MAX_PER} onClick={() => setTactic(t.id, +1)}>+</button>
                     </div>
                   </div>

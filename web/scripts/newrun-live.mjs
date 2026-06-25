@@ -47,7 +47,7 @@ try {
   await aggroPanel.locator("button", { hasText: "Yolo" }).click().catch(() => {})
   await page.waitForTimeout(150)
   const aggroTxt = await aggroPanel.innerText().catch(() => "")
-  check(/\+15% party output/i.test(aggroTxt) && /avoidable damage taken/i.test(aggroTxt), `aggression shows live math (Yolo) — got: ${aggroTxt.replace(/\n/g, " · ").slice(0, 140)}`)
+  check(/\+15% output/i.test(aggroTxt) && /avoidable taken/i.test(aggroTxt), `aggression shows live math (Yolo) — got: ${aggroTxt.replace(/\n/g, " · ").slice(0, 140)}`)
   await aggroPanel.locator("button", { hasText: "Balanced" }).click().catch(() => {})
   await page.waitForTimeout(120)
   check(/Baseline/i.test(await aggroPanel.innerText().catch(() => "")), "Balanced shows 'Baseline — no modifiers.'")
