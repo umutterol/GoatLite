@@ -68,6 +68,8 @@ export function SetupPage({ go }: { go: Go }) {
           {/* keys — the focus of this board. Pick one to run; its holder locks into the party. */}
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <Panel title="Choose a Key" right={<span className="mono" style={{ fontSize: 11.5, color: "var(--faint)" }}>timer {g.keystone.timer}</span>} bodyStyle={{ padding: 0 }}>
+              {/* fixed height while paginated → a short last page reserves the full 10-row space (panel never shrinks) */}
+              <div style={{ height: totalKeyPages > 1 ? 462 : undefined, overflowY: "auto" }}>
               <table className="runs">
                 <thead>
                   <tr>
@@ -102,6 +104,7 @@ export function SetupPage({ go }: { go: Go }) {
                   })}
                 </tbody>
               </table>
+              </div>
               {totalKeyPages > 1 ? (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 14px" }}>
                   <span className="flux mono" style={{ fontSize: 11.5, color: "var(--faint)" }}>{keyPg * KEYS_PER_PAGE + 1}–{Math.min(keys.length, keyPg * KEYS_PER_PAGE + KEYS_PER_PAGE)} of {keys.length}</span>
@@ -148,7 +151,7 @@ export function SetupPage({ go }: { go: Go }) {
                 </div>
                 <span className="flux" style={{ fontSize: 11, color: "var(--faint)" }}>{bench.length} on the bench</span>
               </div>
-              <div style={{ maxHeight: 232, overflowY: "auto" }}>
+              <div style={{ height: 232, overflowY: "auto" }}>
                 <table className="runs">
                   <thead>
                     <tr>

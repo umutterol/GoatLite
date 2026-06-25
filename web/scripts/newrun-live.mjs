@@ -11,6 +11,10 @@ const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } })
 page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()) })
 page.on("pageerror", (e) => errors.push("pageerror: " + e.message))
 const shot = (name) => page.screenshot({ path: `scripts/_shot-newrun-${name}.png` }).catch(() => {})
+const panelHeight = (titleStarts) => page.evaluate((t) => {
+  const p = [...document.querySelectorAll(".panel")].find((el) => el.innerText.toLowerCase().startsWith(t))
+  return p ? Math.round(p.getBoundingClientRect().height) : -1
+}, titleStarts)
 
 try {
   await page.goto(URL, { waitUntil: "networkidle" })
@@ -82,6 +86,20 @@ try {
     check(!!keyTip && /Keystone/i.test(keyTip), `KeyTip renders on hover — ${keyTip ? keyTip.replace(/\n/g, " · ") : "none"}`)
     await shot("keytip")
   } else console.log("(no key table yet — finding N7 not landed)")
+
+  // height constancy: the key panel must not shrink across pages, the party panel must not shrink across filters
+  const kh1 = await panelHeight("choose a key")
+  await page.locator(".panel button", { hasText: "Next" }).first().click().catch(() => {})
+  await page.waitForTimeout(150)
+  const kh2 = await panelHeight("choose a key")
+  check(kh1 > 0 && kh1 === kh2, `key panel constant height across pages (${kh1} → ${kh2})`)
+
+  const ph1 = await panelHeight("party")
+  await page.locator(".panel .seg-group button", { hasText: /^Tank$/ }).first().click().catch(() => {})
+  await page.waitForTimeout(150)
+  const ph2 = await panelHeight("party")
+  await page.locator(".panel .seg-group button", { hasText: /^All$/ }).first().click().catch(() => {})
+  check(ph1 > 0 && ph1 === ph2, `party panel constant height across filters (${ph1} → ${ph2})`)
 
   console.log(`\nconsole errors: ${errors.length}`)
   errors.slice(0, 12).forEach((e) => console.log("  x " + e))
