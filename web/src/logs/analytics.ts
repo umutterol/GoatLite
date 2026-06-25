@@ -52,6 +52,11 @@ export function scoreColor(s: number): string {
 const QUALITY_COLOR: Record<string, string> = { Common: "#ffffff", Uncommon: "#1eff00", Rare: "#0070dd", Epic: "#a335ee", Legendary: "#ff8000" }
 export const qualityColor = (q: string) => QUALITY_COLOR[q] || "#9d9d9d"
 
+// Canonical morale colour ramp (good ≥70 · amber ≥55 · danger) + its hover explainer — shared by the scouting board,
+// roster table, and the New-Run party so the thresholds never drift.
+export const moraleColor = (m: number): string => (m >= 70 ? "var(--good)" : m >= 55 ? "var(--amber)" : "var(--danger)")
+export const MORALE_TIP = "How willing they are to show up and grind. Wins lift it, wipes tank it — high morale sharpens performance, and below 25 they may walk."
+
 /* ---- member class identity (real specs/classes) ---- */
 export interface MC { color: string; subspec: string; klass: string; role: RoleKey }
 export function mc(specId: string): MC {

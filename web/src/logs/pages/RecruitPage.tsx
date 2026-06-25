@@ -2,15 +2,11 @@
    Two display numbers per recruit: precise Current Operator Rating (now) and a fuzzy Potential ★ (ceiling). */
 import { useState } from "react"
 import { useGame, type RoleKey, SLOTS } from "@/state/game-store"
-import { mc, qualityColor } from "../analytics"
+import { mc, qualityColor, moraleColor, MORALE_TIP } from "../analytics"
 import { RolePill, GameIcon, Tip, TipBody, ItemIcon, ItemTip } from "../components"
 import { TalentStrip } from "../TalentGrid"
 import { Stars, corColor, SkillBars, scoutBlurb, traitCombatSummary } from "../OperatorPanel"
 import type { Go } from "../LogsApp"
-
-/** Canonical morale colour ramp (good ≥70 · amber ≥55 · danger) — shared by the table + the scout panel. */
-const moraleColor = (m: number): string => (m >= 70 ? "var(--good)" : m >= 55 ? "var(--amber)" : "var(--danger)")
-const MORALE_TIP = "How willing they are to show up and grind. Wins lift it, wipes tank it — high morale sharpens performance, and below 25 they may walk."
 
 export function RecruitPage({ go }: { go: Go }) {
   const g = useGame()

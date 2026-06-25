@@ -4,8 +4,9 @@ import { content } from "@/content"
 import { useGame } from "@/state/game-store"
 import { affixUnlockKey } from "@/sim/affixes"
 import type { Aggression } from "@/sim"
-import { mc } from "../analytics"
-import { Icon, GameIcon, Panel, RolePill } from "../components"
+import { mc, qualityColor, moraleColor, MORALE_TIP } from "../analytics"
+import { rarityForIlvl } from "@/state/item-stats"
+import { Icon, GameIcon, Panel, RolePill, Tip, TipBody } from "../components"
 import type { Go } from "../LogsApp"
 
 const TACTICS = [...content.tactics.values()]
@@ -133,8 +134,11 @@ export function SetupPage({ go }: { go: Go }) {
                         <div style={{ color: info.color, fontWeight: 700, fontSize: 14 }}>{m.name}{isOwner ? <span title="Key holder — locked into the party" style={{ marginLeft: 7, fontSize: 11, color: "var(--amber)" }}>★ key</span> : null}</div>
                         <div style={{ color: "var(--faint)", fontSize: 12 }}>{info.subspec} {info.klass}</div>
                       </div>
-                      <RolePill role={info.role} />
-                      <span className="mono" style={{ fontSize: 13, color: "var(--muted)", width: 36, textAlign: "right" }}>{m.ilvl}</span>
+                      <RolePill role={info.role} iconOnly />
+                      <span className="mono" style={{ fontSize: 13, color: qualityColor(rarityForIlvl(m.ilvl)), width: 34, textAlign: "right" }}>{m.ilvl}</span>
+                      <Tip tip={<TipBody title="Morale" desc={MORALE_TIP} />}>
+                        <span className="mono" style={{ fontSize: 11.5, color: moraleColor(m.morale), width: 40, textAlign: "right", cursor: "help" }}>{m.morale}%</span>
+                      </Tip>
                       <span className="mono" style={{ fontSize: 11, width: 44, textAlign: "right", color: isOwner ? "var(--amber)" : isIn ? "var(--accent)" : partyFull ? "var(--faint)" : "var(--muted)" }}>
                         {isOwner ? "locked" : isIn ? "✓ in" : partyFull ? "full" : "+ add"}
                       </span>
@@ -152,6 +156,17 @@ export function SetupPage({ go }: { go: Go }) {
                 ))}
               </div>
               <p className="flux" style={{ fontSize: 13, marginTop: 10 }}>{AGGRO.find((a) => a.id === aggression)!.desc}</p>
+              {/* live math, pulled from tuning so the numbers can never drift from the engine */}
+              {(() => {
+                const a = content.tuning.aggression[aggression]
+                const dc = (content.tuning.hitQuality.dialCrit as Record<string, number>)[aggression] ?? 0
+                const out = Math.round((a.output - 1) * 100), intake = Math.round((a.avoidableIntake - 1) * 100), crit = Math.round(dc * 100)
+                const sign = (n: number) => (n > 0 ? "+" : "") + n
+                const parts = [`${sign(out)}% party output`, `${sign(intake)}% avoidable damage taken`]
+                if (crit !== 0) parts.push(`${sign(crit)}% crit`)
+                const neutral = out === 0 && intake === 0 && crit === 0
+                return <div className="mono" style={{ fontSize: 12, marginTop: 8, color: "var(--muted)" }}>{neutral ? "Baseline — no modifiers." : parts.join("  ·  ")}</div>
+              })()}
             </Panel>
 
             <Panel title="Tactics" right={<span className="mono" style={{ fontSize: 12, color: left === 0 ? "var(--good)" : "var(--amber)" }}>{left} of {TOTAL_POINTS} left</span>} bodyStyle={{ padding: 14 }}>
@@ -176,7 +191,7 @@ export function SetupPage({ go }: { go: Go }) {
             </Panel>
 
             <button className="btn btn-primary" style={{ justifyContent: "center", padding: 14, fontSize: 15, opacity: partyFull ? 1 : .5, pointerEvents: partyFull ? "auto" : "none" }} onClick={simulate}>
-              <Icon name="bolt" size={16} color="#04201d" /> Simulate Run → View Report
+              <Icon name="bolt" size={16} color="#04201d" /> Start the Run
             </button>
           </div>
         </div>
