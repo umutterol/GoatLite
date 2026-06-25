@@ -6,9 +6,8 @@ import { content } from "@/content"
 import { useGame, roleOf } from "@/state/game-store"
 import { activeAffixIds } from "@/sim/affixes"
 import { buildReport, liveDamage, liveHealing, hpAt, mc, mmss, ROLE_ORDER, type DmgRow, type LogEntry } from "../analytics"
-import type { Member } from "@/data/game"
 import type { RunResult } from "@/sim"
-import { Icon, Panel, Meter, ClassName, AffixChip, LogSpell } from "../components"
+import { Icon, Meter, ClassName, LogSpell, GameIcon } from "../components"
 import { ReplayCanvas } from "../ReplayCanvas"
 import type { Go, GoChar } from "../LogsApp"
 
@@ -17,15 +16,16 @@ const RATE = 40 // sim-seconds of playback per real second at 1×
 // H.2: the per-spec signature majors — their cast lines get a gold accent in the log
 const MAJOR_IDS = new Set([...content.playerAbilities.values()].filter((a) => (a.tags ?? []).includes("major")).map((a) => a.id))
 
-export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
+export function ReportPage({ go, goChar, viewId, setViewId }: { go: Go; goChar: GoChar; viewId: string | null; setViewId: (id: string | null) => void }) {
   const g = useGame()
   const tickets = g.history
-  const [viewId, setViewId] = useState<string | null>(null)   // null = follow the latest run
+  // viewId is lifted to the app shell (route) so the Report nav-tab dropdown can pick which run to show; null = latest.
   const [tab, setTab] = useState<"log" | "deaths" | "casts">("log")
   const [meterMetric, setMeterMetric] = useState<"dps" | "hps">("dps")
   const [clock, setClock] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
+  const [popupDismissed, setPopupDismissed] = useState(false)   // end-of-run loot popup dismissed for this run
 
   // viewId===null follows the latest; a fresh run lands here with null → shows the new run, no effect needed
   const ticket = (viewId ? tickets.find((t) => t.id === viewId) : null) ?? tickets[0] ?? null
@@ -38,7 +38,8 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
   }, [ticket?.id, g.lastResult]) // eslint-disable-line react-hooks/exhaustive-deps
   const runKey = ticket ? { dungeonId: ticket.dungeonId, dungeon: ticket.dungeonName, level: ticket.keyLevel, rating: ticket.rating } : g.keystone
   // show only the affixes that were actually in effect at this run's key level (gating)
-  const affixNames = ticket ? activeAffixIds(ticket.affixIds, ticket.keyLevel).map((id) => content.affixes.get(id)?.name ?? id) : g.weekAffixes.map((a) => a.name)
+  const affixIds = ticket ? activeAffixIds(ticket.affixIds, ticket.keyLevel) : []
+  const affixNames = ticket ? affixIds.map((id) => content.affixes.get(id)?.name ?? id) : g.weekAffixes.map((a) => a.name)
   const R = useMemo(() => result ? buildReport(result, runKey, affixNames) : null, [result, ticket?.id]) // eslint-disable-line react-hooks/exhaustive-deps
   const specById = useMemo(() => new Map((result?.partyMeta ?? []).map((m) => [m.id, m.specId])), [result])
   const specByName = useMemo(() => new Map((result?.partyMeta ?? []).map((m) => [m.name, m.specId])), [result])
@@ -52,6 +53,7 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
   // StrictMode-safe). Historical runs & re-visits show the finished report (paused) — press play to re-watch.
   useEffect(() => {
     if (!result) return
+    setPopupDismissed(false)   // a new run (or switching runs) re-arms the end-of-run popup
     // an unwatched current run ALWAYS starts at 0 and plays (forced watch) — closes the navigate-away-and-back bypass;
     // everything else (already-watched current run, or a historical re-view) opens at the end, fully revealed.
     const current = isLatest && !!g.lastResult && g.lastResult.seed === result.seed
@@ -101,7 +103,6 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
   const hp = hpAt(result, clock)
   const visibleLog = R.log.filter((l) => l.tSec <= clock)
   const visibleDeaths = result.deaths.filter((d) => d.tSec <= clock)
-  const activeFight = R.fights.find((f) => f.id !== "all" && clock >= f.start && clock < f.end) ?? R.fights[R.fights.length - 1]
   const showAction = isLatest && !!g.lastResult   // loot/continue only applies to the current, unfinished run
   // watch-gate: the freshly-run key hides ALL results (outcome, deaths, loot) + locks the transport (no scrub-ahead,
   // no fast-forward) until the replay has played out once. Re-views / history tickets start at playEnd ⇒ already revealed.
@@ -115,74 +116,33 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
 
   return (
     <div className="page">
-      {/* ---- fight rail ---- */}
-      <div className="rail">
-        <div style={{ padding: "16px 16px 12px", borderBottom: "1px solid var(--line)" }}>
-          <div className="eyebrow" style={{ marginBottom: 6 }}>Report</div>
-          <div style={{ fontSize: 17, fontWeight: 700 }}>{R.title}</div>
-          <div style={{ display: "flex", gap: 6, marginTop: 11, flexWrap: "wrap" }}>
-            <span className="chip" style={{ color: "var(--amber)", borderColor: "#4a3a17" }}>+{R.keyLevel} Key</span>
-            {R.affixes.map((a) => <AffixChip name={a} key={a} />)}
-          </div>
-        </div>
-        <div style={{ padding: "8px 0", overflowY: "auto", flex: 1 }}>
-          <div className="eyebrow" style={{ padding: "6px 16px 8px" }}>Runs · click to view</div>
-          {tickets.map((t, i) => {
-            const oc = t.outcome === "timed" ? "var(--good)" : t.outcome === "wipe" ? "var(--danger)" : "var(--amber)"
-            return (
-              <div key={t.id} className={"fight" + (t.id === ticket?.id ? " active" : "")} style={{ cursor: "pointer" }} onClick={() => setViewId(t.id)}>
-                <span className="fight-ic" style={{ background: oc, borderRadius: 3 }} />
-                <span className="fight-nm">{t.ownerName} · +{t.keyLevel}{i === 0 ? <span style={{ color: "var(--faint)", fontWeight: 400 }}> · latest</span> : null}</span>
-                <span className="fight-meta mono">
-                  {gated && t.seed === result.seed ? "···" : <>{t.deaths > 0 ? <span style={{ color: "var(--danger)", marginRight: 6 }}>☠{t.deaths}</span> : null}{mmss(t.durationSec)}</>}
-                </span>
-              </div>
-            )
-          })}
-          <div style={{ height: 12, borderBottom: "1px solid var(--line)", marginBottom: 8 }} />
-          <div className="eyebrow" style={{ padding: "6px 16px 8px" }}>Pulls · click to seek</div>
-          {R.fights.map((f) => {
-            const tint = f.type === "boss" ? "var(--amber)" : f.type === "all" ? "var(--accent)" : "#5b6472"
-            const isActive = f.id === "all" ? false : f.id === activeFight.id
-            return (
-              <div key={f.id} className={"fight" + (isActive ? " active" : "")} style={gated ? { cursor: "default" } : undefined} onClick={gated ? undefined : () => f.id === "all" ? seek(0) : seek(f.start)}>
-                <span className="fight-ic" style={{ background: tint, borderRadius: f.type === "boss" ? 6 : 2 }} />
-                <span className="fight-nm">{f.name}</span>
-                <span className="fight-meta mono">
-                  {gated ? null : <>{f.deaths > 0 ? <span style={{ color: "var(--danger)", marginRight: 6 }}>☠{f.deaths}</span> : null}{mmss(f.end - f.start)}</>}
-                </span>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* ---- main ---- */}
       <div className="page-scroll" style={{ padding: 20 }}>
-        {/* replay (top) — summary HUD top-left, live meter top-right, both overlaid inside the canvas */}
+        {/* replay (top) — party health (top-left) · timer panel (top-right) · live meter (bottom-right) · loot popup (centered) */}
         <div style={{ marginBottom: 14 }}>
           <ReplayCanvas
             result={result} clock={clock} playing={playing} members={g.members} dungeonId={R.dungeonId}
-            hudLeft={
-              <div style={{ background: "rgba(10,11,15,.62)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "8px 12px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 9, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 16, fontWeight: 700 }}>{R.title}</span>
-                  <span className="mono" style={{ fontSize: 15, fontWeight: 700, color: "var(--amber)" }}>+{R.keyLevel}</span>
-                  <span className="chip" style={{ color: "var(--accent)" }}>{finished ? activeFight.name : activeFight.name + " …"}</span>
+            hudTopLeft={<PartyHealth result={result} hp={hp} goChar={goChar} />}
+            hudTopRight={
+              <div style={{ background: "rgba(10,11,15,.66)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "7px 11px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 14.5, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{R.title}</span>
+                  <span className="mono" style={{ fontSize: 14, fontWeight: 700, color: "var(--amber)", flex: "none" }}>+{R.keyLevel}</span>
                 </div>
-                <div style={{ display: "flex", gap: 5, marginTop: 6, flexWrap: "wrap" }}>
-                  {R.affixes.map((a) => <AffixChip name={a} key={a} />)}
-                </div>
-                <div style={{ display: "flex", gap: 18, marginTop: 8 }}>
-                  <Summary label="Result" value={gated ? <span style={{ color: "var(--faint)" }}>· · ·</span> : <span style={{ color: R.outcomeColor }}>{R.outcome} {R.upgradeLabel}</span>} />
-                  <Summary label="Time" value={<span className="mono">{mmss(clock)}</span>} sub={"par " + R.par} />
-                  <Summary label="Deaths" value={<span className="mono" style={{ color: visibleDeaths.length ? "var(--danger)" : "var(--good)" }}>{visibleDeaths.length}</span>} />
-                  <Summary label="Rez" value={<span className="mono" style={{ color: result.finalRezCharges > 0 ? "var(--good)" : "var(--danger)" }}>{result.finalRezCharges}</span>} sub={result.nextRezChargeAtSec > 0 ? "+1 in " + mmss(result.nextRezChargeAtSec) : "ready"} />
+                {affixIds.length ? (
+                  <div style={{ display: "flex", gap: 5, marginTop: 6, flexWrap: "wrap" }}>
+                    {affixIds.map((id) => <GameIcon key={id} kind="affix" id={id} size={18} label={content.affixes.get(id)?.name} />)}
+                  </div>
+                ) : null}
+                <div style={{ display: "flex", gap: 14, marginTop: 8, justifyContent: "flex-end" }}>
+                  <Stat label="Time" value={<span className="mono">{mmss(clock)}</span>} sub={"/ " + R.par} />
+                  <Stat label="Deaths" value={<span className="mono" style={{ color: visibleDeaths.length ? "var(--danger)" : "var(--good)" }}>{visibleDeaths.length}</span>} />
+                  <Stat label="Rez" value={<span className="mono" style={{ color: result.finalRezCharges > 0 ? "var(--good)" : "var(--danger)" }}>{result.finalRezCharges}</span>} />
+                  <Stat label="Result" value={gated ? <span style={{ color: "var(--faint)" }}>···</span> : <span style={{ color: R.outcomeColor }}>{R.outcome} {R.upgradeLabel}</span>} />
                 </div>
               </div>
             }
-            hudRight={
-              <div style={{ background: "rgba(10,11,15,.62)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "8px 10px" }}>
+            hudBottomRight={
+              <div style={{ background: "rgba(10,11,15,.66)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "8px 10px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
                   <span className="eyebrow">Live Meter</span>
                   <div className="seg-group" style={{ padding: 2 }}>
@@ -193,10 +153,24 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
                 <Meter rows={meterRows} metric={meterMetric} segName="Overall" total={meterTotal} duration={liveDmg.dur} />
               </div>
             }
+            centerPopup={finished && showAction && !gated && !popupDismissed ? (
+              <div className="panel" style={{ width: 360, padding: 20, textAlign: "center", boxShadow: "0 12px 48px rgba(0,0,0,.55)" }}>
+                <div className="eyebrow" style={{ marginBottom: 6 }}>Run Complete</div>
+                <div style={{ fontSize: 26, fontWeight: 800, color: R.outcomeColor }}>{R.outcome} {R.upgradeLabel}</div>
+                <div className="mono" style={{ fontSize: 13, color: "var(--muted)", marginTop: 6 }}>
+                  {mmss(clock)} <span style={{ color: "var(--faint)" }}>/ {R.par}</span>
+                  {visibleDeaths.length ? <span style={{ color: "var(--danger)", marginLeft: 8 }}>☠ {visibleDeaths.length}</span> : null}
+                </div>
+                <button className="btn btn-primary" style={{ justifyContent: "center", padding: 12, fontSize: 14, width: "100%", marginTop: 16 }} onClick={distribute}>
+                  <Icon name="star" size={15} color="#04201d" /> {hasLoot ? "Distribute Loot →" : "Continue → Keystone"}
+                </button>
+                <button className="btn btn-ghost" style={{ justifyContent: "center", padding: 9, fontSize: 12.5, width: "100%", marginTop: 8 }} onClick={() => setPopupDismissed(true)}>Keep viewing report</button>
+              </div>
+            ) : null}
           />
         </div>
 
-        {/* timer adjuster (directly below the replay) */}
+        {/* run player — readout is vs the dungeon timer (clock / par), not the run's final length; pull ticks reveal as the playhead passes them */}
         <div className="panel" style={{ padding: "10px 16px", marginBottom: 14, display: "flex", alignItems: "center", gap: 16 }}>
           <button className="btn btn-primary btn-sm" style={{ width: 38, height: 34, justifyContent: "center", padding: 0, fontSize: 15 }} onClick={togglePlay} title={playing ? "Pause" : finished ? "Replay" : "Play"}>
             {playing ? "❚❚" : finished ? "↻" : "▶"}
@@ -206,69 +180,75 @@ export function ReportPage({ go, goChar }: { go: Go; goChar: GoChar }) {
               <button key={s} className={"seg-btn" + (speed === s ? " on accent" : "")} style={{ padding: "4px 10px", fontSize: 11.5 }} disabled={gated} onClick={() => setSpeed(s)}>{s}×</button>
             ))}
           </div>
-          {/* scrubber with death markers — locked (no scrub-ahead) + markers hidden while watch-gated, to avoid spoilers */}
+          {/* scrubber — pull ticks (revealed once reached, click to seek) + death dots; both hidden/locked while watch-gated */}
           <div style={{ position: "relative", flex: 1, height: 22, display: "flex", alignItems: "center" }}>
             <input type="range" min={0} max={Math.max(1, Math.round(duration))} value={Math.round(clock)} disabled={gated} onChange={(e) => { setPlaying(false); seek(Number(e.target.value)) }}
               style={{ width: "100%", accentColor: "var(--accent)", cursor: gated ? "not-allowed" : "pointer", opacity: gated ? .5 : 1 }} />
+            {R.fights.filter((f) => f.id !== "all" && f.start > 0 && clock >= f.start).map((f) => {
+              const tint = f.type === "boss" ? "var(--amber)" : "var(--accent)"
+              return (
+                <span key={f.id} title={`${f.name} · ${mmss(f.start)}`} onClick={gated ? undefined : () => { setPlaying(false); seek(f.start) }}
+                  style={{ position: "absolute", left: `calc(${(f.start / Math.max(1, duration)) * 100}% - 4px)`, top: 1, width: 8, height: 20, display: "flex", justifyContent: "center", alignItems: "flex-start", cursor: gated ? "default" : "pointer", pointerEvents: gated ? "none" : "auto", zIndex: 2 }}>
+                  <span style={{ width: 2, height: 18, background: tint, borderRadius: 1, boxShadow: "0 0 3px rgba(0,0,0,.6)" }} />
+                </span>
+              )
+            })}
             {!gated && result.deaths.map((d, i) => (
-              <span key={i} title={`${d.name} · ${d.t}`} style={{ position: "absolute", left: `calc(${(d.tSec / Math.max(1, duration)) * 100}% - 3px)`, top: 0, width: 6, height: 6, borderRadius: "50%", background: "var(--danger)", pointerEvents: "none" }} />
+              <span key={"d" + i} title={`${d.name} · ${d.t}`} style={{ position: "absolute", left: `calc(${(d.tSec / Math.max(1, duration)) * 100}% - 3px)`, top: -1, width: 6, height: 6, borderRadius: "50%", background: "var(--danger)", pointerEvents: "none", zIndex: 3 }} />
             ))}
           </div>
-          <span className="mono" style={{ fontSize: 13, color: "var(--muted)", minWidth: 96, textAlign: "right" }}>{mmss(clock)} <span style={{ color: "var(--faint)" }}>/ {mmss(duration)}</span></span>
+          <span className="mono" style={{ fontSize: 13, color: "var(--muted)", minWidth: 96, textAlign: "right" }}>{mmss(clock)} <span style={{ color: "var(--faint)" }}>/ {R.par}</span></span>
         </div>
 
-        {/* the rest, as usual: event log + party health */}
-        <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-          <div className="panel" style={{ flex: 1, minWidth: 0 }}>
-            <div className="panel-head" style={{ padding: "10px 14px" }}>
-              <div className="nav-tabs" style={{ height: 34, gap: 2 }}>
-                {([["log", "Event Log"], ["deaths", "Deaths"], ["casts", "Casts"]] as [typeof tab, string][]).map(([id, lbl]) => (
-                  <button key={id} className={"seg-btn" + (tab === id ? " on accent" : "")} onClick={() => setTab(id)}>{lbl}</button>
-                ))}
-              </div>
-              <span className="mono" style={{ fontSize: 12, color: "var(--faint)" }}>{visibleLog.length} events · {mmss(clock)}</span>
+        {/* full-width event log */}
+        <div className="panel">
+          <div className="panel-head" style={{ padding: "10px 14px" }}>
+            <div className="nav-tabs" style={{ height: 34, gap: 2 }}>
+              {([["log", "Event Log"], ["deaths", "Deaths"], ["casts", "Casts"]] as [typeof tab, string][]).map(([id, lbl]) => (
+                <button key={id} className={"seg-btn" + (tab === id ? " on accent" : "")} onClick={() => setTab(id)}>{lbl}</button>
+              ))}
             </div>
-            <div style={{ padding: 14 }}>
-              {tab === "deaths" ? <DeathsTab deaths={visibleDeaths} specByName={specByName} /> : null}
-              {tab === "casts" ? <CastsTab rows={liveDmg.rows} dur={liveDmg.dur} /> : null}
-              {tab === "log" ? <EventLog log={visibleLog} specById={specById} playing={playing} speed={speed} /> : null}
-            </div>
+            <span className="mono" style={{ fontSize: 12, color: "var(--faint)" }}>{visibleLog.length} events · {mmss(clock)}</span>
           </div>
-
-          {/* right column: party health + action */}
-          <div style={{ width: 320, flex: "none", display: "flex", flexDirection: "column", gap: 16 }}>
-            <PartyHealth result={result} hp={hp} members={g.members} goChar={goChar} />
-
-            {gated ? (
-              <button className="btn" disabled style={{ justifyContent: "center", padding: 12, fontSize: 13.5, opacity: .65, cursor: "not-allowed" }} title="Watch the run to the end to reveal results">
-                <Icon name="report" size={15} color="var(--faint)" /> Watch the run to reveal results…
-              </button>
-            ) : showAction ? (
-              <button className="btn btn-primary" style={{ justifyContent: "center", padding: 12, fontSize: 14 }} onClick={distribute}>
-                <Icon name="star" size={15} color="#04201d" /> {hasLoot ? "Distribute Loot →" : "Continue → Keystone"}
-              </button>
-            ) : !isLatest ? (
-              <button className="btn btn-ghost" style={{ justifyContent: "center", padding: 12, fontSize: 14 }} onClick={() => setViewId(null)}>↩ Back to latest run</button>
-            ) : (
-              // latest run already resolved (loot distributed) — always offer a forward path
-              <button className="btn btn-primary" style={{ justifyContent: "center", padding: 12, fontSize: 14 }} onClick={() => go("setup")}>
-                <Icon name="setup" size={15} color="#04201d" /> Plan a Run →
-              </button>
-            )}
+          <div style={{ padding: 14 }}>
+            {tab === "deaths" ? <DeathsTab deaths={visibleDeaths} specByName={specByName} /> : null}
+            {tab === "casts" ? <CastsTab rows={liveDmg.rows} dur={liveDmg.dur} /> : null}
+            {tab === "log" ? <EventLog log={visibleLog} specById={specById} playing={playing} speed={speed} /> : null}
           </div>
+        </div>
+
+        {/* action footer — always reachable (the centered popup is an extra prompt at run end, and can be dismissed) */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+          {gated ? (
+            <button className="btn" disabled style={{ justifyContent: "center", padding: "11px 20px", fontSize: 13.5, opacity: .65, cursor: "not-allowed" }} title="Watch the run to the end to reveal results">
+              <Icon name="report" size={15} color="var(--faint)" /> Watch the run to reveal results…
+            </button>
+          ) : showAction ? (
+            <button className="btn btn-primary" style={{ justifyContent: "center", padding: "11px 24px", fontSize: 14 }} onClick={distribute}>
+              <Icon name="star" size={15} color="#04201d" /> {hasLoot ? "Distribute Loot →" : "Continue → Keystone"}
+            </button>
+          ) : !isLatest ? (
+            <button className="btn btn-ghost" style={{ justifyContent: "center", padding: "11px 24px", fontSize: 14 }} onClick={() => setViewId(null)}>↩ Back to latest run</button>
+          ) : (
+            <button className="btn btn-primary" style={{ justifyContent: "center", padding: "11px 24px", fontSize: 14 }} onClick={() => go("setup")}>
+              <Icon name="setup" size={15} color="#04201d" /> Plan a Run →
+            </button>
+          )}
         </div>
       </div>
     </div>
   )
 }
 
-/* ---- party portraits + live health bars (replaces the old Run Details panel) ---- */
-function PartyHealth({ result, hp, members, goChar }: { result: RunResult; hp: Record<string, number>; members: Member[]; goChar: GoChar }) {
+/* ---- party live health overlay (top-left of the replay canvas): name · health bar · square class icon ----
+   buff/debuff row is deferred (the sim exposes no per-second status timeline yet — would need engine instrumentation). */
+function PartyHealth({ result, hp, goChar }: { result: RunResult; hp: Record<string, number>; goChar: GoChar }) {
   const rows = result.partyMeta
-    .map((pm) => ({ ...pm, role: roleOf(pm.specId), portrait: members.find((m) => m.id === pm.id)?.portrait, frac: hp[pm.id] ?? 1 }))
+    .map((pm) => ({ ...pm, role: roleOf(pm.specId), classId: content.specs.get(pm.specId)?.classId ?? "", frac: hp[pm.id] ?? 1 }))
     .sort((a, b) => ROLE_ORDER[a.role] - ROLE_ORDER[b.role])
   return (
-    <Panel title="Party · Health" bodyStyle={{ padding: 12 }}>
+    <div style={{ background: "rgba(10,11,15,.66)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "8px 10px", width: 212 }}>
+      <div className="eyebrow" style={{ marginBottom: 8 }}>Party · Health</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
         {rows.map((r) => {
           const info = mc(r.specId)
@@ -276,36 +256,34 @@ function PartyHealth({ result, hp, members, goChar }: { result: RunResult; hp: R
           const pct = Math.round(r.frac * 100)
           const barColor = down ? "#3a3d48" : r.frac > 0.5 ? "var(--good)" : r.frac > 0.25 ? "var(--amber)" : "var(--danger)"
           return (
-            <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => goChar(r.id)}>
-              <span style={{ position: "relative", width: 38, height: 38, borderRadius: 9, flex: "none", border: `2px solid ${info.color}`, overflow: "hidden", background: info.color, filter: down ? "grayscale(1) brightness(.6)" : "none" }}>
-                {r.portrait
-                  ? <img src={r.portrait} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: "#0c0d11", fontWeight: 700 }}>{r.name[0]}</span>}
-                {down ? <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="skull" size={18} color="#e0444e" /></span> : null}
-              </span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 6 }}>
-                  <span style={{ color: info.color, fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.name}</span>
-                  <span className="mono" style={{ fontSize: 11.5, color: down ? "var(--danger)" : "var(--faint)", flex: "none" }}>{down ? "DOWN" : pct + "%"}</span>
-                </div>
-                <div style={{ height: 7, borderRadius: 4, background: "rgba(255,255,255,.06)", marginTop: 4, overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: pct + "%", background: barColor, borderRadius: 4, transition: "width .12s linear, background .2s" }} />
-                </div>
+            <div key={r.id} style={{ cursor: "pointer", filter: down ? "grayscale(.7) brightness(.8)" : "none" }} onClick={() => goChar(r.id)}>
+              {/* name */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 6 }}>
+                <span style={{ color: info.color, fontWeight: 700, fontSize: 12.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.name}</span>
+                <span className="mono" style={{ fontSize: 11, color: down ? "var(--danger)" : "var(--faint)", flex: "none" }}>{down ? "DOWN" : pct + "%"}</span>
+              </div>
+              {/* health bar */}
+              <div style={{ height: 6, borderRadius: 4, background: "rgba(255,255,255,.06)", marginTop: 3, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: pct + "%", background: barColor, borderRadius: 4, transition: "width .12s linear, background .2s" }} />
+              </div>
+              {/* square class icon (buff/debuff row goes here next) */}
+              <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 5 }}>
+                <GameIcon kind="class" id={r.classId} size={18} label={info.klass} noTip style={{ borderRadius: 3, border: `1px solid ${info.color}` }} />
               </div>
             </div>
           )
         })}
       </div>
-    </Panel>
+    </div>
   )
 }
 
-function Summary({ label, value, sub }: { label: string; value: ReactNode; sub?: string }) {
+function Stat({ label, value, sub }: { label: string; value: ReactNode; sub?: string }) {
   return (
     <div style={{ textAlign: "right" }}>
-      <div className="eyebrow" style={{ fontSize: 10 }}>{label}</div>
-      <div style={{ fontSize: 19, fontWeight: 700, marginTop: 3 }}>{value}</div>
-      {sub ? <div className="mono" style={{ fontSize: 10.5, color: "var(--faint)", marginTop: 1 }}>{sub}</div> : null}
+      <div className="eyebrow" style={{ fontSize: 9.5 }}>{label}</div>
+      <div style={{ fontSize: 14.5, fontWeight: 700, marginTop: 2 }}>{value}</div>
+      {sub ? <div className="mono" style={{ fontSize: 10, color: "var(--faint)", marginTop: 1 }}>{sub}</div> : null}
     </div>
   )
 }

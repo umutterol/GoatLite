@@ -4,7 +4,8 @@
    Combatants render as portrait/glyph dots with HP bars on a dungeon-tinted arena; attacks fire as targeting
    lines + ranged projectiles + melee swipes + impact bursts + arcing pop-in damage numbers, all derived from the
    existing event log (windowed, gated to playback so scrubbing shows a static frame). Deterministic + scrub-safe.
-   The summary header + live meter ride in as hudLeft/hudRight overlays. */
+   HUD overlays ride in as four regions: party health (top-left), timer panel (top-right), live meter
+   (bottom-right), and an end-of-run popup (centered) for loot/continue. */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { content } from "@/content"
 import type { Member } from "@/data/game"
@@ -13,7 +14,7 @@ import { roleOf } from "@/state/game-store"
 import { hpAt, mc } from "./analytics"
 import { Icon } from "./components"
 
-const H = 800                 // canvas height (px) — tall arena so the pack-to-pack travel + scrum read clearly
+const H = 640                 // canvas height (px) — arena tall enough for pack-to-pack travel to read (−20% from 800)
 const ARENA_TOP = 90          // arena starts below the HUD band (summary / meter overlays)
 const ARENA_BOT = H - 16
 const ARENA_H = ARENA_BOT - ARENA_TOP
@@ -40,8 +41,9 @@ interface Dot {
   isBoss: boolean; isTank?: boolean; ranged: boolean; frac: number; dead: boolean
 }
 
-export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLeft, hudRight }: {
-  result: RunResult; clock: number; playing: boolean; members: Member[]; dungeonId: string; hudLeft?: ReactNode; hudRight?: ReactNode
+export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudTopLeft, hudTopRight, hudBottomRight, centerPopup }: {
+  result: RunResult; clock: number; playing: boolean; members: Member[]; dungeonId: string
+  hudTopLeft?: ReactNode; hudTopRight?: ReactNode; hudBottomRight?: ReactNode; centerPopup?: ReactNode
 }) {
   const bg = hue(dungeonId)
   const sec = Math.floor(clock)
@@ -223,10 +225,13 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudLe
       <div style={{ position: "absolute", left: "6%", right: "6%", top: ARENA_TOP + ARENA_H * 0.5, height: 1, background: `hsl(${bg} 35% 38% / .3)` }} />
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 120, background: `hsl(${bg} 32% 5% / .55)` }} />
 
-      {/* HUD overlays */}
-      {hudLeft ? <div style={{ position: "absolute", top: 10, left: 12, zIndex: 6, maxWidth: "50%" }}>{hudLeft}</div> : null}
-      {hudRight ? <div style={{ position: "absolute", top: 10, right: 12, zIndex: 6, width: 286, maxWidth: "42%" }}>{hudRight}</div> : null}
-      {stage ? <div className="eyebrow" style={{ position: "absolute", top: 64, left: 0, right: 0, textAlign: "center", zIndex: 3, color: stage.kind === "boss" ? "var(--amber)" : "var(--faint)", fontSize: 10.5 }}>{stage.kind === "boss" ? "Boss" : "Pull"} · {stage.name}</div> : null}
+      {/* HUD overlays: party health (top-left) · timer panel (top-right) · meter (bottom-right) · loot popup (centered) */}
+      {hudTopLeft ? <div style={{ position: "absolute", top: 10, left: 12, zIndex: 6, maxWidth: "46%" }}>{hudTopLeft}</div> : null}
+      {hudTopRight ? <div style={{ position: "absolute", top: 10, right: 12, zIndex: 6, width: 290, maxWidth: "44%" }}>{hudTopRight}</div> : null}
+      {hudBottomRight ? <div style={{ position: "absolute", bottom: 12, right: 12, zIndex: 6, width: 290, maxWidth: "44%" }}>{hudBottomRight}</div> : null}
+      {centerPopup ? (
+        <div style={{ position: "absolute", inset: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(6,7,10,.45)", backdropFilter: "blur(2px)" }}>{centerPopup}</div>
+      ) : null}
 
       {/* SVG layer: targeting lines / melee swipes (px geometry) */}
       {W > 0 ? (
