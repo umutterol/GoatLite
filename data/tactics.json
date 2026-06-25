@@ -1,6 +1,6 @@
 [
-  { "id": "interrupts",  "name": "Interrupts",  "icon": "tac-interrupts",  "perPoint": "Backup auto-kick of dangerous casts (weak — a real interrupter spec is the answer)", "starved": "Dangerous casts land and stack to a wipe" },
-  { "id": "positioning", "name": "Positioning", "icon": "tac-positioning", "perPoint": "Avoidable event hits its target at 60% - 18% per point",       "starved": "Deaths to avoidables" },
-  { "id": "cooldowns",   "name": "Cooldowns",   "icon": "tac-cooldowns",   "perPoint": "+4%/pt party damage in boss burn windows; -10%/pt spike damage taken", "starved": "Wrong phase, wasted CDs" },
-  { "id": "killorder",   "name": "Kill Order",  "icon": "tac-killorder",   "perPoint": "+6%/pt effective party DPS on trash; sets the kill plan",       "starved": "Adds live too long, healer OOM" }
+  { "id": "interrupts",  "name": "Interrupts",  "icon": "tac-interrupts",  "perPoint": "A backup kick the party throws at dangerous casts — better than nothing, but a real interrupter spec lands it far more reliably.", "starved": "Dangerous casts go off unchecked and stack the party into a wipe." },
+  { "id": "positioning", "name": "Positioning", "icon": "tac-positioning", "perPoint": "Sidestep more of every avoidable mechanic: it lands for 42% of its damage at 1 point, 24% at 2, just 6% at 3 (−18% per point).", "starved": "Avoidable mechanics land in full — the floor does the killing." },
+  { "id": "cooldowns",   "name": "Cooldowns",   "icon": "tac-cooldowns",   "perPoint": "During boss burn windows, each point adds +4% party damage and shaves −10% off incoming spike damage.", "starved": "Cooldowns fire in the wrong phase and burn for nothing." },
+  { "id": "killorder",   "name": "Kill Order",  "icon": "tac-killorder",   "perPoint": "Each point sharpens target priority on trash — +6% effective party DPS as they focus the right enemy first.", "starved": "Adds linger too long; the healer runs dry holding it together." }
 ]

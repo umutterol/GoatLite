@@ -1,6 +1,6 @@
 [
-  { "id": "fortified",  "name": "Fortified",  "tier": 1, "icon": "affix-fortified",  "punishes": "output",      "effect": "Trash HP / damage ×1.3" },
-  { "id": "tyrannical", "name": "Tyrannical", "tier": 1, "icon": "affix-tyrannical", "punishes": "cooldowns",   "effect": "Boss HP / damage ×1.3" },
+  { "id": "fortified",  "name": "Fortified",  "tier": 1, "icon": "affix-fortified",  "punishes": "output",      "effect": "Increases non-boss enemies' HP and damage by 30%" },
+  { "id": "tyrannical", "name": "Tyrannical", "tier": 1, "icon": "affix-tyrannical", "punishes": "cooldowns",   "effect": "Increases boss HP and damage by 30%" },
   { "id": "bursting",   "name": "Bursting",   "tier": 2, "icon": "affix-bursting",   "punishes": "killorder",   "effect": "Each mob death applies a 4s stacking party DoT (~1% party HP/stack/s)" },
   { "id": "bolstering", "name": "Bolstering", "tier": 2, "icon": "affix-bolstering", "punishes": "killorder",   "effect": "Each mob death grants surviving pack +15% HP and damage" },
   { "id": "volcanic",   "name": "Volcanic",   "tier": 2, "icon": "affix-volcanic",   "punishes": "positioning", "effect": "Eruption under a random character every ~10s on trash" },
