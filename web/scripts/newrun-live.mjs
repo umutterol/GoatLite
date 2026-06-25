@@ -19,9 +19,13 @@ try {
   await page.waitForTimeout(120)
   await page.evaluate(() => window.__game.createGuild({ name: "Run Co", crest: "#2bb6a4", glyph: "⚔", motto: "push it." }))
   await page.waitForTimeout(150)
-  await page.evaluate(() => { const g = window.__game; g.recruits.slice(0, 5).forEach((r) => g.toggleSignRecruit(r.id)); g.confirmRecruits() })
-  await page.waitForTimeout(300)
+  // sign a LARGE roster (multiple waves) so the party fills (5 slots) AND there's a bench to test
+  for (let i = 0; i < 3; i++) {
+    await page.evaluate(() => { const g = window.__game; g.recruits.forEach((r) => g.toggleSignRecruit(r.id)); g.confirmRecruits() })
+    await page.waitForTimeout(250)
+  }
   check(await page.evaluate(() => window.__game.phase) === "playing", "reached playing phase")
+  check(await page.evaluate(() => window.__game.members.length) > 5, `roster > 5 so there's a bench (${await page.evaluate(() => window.__game.members.length)})`)
 
   await page.locator(".nav-tab", { hasText: "New Run" }).click().catch(() => {})
   await page.waitForTimeout(350)
@@ -30,17 +34,31 @@ try {
   const txt = await page.evaluate(() => document.querySelector(".app-main")?.innerText || "")
   check(/Start the Run/i.test(txt), "button reads 'Start the Run' (not Simulate/View Report)")
 
-  // party: role icon-only (role-*.png imgs) + morale % shown
-  const party = await page.evaluate(() => {
-    const panels = [...document.querySelectorAll(".panel")]
-    const p = panels.find((el) => /party/i.test(el.innerText.split("\n")[0]))
-    if (!p) return null
-    const roleImgs = [...p.querySelectorAll("img")].filter((im) => (im.getAttribute("src") || "").includes("/role-")).length
-    const moraleHits = (p.innerText.match(/\d+%/g) || []).length
-    return { roleImgs, moraleHits, text: p.innerText.slice(0, 160) }
+  // party: 5 square slots + a sortable/filterable bench (role icons + morale on bench rows)
+  const slots = await page.locator("[data-party-slot]").count().catch(() => 0)
+  check(slots === 5, `party shows exactly 5 square slots (${slots})`)
+  const benchRows = await page.locator("[data-bench-row]").count().catch(() => 0)
+  check(benchRows >= 1, `bench lists guild members (${benchRows} rows)`)
+  const benchInfo = await page.evaluate(() => {
+    const rows = [...document.querySelectorAll("[data-bench-row]")]
+    const roleImgs = rows.flatMap((r) => [...r.querySelectorAll("img")]).filter((im) => (im.getAttribute("src") || "").includes("/role-")).length
+    const morale = rows.map((r) => r.innerText).join(" ").match(/\d+%/g)?.length ?? 0
+    return { roleImgs, morale }
   })
-  check(!!party && party.roleImgs >= 1, `party rows show role icons (${party?.roleImgs})`)
-  check(!!party && party.moraleHits >= 1, `party rows show morale % (${party?.moraleHits} matches)`)
+  check(benchInfo.roleImgs >= 1, `bench rows show role icons (${benchInfo.roleImgs})`)
+  check(benchInfo.morale >= 1, `bench rows show morale % (${benchInfo.morale})`)
+  // role filter: click "Tank" → every visible bench row is a tank (role icon = role-tank.png)
+  await page.locator(".panel .seg-group button", { hasText: /^Tank$/ }).first().click().catch(() => {})
+  await page.waitForTimeout(150)
+  const tankOnly = await page.evaluate(() => {
+    const rows = [...document.querySelectorAll("[data-bench-row]")]
+    if (!rows.length) return true // 0 tanks on bench is a valid filter result
+    return rows.every((r) => [...r.querySelectorAll("img")].some((im) => (im.getAttribute("src") || "").includes("/role-tank")))
+  })
+  check(tankOnly, "role filter (Tank) shows only tanks on the bench")
+  await page.locator(".panel .seg-group button", { hasText: /^All$/ }).first().click().catch(() => {})
+  await page.waitForTimeout(120)
+  await shot("party")
 
   // aggression math — switch to Yolo and check the derived numbers render
   const aggroPanel = page.locator(".panel").filter({ hasText: "Aggression" })

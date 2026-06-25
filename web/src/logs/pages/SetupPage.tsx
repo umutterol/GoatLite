@@ -1,12 +1,12 @@
 /* Step 3 / 6 — New Run: keystone, affixes, party, aggression + tactics, then simulate. */
 import { useState } from "react"
 import { content } from "@/content"
-import { useGame } from "@/state/game-store"
+import { useGame, type RoleKey } from "@/state/game-store"
 import { activeAffixIds } from "@/sim/affixes"
 import type { Aggression } from "@/sim"
-import { mc, qualityColor, moraleColor, MORALE_TIP } from "../analytics"
+import { mc, qualityColor, moraleColor } from "../analytics"
 import { rarityForIlvl } from "@/state/item-stats"
-import { Icon, GameIcon, Panel, RolePill, Tip, TipBody, KeyTip, IconLabel } from "../components"
+import { Icon, GameIcon, Panel, RolePill, KeyTip, IconLabel } from "../components"
 import type { Go } from "../LogsApp"
 
 const TACTICS = [...content.tactics.values()]
@@ -22,6 +22,10 @@ export function SetupPage({ go }: { go: Go }) {
   const [aggression, setAggression] = useState<Aggression>("Balanced")
   const [tactics, setTactics] = useState<Record<string, number>>({ interrupts: 2, positioning: 1, cooldowns: 1, killorder: 2 })
   const [keyPage, setKeyPage] = useState(0)
+  const [benchFilter, setBenchFilter] = useState<"all" | RoleKey>("all")
+  const [benchSort, setBenchSort] = useState<{ key: "name" | "role" | "ilvl" | "morale"; dir: 1 | -1 }>({ key: "ilvl", dir: -1 })
+  const sortBy = (key: "name" | "role" | "ilvl" | "morale") =>
+    setBenchSort((s) => ({ key, dir: s.key === key ? (s.dir * -1 as 1 | -1) : (key === "name" || key === "role" ? 1 : -1) }))
 
   const used = TACTICS.reduce((s, t) => s + (tactics[t.id] || 0), 0)
   const left = TOTAL_POINTS - used
@@ -36,9 +40,19 @@ export function SetupPage({ go }: { go: Go }) {
   const totalKeyPages = Math.max(1, Math.ceil(keys.length / KEYS_PER_PAGE))
   const keyPg = Math.min(keyPage, totalKeyPages - 1)
   const pageKeys = keys.slice(keyPg * KEYS_PER_PAGE, keyPg * KEYS_PER_PAGE + KEYS_PER_PAGE)
-  // roster picker order: key owner first, then the rest of the party, then the bench (each by ilvl desc)
-  const rank = (id: string) => id === g.selectedKeyOwnerId ? 0 : g.partyIds.includes(id) ? 1 : 2
-  const roster = [...g.members].sort((a, b) => rank(a.id) - rank(b.id) || b.ilvl - a.ilvl)
+  // party = 5 slots (key owner pinned first); bench = the rest of the guild, role-filtered + sorted
+  const ownerId = g.selectedKeyOwnerId
+  const partyOrdered = [...g.party].sort((a, b) => (a.id === ownerId ? -1 : 0) - (b.id === ownerId ? -1 : 0) || a.name.localeCompare(b.name))
+  const bench = g.members
+    .filter((m) => !g.partyIds.includes(m.id))
+    .filter((m) => benchFilter === "all" || mc(m.spec).role === benchFilter)
+    .sort((a, b) => {
+      const d = benchSort.dir
+      if (benchSort.key === "name") return d * a.name.localeCompare(b.name)
+      if (benchSort.key === "role") return d * mc(a.spec).role.localeCompare(mc(b.spec).role)
+      if (benchSort.key === "ilvl") return d * (a.ilvl - b.ilvl)
+      return d * (a.morale - b.morale)
+    })
 
   const simulate = () => { if (g.party.length !== 5) return; g.runKey({ tactics, aggression }); go("report") }
 
@@ -105,38 +119,66 @@ export function SetupPage({ go }: { go: Go }) {
 
           {/* party & tactics */}
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-            <Panel title="Party" right={<span className="mono" style={{ fontSize: 12, color: partyFull ? "var(--good)" : "var(--amber)" }}>{g.party.length}/5</span>} bodyStyle={{ padding: 10 }}>
-              <div style={{ display: "flex", flexDirection: "column", maxHeight: 360, overflowY: "auto" }}>
-                {roster.map((m) => {
-                  const info = mc(m.spec)
-                  const isOwner = m.id === g.selectedKeyOwnerId
-                  const isIn = g.partyIds.includes(m.id)
-                  const canToggle = !isOwner && (isIn || !partyFull)
+            <Panel title="Party" right={<span className="mono" style={{ fontSize: 12, color: partyFull ? "var(--good)" : "var(--amber)" }}>{g.party.length}/5</span>} bodyStyle={{ padding: 12 }}>
+              {/* 5 square party slots — key owner pinned (★, locked), others removable (×), empties are click-to-fill targets */}
+              <div style={{ display: "flex", gap: 8 }}>
+                {Array.from({ length: 5 }).map((_, i) => {
+                  const m = partyOrdered[i]
+                  if (!m) return <div key={i} data-party-slot style={{ flex: 1, aspectRatio: "1 / 1", borderRadius: "var(--radius)", border: "1px dashed var(--line)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--faint)", fontSize: 24 }}>+</div>
+                  const info = mc(m.spec), isOwner = m.id === ownerId
                   return (
-                    <div key={m.id} onClick={canToggle ? () => g.togglePartyMember(m.id) : undefined}
-                      style={{ display: "flex", alignItems: "center", gap: 11, padding: "8px 8px", borderRadius: 8,
-                        border: "1px solid " + (isIn ? "var(--line-soft)" : "transparent"),
-                        background: isIn ? "rgba(43,182,164,.07)" : "transparent",
-                        opacity: isIn ? 1 : (partyFull ? .45 : .8),
-                        cursor: canToggle ? "pointer" : (isOwner ? "default" : "not-allowed"), marginBottom: 2 }}>
-                      <span style={{ width: 30, height: 30, borderRadius: 7, background: info.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#0c0d11", fontSize: 14, flex: "none" }}>{m.name[0]}</span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ color: info.color, fontWeight: 700, fontSize: 14 }}>{m.name}{isOwner ? <span title="Key holder — locked into the party" style={{ marginLeft: 7, fontSize: 11, color: "var(--amber)" }}>★ key</span> : null}</div>
-                        <div style={{ color: "var(--faint)", fontSize: 12 }}>{info.subspec} {info.klass}</div>
-                      </div>
-                      <RolePill role={info.role} iconOnly />
-                      <span className="mono" style={{ fontSize: 13, color: qualityColor(rarityForIlvl(m.ilvl)), width: 34, textAlign: "right" }}>{m.ilvl}</span>
-                      <Tip tip={<TipBody title="Morale" desc={MORALE_TIP} />}>
-                        <span className="mono" style={{ fontSize: 11.5, color: moraleColor(m.morale), width: 40, textAlign: "right", cursor: "help" }}>{m.morale}%</span>
-                      </Tip>
-                      <span className="mono" style={{ fontSize: 11, width: 44, textAlign: "right", color: isOwner ? "var(--amber)" : isIn ? "var(--accent)" : partyFull ? "var(--faint)" : "var(--muted)" }}>
-                        {isOwner ? "locked" : isIn ? "✓ in" : partyFull ? "full" : "+ add"}
-                      </span>
+                    <div key={m.id} data-party-slot style={{ flex: 1, aspectRatio: "1 / 1", minWidth: 0, position: "relative", borderRadius: "var(--radius)", border: `1px solid ${info.color}66`, background: `${info.color}14`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, padding: 6 }}>
+                      <GameIcon kind="spec" id={m.spec} size={34} color={info.color} label={`${info.subspec} ${info.klass}`} />
+                      <span style={{ color: info.color, fontWeight: 700, fontSize: 11.5, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.name}</span>
+                      <span className="mono" style={{ fontSize: 10.5, color: qualityColor(rarityForIlvl(m.ilvl)) }}>{m.ilvl}</span>
+                      {isOwner
+                        ? <span title="Key holder — locked into the party" style={{ position: "absolute", top: 3, right: 5, fontSize: 11, color: "var(--amber)" }}>★</span>
+                        : <button title="Remove from party" onClick={() => g.togglePartyMember(m.id)} style={{ position: "absolute", top: 0, right: 3, border: "none", background: "none", color: "var(--faint)", cursor: "pointer", fontSize: 15, lineHeight: 1 }}>×</button>}
                     </div>
                   )
                 })}
               </div>
-              {!partyFull ? <div className="flux" style={{ fontSize: 12.5, padding: "8px 6px 2px", color: "var(--danger)" }}>Pick {5 - g.party.length} more — click reserves below to add them.</div> : null}
+
+              {/* the rest of the guild — role filter + sortable headers, click a row to fill the next open slot */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, margin: "14px 0 2px" }}>
+                <div className="seg-group">
+                  {([["all", "All"], ["tank", "Tank"], ["healer", "Heal"], ["dps", "DPS"]] as [string, string][]).map(([id, lbl]) => (
+                    <button key={id} className={"seg-btn" + (benchFilter === id ? " on" : "")} onClick={() => setBenchFilter(id as "all" | RoleKey)}>{lbl}</button>
+                  ))}
+                </div>
+                <span className="flux" style={{ fontSize: 11, color: "var(--faint)" }}>{bench.length} on the bench</span>
+              </div>
+              <div style={{ maxHeight: 232, overflowY: "auto" }}>
+                <table className="runs">
+                  <thead>
+                    <tr>
+                      {([["name", "Member", ""], ["role", "Role", ""], ["ilvl", "iLvl", "r"], ["morale", "Mrl", "r"]] as [typeof benchSort.key, string, string][]).map(([k, lbl, cls]) => (
+                        <th key={k} className={cls} onClick={() => sortBy(k)} style={{ cursor: "pointer", position: "sticky", top: 0, background: "var(--panel)", userSelect: "none" }}>
+                          {lbl}{benchSort.key === k ? (benchSort.dir < 0 ? " ↓" : " ↑") : ""}
+                        </th>
+                      ))}
+                      <th style={{ position: "sticky", top: 0, background: "var(--panel)" }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bench.map((m) => {
+                      const info = mc(m.spec)
+                      return (
+                        <tr key={m.id} data-bench-row onClick={() => !partyFull && g.togglePartyMember(m.id)}
+                          style={{ cursor: partyFull ? "not-allowed" : "pointer", opacity: partyFull ? .5 : 1 }}>
+                          <td><IconLabel kind="spec" id={m.spec} name={m.name} color={info.color} size={22} fontSize={13} /></td>
+                          <td><RolePill role={info.role} iconOnly /></td>
+                          <td className="r mono" style={{ color: qualityColor(rarityForIlvl(m.ilvl)), fontWeight: 600 }}>{m.ilvl}</td>
+                          <td className="r mono" style={{ color: moraleColor(m.morale) }}>{m.morale}%</td>
+                          <td className="r mono" style={{ fontSize: 11, color: partyFull ? "var(--faint)" : "var(--accent)" }}>{partyFull ? "full" : "+ add"}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+                {bench.length === 0 ? <div className="flux" style={{ fontSize: 12, color: "var(--faint)", padding: "12px 8px", textAlign: "center" }}>No guild members match this filter.</div> : null}
+              </div>
+              {!partyFull ? <div className="flux" style={{ fontSize: 12.5, padding: "8px 4px 0", color: "var(--danger)" }}>Pick {5 - g.party.length} more — click a member below to add them.</div> : null}
             </Panel>
 
             {/* thin aggression strip — seg + live math (from tuning, can't drift); flavour on hover */}
