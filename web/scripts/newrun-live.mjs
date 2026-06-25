@@ -60,15 +60,13 @@ try {
   await page.waitForTimeout(120)
   await shot("party")
 
-  // aggression math — switch to Yolo and check the derived numbers render
+  // aggression — 3 cards, each carries its own live math (Safe -10% / Balanced baseline / Yolo +15%)
   const aggroPanel = page.locator(".panel").filter({ hasText: "Aggression" })
-  await aggroPanel.locator("button", { hasText: "Yolo" }).click().catch(() => {})
-  await page.waitForTimeout(150)
   const aggroTxt = await aggroPanel.innerText().catch(() => "")
-  check(/\+15% output/i.test(aggroTxt) && /avoidable taken/i.test(aggroTxt), `aggression shows live math (Yolo) — got: ${aggroTxt.replace(/\n/g, " · ").slice(0, 140)}`)
-  await aggroPanel.locator("button", { hasText: "Balanced" }).click().catch(() => {})
+  check(/\+15% out/i.test(aggroTxt) && /-10% out/i.test(aggroTxt) && /baseline/i.test(aggroTxt),
+    `aggression cards each show their math — ${aggroTxt.replace(/\n/g, " · ").slice(0, 160)}`)
+  await aggroPanel.locator("button", { hasText: "Yolo" }).click().catch(() => {})  // selection still works (no crash)
   await page.waitForTimeout(120)
-  check(/Baseline/i.test(await aggroPanel.innerText().catch(() => "")), "Balanced shows 'Baseline — no modifiers.'")
 
   // key table (finding N7) — only assert if present
   const keyRows = await page.locator("[data-key-row]").count().catch(() => 0)

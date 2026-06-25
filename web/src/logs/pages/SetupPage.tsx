@@ -128,9 +128,9 @@ export function SetupPage({ go }: { go: Go }) {
                   const info = mc(m.spec), isOwner = m.id === ownerId
                   return (
                     <div key={m.id} data-party-slot style={{ flex: 1, aspectRatio: "1 / 1", minWidth: 0, position: "relative", borderRadius: "var(--radius)", border: `1px solid ${info.color}66`, background: `${info.color}14`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, padding: 6 }}>
-                      <GameIcon kind="spec" id={m.spec} size={34} color={info.color} label={`${info.subspec} ${info.klass}`} />
+                      <GameIcon kind="spec" id={m.spec} size={51} color={info.color} label={`${info.subspec} ${info.klass}`} />
                       <span style={{ color: info.color, fontWeight: 700, fontSize: 11.5, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.name}</span>
-                      <span className="mono" style={{ fontSize: 10.5, color: qualityColor(rarityForIlvl(m.ilvl)) }}>{m.ilvl}</span>
+                      <span className="mono" style={{ fontSize: 16, fontWeight: 700, color: qualityColor(rarityForIlvl(m.ilvl)) }}>{m.ilvl}</span>
                       {isOwner
                         ? <span title="Key holder — locked into the party" style={{ position: "absolute", top: 3, right: 5, fontSize: 11, color: "var(--amber)" }}>★</span>
                         : <button title="Remove from party" onClick={() => g.togglePartyMember(m.id)} style={{ position: "absolute", top: 0, right: 3, border: "none", background: "none", color: "var(--faint)", cursor: "pointer", fontSize: 15, lineHeight: 1 }}>×</button>}
@@ -183,22 +183,26 @@ export function SetupPage({ go }: { go: Go }) {
 
             {/* thin aggression strip — seg + live math (from tuning, can't drift); flavour on hover */}
             <Panel title="Aggression" bodyStyle={{ padding: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div className="seg-group" style={{ flex: "none" }}>
-                  {AGGRO.map((a) => (
-                    <button key={a.id} title={a.desc} className={"seg-btn" + (aggression === a.id ? " on accent" : "")} onClick={() => setAggression(a.id)}>{a.name}</button>
-                  ))}
-                </div>
-                {(() => {
-                  const a = content.tuning.aggression[aggression]
-                  const dc = (content.tuning.hitQuality.dialCrit as Record<string, number>)[aggression] ?? 0
-                  const out = Math.round((a.output - 1) * 100), intake = Math.round((a.avoidableIntake - 1) * 100), crit = Math.round(dc * 100)
+              {/* 3 balanced cards — each option carries its own math, so there's no orphan stat line */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                {AGGRO.map((a) => {
+                  const t = content.tuning.aggression[a.id]
+                  const dc = (content.tuning.hitQuality.dialCrit as Record<string, number>)[a.id] ?? 0
+                  const out = Math.round((t.output - 1) * 100), intake = Math.round((t.avoidableIntake - 1) * 100), crit = Math.round(dc * 100)
                   const sign = (n: number) => (n > 0 ? "+" : "") + n
-                  const parts = [`${sign(out)}% output`, `${sign(intake)}% avoidable taken`]
-                  if (crit !== 0) parts.push(`${sign(crit)}% crit`)
                   const neutral = out === 0 && intake === 0 && crit === 0
-                  return <div className="mono" style={{ fontSize: 11.5, color: "var(--muted)", lineHeight: 1.3 }}>{neutral ? "Baseline — no modifiers." : parts.join(" · ")}</div>
-                })()}
+                  const on = aggression === a.id
+                  return (
+                    <button key={a.id} title={a.desc} onClick={() => setAggression(a.id)}
+                      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "9px 6px", borderRadius: "var(--radius)", cursor: "pointer", textAlign: "center", fontFamily: "inherit",
+                        border: on ? "1px solid var(--accent)" : "1px solid var(--line)", background: on ? "rgba(43,182,164,.10)" : "var(--panel-3)" }}>
+                      <span style={{ fontWeight: 700, fontSize: 13, color: on ? "var(--accent)" : "var(--text)" }}>{a.name}</span>
+                      <span className="mono" style={{ fontSize: 10, lineHeight: 1.45, color: on ? "var(--muted)" : "var(--faint)" }}>
+                        {neutral ? "baseline" : <>{sign(out)}% out · {sign(intake)}% taken{crit !== 0 ? <><br />{sign(crit)}% crit</> : null}</>}
+                      </span>
+                    </button>
+                  )
+                })}
               </div>
             </Panel>
 
@@ -209,9 +213,9 @@ export function SetupPage({ go }: { go: Go }) {
                   <div key={t.id} style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
                     <GameIcon kind="tactic" id={t.id} size={30} color="var(--muted)" label={t.name} />
                     <div style={{ fontWeight: 600, fontSize: 12, textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{t.name}</div>
-                    <div className="stepper">
+                    <div className="stepper sm">
                       <button disabled={(tactics[t.id] || 0) <= 0} onClick={() => setTactic(t.id, -1)}>−</button>
-                      <span className="v" style={{ minWidth: 26, fontSize: 15 }}>{tactics[t.id] || 0}</span>
+                      <span className="v">{tactics[t.id] || 0}</span>
                       <button disabled={left <= 0 || (tactics[t.id] || 0) >= MAX_PER} onClick={() => setTactic(t.id, +1)}>+</button>
                     </div>
                   </div>
