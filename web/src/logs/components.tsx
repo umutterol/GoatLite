@@ -5,7 +5,24 @@ import { useStage, toStageCoords, STAGE_W, STAGE_H } from "./ViewportStage"
 import { content } from "@/content"
 import { activeAffixIds, affixUnlockKey } from "@/sim/affixes"
 import { mc, parseColor, parseLabel, fmt, fmtInt, mmss, qualityColor, type DmgRow } from "./analytics"
+import { weaponInfo, armorMaterial, splitPrice } from "./item-display"
 import type { RoleKey, GearItem } from "@/state/game-store"
+
+/* ---- C.5: WoW-style tooltip panel — warm gold-gradient surface + a rarity/gold border with a faint inner glow.
+   Shared by every tooltip (item/spell/key/affix) so the whole surface reads like a Warcraft item card. `accent` is a
+   hex colour (e.g. qualityColor(rarity)) that sets the border + glow; absent → gold (Common / non-item tooltips). */
+const TIP_BG = "linear-gradient(180deg, hsl(35 16% 9%) 0%, hsl(35 12% 5%) 100%)"
+const TIP_GOLD = "#b8923a"
+function tipPanel(accent?: string): CSSProperties {
+  const b = accent ?? TIP_GOLD
+  return {
+    background: TIP_BG,
+    border: `1px solid ${b}`,
+    borderRadius: "var(--radius)",
+    boxShadow: `inset 0 0 9px ${b}22, 0 6px 22px rgba(0,0,0,.7)`,
+    color: "var(--text)",
+  }
+}
 
 /* ---- J.10: one reusable hover tooltip (fixed-position portal — never clipped, follows the trigger) ---- */
 export function Tip({ tip, children, max = 280, style, accent }: { tip: ReactNode; children: ReactNode; max?: number; style?: CSSProperties; accent?: string }) {
@@ -23,7 +40,7 @@ export function Tip({ tip, children, max = 280, style, accent }: { tip: ReactNod
     <span ref={ref} onMouseEnter={() => { place(); setShow(true) }} onMouseLeave={() => setShow(false)} style={{ display: "inline-flex", alignItems: "center", ...style }}>
       {children}
       {show ? createPortal(
-        <div role="tooltip" style={{ position: "fixed", left: pos.x, top: pos.y, transform: "translate(-50%,-100%) translateY(-9px)", zIndex: 9999, pointerEvents: "none", maxWidth: max, background: "var(--panel-3)", border: `1px solid ${accent ?? "var(--line)"}`, borderRadius: "var(--radius)", boxShadow: "0 8px 24px rgba(0,0,0,.55)", padding: "8px 11px", fontSize: 12.5, lineHeight: 1.5, color: "var(--text)" }}>
+        <div role="tooltip" style={{ position: "fixed", left: pos.x, top: pos.y, transform: "translate(-50%,-100%) translateY(-9px)", zIndex: 9999, pointerEvents: "none", maxWidth: max, padding: "9px 12px", fontSize: 12.5, lineHeight: 1.5, ...tipPanel(accent) }}>
           {tip}
         </div>, el ?? document.body) : null}
     </span>
@@ -44,23 +61,75 @@ export function ItemIcon({ item, size = 36 }: { item?: GearItem; size?: number }
     </span>
   )
 }
-/** WoW-style item card: rarity-coloured name, type/ilvl line, then white base stats (main + stamina) and green
-    secondary stats. Pair with <Tip accent={qualityColor(item.rarity)}> so the tooltip border matches the rarity. */
-export function ItemTip({ item, label }: { item: GearItem; label?: string }) {
-  const q = qualityColor(item.rarity)
-  const slotName = content.itemSlots.get(item.slot)?.name ?? item.slot
+/* C.5 item-card colours: main stats / type / damage = white; secondaries + Equip = uncommon green; item level = gold;
+   flavor = tan italic. Rarity colour (name + rarity word) comes from qualityColor(). */
+const STAT_GREEN = "#1eff00"   // "uncommon green" — secondaries + Equip effects
+const STAT_WHITE = "#fff"      // primary stats, type line, faked damage
+const GOLD = "var(--amber)"    // item-level line
+const FLAVOR_TAN = "#c79a3f"   // italic lore line
+
+/** A left/right justified row (e.g. "Two-Hand … Axe", "412 - 620 Damage … Speed 3.60"). */
+function TipRow({ left, right, color }: { left: ReactNode; right?: ReactNode; color?: string }) {
   return (
-    <div className="pixel" style={{ minWidth: 172, maxWidth: 260 }}>
-      <div style={{ fontWeight: 700, fontSize: 14, color: q, display: "flex", alignItems: "center", gap: 7 }}><ItemIcon item={item} size={22} />{item.name}</div>
-      <div style={{ color: "var(--muted)", fontSize: 11.5, marginTop: 1, display: "flex", justifyContent: "space-between", gap: 14 }}>
-        <span>{label ?? slotName}</span><span style={{ color: q }}>{item.rarity}</span>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 18, color }}>
+      <span>{left}</span>{right != null ? <span>{right}</span> : null}
+    </div>
+  )
+}
+/** The WoW sell-price line: gold/silver/copper with tinted unit letters. */
+function SellPrice({ copper }: { copper: number }) {
+  const { g, s, c } = splitPrice(copper)
+  const coin = (n: number, color: string, unit: string) => (
+    <span style={{ marginRight: 6 }}>{n}<span style={{ color, marginLeft: 1, fontWeight: 700 }}>{unit}</span></span>
+  )
+  return (
+    <div style={{ marginTop: 6, color: "var(--muted)", fontSize: 11.5 }}>
+      Sell Price: {g ? coin(g, "#e6c200", "g") : null}{g || s ? coin(s, "#c6c6c6", "s") : null}{coin(c, "#cb7a44", "c")}
+    </div>
+  )
+}
+
+/** WoW-style item card. Rarity-coloured name + rarity word, gold item-level, a type line (hands | weapon-type for
+    weapons; slot | material for armor), a faked damage/speed block for weapons, then white primary stats and green
+    secondaries. Optional Equip effects (green), flavor (tan italic) and a sell-price line are pulled from the base
+    item (`content.items`) when authored — all cosmetic; none of it feeds the sim. Pair with
+    <Tip accent={qualityColor(item.rarity)}> so the panel border matches the rarity. */
+export function ItemTip({ item, label, statLabel }: { item: GearItem; label?: string; statLabel?: string }) {
+  const q = qualityColor(item.rarity)
+  const base = content.items.get(item.baseId)
+  const slotName = content.itemSlots.get(item.slot)?.name ?? item.slot
+  const wpn = weaponInfo(item)
+  const material = item.slot !== "weapon" ? armorMaterial(base?.note) : null
+  const typeLeft = wpn ? wpn.handLabel : label ?? slotName
+  const typeRight = wpn ? wpn.weaponType : material
+  const equip = base?.equip ?? []
+  return (
+    <div className="pixel" style={{ minWidth: 210, maxWidth: 300, lineHeight: 1.4 }}>
+      {/* name + rarity word, in rarity colour (rarity word replaces WoW's difficulty/track line) */}
+      <div style={{ fontWeight: 700, fontSize: 14.5, color: q }}>{item.name}</div>
+      <div style={{ color: q, fontSize: 12 }}>{item.rarity}</div>
+      <div style={{ color: GOLD, fontSize: 12 }}>Item Level {item.ilvl}</div>
+      {/* type line: hands | weapon-type (weapons) or slot | material (armor) */}
+      {typeLeft || typeRight ? <TipRow left={typeLeft} right={typeRight} color={STAT_WHITE} /> : null}
+      {/* faked weapon damage + speed (cosmetic; never simulated) */}
+      {wpn ? (
+        <div style={{ color: STAT_WHITE }}>
+          <TipRow left={`${wpn.min} - ${wpn.max} Damage`} right={`Speed ${wpn.speed.toFixed(2)}`} />
+          <div style={{ color: "var(--faint)" }}>({wpn.dps.toFixed(1)} damage per second)</div>
+        </div>
+      ) : null}
+      {/* primary stats white, secondaries green */}
+      <div style={{ marginTop: 4 }}>
+        {item.mainStat ? <div style={{ color: STAT_WHITE }}>+{item.mainStat} {statLabel ?? item.mainStatType}</div> : null}
+        {item.stamina ? <div style={{ color: STAT_WHITE }}>+{item.stamina} Stamina</div> : null}
+        {(item.secondaries ?? []).map((s, i) => <div key={i} style={{ color: STAT_GREEN }}>+{s.value} {s.stat}</div>)}
       </div>
-      <div style={{ color: "var(--faint)", fontSize: 11 }}>Item Level {item.ilvl}</div>
-      <div style={{ marginTop: 5 }}>
-        {item.mainStat ? <div style={{ color: "var(--text)" }}>+{item.mainStat} {item.mainStatType}</div> : null}
-        {item.stamina ? <div style={{ color: "var(--text)" }}>+{item.stamina} Stamina</div> : null}
-        {(item.secondaries ?? []).map((s, i) => <div key={i} style={{ color: "var(--good)" }}>+{s.value} {s.stat}</div>)}
-      </div>
+      {/* loot screen passes the item's adaptive stat range → tell the player it becomes the wearer's stat (don't skip the healer) */}
+      {statLabel && statLabel.includes("/") ? <div style={{ marginTop: 4, color: "var(--faint)", fontStyle: "italic", fontSize: 11.5 }}>Adapts — becomes the wearer's primary stat.</div> : null}
+      {/* OPTIONAL blocks — render only when authored on the base item */}
+      {equip.length ? <div style={{ marginTop: 6, color: STAT_GREEN, fontSize: 12 }}>{equip.map((e, i) => <div key={i}>Equip: {e}</div>)}</div> : null}
+      {base?.flavor ? <div style={{ marginTop: 6, color: FLAVOR_TAN, fontStyle: "italic", fontSize: 12 }}>"{base.flavor}"</div> : null}
+      {typeof base?.sellPrice === "number" ? <SellPrice copper={base.sellPrice} /> : null}
     </div>
   )
 }
@@ -272,7 +341,7 @@ export function LogSpell({ name, skillId, color }: { name: string; skillId?: str
       <span className="log-spell" onMouseEnter={(e) => { move(e); setShow(true) }} onMouseMove={move} onMouseLeave={() => setShow(false)}
         style={{ fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 2, cursor: "help", color: color ?? "inherit" }}>{name}</span>
       {show ? createPortal(
-        <div role="tooltip" style={{ position: "fixed", left: pos.x, top: pos.y, zIndex: 9999, pointerEvents: "none", background: "var(--panel-3)", border: "1px solid var(--line)", borderRadius: "var(--radius)", boxShadow: "0 8px 24px rgba(0,0,0,.55)", padding: "9px 12px" }}>
+        <div role="tooltip" style={{ position: "fixed", left: pos.x, top: pos.y, zIndex: 9999, pointerEvents: "none", padding: "9px 12px", ...tipPanel() }}>
           <SpellTip skillId={skillId} name={name} />
         </div>, el ?? document.body) : null}
     </>

@@ -178,6 +178,14 @@ export const DungeonSchema = z.object({
 export const ItemSlotSchema = z.object({ id: z.string(), name: z.string() })
 export const ItemSchema = z.object({
   id: z.string(), name: z.string(), slot: z.string(), specs: z.array(z.string()), note: z.string().optional(),
+  // C.5 tooltip overhaul — all optional, display-only. weaponType/hands/speed drive the WoW-style weapon
+  // type line + faked damage range; flavor/equip/sellPrice are authored "possibility" fields (cosmetic, NOT simulated).
+  weaponType: z.string().optional(),               // "Dagger" | "Axe" | "Staff" | "Bow" | "Fist Weapon" | …
+  hands: z.union([z.literal(1), z.literal(2)]).optional(),
+  speed: z.number().optional(),                    // attack speed in seconds, e.g. 3.6
+  flavor: z.string().optional(),                   // italic lore line
+  equip: z.array(z.string()).optional(),           // green "Equip: …" effect lines (effect text only, no prefix)
+  sellPrice: z.number().optional(),                // vendor value in copper
 })
 export const CurrencySchema = z.object({ id: z.string(), name: z.string(), icon: z.string(), tint: z.string(), desc: z.string() })
 export const BuildingSchema = z.object({ id: z.string(), name: z.string(), icon: z.string(), effect: z.string() })
