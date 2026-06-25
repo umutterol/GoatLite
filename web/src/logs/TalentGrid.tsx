@@ -13,7 +13,9 @@ import { useStage } from "./ViewportStage"
 type TalentOption = { id: string; name: string; effect: string; default?: boolean }
 type TalentNode = { id: string; node: number; specId?: string; name: string; options: TalentOption[] }
 
-/** A talent tile: the painted PNG if present, else a styled tier-numbered fallback box (selected = accent ring). */
+/** A talent tile: the painted PNG if present, else the app's default icon art (like every GameIcon) — so talents
+    "use fallback icons" until /icons/talent-{id}.png is dropped in. Selected = accent ring; a small tier badge keeps
+    the tier readable at a glance. */
 function TalentIcon({ opt, tier, on, size = 38 }: { opt: TalentOption; tier: number; on?: boolean; size?: number }) {
   const ring = on ? "var(--accent)" : "var(--line)"
   return (
@@ -23,10 +25,10 @@ function TalentIcon({ opt, tier, on, size = 38 }: { opt: TalentOption; tier: num
       alignItems: "center", justifyContent: "center", overflow: "hidden",
       boxShadow: on ? "0 0 0 2px rgba(43,182,164,.18)" : undefined,
     }}>
-      <span style={{ position: "absolute", fontWeight: 700, fontSize: Math.round(size * 0.42), color: on ? "var(--accent)" : "var(--faint)", opacity: .9 }}>{tier}</span>
-      <img key={opt.id} src={`/icons/talent-${opt.id}.png`} width={size - 4} height={size - 4} alt=""
-        onError={(e) => { e.currentTarget.style.display = "none" }}
-        style={{ position: "relative", objectFit: "cover", borderRadius: "var(--radius)" }} />
+      <img key={opt.id} src={`/icons/talent-${opt.id}.png`} width={size - 3} height={size - 3} alt=""
+        onError={(e) => { const t = e.currentTarget; if (!t.src.endsWith("/icons/icon-default.png")) t.src = "/icons/icon-default.png" }}
+        style={{ objectFit: "cover", borderRadius: "var(--radius)" }} />
+      <span style={{ position: "absolute", bottom: -1, right: 1, fontSize: Math.max(8, Math.round(size * 0.26)), fontWeight: 700, lineHeight: 1, color: on ? "var(--accent)" : "var(--faint)", textShadow: "0 0 3px #000, 0 0 3px #000" }}>{tier}</span>
     </span>
   )
 }

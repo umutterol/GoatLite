@@ -5,7 +5,7 @@ import type { Member } from "@/data/game"
 import { corOf, potentialStars, roleKeyOf } from "@/data/operator"
 import { mc, memberScore, scoreColor, qualityColor, bestRunsFor } from "../analytics"
 import { Icon, Panel, RolePill, Upgrade, Tip, ItemTip, ItemIcon, SpellTip, GameIcon } from "../components"
-import { SkillBars, Stars, corColor, traitCombatSummary } from "../OperatorPanel"
+import { SkillBars, corColor, potentialLabel, potentialCor, traitCombatSummary } from "../OperatorPanel"
 import type { Go, GoChar } from "../LogsApp"
 
 const SEASON_DUNGEONS = ([...content.seasons.values()][0]?.dungeons ?? [...content.dungeons.keys()])
@@ -135,7 +135,7 @@ function OperatorCard({ member, color }: { member: Member; color: string }) {
     <Panel title="Aptitudes" right={<span className="mono" style={{ fontSize: 13, fontWeight: 700, color: corColor(cor) }}>{cor} <span style={{ color: "var(--faint)", fontWeight: 400, fontSize: 10 }}>COR</span></span>} bodyStyle={{ padding: 14 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 13 }}>
         <span className="flux" style={{ fontSize: 12 }}>Potential</span>
-        <Stars value={stars} size={15} />
+        <span className="mono" style={{ fontSize: 15, fontWeight: 700, color: corColor(potentialCor(stars)) }}>{potentialLabel(stars)}</span>
       </div>
       <SkillBars skills={member.skills} ceilings={member.ceilings} revealed={member.revealed} skillXp={member.skillXp} color={color} showXp />
       {combat ? <div className="flux" style={{ fontSize: 11, marginTop: 13, color: "var(--faint)" }}>Trait in combat: <span style={{ color: "var(--muted)" }}>{combat}</span></div> : null}

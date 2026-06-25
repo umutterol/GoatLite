@@ -11,6 +11,11 @@ const OP_SKILLS = [...content.operatorSkills.values()]
 export const corColor = (c: number): string =>
   c >= 78 ? "#ff8000" : c >= 62 ? "#a335ee" : c >= 46 ? "#0070ff" : c >= 30 ? "#1eff00" : "#9d9d9d"
 
+/** Potential shown as a deliberately VAGUE ceiling band — stars (0-5) map to a ~COR ceiling (×20), floored to 10s
+    and suffixed "+" (e.g. 3.9★ → 78 → "70+"). Keeps the scouting "estimate, not a promise" feel as a number. */
+export const potentialCor = (stars: number): number => stars * 20
+export const potentialLabel = (stars: number): string => `${Math.floor((stars * 20) / 10) * 10}+`
+
 /** One partial star (fill 0..1) — a faint base star with an amber star clipped to `fill`. */
 function Star({ fill, size = 14 }: { fill: number; size?: number }) {
   return (

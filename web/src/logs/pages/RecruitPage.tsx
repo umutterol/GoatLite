@@ -5,7 +5,7 @@ import { useGame, type RoleKey, SLOTS } from "@/state/game-store"
 import { mc, qualityColor, moraleColor, MORALE_TIP } from "../analytics"
 import { RolePill, GameIcon, Tip, TipBody, ItemIcon, ItemTip } from "../components"
 import { TalentStrip } from "../TalentGrid"
-import { Stars, corColor, SkillBars, scoutBlurb, traitCombatSummary } from "../OperatorPanel"
+import { corColor, potentialLabel, potentialCor, SkillBars, traitCombatSummary } from "../OperatorPanel"
 import type { Go } from "../LogsApp"
 
 export function RecruitPage({ go }: { go: Go }) {
@@ -84,7 +84,7 @@ export function RecruitPage({ go }: { go: Go }) {
                       <td><RolePill role={r.role} iconOnly /></td>
                       <td className="r mono" style={{ fontWeight: 600 }}>{r.ilvl}</td>
                       <td className="r"><span className="mono" style={{ fontWeight: 700, fontSize: 15, color: corColor(r.cor) }}>{r.cor}</span></td>
-                      <td><Stars value={r.stars} size={13} /></td>
+                      <td className="r mono" style={{ fontWeight: 700, color: corColor(potentialCor(r.stars)) }}>{potentialLabel(r.stars)}</td>
                       <td className="r mono" style={{ color: moraleColor(r.morale), fontWeight: 600 }}>{r.morale}%</td>
                       <td className="r mono" style={{ color: afford || isSigned ? "var(--amber)" : "var(--danger)" }}>◈{r.cost}</td>
                       <td className="r">
@@ -157,23 +157,16 @@ function ScoutDetail({ r }: { r: ReturnType<typeof useGame>["recruits"][number] 
         </div>
       </div>
 
-      {/* the two scouting numbers */}
+      {/* the two scouting numbers — both numeric now (Potential is a deliberately vague "70+" ceiling band) */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid var(--line-soft)" }}>
         <div style={{ padding: "13px 16px", borderRight: "1px solid var(--line-soft)" }}>
           <div className="eyebrow" style={{ fontSize: 9.5 }}>Operator Rating</div>
           <div className="mono" style={{ fontSize: 30, fontWeight: 700, color: corColor(r.cor), lineHeight: 1.1 }}>{r.cor}</div>
-          <div className="flux" style={{ fontSize: 10.5 }}>how good now</div>
         </div>
         <div style={{ padding: "13px 16px" }}>
           <div className="eyebrow" style={{ fontSize: 9.5 }}>Potential</div>
-          <div style={{ marginTop: 5 }}><Stars value={r.stars} size={17} /></div>
-          <div className="flux" style={{ fontSize: 10.5, marginTop: 4 }}>how high they climb</div>
+          <div className="mono" style={{ fontSize: 30, fontWeight: 700, color: corColor(potentialCor(r.stars)), lineHeight: 1.1 }}>{potentialLabel(r.stars)}</div>
         </div>
-      </div>
-
-      {/* scout report — fixed 2-line height (clamped) so the panel stays one constant height across recruits */}
-      <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--line-soft)", background: "var(--row-alt)" }}>
-        <div className="flux" title={scoutBlurb(r.cor, r.stars)} style={{ fontSize: 12.5, fontStyle: "italic", lineHeight: 1.4, height: 35, display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 2, overflow: "hidden" }}>“{scoutBlurb(r.cor, r.stars)}”</div>
       </div>
 
       {/* equipped gear — a real paper-doll reflecting their ilvl (per-slot) + quality (rarity); inherited on sign */}
