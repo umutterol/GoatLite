@@ -143,6 +143,8 @@ a { color: var(--link); text-decoration: none; }
   display: flex; flex-direction: column; min-height: 0;
   font-family: var(--font-pixel);   /* chat stays in the Pixelify accent font */
 }
+/* embedded chat (Report page body): fills its box as a self-contained framed panel, not the docked rail */
+.guild-feed.embedded { width: 100%; height: 100%; flex: 1; border-left: none; border: 1px solid var(--line); border-radius: var(--radius); }
 .feed-head {
   flex: 0 0 auto; height: 44px; display: flex; align-items: center; gap: 8px;
   padding: 0 14px; border-bottom: 1px solid var(--line);

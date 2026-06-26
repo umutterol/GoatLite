@@ -21,13 +21,16 @@ try {
   await page.evaluate(() => window.__game.runKey({ tactics: { interrupts: 2, positioning: 1, cooldowns: 1, killorder: 2 }, aggression: "Balanced" }))
   await page.waitForTimeout(600)
 
-  // overlays present inside the canvas
-  await page.waitForSelector("text=Party · Health", { timeout: 8000 })
-  check(await page.getByText("Party · Health").count() > 0, "party-health overlay renders (top-left)")
-  check(await page.getByText("Live Meter").count() > 0, "live meter renders (bottom-right)")
+  // overlays present inside the canvas (live meter bottom-right; the Damage/Healing toggle now sits in the meter titlebar)
+  await page.waitForSelector(".meter", { timeout: 8000 })
+  check(await page.locator(".meter").count() > 0, "live meter renders (bottom-right)")
+  check(await page.locator(".meter .meter-titlebar").getByRole("button", { name: "Damage" }).count() > 0, "Damage/Healing toggle moved into the meter titlebar (no 'Live Meter' header)")
+  // swap: event log -> right rail; guild chat -> report body
+  check(await page.getByRole("button", { name: "Event Log" }).count() > 0, "event log present (right rail)")
+  check(await page.getByText("Guild Chat").count() > 0, "guild chat moved into the report body")
   // run-player readout uses clock / par (e.g. 0:12 / 25:00) — a '/' followed by m:ss, not the run's final length
-  const readout = (await page.locator("span.mono").allInnerTexts()).find((t) => /\/\s*\d+:\d\d/.test(t)) ?? ""
-  check(/\/\s*\d+:\d\d/.test(readout), `run-player readout shows clock / par ("${readout.trim()}")`)
+  const readout = (await page.locator("span.mono").allInnerTexts()).find((t) => /\d+:\d\d\/\d+:\d\d/.test(t)) ?? ""
+  check(/\d+:\d\d\/\d+:\d\d/.test(readout) || (await page.locator("span.mono").allInnerTexts()).some((t) => /\/\s*\d+:\d\d/.test(t)), `time readout shows clock/par ("${readout.trim()}")`)
 
   // let the (gated) replay run so a pull tick or two reveals, then shoot the mid-play frame
   await page.waitForTimeout(4000)

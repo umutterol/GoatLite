@@ -15,7 +15,7 @@ import { hpAt, mc } from "./analytics"
 import { Icon } from "./components"
 
 const H = 640                 // canvas height (px) — arena tall enough for pack-to-pack travel to read (−20% from 800)
-const ARENA_TOP = 90          // arena starts below the HUD band (summary / meter overlays)
+const ARENA_TOP = 130         // arena starts BELOW the top HUD band (party frame top-left + timer panel top-right) so combat never renders under them
 const ARENA_BOT = H - 16
 const ARENA_H = ARENA_BOT - ARENA_TOP
 
@@ -98,7 +98,8 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudTo
     const stations = new Map<number, V>(), packs = new Map<number, V>(), prevs = new Map<number, V>()
     let prev = START
     for (const st of (tl?.stages ?? [])) {
-      const c: V = { x: lerp(0.32, 0.80, hashF(seed + ":" + st.idx + ":x")), y: lerp(0.30, 0.78, hashF(seed + ":" + st.idx + ":y")) }
+      // pack centres stay central (away from the bottom-right meter widget + the edges) — the place() clamp is a backstop
+      const c: V = { x: lerp(0.30, 0.70, hashF(seed + ":" + st.idx + ":x")), y: lerp(0.28, 0.72, hashF(seed + ":" + st.idx + ":y")) }
       const u = unit(prev.x - c.x, prev.y - c.y)
       const station: V = { x: c.x + u.x * STANDOFF, y: c.y + u.y * STANDOFF }
       packs.set(st.idx, c); stations.set(st.idx, station); prevs.set(st.idx, prev); prev = station
@@ -144,7 +145,9 @@ export function ReplayCanvas({ result, clock, playing, members, dungeonId, hudTo
   // clock-based sinusoid aliases into jitter. Idle is a real-time CSS animation (`.replay-idle`) instead.
   const place = (d: Dot) => {
     const t = targetPos(d), frac = rawFrac(d)
-    const ax = clamp(t.x, 0.03, 0.97), ay = clamp(t.y, 0.06, 0.94)
+    let ax = clamp(t.x, 0.03, 0.97); const ay = clamp(t.y, 0.06, 0.94)
+    // keep combat clear of the bottom-right meter widget: nudge any dot that would land under it back to its left edge
+    if (ax > 0.72 && ay > 0.55) ax = 0.72
     return { ...d, frac, dead: frac <= 0.001, px: ax * W, py: ARENA_TOP + ay * ARENA_H, axPct: ax * 100 }
   }
   // P.4: a summoned add (e.g. a guard) spawns mid-stage, so hide its dot until its spawn second — otherwise every add the

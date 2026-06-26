@@ -17,7 +17,7 @@ function channelOf(e: { kind?: string; tone: string }): { tag: string; col: stri
 }
 const hhmm = (t: number) => { const d = new Date(t); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}` }
 
-export function GuildFeed({ goChar }: { goChar: GoChar }) {
+export function GuildFeed({ goChar, embedded = false }: { goChar: GoChar; embedded?: boolean }) {
   const { feed } = useGame()
   const scrollRef = useRef<HTMLDivElement>(null)
   // stable per-line wall-clock timestamp (cosmetic): stamp an id the first time it's seen; persists across renders.
@@ -31,7 +31,7 @@ export function GuildFeed({ goChar }: { goChar: GoChar }) {
   }, [feed.length])
 
   return (
-    <aside className="guild-feed" aria-label="Guild chat">
+    <aside className={"guild-feed" + (embedded ? " embedded" : "")} aria-label="Guild chat">
       <div className="feed-head">
         <span className="panel-title">Guild Chat</span>
         {feed.length ? <span className="feed-count">{feed.length}</span> : null}

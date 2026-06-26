@@ -382,13 +382,13 @@ export function DamageTable({ rows, metric = "dps" }: { rows: DmgRow[]; metric?:
 }
 
 /* Details!-style compact meter */
-export function Meter({ rows, metric = "dps", segName, total, duration }: { rows: DmgRow[]; metric?: "dps" | "hps"; segName: string; total: number; duration: number }) {
+export function Meter({ rows, metric = "dps", segName, title, total, duration }: { rows: DmgRow[]; metric?: "dps" | "hps"; segName: string; title?: ReactNode; total: number; duration: number }) {
   const max = rows.length ? rows[0].amount : 1
   const rate = (d: DmgRow) => (metric === "hps" ? (d.hps ?? 0) : d.dps)
   return (
     <div className="meter">
       <div className="meter-titlebar">
-        <span className="seg-name"><Icon name="bolt" size={12} color="var(--accent)" />{segName}</span>
+        {title ?? <span className="seg-name"><Icon name="bolt" size={12} color="var(--accent)" />{segName}</span>}
         <span className="seg-meta mono">{fmt(total)} · {mmss(duration)}</span>
       </div>
       <div className="meter-body">

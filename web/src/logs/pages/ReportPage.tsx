@@ -9,6 +9,7 @@ import { buildReport, liveDamage, liveHealing, hpAt, mc, mmss, ROLE_ORDER, type 
 import type { RunResult } from "@/sim"
 import { Icon, Meter, ClassName, LogSpell, GameIcon } from "../components"
 import { ReplayCanvas } from "../ReplayCanvas"
+import { GuildFeed } from "../GuildFeed"
 import type { Go, GoChar } from "../LogsApp"
 
 const SPEEDS = [0.5, 1, 2, 4]
@@ -116,9 +117,10 @@ export function ReportPage({ go, goChar, viewId, setViewId }: { go: Go; goChar: 
 
   return (
     <div className="page">
-      <div className="page-scroll" style={{ padding: 20 }}>
+      {/* MAIN COLUMN: replay + run-player + guild chat (moved into the body) + action footer — fixed, no page scroll */}
+      <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden", padding: 20 }}>
         {/* replay (top) — party health (top-left) · timer panel (top-right) · live meter (bottom-right) · loot popup (centered) */}
-        <div style={{ marginBottom: 14 }}>
+        <div style={{ marginBottom: 14, flex: "none" }}>
           <ReplayCanvas
             result={result} clock={clock} playing={playing} members={g.members} dungeonId={R.dungeonId}
             hudTopLeft={<PartyHealth result={result} hp={hp} goChar={goChar} />}
@@ -131,7 +133,7 @@ export function ReportPage({ go, goChar, viewId, setViewId }: { go: Go; goChar: 
                   {affixIds.map((id) => <GameIcon key={id} kind="affix" id={id} size={16} label={content.affixes.get(id)?.name} />)}
                 </div>
                 <div style={{ display: "flex", gap: 14, marginTop: 8, justifyContent: "flex-end" }}>
-                  <Stat label="Time" value={<span className="mono">{mmss(clock)}</span>} sub={"/ " + R.par} />
+                  <Stat label="Time" value={<span className="mono">{mmss(clock)}/{R.par}</span>} />
                   <Stat label="Deaths" value={<span className="mono" style={{ color: visibleDeaths.length ? "var(--danger)" : "var(--good)" }}>{visibleDeaths.length}</span>} />
                   <Stat label="Rez" value={<span className="mono" style={{ color: result.finalRezCharges > 0 ? "var(--good)" : "var(--danger)" }}>{result.finalRezCharges}</span>} />
                   <Stat label="Result" value={gated ? <span style={{ color: "var(--faint)" }}>···</span> : <span style={{ color: R.outcomeColor }}>{R.outcome} {R.upgradeLabel}</span>} />
@@ -140,14 +142,14 @@ export function ReportPage({ go, goChar, viewId, setViewId }: { go: Go; goChar: 
             }
             hudBottomRight={
               <div style={{ background: "rgba(10,11,15,.66)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "8px 10px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
-                  <span className="eyebrow">Live Meter</span>
-                  <div className="seg-group" style={{ padding: 2 }}>
-                    <button className={"seg-btn" + (meterMetric === "dps" ? " on accent" : "")} style={{ padding: "3px 9px", fontSize: 11 }} onClick={() => setMeterMetric("dps")}>Damage</button>
-                    <button className={"seg-btn" + (meterMetric === "hps" ? " on accent" : "")} style={{ padding: "3px 9px", fontSize: 11 }} onClick={() => setMeterMetric("hps")}>Healing</button>
-                  </div>
-                </div>
-                <Meter rows={meterRows} metric={meterMetric} segName="Overall" total={meterTotal} duration={liveDmg.dur} />
+                {/* the Damage/Healing toggle replaces the meter's "Overall" title (no separate "Live Meter" header) */}
+                <Meter rows={meterRows} metric={meterMetric} segName="Overall" total={meterTotal} duration={liveDmg.dur}
+                  title={
+                    <div className="seg-group" style={{ padding: 2 }}>
+                      <button className={"seg-btn" + (meterMetric === "dps" ? " on accent" : "")} style={{ padding: "3px 9px", fontSize: 11 }} onClick={() => setMeterMetric("dps")}>Damage</button>
+                      <button className={"seg-btn" + (meterMetric === "hps" ? " on accent" : "")} style={{ padding: "3px 9px", fontSize: 11 }} onClick={() => setMeterMetric("hps")}>Healing</button>
+                    </div>
+                  } />
               </div>
             }
             centerPopup={finished && showAction && !gated && !popupDismissed ? (
@@ -168,7 +170,7 @@ export function ReportPage({ go, goChar, viewId, setViewId }: { go: Go; goChar: 
         </div>
 
         {/* run player — readout is vs the dungeon timer (clock / par), not the run's final length; pull ticks reveal as the playhead passes them */}
-        <div className="panel" style={{ padding: "10px 16px", marginBottom: 14, display: "flex", alignItems: "center", gap: 16 }}>
+        <div className="panel" style={{ padding: "10px 16px", marginBottom: 14, display: "flex", alignItems: "center", gap: 16, flex: "none" }}>
           <button className="btn btn-primary btn-sm" style={{ width: 38, height: 34, justifyContent: "center", padding: 0, fontSize: 15 }} onClick={togglePlay} title={playing ? "Pause" : finished ? "Replay" : "Play"}>
             {playing ? "❚❚" : finished ? "↻" : "▶"}
           </button>
@@ -197,25 +199,13 @@ export function ReportPage({ go, goChar, viewId, setViewId }: { go: Go; goChar: 
           <span className="mono" style={{ fontSize: 13, color: "var(--muted)", minWidth: 96, textAlign: "right" }}>{mmss(clock)} <span style={{ color: "var(--faint)" }}>/ {R.par}</span></span>
         </div>
 
-        {/* full-width event log */}
-        <div className="panel">
-          <div className="panel-head" style={{ padding: "10px 14px" }}>
-            <div className="nav-tabs" style={{ height: 34, gap: 2 }}>
-              {([["log", "Event Log"], ["deaths", "Deaths"], ["casts", "Casts"]] as [typeof tab, string][]).map(([id, lbl]) => (
-                <button key={id} className={"seg-btn" + (tab === id ? " on accent" : "")} onClick={() => setTab(id)}>{lbl}</button>
-              ))}
-            </div>
-            <span className="mono" style={{ fontSize: 12, color: "var(--faint)" }}>{visibleLog.length} events · {mmss(clock)}</span>
-          </div>
-          <div style={{ padding: 14 }}>
-            {tab === "deaths" ? <DeathsTab deaths={visibleDeaths} specByName={specByName} /> : null}
-            {tab === "casts" ? <CastsTab rows={liveDmg.rows} dur={liveDmg.dur} /> : null}
-            {tab === "log" ? <EventLog log={visibleLog} specById={specById} playing={playing} speed={speed} /> : null}
-          </div>
+        {/* guild chat — moved into the report body (the docked rail is suppressed on this page); fixed window, internal scroll */}
+        <div style={{ flex: 1, minHeight: 0, marginBottom: 14, display: "flex" }}>
+          <GuildFeed goChar={goChar} embedded />
         </div>
 
         {/* action footer — always reachable (the centered popup is an extra prompt at run end, and can be dismissed) */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 0, flex: "none" }}>
           {gated ? (
             <button className="btn" disabled style={{ justifyContent: "center", padding: "11px 20px", fontSize: 13.5, opacity: .65, cursor: "not-allowed" }} title="Watch the run to the end to reveal results">
               <Icon name="report" size={15} color="var(--faint)" /> Watch the run to reveal results…
@@ -233,27 +223,43 @@ export function ReportPage({ go, goChar, viewId, setViewId }: { go: Go; goChar: 
           )}
         </div>
       </div>
+
+      {/* RIGHT RAIL: event log (moved here), same 300px footprint the chat had — fixed window, internal scroll */}
+      <div style={{ width: 300, flex: "none", display: "flex", flexDirection: "column", minHeight: 0, borderLeft: "1px solid var(--line)", background: "var(--panel)" }}>
+        <div className="panel-head" style={{ padding: "10px 14px", flex: "none" }}>
+          <div className="nav-tabs" style={{ height: 34, gap: 2 }}>
+            {([["log", "Event Log"], ["deaths", "Deaths"], ["casts", "Casts"]] as [typeof tab, string][]).map(([id, lbl]) => (
+              <button key={id} className={"seg-btn" + (tab === id ? " on accent" : "")} onClick={() => setTab(id)}>{lbl}</button>
+            ))}
+          </div>
+          <span className="mono" style={{ fontSize: 12, color: "var(--faint)" }}>{visibleLog.length}</span>
+        </div>
+        <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden", padding: 14 }}>
+          {tab === "deaths" ? <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}><DeathsTab deaths={visibleDeaths} specByName={specByName} /></div> : null}
+          {tab === "casts" ? <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}><CastsTab rows={liveDmg.rows} dur={liveDmg.dur} /></div> : null}
+          {tab === "log" ? <EventLog log={visibleLog} specById={specById} playing={playing} speed={speed} /> : null}
+        </div>
+      </div>
     </div>
   )
 }
 
 /* ---- party live health overlay (top-left of the replay canvas): raid-frame grid, one column per member ----
-   row 1 = square class icons · row 2 = names · row 3 = health bars. (Buff/debuff row deferred — the sim exposes no
+   row 1 = spec icons (1.5×) · row 2 = names · row 3 = health bars. (Buff/debuff row deferred — the sim exposes no
    per-second status timeline yet; that needs engine instrumentation.) */
 function PartyHealth({ result, hp, goChar }: { result: RunResult; hp: Record<string, number>; goChar: GoChar }) {
   const rows = result.partyMeta
-    .map((pm) => ({ ...pm, role: roleOf(pm.specId), classId: content.specs.get(pm.specId)?.classId ?? "", frac: hp[pm.id] ?? 1 }))
+    .map((pm) => ({ ...pm, role: roleOf(pm.specId), frac: hp[pm.id] ?? 1 }))
     .sort((a, b) => ROLE_ORDER[a.role] - ROLE_ORDER[b.role])
   return (
-    <div style={{ background: "rgba(10,11,15,.66)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "8px 11px", width: 360 }}>
-      <div className="eyebrow" style={{ marginBottom: 8 }}>Party · Health</div>
+    <div style={{ background: "rgba(10,11,15,.66)", backdropFilter: "blur(3px)", border: "1px solid var(--line)", borderRadius: "var(--radius)", padding: "9px 11px", width: 380 }}>
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${rows.length}, minmax(0, 1fr))`, columnGap: 9, rowGap: 6, alignItems: "center" }}>
-        {/* row 1 — square class icons */}
+        {/* row 1 — spec icons (1.5×) */}
         {rows.map((r) => {
           const info = mc(r.specId), down = r.frac <= 0.001
           return (
             <span key={"i" + r.id} onClick={() => goChar(r.id)} style={{ display: "flex", justifyContent: "center", cursor: "pointer" }}>
-              <GameIcon kind="class" id={r.classId} size={24} label={info.klass} noTip style={{ borderRadius: 3, border: `1px solid ${info.color}`, filter: down ? "grayscale(.8) brightness(.7)" : "none" }} />
+              <GameIcon kind="spec" id={r.specId} size={36} label={info.subspec} noTip style={{ borderRadius: 4, border: `1px solid ${info.color}`, filter: down ? "grayscale(.8) brightness(.7)" : "none" }} />
             </span>
           )
         })}
@@ -343,7 +349,7 @@ function EventLog({ log, specById, playing, speed }: { log: LogEntry[]; specById
   // (slow, readable fade at 0.5×; snappy at 4×) so the speed visibly changes the log cadence. Off when paused/seeking.
   const reveal = playing ? `logIn ${Math.max(0.07, 0.42 / speed).toFixed(2)}s ease-out` : undefined
   return (
-    <div ref={ref} className="scroll-thin" style={{ display: "flex", flexDirection: "column", maxHeight: "calc(var(--stage-h) - 320px)", overflowY: "auto" }}>
+    <div ref={ref} className="scroll-thin" style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, overflowY: "auto" }}>
       {log.map((e, i) => {
         const specId = e.who ? specById.get(e.who) : null
         const color = specId ? mc(specId).color : null

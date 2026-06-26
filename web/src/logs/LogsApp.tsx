@@ -109,7 +109,8 @@ export function LogsApp() {
           {page === "roster" ? <RosterPage goChar={goChar} /> : null}
           {page === "character" && route.charId ? <CharacterPage id={route.charId} go={go} goChar={goChar} /> : null}
         </div>
-        {playing ? <GuildFeed goChar={goChar} /> : null}
+        {/* the Report page hosts its own chat (moved into the body); every other page keeps the docked chat rail */}
+        {playing && page !== "report" ? <GuildFeed goChar={goChar} /> : null}
       </div>
     </div>
   )
