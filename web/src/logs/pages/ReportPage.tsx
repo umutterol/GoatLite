@@ -224,8 +224,8 @@ export function ReportPage({ go, goChar, viewId, setViewId }: { go: Go; goChar: 
         </div>
       </div>
 
-      {/* RIGHT RAIL: event log (moved here), same 300px footprint the chat had — fixed window, internal scroll */}
-      <div style={{ width: 300, flex: "none", display: "flex", flexDirection: "column", minHeight: 0, borderLeft: "1px solid var(--line)", background: "var(--panel)" }}>
+      {/* RIGHT RAIL: event log (moved here) — widened to 460 so the combat canvas (main column) is narrower; fixed window, internal scroll */}
+      <div style={{ width: 460, flex: "none", display: "flex", flexDirection: "column", minHeight: 0, borderLeft: "1px solid var(--line)", background: "var(--panel)" }}>
         <div className="panel-head" style={{ padding: "10px 14px", flex: "none" }}>
           <div className="nav-tabs" style={{ height: 34, gap: 2 }}>
             {([["log", "Event Log"], ["deaths", "Deaths"], ["casts", "Casts"]] as [typeof tab, string][]).map(([id, lbl]) => (
