@@ -32,6 +32,13 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 (B.5), interactive talent picker (B.7), mid-run persistence (B.11).
 **NEXT:** finish the B gaps, then Phase C (content scale-up). (Leaderboard/backend is a separate workstream, not yet tracked here.)
 
+> ### ⚠️ STRATEGIC PIVOT (2026-07-02): the incremental conversion — Phase IG
+> GOAT Lite converts **in-place** to a browser-first **incremental/idle game** (auto-chained keystone farming @36×,
+> Momentum click layer, guild+spec trees, gear aspects, prestige "The Patch"); the manual run flow (Report replay,
+> parses) survives as the opt-in depth layer. Design + full audit: **`Docs/INCREMENTAL-PLAN.md`**; execution tickets:
+> **Phase IG** below. Phase IG **supersedes the NOW/NEXT above** — B.11 and further manual-run-flow polish are
+> paused until IG-1 lands (those surfaces get demoted/repurposed). Kill/continue gate = end of IG-2.
+
 | Phase | Theme | Progress |
 |---|---|---|
 | 0 | Foundation (design, data, UI mockup) | ✅ 4/4 |
@@ -52,6 +59,7 @@ editable New-Run party, reports history with deterministic replay all shipped). 
 | M | **Guild Feed & Loot Drama (social meta-layer)** | ✅ 5/5 (+1 v2) — feed + system notifications (M.1), loot-drama snub (M.2), deterministic bark engine (M.3) + voice packs (M.4) + snub-in-feed (M.5), all live-verified. M.6 (exchange beats + Rival) = v2 💤 |
 | N | **Intake balance (`enemyDmgMult`) + sim-dump tooling** | ✅ 2/2 — enemy damage is now an **isolated** intake lever (=2.0); survival binds below the timer wall; +2 floor + operator runway (+3) hold; new config/CLI `sim-dump` harness |
 | **P** | **Class-Tools System** (classes bring different tools to solve different problems) | ✅ 6/6 (P.0–P.5) — **design ✅** (`Class-Tools-System.md`); **P.0–P.3 done** (boss-dive fix; school tax +4 + Bard→Archer; cast scheduler+interrupt = Bellreach kick-or-wipe; dispel typing = Mire P4 Nature-curse); **P.4 done** (shield/guard kill-priority = the Leaden Carillon summon-shield boss); **P.5 done** (P.5a stacked-shield nerf · P.5b berserker fix · **P.5c the DPS-check / regime shift — survival-bound→timer-bound, generic-EHP demoted, comp spread 3.3, all reads verified/repaired**). **Follow-ons:** P.5d (P9 self-heal enemy + anti-heal/purge), P.5e (P7 eruption), magic-spec pass (pyro ST → Pyreward school read) |
+| **IG** | **Incremental conversion (idle/clicker pivot)** — THE ACTIVE WORKSTREAM | ⬜ 0/39 — **design ✅** (`Docs/INCREMENTAL-PLAN.md`, 2026-07-02): farm = auto-chained keys @36×, Momentum click (dmg+healing), two-knob scaling, Atlas spec trees (existing 5 nodes = stances), gear aspects + Codex, guild tree, prestige "The Patch", browser v1 → leaderboards v1.5 |
 
 ---
 
@@ -345,6 +353,102 @@ execute later.*
 
 ---
 
+## Phase IG — Incremental conversion (idle/clicker pivot) ⬜ 0/39 (design ✅ — `Docs/INCREMENTAL-PLAN.md`)
+
+*GOAT Lite becomes a browser-first incremental in-place. Design source of truth + market rationale + the 2026-07-02
+code-audit findings (F1–F8) live in `INCREMENTAL-PLAN.md`; locked decisions D1–D14 there. Phases are dependency-ordered;
+**kill/continue gate = end of IG-2** (economy harness must prove the idle/active gradient before content/art spend).
+One hard save reset at IG-1 (`SAVE_VERSION` bump); everything after is additive + sanitize-on-load. One commit per
+milestone; roadmap update protocol applies to every ticket. **Manual-run-flow polish is paused until IG-1.***
+
+### IG-0 — Engine foundations (~1–2 wks)
+
+| # | Task | Status | Notes |
+|---|---|---|---|
+| IG-0.1 | **Sim stepper API** — extract `runDungeonEGM`'s loop into `createRunStepper(input).step(dt, inputs)`; `runDungeonEGM` = step-to-completion | ⬜ | Riskiest refactor, do alone; `egm-smoke` must stay **byte-identical** |
+| IG-0.2 | **Click/input log in `RunInput`** — clicks/Momentum as a recorded, timestamped input stream; `(seed, input, clickLog)` replays exactly | ⬜ | This IS the v1.5 leaderboard verification ticket format |
+| IG-0.3 | **Seed chain** — auto-chained/offline run seeds derive from a persisted `seedCursor` (hash-advance), never `Date.now()` | ⬜ | Makes offline resolution replayable/honest |
+| IG-0.4 | **Perf + estimator spike** — headless runs/sec in-browser; closed-form per-run reward estimator vs real sims | ⬜ | Gate: estimator within ~10% of sim means; decides offline real-sim budget (plan R4) |
+| IG-0.5 | **`resolveRunRewards()` extraction** — one pure reward fn (loot, margin key-delta, morale, operator XP) shared by manual/auto/offline; retire the `CONFIRM_LOOT` vs legacy `FILE_REPORT` divergence | ⬜ | Audit F3; engine `keyDelta` currently only feeds the legacy path |
+| IG-0.6 | **Tuning unification** — hardcoded economy (drop ilvl `112+4·key`, items/emblems/gold/shards, morale deltas) moves from `game-store.tsx` into `tuning.json`; delete dead blocks (`tuning.loot`, `morale.bands`, stale `hitQuality` keys, dead `hps` stat, stale "only Ashveil" comments) | ⬜ | Audit F2; prerequisite for the IG-2 harness |
+
+### IG-1 — Core loop transform (~2–3 wks)
+
+| # | Task | Status | Notes |
+|---|---|---|---|
+| IG-1.1 | **Farm ticker + auto-chain (policies v1)** — background ticker in the store advances the active party's stepper across screens; runs auto-chain per policy ("hold at key K" / "push") | ⬜ | Farm = chained keystone runs (D6); margin +1/+2/+3 kept, key-40 clamp removed |
+| IG-1.2 | **Live fight screen @36×** — party vs pack bars, timer, pack counter (HTML/React first; Pixi in IG-6); "open the logs" links the existing Report replay | ⬜ | D13; a run ≈ 25–40 wall-sec |
+| IG-1.3 | **Momentum + click** — click = lead damage + stack; stacks multiply party **output AND healing** (effective-`power` level, NOT `opOutputMult` — heals ignore it); wall-clock decay → sim-time conversion; new `tuning.momentum.*` block; click-power upgrade axis (gold sink) | ⬜ | Audit F1 / D7; client-side click feedback decoupled from sim application (plan R2) |
+| IG-1.4 | **Result burst** — 2–3s loot/key±/parse toast between chained runs | ⬜ | The dopamine atom |
+| IG-1.5 | **Loot-at-scale** — auto-equip-upgrades + auto-scrap policies; notable-drop queue (aspect legendaries, big upgrades) as the only manual decisions; loot-drama barks fire on auto-distribution | ⬜ | Audit F4; LootPage → notable-drop queue |
+| IG-1.6 | **Watch-gate removal + SAVE bump** — anti-spoiler gate (`autoplaySeed`/`pendingFeed`/`MARK_WATCHED`) removed for auto runs; **`SAVE_VERSION` bump (the one hard reset)**; background-tab catch-up on `visibilitychange` | ⬜ | Plan R3; Report stays as opt-in celebration/depth |
+
+### IG-2 — Balance spine: the infinite ladder (~2 wks, then continuous) — **KILL/CONTINUE GATE**
+
+| # | Task | Status | Notes |
+|---|---|---|---|
+| IG-2.1 | **Two-knob scaling split** — `keyScalingPerLevel` → `hpScalingPerLevel` (~1.08) + `dmgScalingPerLevel` (~1.05): frontier wall = timer-bound (clickable), survival walls = periodic gear gates | ⬜ | Audit F1 / D8. ⚠️ Re-opens P.5c calibration — **all Class-Tools reads (P.0–P.5) must be re-verified** after (plan R1) |
+| IG-2.2 | **Lift the caps** — gear ilvl-160 cap → long diminishing curve (never zero); key clamp 40 removed | ⬜ | `GEAR_CAP_ILVL` / clamp in game-store; above-cap operator-XP rule re-derived |
+| IG-2.3 | **Economy harness** — CLI sweep tool (key range × comps × build configs, seed-averaged batches) → time-to-key-N curves | ⬜ | Audit F6: `egm-smoke` is a fixed probe, this is a from-scratch build; the balance tool for everything after |
+| IG-2.4 | **Reward-rate re-derivation** — operator XP (34-base/1.18^level maxes in ~a day of chained runs), emblems, gold, shards re-tuned for idle run-volume (~50–100× manual cadence) | ⬜ | Audit F6 |
+| IG-2.5 | **Wall-spacing validation (THE GATE)** — harness proves: idle wall ~2–4h; clicking worth ~+2–3 keys; meta layers move the wall; +2 floor holds | ⬜ | Fail → stop and redesign before IG-3+ spend |
+
+### IG-3 — Character axis: spec trees + aspects (~2–3 wks)
+
+| # | Task | Status | Notes |
+|---|---|---|---|
+| IG-3.1 | **Spec-tree schema (Atlas model)** — `talents.json` gains `kind:"passive"` unlock nodes; **existing 5 option-nodes/spec become the stance sockets** (content FREE — all 10 specs authored+wired, audit F7); stance picked **per party slot**; migration: per-member `talents` → slot picks + shared spec unlock state | ⬜ | D10 |
+| IG-3.2 | **Spec Mastery XP** — earned running the spec (reduced bench rate = off-meta catch-up); ~15 levels = full unlock; persists prestige | ⬜ | |
+| IG-3.3 | **Passive-node authoring** — ~8–10 passives/spec, Berserker template first (plan §4.4: Rampage economy, Momentum synergy, capstone = +1 aspect slot); launch wave = Berserker + 4 specs, rest post-launch | ⬜ | Plan R6; no raw +% nodes (those live in the guild tree) |
+| IG-3.4 | **Aspects system** — `data/aspects.json` + data-driven `special` handlers (Bladestorm-bleed pattern) gated by a `GearItem.imprint` field; legendary drop → **extract** (destroys item → Codex, persists) → **imprint any aspect onto any slot** (shard cost); cap 1/member (+1 via capstone) | ⬜ | D11 |
+| IG-3.5 | **Aspect content wave 1** — the 8 designed Berserker aspects + ~3 generic per role | ⬜ | Plan §4.5 |
+
+### IG-4 — Guild axis + idle depth (~2–3 wks)
+
+| # | Task | Status | Notes |
+|---|---|---|---|
+| IG-4.1 | **Guild tree** — data + purchase reducer + UI: global mults, click/Momentum upgrades, concurrent-party slots, offline rate, recruit-ceiling quality, loot quality, policy unlocks; fed by IK + gold early (alive pre-first-prestige) | ⬜ | The permanent "numbers forever" backbone |
+| IG-4.2 | **Concurrent parties** — N steppers; member in one party max; each party pushes its key-owner's keystone | ⬜ | Per-member keys make this elegant; perf per IG-0.4 |
+| IG-4.3 | **Policies v2 + default safety stop-rules** — stop rules ("hold at last-timed", "stop below morale X" — ON by default), stance/tactics/aggression presets, auto-regear toggle | ⬜ | Audit F5: kills the AFK morale death-spiral; SetupPage → policy editor |
+| IG-4.4 | **Offline resolution + "While you were away"** — seed-chain + estimator/real-sim mix (IG-0.4 split); report with highlight run (real sim, watchable) | ⬜ | Morale departure stays disabled (D14) |
+| IG-4.5 | **Per-dungeon lootTable activation** — the authored-but-unused `dungeon.lootTable` drives biome-specialized loot | ⬜ | Audit F7: 6 differentiated biomes day one; the reason to choose where to farm |
+| IG-4.6 | **Gold/shard sinks live** — gold → click-power/guild-tree/policies; shards → imprints/crafting | ⬜ | Audit F2: no dead currencies at launch |
+
+### IG-5 — Prestige: The Patch (~1–2 wks)
+
+| # | Task | Status | Notes |
+|---|---|---|---|
+| IG-5.1 | **The Patch flow** — player-initiated at a min-key gate; resets gear+imprints/keystones/operator+roster (re-recruit, ceilings re-roll); persists guild tree/spec trees/Codex; affix-season rotation (ties into the ※ affix-swap ticket) | ⬜ | D9/D12 |
+| IG-5.2 | **Institutional Knowledge** — formula off best-key + throughput; guild-tree spend | ⬜ | Exact formula = open question, harness-tuned |
+| IG-5.3 | **Prestige pacing tune** — first Patch attractive at ~3–5h; re-climb fast-but-felt | ⬜ | Browser churn beats a 15h hook |
+
+### IG-6 — Render layer + asset hunt (~3–4 wks, overlaps IG-3–5)
+
+| # | Task | Status | Notes |
+|---|---|---|---|
+| IG-6.1 | **PixiJS fight scene** — replaces the IG-1.2 HTML screen, fed by stepper tick state: biome backdrop, animated sprites, hit/crit numbers, Momentum bar juice, shake; React keeps menus/trees | ⬜ | D5: no engine port; sim stays the source of truth |
+| IG-6.2 | **Asset purchase + pipeline** — **6 biome backdrops** (all dungeons live), one consistent animated hero pack (~10 archetypes: idle/attack/cast/death), matching enemy pack, pixel VFX packs, SFX; budget ~$150–350; **every purchase logs its license** (IP gate) | ⬜ | D4; sprite-sheets first, Spine/Rive only if insufficient |
+| IG-6.3 | **Juice pass** — click feedback (instant, decoupled from sim tick), crit bursts, loot rain, number pops | ⬜ | Plan R2 |
+| IG-6.4 | **Audio** — UI clicks, loot fanfare, ambient per biome | ⬜ | |
+
+### IG-7 — Browser launch prep (~1–2 wks)
+
+| # | Task | Status | Notes |
+|---|---|---|---|
+| IG-7.1 | **Web build + save safety** — itch.io/web build; save export/import button (localStorage fragility) | ⬜ | D2 |
+| IG-7.2 | **IP scrub gate (HARD)** — Extract/ reference, WoW-adjacent strings, asset licenses audited before anything public | ⬜ | Plan R5; existing ※ affix-swap ticket folds in |
+| IG-7.3 | **Telemetry** — anonymous session length / key reached / prestige count; consent per the open D.10 decision | ⬜ | The validation data the wedge strategy exists for |
+| IG-7.4 | **Launch page + copy** — lead with the satire ("burned-out QA lead automates raid bots") | ⬜ | One headline register (clicker wedge), depth discovered |
+
+### IG-v1.5 — Weekly Key + verified leaderboards (post-validation, separate workstream)
+
+*Thin server publishes weekly `(seed, dungeon, affixes)`; clients submit the IG-0.2 run ticket; server **re-simulates
+to verify**, then ranks (weekly board, season key ladder, per-spec parse ranks). Zero client migration — the ticket
+format ships in v1. Async-only: no realtime, no accounts beyond a handle, no chat. Depends on the open
+"Leaderboard integrity" + "Telemetry stack" decisions.*
+
+---
+
 ## Open Design Decisions (resolve before/while building the dependent task)
 
 | Decision | Blocks | Status | Resolution |
@@ -357,8 +461,8 @@ execute later.*
 | Summon/pet engine scope | C.2, L, D | ✅ Resolved | **Build a general summoned-combatant system regardless of necro** (Umut, 2026-06-23) — used immediately for **enemy adds on trash/bosses**, reused by the deferred Bonecaller later. Its own milestone (Talent doc synthesis §H). |
 | Necromancer (Bonecaller/Pallbinder) timing | C.2, L | ✅ Resolved | **Deferred** ("might add later" — Umut, 2026-06-23). Active talent scope = 10 specs; necro trees kept in the doc under a banner, un-revamped until revived. |
 | Tick rate / timeline model | A.3, A2.1 | ✅ Resolved | v1 ran 1s ticks; the **EGM rebuild (A2) runs continuous seconds** (DT=0.25 inner step, attack-speed-driven, mm:ss timeline). `tuning.sim` (hpUnit/dmgUnit/keyScalingPerLevel) calibrated to the GDD timer table for the 1T/1H/3D comp. |
-| Client-only vs isomorphic sim | A.1, D.6, D.10 | ⬜ Open | leaderboard + telemetry re-sim want a shared/version-pinned TS sim |
-| Gold sinks / economy balance | D.4 | ⬜ Open | gold has no spend yet |
+| Client-only vs isomorphic sim | A.1, D.6, D.10 | ✅ Resolved | **Stay isomorphic TypeScript** (2026-07-02, incremental plan D5) — no Unity/Unreal port (would forfeit the deterministic-sim moat); leaderboards verify by **server-side re-sim of run tickets** (`seed + input + clickLog`, IG-0.2); render layer = PixiJS on top of the sim (IG-6). |
+| Gold sinks / economy balance | D.4 | ✅ Resolved | **Gold → click-power upgrades + early guild-tree nodes + policy unlocks; shards → aspect imprinting + crafting** (2026-07-02, incremental plan §4.8; wired in IG-4.6). No dead currencies at launch. |
 | Haste & Mastery effects | D.8 | 🟡 Partial | **Haste now wired** in the EGM engine (shortens `attackInterval`; Chill = −haste slows). Mastery still a no-op (per-spec hook unspecified). |
 | Recruitment Board "guild progression" metric | B.9, D.6, F.4 | ✅ Resolved | **Operator-skill Ceilings** are the recruit-quality lever — guild progression unlocks **higher-Ceiling recruit pools** ("access higher potential recruits"). Current rating shown precisely; Potential shown as fuzzy ★. See `Operator-Skills-Design.md`. |
 | Potentials: draft-bias vs power lever | F.1–F.4, D.5 | ✅ Resolved | **Unified.** The locked GDD "Potentials" (hidden tag-weights, never touched power) now ALSO set each operator skill's **Ceiling** (so they drive power) while keeping their old job of biasing earned-trait rolls. One hidden "how good can this bot get" system instead of two. GDD §Potentials updated. |
@@ -371,12 +475,21 @@ execute later.*
 | Guild feed: form factor + v1 scope | M.1–M.5 | ✅ Resolved | **Always-visible** meta-layer panel (not a tab you visit); **meta-only** (no in-run combat log). v1 = **system notifications + solo barks**, curated **~1–2 barks/run**; multi-character exchange "beats" deferred to **v2 (M.6)**. |
 | Bark authoring for random characters | M.3, M.4 | ✅ Resolved | **Voice attaches to personality (trait/archetype), never identity** → procedurally-generated members inherit a voice pack for free. Voice = trait(tone) × spec(vocabulary) × morale(mood) × per-character style seed; **templated + state-grounded**, no runtime LLM (deterministic/offline). Coherence for v2 exchanges comes from authoring whole multi-role **beats**, not stitching atomic lines. |
 | Loot drama: depth + who contests | B.5, M.2 | ✅ Resolved | Wire the GDD-canon mechanic (loser −5 morale, winner +5% next run) but **personality-gated**: Selfish archetypes contest loudly + lose more, passive ones shrug. Make it a **decision, not a tax** (give to best-fit vs placate fragile morale) + a default auto-assign policy so the modal is opt-in. Rival-trait escalation from repeat snubs → **v2 (M.6)**. |
-| Telemetry stack + consent model | D.10 | ⬜ Open | Supabase (raw runs + SQL — leaning pick) vs PostHog (funnels/retention UI) vs thin Vercel fn; **opt-in vs opt-out** + privacy policy required for any public/Steam build |
+| Telemetry stack + consent model | D.10 | ⬜ Open | Supabase (raw runs + SQL — leaning pick) vs PostHog (funnels/retention UI) vs thin Vercel fn; **opt-in vs opt-out** + privacy policy required for any public/Steam build. Now blocks IG-7.3. |
+| **Incremental pivot — product scope** | IG (all) | ✅ Resolved | **Transform in-place** (Umut, 2026-07-02): GOAT Lite becomes the incremental; manual run flow (Report replay/parses) survives as the opt-in depth layer. Not a mode toggle, not a fork. |
+| **Incremental pivot — v1 platform + social + art** | IG-6, IG-7, v1.5 | ✅ Resolved | **Browser/itch first** (Steam wrap after validation) · **leaderboards deferred to v1.5** but the verifiable run-ticket format ships in v1 (IG-0.2) · **purchased 2D asset packs** + palette pass (Umut, 2026-07-02). |
+| **Momentum (the click)** | IG-1.3, IG-2 | ✅ Resolved | Click = lead damage + a stack; stacks multiply party **output AND healing** (effective-`power` level — heals ignore `opOutputMult`, audit F1), wall-clock decay. Needed so clicking can push survival walls (2026-07-02). |
+| **Enemy scaling for the infinite ladder** | IG-2.1 | ✅ Resolved | **Two knobs**: `hpScalingPerLevel` (~1.08) > `dmgScalingPerLevel` (~1.05) — frontier wall timer-bound (clickable), survival walls periodic gear gates. Replaces the single `keyScalingPerLevel`; P.0–P.5 reads re-verified after (2026-07-02). |
+| **Progression persistence split** | IG-3, IG-4, IG-5 | ✅ Resolved | **Persist through The Patch:** guild tree, spec trees, aspect Codex. **Reset:** gear+imprints, keystones, operator skills + roster (ceilings re-roll = seasonal recruit lottery) (Umut, 2026-07-02). |
+| **Spec-tree model** | IG-3.1 | ✅ Resolved | **PoE2-Atlas style**: all nodes eventually unlockable; identity = **swappable stance sockets picked per party slot** — the existing 5 authored talent nodes/spec ARE the stances; +~8–10 new passive nodes/spec; capstone = +1 aspect slot (Umut, 2026-07-02). |
+| **Aspects (D4-style legendary powers)** | IG-3.4 | ✅ Resolved | Live **on gear**; **any aspect imprints onto any slot** (unlike Diablo's slot-typing); extract destroys the item → permanent **Codex** (guild knowledge); imprint costs shards; cap 1/member (+1 via spec capstone) (Umut, 2026-07-02). |
+| **Farming model ("biomes")** | IG-1.1 | ✅ Resolved | **No separate depth axis — the keystone IS the ladder** (Umut, 2026-07-02): farm = auto-chained key runs at the party's key; margin-based +1/+2/+3 kept; key-40 clamp removed; per-dungeon `lootTable` activation = the biome identity. |
 
 ---
 
 ## Changelog
 
+- **2026-07-02** — **STRATEGIC PIVOT: the incremental conversion — design locked, Phase IG added (Umut + Claude).** After a market analysis (June-2026 idle/incremental wave: Loot Loop, Agrivore, contracts+leaderboards), a PM assessment (transform-in-place beats pivot-vs-two-products), and a **balance-audit of the actual implementation** (2 subagent code audits), GOAT Lite converts to a **browser-first incremental**: farm = auto-chained keystone runs @36×, **Momentum click layer** (lead damage + party output-AND-healing mult, wall-clock decay), **two-knob enemy scaling** (`hp` > `dmg` per level → frontier wall timer-bound/clickable), **Atlas-style spec trees** (the existing 5 authored talent nodes/spec become swappable per-party-slot **stances** + ~8–10 new passives), **gear aspects** (extract → permanent Codex → imprint any aspect on any slot, shard cost), **guild tree** (permanent), prestige **"The Patch"** (gear/keys/operator reset; guild/spec/Codex persist; first Patch ~3–5h), leaderboards deferred to v1.5 but the verifiable run-ticket format (`seed+input+clickLog`) ships in v1. **Audit findings driving the plan:** healing ignores the output-mult stack (`combat.ts:682`) + survival-bound wall would make Momentum useless (→ D7/D8); `tuning.loot`+`morale.bands` are dead config with the real economy hardcoded in `game-store.tsx`, gold/shards have zero sinks (→ IG-0.6/IG-4.6); progression applies only inside the watch-gated `CONFIRM_LOOT` (→ IG-0.5 `resolveRunRewards()`); **all 6 dungeons are fully authored/runnable** (stale "only Ashveil" comment) with unused per-dungeon `lootTable`s (→ 6 biomes day one, IG-4.5); replay already runs at 36× (→ D13). **New:** `Docs/INCREMENTAL-PLAN.md` (design source of truth: vision, market, D1–D14 locked decisions, system designs §4, audit F1–F8, risks R1–R6) + **Phase IG** (39 tickets, IG-0…IG-7 + v1.5) + snapshot pivot banner + 10 Open-Design-Decision resolutions (incl. gold sinks + client-only-vs-isomorphic, both previously open). **Kill/continue gate = IG-2.5** (economy harness must prove the idle/active gradient before content/art spend). Manual-run-flow polish (Report/SetupPage) **paused until IG-1**. Docs-only — no code/sim change (`tsc`/smoke unaffected). Files: `Docs/INCREMENTAL-PLAN.md` (new), `Docs/ROADMAP.md`.
 - **2026-06-26** — **Report page: widen the event-log rail 300→460 → narrower combat canvas (Umut).** The right-rail event log was widened to **460px**, which narrows the main column (combat canvas / run-player / chat) by the same amount — more readable log lines (less wrapping), a less-dominant arena. Combat still clears the bottom-right meter at the smaller canvas width (the `place()` exclusion is fraction-based; meter left-edge ≈0.79 > the 0.72 threshold). **Verify:** `tsc -b` clean; `report-ui-check.mjs` LIVE PASS, 0 console errors; `_shot-report-ui-midplay.png` confirms the wider log + narrower canvas + no widget overlap. File: `web/src/logs/pages/ReportPage.tsx`.
 - **2026-06-26** — **Report page pass 3 (Umut): spec-icon party frames · inline timer · meter toggle in titlebar · combat-clear arena · chat⇄log swap, one-page.** Five tweaks: **(1)** party frames drop the "Party · Health" header, use **spec icons** (`GameIcon kind=spec`) at **1.5× (24→36)**. **(2)** timer widget writes the time **inline `20:02/25:00`** (one line, was value + `/par` sub). **(3)** DPS meter loses its "Live Meter" header + the toggle above it — the **Damage/Healing toggle now replaces "Overall"** inside the meter titlebar (new optional `Meter` `title?` slot; `Meter` is only used here). **(4)** replay arena now keeps **combat clear of the corner widgets**: `ARENA_TOP` 90→130 (top band cleared for the party frame + timer), pack centres pulled central (`x 0.30–0.70`, `y 0.28–0.72`), and a `place()` backstop nudges any dot that would land under the **bottom-right meter** (`ax>0.72 && ay>0.55 → ax=0.72`). Deterministic/scrub-safe. **(5)** **chat ⇄ event-log swap + one-page fixed windows:** the **event log moves to a 300px right rail** (the chat's old footprint — tabs + internal scroll, full height) and the **guild chat moves into the report body** (below the run-player, fixed height + internal scroll). `LogsApp` suppresses the docked global `GuildFeed` on the Report page only (every other page keeps it); new `GuildFeed embedded` variant (`.guild-feed.embedded` fills its box, no left border); the Report page is now a fixed two-column layout with **no page scroll** (main column `overflow:hidden`, each window scrolls internally). Canvas shrinks **width-wise** (main column = page − 300px rail; height unchanged at 640). **Verify:** `tsc -b` clean; `report-ui-check.mjs` **LIVE PASS, 0 console errors** — asserts the meter + titlebar toggle, the event-log rail, the chat-in-body, the `0:29/25:00` inline readout, the runs dropdown, and the centered popup; screenshots `_shot-report-ui-{midplay,popup}.png` confirm spec-icon frames, the inline timer, the swap, one-page fit, and combat staying clear of the widgets. Files: `web/src/logs/pages/ReportPage.tsx`, `web/src/logs/ReplayCanvas.tsx`, `web/src/logs/components.tsx`, `web/src/logs/GuildFeed.tsx`, `web/src/logs/LogsApp.tsx`, `web/src/logs.css`, `web/scripts/report-ui-check.mjs`.
 - **2026-06-25** — **Report page follow-up tweaks (Umut): affix icons beside the key level + raid-frame party health.** Two small adjustments to the report overhaul: **(a)** the timer panel's affix icons now ride **inline next to `+{keyLevel}`** on the title row (size 16) instead of on their own row below; **(b)** the top-left party-health overlay is now a **raid-frame grid (one column per member)** — row 1 = square class icons, row 2 = names, row 3 = health bars (was a vertical name/bar/icon stack per member); panel widened 212→360. **Verify:** `tsc -b` clean; `report-ui-check.mjs` LIVE PASS (0 console errors); `_shot-report-ui-midplay.png` confirms the inline affixes + icon/name/HB grid. Files: `web/src/logs/pages/ReportPage.tsx`.
